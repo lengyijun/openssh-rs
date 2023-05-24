@@ -17,7 +17,7 @@ extern "C" {
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn umask(__mask: __mode_t) -> __mode_t;
+    
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn close(__fd: libc::c_int) -> libc::c_int;
@@ -3714,7 +3714,7 @@ unsafe extern "C" fn do_known_hosts(
                 b"known_hosts path too long\0" as *const u8 as *const libc::c_char,
             );
         }
-        umask(0o77 as libc::c_int as __mode_t);
+        libc::umask(0o77 as libc::c_int as __mode_t);
         fd = _ssh_mkstemp(tmp.as_mut_ptr());
         if fd == -(1 as libc::c_int) {
             sshfatal(
@@ -8641,9 +8641,9 @@ unsafe extern "C" fn save_attestation(mut attest: *mut sshbuf, mut path: *const 
             b"Enrollment did not return attestation data\0" as *const u8 as *const libc::c_char,
         );
     }
-    omask = umask(0o77 as libc::c_int as __mode_t);
+    omask = libc::umask(0o77 as libc::c_int as __mode_t);
     r = sshbuf_write_file(path, attest);
-    umask(omask);
+    libc::umask(omask);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,

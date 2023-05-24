@@ -22,7 +22,7 @@ extern "C" {
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
     fn connect(__fd: libc::c_int, __addr: __CONST_SOCKADDR_ARG, __len: socklen_t) -> libc::c_int;
     fn tcgetattr(__fd: libc::c_int, __termios_p: *mut termios) -> libc::c_int;
-    fn umask(__mask: __mode_t) -> __mode_t;
+    
     fn __errno_location() -> *mut libc::c_int;
     fn platform_pledge_mux();
     fn kill(__pid: __pid_t, __sig: libc::c_int) -> libc::c_int;
@@ -3803,10 +3803,10 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
         b"temporary control path %s\0" as *const u8 as *const libc::c_char,
         options.control_path,
     );
-    old_umask = umask(0o177 as libc::c_int as __mode_t);
+    old_umask = libc::umask(0o177 as libc::c_int as __mode_t);
     muxserver_sock = unix_listener(options.control_path, 64 as libc::c_int, 0 as libc::c_int);
     oerrno = *__errno_location();
-    umask(old_umask);
+    libc::umask(old_umask);
     if muxserver_sock < 0 as libc::c_int {
         if oerrno == 22 as libc::c_int || oerrno == 98 as libc::c_int {
             sshlog(

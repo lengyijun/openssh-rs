@@ -14,7 +14,7 @@ extern "C" {
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn umask(__mask: __mode_t) -> __mode_t;
+    
     fn __errno_location() -> *mut libc::c_int;
     fn kill(__pid: __pid_t, __sig: libc::c_int) -> libc::c_int;
     fn sigaction(
@@ -3737,7 +3737,7 @@ unsafe extern "C" fn parse_dispatch_command(
             current_block_116 = 7337917895049117968;
         }
         15 => {
-            umask(n_arg as __mode_t);
+            libc::umask(n_arg as __mode_t);
             printf(
                 b"Local umask: %03lo\n\0" as *const u8 as *const libc::c_char,
                 n_arg,

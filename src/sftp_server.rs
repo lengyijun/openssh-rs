@@ -17,7 +17,7 @@ extern "C" {
         __mode: __mode_t,
         __flag: libc::c_int,
     ) -> libc::c_int;
-    fn umask(__mask: __mode_t) -> __mode_t;
+    
     fn utimensat(
         __fd: libc::c_int,
         __path: *const libc::c_char,

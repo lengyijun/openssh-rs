@@ -33,7 +33,7 @@ extern "C" {
     fn accept(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __addr_len: *mut socklen_t)
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn umask(__mask: __mode_t) -> __mode_t;
+    
     fn __errno_location() -> *mut libc::c_int;
     fn platform_disable_tracing(_: libc::c_int);
     fn platform_pledge_agent();
@@ -5028,7 +5028,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
         );
     }
-    prev_mask = umask(0o177 as libc::c_int as __mode_t);
+    prev_mask = libc::umask(0o177 as libc::c_int as __mode_t);
     sock = unix_listener(
         socket_name.as_mut_ptr(),
         128 as libc::c_int,
@@ -5038,7 +5038,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         *socket_name.as_mut_ptr() = '\0' as i32 as libc::c_char;
         cleanup_exit(1 as libc::c_int);
     }
-    umask(prev_mask);
+    libc::umask(prev_mask);
     if D_flag != 0 || d_flag != 0 {
         log_init(
             __progname,

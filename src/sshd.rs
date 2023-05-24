@@ -65,7 +65,7 @@ extern "C" {
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn umask(__mask: __mode_t) -> __mode_t;
+    
     fn __errno_location() -> *mut libc::c_int;
     fn endpwent();
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
@@ -4724,8 +4724,8 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         *fresh16 = 0 as *mut libc::c_char;
     }
     listener_proctitle = prepare_proctitle(ac, av);
-    new_umask = umask(0o77 as libc::c_int as __mode_t) | 0o22 as libc::c_int as libc::c_uint;
-    umask(new_umask);
+    new_umask = libc::umask(0o77 as libc::c_int as __mode_t) | 0o22 as libc::c_int as libc::c_uint;
+    libc::umask(new_umask);
     if debug_flag != 0 && (inetd_flag == 0 || rexeced_flag != 0) {
         log_stderr = 1 as libc::c_int;
     }

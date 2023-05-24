@@ -25,7 +25,7 @@ extern "C" {
     fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn umask(__mask: __mode_t) -> __mode_t;
+    
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn strnvis(
@@ -3677,9 +3677,9 @@ pub unsafe extern "C" fn sink(
     } else {
         targisdir = 0 as libc::c_int;
         setimes = targisdir;
-        mask = umask(0 as libc::c_int as __mode_t);
+        mask = libc::umask(0 as libc::c_int as __mode_t);
         if pflag == 0 {
-            umask(mask);
+            libc::umask(mask);
         }
         if argc != 1 as libc::c_int {
             run_err(b"ambiguous target\0" as *const u8 as *const libc::c_char);

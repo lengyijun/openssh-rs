@@ -9,7 +9,7 @@ extern "C" {
     pub type ec_key_st;
     pub type ssh_hmac_ctx;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn umask(__mask: __mode_t) -> __mode_t;
+    
     fn __errno_location() -> *mut libc::c_int;
     fn close(__fd: libc::c_int) -> libc::c_int;
     fn getuid() -> __uid_t;
@@ -1286,7 +1286,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
     let mut omask: mode_t = 0;
     let mut i: size_t = 0;
     let mut want: u_int = 0;
-    omask = umask(0o77 as libc::c_int as __mode_t);
+    omask = libc::umask(0o77 as libc::c_int as __mode_t);
     memset(
         &mut ctx as *mut host_delete_ctx as *mut libc::c_void,
         0 as libc::c_int,
@@ -1618,7 +1618,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
         fclose(ctx.out);
     }
     free(ctx.match_keys as *mut libc::c_void);
-    umask(omask);
+    libc::umask(omask);
     if r == -(24 as libc::c_int) {
         *__errno_location() = oerrno;
     }

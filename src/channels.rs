@@ -29,7 +29,7 @@ extern "C" {
     fn accept(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __addr_len: *mut socklen_t)
         -> libc::c_int;
     fn tcgetattr(__fd: libc::c_int, __termios_p: *mut termios) -> libc::c_int;
-    fn umask(__mask: __mode_t) -> __mode_t;
+    
     fn __errno_location() -> *mut libc::c_int;
     fn close(__fd: libc::c_int) -> libc::c_int;
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
@@ -8387,13 +8387,13 @@ unsafe extern "C" fn channel_setup_fwd_listener_streamlocal(
         type_0,
         (*fwd).listen_path,
     );
-    omask = umask((*fwd_opts).streamlocal_bind_mask);
+    omask = libc::umask((*fwd_opts).streamlocal_bind_mask);
     sock = unix_listener(
         (*fwd).listen_path,
         128 as libc::c_int,
         (*fwd_opts).streamlocal_bind_unlink,
     );
-    umask(omask);
+    libc::umask(omask);
     if sock < 0 as libc::c_int {
         return 0 as libc::c_int;
     }

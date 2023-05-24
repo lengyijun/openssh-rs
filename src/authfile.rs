@@ -9,7 +9,7 @@ extern "C" {
     pub type ec_key_st;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn umask(__mask: __mode_t) -> __mode_t;
+    
     fn __errno_location() -> *mut libc::c_int;
     fn close(__fd: libc::c_int) -> libc::c_int;
     fn getuid() -> __uid_t;
@@ -245,9 +245,9 @@ unsafe extern "C" fn sshkey_save_private_blob(
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     let mut omask: mode_t = 0;
-    omask = umask(0o77 as libc::c_int as __mode_t);
+    omask = libc::umask(0o77 as libc::c_int as __mode_t);
     r = sshbuf_write_file(filename, keybuf);
-    umask(omask);
+    libc::umask(omask);
     return r;
 }
 pub unsafe extern "C" fn sshkey_save_private(

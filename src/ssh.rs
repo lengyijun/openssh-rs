@@ -16,7 +16,7 @@ extern "C" {
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn umask(__mask: __mode_t) -> __mode_t;
+    
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
@@ -2222,7 +2222,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         exit(255 as libc::c_int);
     }
     pw = pwcopy(pw);
-    umask(0o22 as libc::c_int as libc::c_uint | umask(0o77 as libc::c_int as __mode_t));
+    libc::umask(0o22 as libc::c_int as libc::c_uint | libc::umask(0o77 as libc::c_int as __mode_t));
     msetlocale();
     initialize_options(&mut options);
     ssh = ssh_alloc_session_state();
