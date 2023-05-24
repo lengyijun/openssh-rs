@@ -28,7 +28,7 @@ extern "C" {
         _: ...
     ) -> libc::c_int;
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -466,7 +466,7 @@ pub unsafe extern "C" fn sys_tun_open(
     if !ifname.is_null() {
         *ifname = 0 as *mut libc::c_char;
     }
-    fd = open(
+    fd = libc::open(
         b"/dev/net/tun\0" as *const u8 as *const libc::c_char,
         0o2 as libc::c_int,
     );

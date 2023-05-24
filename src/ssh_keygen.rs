@@ -162,7 +162,7 @@ extern "C" {
         cb: Option<pem_password_cb>,
         u: *mut libc::c_void,
     ) -> libc::c_int;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
@@ -7082,7 +7082,7 @@ unsafe extern "C" fn sign_one(
                         filename,
                     );
                     if confirm_overwrite(wfile) != 0 {
-                        wfd = open(
+                        wfd = libc::open(
                             wfile,
                             0o1 as libc::c_int | 0o100 as libc::c_int | 0o1000 as libc::c_int,
                             0o666 as libc::c_int,
@@ -7469,7 +7469,7 @@ unsafe extern "C" fn sig_sign(
                             {
                                 fd = 0 as libc::c_int;
                             } else {
-                                fd = open(*argv.offset(i as isize), 0 as libc::c_int);
+                                fd = libc::open(*argv.offset(i as isize), 0 as libc::c_int);
                                 if fd == -(1 as libc::c_int) {
                                     sshlog(
                                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,

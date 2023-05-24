@@ -12,7 +12,7 @@ extern "C" {
     fn close(__fd: libc::c_int) -> libc::c_int;
     fn getuid() -> __uid_t;
     fn pledge(promises: *const libc::c_char, paths: *mut *const libc::c_char) -> libc::c_int;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -794,7 +794,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             strerror(*__errno_location()),
         );
     }
-    fd = open(
+    fd = libc::open(
         b"/dev/null\0" as *const u8 as *const libc::c_char,
         0o2 as libc::c_int,
     );
@@ -807,31 +807,31 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
     i = 0 as libc::c_int;
     let fresh0 = i;
     i = i + 1;
-    key_fd[fresh0 as usize] = open(
+    key_fd[fresh0 as usize] = libc::open(
         b"/usr/local/etc/ssh_host_dsa_key\0" as *const u8 as *const libc::c_char,
         0 as libc::c_int,
     );
     let fresh1 = i;
     i = i + 1;
-    key_fd[fresh1 as usize] = open(
+    key_fd[fresh1 as usize] = libc::open(
         b"/usr/local/etc/ssh_host_ecdsa_key\0" as *const u8 as *const libc::c_char,
         0 as libc::c_int,
     );
     let fresh2 = i;
     i = i + 1;
-    key_fd[fresh2 as usize] = open(
+    key_fd[fresh2 as usize] = libc::open(
         b"/usr/local/etc/ssh_host_ed25519_key\0" as *const u8 as *const libc::c_char,
         0 as libc::c_int,
     );
     let fresh3 = i;
     i = i + 1;
-    key_fd[fresh3 as usize] = open(
+    key_fd[fresh3 as usize] = libc::open(
         b"/usr/local/etc/ssh_host_xmss_key\0" as *const u8 as *const libc::c_char,
         0 as libc::c_int,
     );
     let fresh4 = i;
     i = i + 1;
-    key_fd[fresh4 as usize] = open(
+    key_fd[fresh4 as usize] = libc::open(
         b"/usr/local/etc/ssh_host_rsa_key\0" as *const u8 as *const libc::c_char,
         0 as libc::c_int,
     );

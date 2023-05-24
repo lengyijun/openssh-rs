@@ -26,7 +26,7 @@ extern "C" {
     fn opendir(__name: *const libc::c_char) -> *mut DIR;
     fn closedir(__dirp: *mut DIR) -> libc::c_int;
     fn readdir(__dirp: *mut DIR) -> *mut dirent;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn free(_: *mut libc::c_void);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -4141,7 +4141,7 @@ pub unsafe extern "C" fn do_download(
     {
         return -(1 as libc::c_int);
     }
-    local_fd = open(
+    local_fd = libc::open(
         local_path,
         0o1 as libc::c_int
             | 0o100 as libc::c_int
@@ -5216,7 +5216,7 @@ pub unsafe extern "C" fn do_upload(
     );
     acks.tqh_first = 0 as *mut request;
     acks.tqh_last = &mut acks.tqh_first;
-    local_fd = open(local_path, 0 as libc::c_int);
+    local_fd = libc::open(local_path, 0 as libc::c_int);
     if local_fd == -(1 as libc::c_int) {
         sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,

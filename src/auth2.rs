@@ -24,7 +24,7 @@ extern "C" {
         __f: *const libc::c_char,
         __arg: ::core::ffi::VaList,
     ) -> libc::c_int;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -566,7 +566,7 @@ pub unsafe extern "C" fn auth2_read_banner() -> *mut libc::c_char {
     let mut len: size_t = 0;
     let mut n: size_t = 0;
     let mut fd: libc::c_int = 0;
-    fd = open(options.banner, 0 as libc::c_int);
+    fd = libc::open(options.banner, 0 as libc::c_int);
     if fd == -(1 as libc::c_int) {
         return 0 as *mut libc::c_char;
     }

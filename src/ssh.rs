@@ -71,7 +71,7 @@ extern "C" {
     fn daemon(__nochdir: libc::c_int, __noclose: libc::c_int) -> libc::c_int;
     fn gethostname(__name: *mut libc::c_char, __len: size_t) -> libc::c_int;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
@@ -5424,7 +5424,7 @@ unsafe extern "C" fn ssh_session2_open(mut ssh: *mut ssh) -> libc::c_int {
     let mut out: libc::c_int = 0;
     let mut err: libc::c_int = 0;
     if options.stdin_null != 0 {
-        in_0 = open(
+        in_0 = libc::open(
             b"/dev/null\0" as *const u8 as *const libc::c_char,
             0 as libc::c_int,
         );

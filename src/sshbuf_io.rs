@@ -7,7 +7,7 @@ extern "C" {
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_free(buf: *mut sshbuf);
@@ -175,7 +175,7 @@ pub unsafe extern "C" fn sshbuf_load_file(
     let mut fd: libc::c_int = 0;
     let mut oerrno: libc::c_int = 0;
     *bufp = 0 as *mut sshbuf;
-    fd = open(path, 0 as libc::c_int);
+    fd = libc::open(path, 0 as libc::c_int);
     if fd == -(1 as libc::c_int) {
         return -(24 as libc::c_int);
     }
@@ -196,7 +196,7 @@ pub unsafe extern "C" fn sshbuf_write_file(
 ) -> libc::c_int {
     let mut fd: libc::c_int = 0;
     let mut oerrno: libc::c_int = 0;
-    fd = open(
+    fd = libc::open(
         path,
         0o1 as libc::c_int | 0o100 as libc::c_int | 0o1000 as libc::c_int,
         0o644 as libc::c_int,

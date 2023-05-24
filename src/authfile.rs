@@ -24,7 +24,7 @@ extern "C" {
         __stream: *mut FILE,
     ) -> __ssize_t;
     fn ferror(__stream: *mut FILE) -> libc::c_int;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn free(_: *mut libc::c_void);
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
@@ -404,7 +404,7 @@ pub unsafe extern "C" fn sshkey_load_private_type(
     if !commentp.is_null() {
         *commentp = 0 as *mut libc::c_char;
     }
-    fd = open(filename, 0 as libc::c_int);
+    fd = libc::open(filename, 0 as libc::c_int);
     if fd == -(1 as libc::c_int) {
         return -(24 as libc::c_int);
     }
@@ -465,7 +465,7 @@ unsafe extern "C" fn sshkey_load_pubkey_from_private(
     if !pubkeyp.is_null() {
         *pubkeyp = 0 as *mut sshkey;
     }
-    fd = open(filename, 0 as libc::c_int);
+    fd = libc::open(filename, 0 as libc::c_int);
     if fd == -(1 as libc::c_int) {
         return -(24 as libc::c_int);
     }
@@ -821,7 +821,7 @@ pub unsafe extern "C" fn sshkey_save_public(
     let mut oerrno: libc::c_int = 0;
     let mut f: *mut FILE = 0 as *mut FILE;
     let mut r: libc::c_int = -(1 as libc::c_int);
-    fd = open(
+    fd = libc::open(
         path,
         0o1 as libc::c_int | 0o100 as libc::c_int | 0o1000 as libc::c_int,
         0o644 as libc::c_int,

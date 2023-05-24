@@ -42,7 +42,7 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -4035,7 +4035,7 @@ pub unsafe extern "C" fn mm_answer_pty(
                     b"send fds failed\0" as *const u8 as *const libc::c_char,
                 );
             }
-            fd0 = open(
+            fd0 = libc::open(
                 b"/dev/null\0" as *const u8 as *const libc::c_char,
                 0 as libc::c_int,
             );

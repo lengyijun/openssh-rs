@@ -63,7 +63,7 @@ extern "C" {
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
@@ -685,7 +685,7 @@ unsafe extern "C" fn add_file(
         fd = 0 as libc::c_int;
         filename = b"(stdin)\0" as *const u8 as *const libc::c_char;
     } else {
-        fd = open(filename, 0 as libc::c_int);
+        fd = libc::open(filename, 0 as libc::c_int);
         if fd == -(1 as libc::c_int) {
             perror(filename);
             return -(1 as libc::c_int);

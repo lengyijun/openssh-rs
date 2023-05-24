@@ -140,7 +140,7 @@ extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __ctype_tolower_loc() -> *mut *const __int32_t;
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn initgroups(__user: *const libc::c_char, __group: __gid_t) -> libc::c_int;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
@@ -2673,7 +2673,7 @@ pub unsafe extern "C" fn tun_open(
 pub unsafe extern "C" fn sanitise_stdfd() {
     let mut nullfd: libc::c_int = 0;
     let mut dupfd: libc::c_int = 0;
-    dupfd = open(
+    dupfd = libc::open(
         b"/dev/null\0" as *const u8 as *const libc::c_char,
         0o2 as libc::c_int,
     );
@@ -3517,7 +3517,7 @@ pub unsafe extern "C" fn forward_equals(
 }
 pub unsafe extern "C" fn daemonized() -> libc::c_int {
     let mut fd: libc::c_int = 0;
-    fd = open(
+    fd = libc::open(
         b"/dev/tty\0" as *const u8 as *const libc::c_char,
         0 as libc::c_int | 0o400 as libc::c_int,
     );
@@ -4665,7 +4665,7 @@ pub unsafe extern "C" fn stdfd_devnull(
 ) -> libc::c_int {
     let mut devnull: libc::c_int = 0;
     let mut ret: libc::c_int = 0 as libc::c_int;
-    devnull = open(
+    devnull = libc::open(
         b"/dev/null\0" as *const u8 as *const libc::c_char,
         0o2 as libc::c_int,
     );
@@ -4965,7 +4965,7 @@ pub unsafe extern "C" fn subprocess(
                     i += 1;
                     i;
                 }
-                devnull = open(
+                devnull = libc::open(
                     b"/dev/null\0" as *const u8 as *const libc::c_char,
                     0o2 as libc::c_int,
                 );

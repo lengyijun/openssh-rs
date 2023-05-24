@@ -78,7 +78,7 @@ extern "C" {
     fn opendir(__name: *const libc::c_char) -> *mut DIR;
     fn closedir(__dirp: *mut DIR) -> libc::c_int;
     fn readdir(__dirp: *mut DIR) -> *mut dirent;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn getgrgid(__gid: __gid_t) -> *mut group;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
@@ -1916,7 +1916,7 @@ unsafe extern "C" fn process_open(mut id: u_int32_t) {
         );
         status = 3 as libc::c_int;
     } else {
-        fd = open(name, flags, mode);
+        fd = libc::open(name, flags, mode);
         if fd == -(1 as libc::c_int) {
             status = errno_to_portable(*__errno_location());
         } else {

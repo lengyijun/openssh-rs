@@ -8,7 +8,7 @@ extern "C" {
     fn ttyname(__fd: libc::c_int) -> *mut libc::c_char;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn getgrnam(__name: *const libc::c_char) -> *mut group;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn sshlog(
@@ -183,7 +183,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
     mut tty: *const libc::c_char,
 ) {
     let mut fd: libc::c_int = 0;
-    fd = open(
+    fd = libc::open(
         b"/dev/tty\0" as *const u8 as *const libc::c_char,
         0o2 as libc::c_int | 0o400 as libc::c_int,
     );
@@ -210,7 +210,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
             strerror(*__errno_location()),
         );
     }
-    fd = open(
+    fd = libc::open(
         b"/dev/tty\0" as *const u8 as *const libc::c_char,
         0o2 as libc::c_int | 0o400 as libc::c_int,
     );
@@ -259,7 +259,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
             strerror(*__errno_location()),
         );
     }
-    fd = open(tty, 0o2 as libc::c_int);
+    fd = libc::open(tty, 0o2 as libc::c_int);
     if fd == -(1 as libc::c_int) {
         sshlog(
             b"sshpty.c\0" as *const u8 as *const libc::c_char,
@@ -278,7 +278,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
     } else {
         close(fd);
     }
-    fd = open(
+    fd = libc::open(
         b"/dev/tty\0" as *const u8 as *const libc::c_char,
         0o1 as libc::c_int,
     );
@@ -479,7 +479,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
 }
 pub unsafe extern "C" fn disconnect_controlling_tty() {
     let mut fd: libc::c_int = 0;
-    fd = open(
+    fd = libc::open(
         b"/dev/tty\0" as *const u8 as *const libc::c_char,
         0o2 as libc::c_int | 0o400 as libc::c_int,
     );

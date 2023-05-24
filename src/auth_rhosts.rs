@@ -19,7 +19,7 @@ extern "C" {
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut FILE) -> *mut libc::c_char;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
@@ -360,7 +360,7 @@ unsafe extern "C" fn check_rhosts_file(
         },
         __glibc_reserved: [0; 3],
     };
-    fd = open(filename, 0 as libc::c_int | 0o4000 as libc::c_int);
+    fd = libc::open(filename, 0 as libc::c_int | 0o4000 as libc::c_int);
     if fd == -(1 as libc::c_int) {
         return 0 as libc::c_int;
     }

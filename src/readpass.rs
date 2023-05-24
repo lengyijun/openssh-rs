@@ -31,7 +31,7 @@ extern "C" {
         _: ::core::ffi::VaList,
     ) -> libc::c_int;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
@@ -371,7 +371,7 @@ pub unsafe extern "C" fn read_passphrase(
         }
     } else {
         rppflags |= 0x2 as libc::c_int;
-        ttyfd = open(
+        ttyfd = libc::open(
             b"/dev/tty\0" as *const u8 as *const libc::c_char,
             0o2 as libc::c_int,
         );

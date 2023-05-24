@@ -21,7 +21,7 @@ extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __ctype_tolower_loc() -> *mut *const __int32_t;
     fn __ctype_toupper_loc() -> *mut *const __int32_t;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
@@ -307,7 +307,7 @@ pub unsafe extern "C" fn readpassphrase(
         save_errno = 0 as libc::c_int;
         need_restart = 0 as libc::c_int;
         if flags & 0x20 as libc::c_int != 0 || {
-            output = open(
+            output = libc::open(
                 b"/dev/tty\0" as *const u8 as *const libc::c_char,
                 0o2 as libc::c_int,
             );

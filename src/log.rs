@@ -31,7 +31,7 @@ extern "C" {
     ) -> libc::c_int;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
@@ -503,7 +503,7 @@ pub unsafe extern "C" fn log_redirect_stderr_to(mut logfile: *const libc::c_char
         }
         return;
     }
-    fd = open(
+    fd = libc::open(
         logfile,
         0o1 as libc::c_int | 0o100 as libc::c_int | 0o2000 as libc::c_int,
         0o600 as libc::c_int,

@@ -68,7 +68,6 @@ extern "C" {
     fn opendir(__name: *const libc::c_char) -> *mut DIR;
     fn closedir(__dirp: *mut DIR) -> libc::c_int;
     fn readdir(__dirp: *mut DIR) -> *mut dirent;
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
     fn fnmatch(
         __pattern: *const libc::c_char,
         __name: *const libc::c_char,
@@ -2792,7 +2791,7 @@ pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc:
             len -= 1;
             *name.offset(len as isize) = '\0' as i32 as libc::c_char;
         }
-        fd = open(name, 0 as libc::c_int | 0o4000 as libc::c_int);
+        fd = libc::open(name, 0 as libc::c_int | 0o4000 as libc::c_int);
         if fd == -(1 as libc::c_int) {
             current_block = 13417990991670220822;
         } else {
@@ -4238,7 +4237,7 @@ pub unsafe extern "C" fn sink(
                                 } else {
                                     omode = mode;
                                     mode |= 0o200 as libc::c_int as libc::c_uint;
-                                    ofd = open(np, 0o1 as libc::c_int | 0o100 as libc::c_int, mode);
+                                    ofd = libc::open(np, 0o1 as libc::c_int | 0o100 as libc::c_int, mode);
                                     if ofd == -(1 as libc::c_int) {
                                         current_block = 11551238854158739040;
                                     } else {

@@ -26,7 +26,7 @@ extern "C" {
     ) -> __ssize_t;
     fn fileno(__stream: *mut FILE) -> libc::c_int;
     fn free(_: *mut libc::c_void);
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -1152,7 +1152,7 @@ unsafe extern "C" fn auth_openfile(
     };
     let mut fd: libc::c_int = 0;
     let mut f: *mut FILE = 0 as *mut FILE;
-    fd = open(file, 0 as libc::c_int | 0o4000 as libc::c_int);
+    fd = libc::open(file, 0 as libc::c_int | 0o4000 as libc::c_int);
     if fd == -(1 as libc::c_int) {
         if *__errno_location() != 2 as libc::c_int {
             sshlog(

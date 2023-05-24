@@ -47,7 +47,7 @@ extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn free(_: *mut libc::c_void);
-    fn open(__file: *const libc::c_char, __oflag: libc::c_int, _: ...) -> libc::c_int;
+    
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strncpy(_: *mut libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
@@ -916,7 +916,7 @@ unsafe extern "C" fn lastlog_openseek(
         );
         return 0 as libc::c_int;
     }
-    *fd = open(lastlog_file.as_mut_ptr(), filemode, 0o600 as libc::c_int);
+    *fd = libc::open(lastlog_file.as_mut_ptr(), filemode, 0o600 as libc::c_int);
     if *fd < 0 as libc::c_int {
         sshlog(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
@@ -1207,7 +1207,7 @@ pub unsafe extern "C" fn record_failed_login(
     if geteuid() != 0 as libc::c_int as libc::c_uint {
         return;
     }
-    fd = open(
+    fd = libc::open(
         b"/var/log/btmp\0" as *const u8 as *const libc::c_char,
         0o1 as libc::c_int | 0o2000 as libc::c_int,
     );
