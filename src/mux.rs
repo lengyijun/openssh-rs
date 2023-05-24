@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_ns;
@@ -26,7 +27,7 @@ extern "C" {
     fn __errno_location() -> *mut libc::c_int;
     fn platform_pledge_mux();
     fn kill(__pid: __pid_t, __sig: libc::c_int) -> libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     static mut environ: *mut *mut libc::c_char;

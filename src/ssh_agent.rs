@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_ns;
@@ -17,7 +18,7 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
     pub type notifier_ctx;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn usleep(__useconds: __useconds_t) -> libc::c_int;

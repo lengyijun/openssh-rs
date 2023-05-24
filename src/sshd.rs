@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_un;
@@ -82,7 +83,7 @@ extern "C" {
         __set: *const sigset_t,
         __oset: *mut sigset_t,
     ) -> libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn closefrom(__lowfd: libc::c_int);
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;

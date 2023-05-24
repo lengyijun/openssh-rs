@@ -1,4 +1,6 @@
 use ::libc;
+use libc::close;
+
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_un;
@@ -32,7 +34,7 @@ extern "C" {
         -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn kill(__pid: __pid_t, __sig: libc::c_int) -> libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;

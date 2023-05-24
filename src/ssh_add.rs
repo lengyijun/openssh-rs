@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -7,7 +8,7 @@ extern "C" {
     pub type dsa_st;
     pub type rsa_st;
     pub type ec_key_st;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;

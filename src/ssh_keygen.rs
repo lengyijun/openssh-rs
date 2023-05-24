@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -20,7 +21,7 @@ extern "C" {
     
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn getuid() -> __uid_t;
     fn seed_rng();

@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -22,7 +23,7 @@ extern "C" {
         __act: *const sigaction,
         __oact: *mut sigaction,
     ) -> libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn getcwd(__buf: *mut libc::c_char, __size: size_t) -> *mut libc::c_char;

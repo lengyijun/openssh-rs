@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -30,7 +31,7 @@ extern "C" {
     fn platform_disable_tracing(_: libc::c_int);
     fn platform_pledge_sftp_server();
     fn lseek(__fd: libc::c_int, __offset: __off_t, __whence: libc::c_int) -> __off_t;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn chown(__file: *const libc::c_char, __owner: __uid_t, __group: __gid_t) -> libc::c_int;

@@ -1,4 +1,6 @@
 use ::libc;
+use libc::close;
+
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -11,7 +13,7 @@ extern "C" {
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
     
     fn __errno_location() -> *mut libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn getuid() -> __uid_t;
     fn fclose(__stream: *mut FILE) -> libc::c_int;
     fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut FILE;

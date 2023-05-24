@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -8,7 +9,7 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
     fn __errno_location() -> *mut libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn closefrom(__lowfd: libc::c_int);
     fn dup(__fd: libc::c_int) -> libc::c_int;
     fn BSDgetopt(

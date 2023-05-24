@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type sshbuf;
     pub type dsa_st;
@@ -13,7 +14,7 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn __errno_location() -> *mut libc::c_int;
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn closefrom(__lowfd: libc::c_int);
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
     fn execlp(__file: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;

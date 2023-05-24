@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type sshbuf;
     pub type dsa_st;
@@ -9,7 +10,7 @@ extern "C" {
         -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn getuid() -> __uid_t;
     fn pledge(promises: *const libc::c_char, paths: *mut *const libc::c_char) -> libc::c_int;
     

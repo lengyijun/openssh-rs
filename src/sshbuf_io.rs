@@ -1,7 +1,8 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type sshbuf;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;

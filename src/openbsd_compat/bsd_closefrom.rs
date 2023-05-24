@@ -1,7 +1,8 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type __dirstream;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn sysconf(__name: libc::c_int) -> libc::c_long;
     fn getpid() -> __pid_t;
     fn snprintf(

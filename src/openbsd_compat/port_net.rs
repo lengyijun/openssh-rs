@@ -1,5 +1,6 @@
 use ::c2rust_bitfields;
 use ::libc;
+use libc::close;
 extern "C" {
     pub type ssh;
     pub type sshbuf;
@@ -20,7 +21,7 @@ extern "C" {
     ) -> libc::c_int;
     fn bzero(_: *mut libc::c_void, _: libc::c_ulong);
     fn __errno_location() -> *mut libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,

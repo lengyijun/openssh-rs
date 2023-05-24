@@ -1,11 +1,12 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type sshbuf;
     pub type __dirstream;
     fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn lseek(__fd: libc::c_int, __offset: __off_t, __whence: libc::c_int) -> __off_t;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn fsync(__fd: libc::c_int) -> libc::c_int;

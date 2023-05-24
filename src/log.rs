@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -11,7 +12,7 @@ extern "C" {
         _: size_t,
         _: libc::c_int,
     ) -> libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn _exit(_: libc::c_int) -> !;
     fn getpid() -> __pid_t;

@@ -1,8 +1,9 @@
 use ::libc;
+use libc::close;
 extern "C" {
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn chown(__file: *const libc::c_char, __owner: __uid_t, __group: __gid_t) -> libc::c_int;
     fn setsid() -> __pid_t;
     fn ttyname(__fd: libc::c_int) -> *mut libc::c_char;

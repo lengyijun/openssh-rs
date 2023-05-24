@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_ns;
@@ -58,7 +59,7 @@ extern "C" {
     fn platform_setusercontext(_: *mut passwd);
     fn platform_setusercontext_post_groups(_: *mut passwd);
     fn killpg(__pgrp: __pid_t, __sig: libc::c_int) -> libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn closefrom(__lowfd: libc::c_int);
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;

@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -20,7 +21,7 @@ extern "C" {
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn closefrom(__lowfd: libc::c_int);
     fn dup(__fd: libc::c_int) -> libc::c_int;
     static mut environ: *mut *mut libc::c_char;

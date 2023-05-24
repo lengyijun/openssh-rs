@@ -1,4 +1,6 @@
 use ::libc;
+use libc::close;
+
 extern "C" {
     pub type ssh_channels;
     pub type sshbuf;
@@ -8,7 +10,7 @@ extern "C" {
     pub type kex;
     pub type session_state;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn setproctitle(fmt: *const libc::c_char, _: ...);

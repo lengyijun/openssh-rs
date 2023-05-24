@@ -1,4 +1,5 @@
 use ::libc;
+use libc::close;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_ns;
@@ -51,7 +52,7 @@ extern "C" {
         __act: *const sigaction,
         __oact: *mut sigaction,
     ) -> libc::c_int;
-    fn close(__fd: libc::c_int) -> libc::c_int;
+    
     fn closefrom(__lowfd: libc::c_int);
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn getservbyname(__name: *const libc::c_char, __proto: *const libc::c_char) -> *mut servent;
