@@ -12,7 +12,6 @@
 #[macro_use]
 extern crate c2rust_bitfields;
 extern crate libc;
-pub mod src {
     pub mod addr;
     pub mod addrmatch;
     pub mod atomicio;
@@ -252,4 +251,3 @@ pub mod src {
     pub mod xmss_hash;
     pub mod xmss_hash_address;
     pub mod xmss_wots;
-} // mod src
