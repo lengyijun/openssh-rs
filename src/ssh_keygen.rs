@@ -2049,7 +2049,7 @@ unsafe extern "C" fn get_line(
     return -(1 as libc::c_int);
 }
 unsafe extern "C" fn do_convert_from_ssh2(
-    mut pw: *mut passwd,
+    mut _pw: *mut passwd,
     mut k: *mut *mut sshkey,
     mut private: *mut libc::c_int,
 ) {
@@ -2208,7 +2208,7 @@ unsafe extern "C" fn do_convert_from_ssh2(
     sshbuf_free(buf);
     fclose(fp);
 }
-unsafe extern "C" fn do_convert_from_pkcs8(mut k: *mut *mut sshkey, mut private: *mut libc::c_int) {
+unsafe extern "C" fn do_convert_from_pkcs8(mut k: *mut *mut sshkey, mut _private: *mut libc::c_int) {
     let mut pubkey: *mut EVP_PKEY = 0 as *mut EVP_PKEY;
     let mut fp: *mut FILE = 0 as *mut FILE;
     fp = fopen(
@@ -2322,7 +2322,7 @@ unsafe extern "C" fn do_convert_from_pkcs8(mut k: *mut *mut sshkey, mut private:
     }
     EVP_PKEY_free(pubkey);
 }
-unsafe extern "C" fn do_convert_from_pem(mut k: *mut *mut sshkey, mut private: *mut libc::c_int) {
+unsafe extern "C" fn do_convert_from_pem(mut k: *mut *mut sshkey, mut _private: *mut libc::c_int) {
     let mut fp: *mut FILE = 0 as *mut FILE;
     let mut rsa: *mut RSA = 0 as *mut RSA;
     fp = fopen(
@@ -2618,7 +2618,7 @@ unsafe extern "C" fn do_print_public(mut pw: *mut passwd) {
     free(comment as *mut libc::c_void);
     exit(0 as libc::c_int);
 }
-unsafe extern "C" fn do_download(mut pw: *mut passwd) {
+unsafe extern "C" fn do_download(mut _pw: *mut passwd) {
     let mut keys: *mut *mut sshkey = 0 as *mut *mut sshkey;
     let mut i: libc::c_int = 0;
     let mut nkeys: libc::c_int = 0;
@@ -3761,7 +3761,7 @@ unsafe extern "C" fn do_known_hosts(
     }) as libc::c_uint;
     r = hostkeys_foreach(
         identity_file.as_mut_ptr(),
-        (if find_host != 0 || hash_hosts == 0 {
+        if find_host != 0 || hash_hosts == 0 {
             Some(
                 known_hosts_find_delete
                     as unsafe extern "C" fn(
@@ -3777,7 +3777,7 @@ unsafe extern "C" fn do_known_hosts(
                         *mut libc::c_void,
                     ) -> libc::c_int,
             )
-        }),
+        },
         &mut ctx as *mut known_hosts_ctx as *mut libc::c_void,
         name,
         0 as *const libc::c_char,
@@ -4101,7 +4101,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut passwd) {
     exit(0 as libc::c_int);
 }
 unsafe extern "C" fn do_print_resource_record(
-    mut pw: *mut passwd,
+    mut _pw: *mut passwd,
     mut fname: *mut libc::c_char,
     mut hname: *mut libc::c_char,
     mut print_generic: libc::c_int,
@@ -4798,8 +4798,8 @@ unsafe extern "C" fn agent_signer(
     mut data: *const u_char,
     mut datalen: size_t,
     mut alg: *const libc::c_char,
-    mut provider: *const libc::c_char,
-    mut pin: *const libc::c_char,
+    mut _provider: *const libc::c_char,
+    mut _pin: *const libc::c_char,
     mut compat: u_int,
     mut ctx: *mut libc::c_void,
 ) -> libc::c_int {
@@ -6688,7 +6688,7 @@ unsafe extern "C" fn do_gen_krl(
     sshkey_free(ca);
 }
 unsafe extern "C" fn do_check_krl(
-    mut pw: *mut passwd,
+    mut _pw: *mut passwd,
     mut print_krl: libc::c_int,
     mut argc: libc::c_int,
     mut argv: *mut *mut libc::c_char,

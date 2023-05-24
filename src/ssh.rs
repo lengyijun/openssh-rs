@@ -2846,16 +2846,16 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     if process_config_line(
                         &mut options,
                         pw,
-                        (if !host.is_null() {
+                        if !host.is_null() {
                             host as *const libc::c_char
                         } else {
                             b"\0" as *const u8 as *const libc::c_char
-                        }),
-                        (if !host.is_null() {
+                        },
+                        if !host.is_null() {
                             host as *const libc::c_char
                         } else {
                             b"\0" as *const u8 as *const libc::c_char
-                        }),
+                        },
                         line,
                         b"command-line\0" as *const u8 as *const libc::c_char,
                         0 as libc::c_int,
@@ -2994,11 +2994,11 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             r = sshbuf_putf(
                 command,
                 b"%s%s\0" as *const u8 as *const libc::c_char,
-                (if i != 0 {
+                if i != 0 {
                     b" \0" as *const u8 as *const libc::c_char
                 } else {
                     b"\0" as *const u8 as *const libc::c_char
-                }),
+                },
                 *av.offset(i as isize),
             );
             if r != 0 as libc::c_int {
@@ -4643,7 +4643,7 @@ unsafe extern "C" fn forwarding_success() {
 unsafe extern "C" fn ssh_confirm_remote_forward(
     mut ssh: *mut ssh,
     mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _seq: u_int32_t,
     mut ctxt: *mut libc::c_void,
 ) {
     let mut rfwd: *mut Forward = ctxt as *mut Forward;
@@ -4818,10 +4818,10 @@ unsafe extern "C" fn ssh_confirm_remote_forward(
     forwarding_success();
 }
 unsafe extern "C" fn client_cleanup_stdio_fwd(
-    mut ssh: *mut ssh,
-    mut id: libc::c_int,
-    mut force: libc::c_int,
-    mut arg: *mut libc::c_void,
+    mut _ssh: *mut ssh,
+    mut _id: libc::c_int,
+    mut _force: libc::c_int,
+    mut _arg: *mut libc::c_void,
 ) {
     sshlog(
         b"ssh.c\0" as *const u8 as *const libc::c_char,
@@ -4836,10 +4836,10 @@ unsafe extern "C" fn client_cleanup_stdio_fwd(
     cleanup_exit(0 as libc::c_int);
 }
 unsafe extern "C" fn ssh_stdio_confirm(
-    mut ssh: *mut ssh,
-    mut id: libc::c_int,
+    mut _ssh: *mut ssh,
+    mut _id: libc::c_int,
     mut success: libc::c_int,
-    mut arg: *mut libc::c_void,
+    mut _arg: *mut libc::c_void,
 ) {
     if success == 0 {
         sshfatal(
@@ -4855,10 +4855,10 @@ unsafe extern "C" fn ssh_stdio_confirm(
     }
 }
 unsafe extern "C" fn ssh_tun_confirm(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut id: libc::c_int,
     mut success: libc::c_int,
-    mut arg: *mut libc::c_void,
+    mut _arg: *mut libc::c_void,
 ) {
     if success == 0 {
         sshlog(
@@ -5296,7 +5296,7 @@ unsafe extern "C" fn ssh_session2_setup(
     mut ssh: *mut ssh,
     mut id: libc::c_int,
     mut success: libc::c_int,
-    mut arg: *mut libc::c_void,
+    mut _arg: *mut libc::c_void,
 ) {
     extern "C" {
         #[link_name = "environ"]
@@ -5974,7 +5974,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
         ::core::mem::size_of::<[libc::c_int; 100]>() as libc::c_ulong,
     );
 }
-unsafe extern "C" fn main_sigchld_handler(mut sig: libc::c_int) {
+unsafe extern "C" fn main_sigchld_handler(mut _sig: libc::c_int) {
     let mut save_errno: libc::c_int = *__errno_location();
     let mut pid: pid_t = 0;
     let mut status: libc::c_int = 0;

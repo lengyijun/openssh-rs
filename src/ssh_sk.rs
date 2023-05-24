@@ -1406,7 +1406,7 @@ pub unsafe extern "C" fn sshsk_sign(
     mut lenp: *mut size_t,
     mut data: *const u_char,
     mut datalen: size_t,
-    mut compat: u_int,
+    mut _compat: u_int,
     mut pin: *const libc::c_char,
 ) -> libc::c_int {
     let mut current_block: u64;
@@ -1638,7 +1638,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
     mut provider_path: *const libc::c_char,
     mut device: *const libc::c_char,
     mut pin: *const libc::c_char,
-    mut flags: u_int,
+    mut _flags: u_int,
     mut srksp: *mut *mut *mut sshsk_resident_key,
     mut nsrksp: *mut size_t,
 ) -> libc::c_int {

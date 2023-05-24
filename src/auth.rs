@@ -2082,7 +2082,7 @@ pub unsafe extern "C" fn auth_log_authopts(
     }
 }
 pub unsafe extern "C" fn auth_activate_options(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut opts: *mut sshauthopt,
 ) -> libc::c_int {
     let mut old: *mut sshauthopt = auth_opts;

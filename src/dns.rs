@@ -387,7 +387,7 @@ unsafe extern "C" fn is_numeric_hostname(mut hostname: *const libc::c_char) -> l
 }
 pub unsafe extern "C" fn verify_host_key_dns(
     mut hostname: *const libc::c_char,
-    mut address: *mut sockaddr,
+    mut _address: *mut sockaddr,
     mut hostkey: *mut sshkey,
     mut flags: *mut libc::c_int,
 ) -> libc::c_int {

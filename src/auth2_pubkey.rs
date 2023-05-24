@@ -1237,11 +1237,11 @@ unsafe extern "C" fn userauth_pubkey(
                                         slen,
                                         sshbuf_ptr(b),
                                         sshbuf_len(b),
-                                        (if (*ssh).compat & 0x2 as libc::c_int == 0 as libc::c_int {
+                                        if (*ssh).compat & 0x2 as libc::c_int == 0 as libc::c_int {
                                             pkalg
                                         } else {
                                             0 as *mut libc::c_char
-                                        }),
+                                        },
                                         (*ssh).compat as u_int,
                                         &mut sig_details,
                                     )
@@ -1252,11 +1252,11 @@ unsafe extern "C" fn userauth_pubkey(
                                         slen,
                                         sshbuf_ptr(b),
                                         sshbuf_len(b),
-                                        (if (*ssh).compat & 0x2 as libc::c_int == 0 as libc::c_int {
+                                        if (*ssh).compat & 0x2 as libc::c_int == 0 as libc::c_int {
                                             pkalg
                                         } else {
                                             0 as *mut libc::c_char
-                                        }),
+                                        },
                                         (*ssh).compat as u_int,
                                         &mut sig_details,
                                     )
@@ -1936,11 +1936,11 @@ unsafe extern "C" fn user_cert_trusted_ca(
                 0 as libc::c_int,
                 1 as libc::c_int,
                 0 as libc::c_int,
-                (if use_authorized_principals != 0 {
+                if use_authorized_principals != 0 {
                     0 as *mut libc::c_char
                 } else {
                     (*pw).pw_name
-                }),
+                },
                 &mut reason,
             ) != 0 as libc::c_int
             {
@@ -2342,7 +2342,7 @@ pub unsafe extern "C" fn user_key_allowed(
     mut ssh: *mut ssh,
     mut pw: *mut passwd,
     mut key: *mut sshkey,
-    mut auth_attempt: libc::c_int,
+    mut _auth_attempt: libc::c_int,
     mut authoptsp: *mut *mut sshauthopt,
 ) -> libc::c_int {
     let mut success: u_int = 0 as libc::c_int as u_int;

@@ -477,7 +477,7 @@ unsafe extern "C" fn recv_msg(mut m: *mut sshbuf) -> libc::c_int {
     }
     return c as libc::c_int;
 }
-pub unsafe extern "C" fn pkcs11_init(mut interactive: libc::c_int) -> libc::c_int {
+pub unsafe extern "C" fn pkcs11_init(mut _interactive: libc::c_int) -> libc::c_int {
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn pkcs11_terminate() {
@@ -612,8 +612,8 @@ unsafe extern "C" fn rsa_encrypt(
 unsafe extern "C" fn ecdsa_do_sign(
     mut dgst: *const libc::c_uchar,
     mut dgst_len: libc::c_int,
-    mut inv: *const BIGNUM,
-    mut rp: *const BIGNUM,
+    mut _inv: *const BIGNUM,
+    mut _rp: *const BIGNUM,
     mut ec: *mut EC_KEY,
 ) -> *mut ECDSA_SIG {
     let mut key: *mut sshkey = 0 as *mut sshkey;

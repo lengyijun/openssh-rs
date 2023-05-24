@@ -895,7 +895,7 @@ static mut xxx_hostaddr: *mut sockaddr = 0 as *const sockaddr as *mut sockaddr;
 static mut xxx_conn_info: *const ssh_conn_info = 0 as *const ssh_conn_info;
 unsafe extern "C" fn verify_host_key_callback(
     mut hostkey: *mut sshkey,
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     r = sshkey_check_rsa_length(hostkey, options.required_rsa_size);
@@ -1439,8 +1439,8 @@ pub unsafe extern "C" fn ssh_userauth2(
     };
 }
 unsafe extern "C" fn input_userauth_service_accept(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut current_block: u64;
@@ -1625,8 +1625,8 @@ pub unsafe extern "C" fn userauth(mut ssh: *mut ssh, mut authlist: *mut libc::c_
 }
 unsafe extern "C" fn input_userauth_error(
     mut type_0: libc::c_int,
-    mut seq: u_int32_t,
-    mut ssh: *mut ssh,
+    mut _seq: u_int32_t,
+    mut _ssh: *mut ssh,
 ) -> libc::c_int {
     sshfatal(
         b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
@@ -1641,8 +1641,8 @@ unsafe extern "C" fn input_userauth_error(
     );
 }
 unsafe extern "C" fn input_userauth_banner(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut msg: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -1674,8 +1674,8 @@ unsafe extern "C" fn input_userauth_banner(
     return r;
 }
 unsafe extern "C" fn input_userauth_success(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
@@ -1704,8 +1704,8 @@ unsafe extern "C" fn input_userauth_success(
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn input_userauth_failure(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
@@ -1815,8 +1815,8 @@ unsafe extern "C" fn format_identity(mut id: *mut Identity) -> *mut libc::c_char
     return ret;
 }
 unsafe extern "C" fn input_userauth_pk_ok(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
@@ -2091,8 +2091,8 @@ unsafe extern "C" fn userauth_passwd(mut ssh: *mut ssh) -> libc::c_int {
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn input_userauth_passwd_changereq(
-    mut type_0: libc::c_int,
-    mut seqnr: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seqnr: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut current_block: u64;
@@ -3925,8 +3925,8 @@ unsafe extern "C" fn userauth_kbdint(mut ssh: *mut ssh) -> libc::c_int {
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn input_userauth_info_req(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut current_block: u64;
@@ -4047,11 +4047,11 @@ unsafe extern "C" fn input_userauth_info_req(
                         0 as *mut libc::c_int,
                         b"(%s@%s) %s\0" as *const u8 as *const libc::c_char,
                         (*authctxt).server_user,
-                        (if !(options.host_key_alias).is_null() {
+                        if !(options.host_key_alias).is_null() {
                             options.host_key_alias as *const libc::c_char
                         } else {
                             (*authctxt).host
-                        }),
+                        },
                         prompt,
                     ) == -(1 as libc::c_int)
                     {
@@ -4117,7 +4117,7 @@ unsafe extern "C" fn input_userauth_info_req(
 }
 unsafe extern "C" fn ssh_keysign(
     mut ssh: *mut ssh,
-    mut key: *mut sshkey,
+    mut _key: *mut sshkey,
     mut sigp: *mut *mut u_char,
     mut lenp: *mut size_t,
     mut data: *const u_char,
@@ -5005,11 +5005,11 @@ unsafe extern "C" fn authmethods_get() -> *mut libc::c_char {
             r = sshbuf_putf(
                 b,
                 b"%s%s\0" as *const u8 as *const libc::c_char,
-                (if sshbuf_len(b) != 0 {
+                if sshbuf_len(b) != 0 {
                     b",\0" as *const u8 as *const libc::c_char
                 } else {
                     b"\0" as *const u8 as *const libc::c_char
-                }),
+                },
                 (*method).name,
             );
             if r != 0 as libc::c_int {

@@ -4976,14 +4976,14 @@ unsafe extern "C" fn download_dir_internal(
                 conn,
                 new_src,
                 new_dst,
-                (if (**dir_entries.offset(i as isize)).a.perm
+                if (**dir_entries.offset(i as isize)).a.perm
                     & 0o170000 as libc::c_int as libc::c_uint
                     == 0o120000 as libc::c_int as libc::c_uint
                 {
                     0 as *mut Attrib
                 } else {
                     &mut (**dir_entries.offset(i as isize)).a
-                }),
+                },
                 preserve_flag,
                 resume_flag,
                 fsync_flag,
@@ -5968,7 +5968,7 @@ pub unsafe extern "C" fn upload_dir(
 }
 unsafe extern "C" fn handle_dest_replies(
     mut to: *mut sftp_conn,
-    mut to_path: *const libc::c_char,
+    mut _to_path: *const libc::c_char,
     mut synchronous: libc::c_int,
     mut nreqsp: *mut u_int,
     mut write_errorp: *mut u_int,
@@ -6910,14 +6910,14 @@ unsafe extern "C" fn crossload_dir_internal(
                 to,
                 new_from_path,
                 new_to_path,
-                (if (**dir_entries.offset(i as isize)).a.perm
+                if (**dir_entries.offset(i as isize)).a.perm
                     & 0o170000 as libc::c_int as libc::c_uint
                     == 0o120000 as libc::c_int as libc::c_uint
                 {
                     0 as *mut Attrib
                 } else {
                     &mut (**dir_entries.offset(i as isize)).a
-                }),
+                },
                 preserve_flag,
             ) == -(1 as libc::c_int)
             {

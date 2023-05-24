@@ -1146,7 +1146,7 @@ pub unsafe extern "C" fn record_failed_login(
     mut ssh: *mut ssh,
     mut username: *const libc::c_char,
     mut hostname: *const libc::c_char,
-    mut ttyn: *const libc::c_char,
+    mut _ttyn: *const libc::c_char,
 ) {
     let mut fd: libc::c_int = 0;
     let mut ut: utmp = utmp {

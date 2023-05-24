@@ -996,8 +996,8 @@ static mut mux_master_handlers: [C2RustUnnamed_4; 10] = unsafe {
 unsafe extern "C" fn mux_master_session_cleanup_cb(
     mut ssh: *mut ssh,
     mut cid: libc::c_int,
-    mut force: libc::c_int,
-    mut unused: *mut libc::c_void,
+    mut _force: libc::c_int,
+    mut _unused: *mut libc::c_void,
 ) {
     let mut cc: *mut Channel = 0 as *mut Channel;
     let mut c: *mut Channel = channel_by_id(ssh, cid);
@@ -1057,8 +1057,8 @@ unsafe extern "C" fn mux_master_session_cleanup_cb(
 unsafe extern "C" fn mux_master_control_cleanup_cb(
     mut ssh: *mut ssh,
     mut cid: libc::c_int,
-    mut force: libc::c_int,
-    mut unused: *mut libc::c_void,
+    mut _force: libc::c_int,
+    mut _unused: *mut libc::c_void,
 ) {
     let mut sc: *mut Channel = 0 as *mut Channel;
     let mut c: *mut Channel = channel_by_id(ssh, cid);
@@ -1180,11 +1180,11 @@ unsafe extern "C" fn env_permitted(mut env: *const libc::c_char) -> libc::c_int 
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn mux_master_process_hello(
-    mut ssh: *mut ssh,
-    mut rid: u_int,
+    mut _ssh: *mut ssh,
+    mut _rid: u_int,
     mut c: *mut Channel,
     mut m: *mut sshbuf,
-    mut reply: *mut sshbuf,
+    mut _reply: *mut sshbuf,
 ) -> libc::c_int {
     let mut ver: u_int = 0;
     let mut state: *mut mux_master_state = (*c).mux_ctx as *mut mux_master_state;
@@ -1797,10 +1797,10 @@ unsafe extern "C" fn mux_master_process_new_session(
     return -(1 as libc::c_int);
 }
 unsafe extern "C" fn mux_master_process_alive_check(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut rid: u_int,
     mut c: *mut Channel,
-    mut m: *mut sshbuf,
+    mut _m: *mut sshbuf,
     mut reply: *mut sshbuf,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
@@ -1844,10 +1844,10 @@ unsafe extern "C" fn mux_master_process_alive_check(
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn mux_master_process_terminate(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut rid: u_int,
     mut c: *mut Channel,
-    mut m: *mut sshbuf,
+    mut _m: *mut sshbuf,
     mut reply: *mut sshbuf,
 ) -> libc::c_int {
     sshlog(
@@ -2009,7 +2009,7 @@ unsafe extern "C" fn compare_forward(mut a: *mut Forward, mut b: *mut Forward) -
 unsafe extern "C" fn mux_confirm_remote_forward(
     mut ssh: *mut ssh,
     mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _seq: u_int32_t,
     mut ctxt: *mut libc::c_void,
 ) {
     let mut current_block: u64;
@@ -3279,7 +3279,7 @@ unsafe extern "C" fn mux_master_process_stop_listening(
     mut ssh: *mut ssh,
     mut rid: u_int,
     mut c: *mut Channel,
-    mut m: *mut sshbuf,
+    mut _m: *mut sshbuf,
     mut reply: *mut sshbuf,
 ) -> libc::c_int {
     sshlog(
@@ -3335,10 +3335,10 @@ unsafe extern "C" fn mux_master_process_stop_listening(
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn mux_master_process_proxy(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut rid: u_int,
     mut c: *mut Channel,
-    mut m: *mut sshbuf,
+    mut _m: *mut sshbuf,
     mut reply: *mut sshbuf,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
@@ -5470,11 +5470,11 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
         || {
             r = sshbuf_put_cstring(
                 m,
-                (if term.is_null() {
+                if term.is_null() {
                     b"\0" as *const u8 as *const libc::c_char
                 } else {
                     term
-                }),
+                },
             );
             r != 0 as libc::c_int
         }

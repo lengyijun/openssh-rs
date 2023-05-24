@@ -1304,8 +1304,8 @@ pub unsafe extern "C" fn kex_send_newkeys(mut ssh: *mut ssh) -> libc::c_int {
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn kex_input_ext_info(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut kex: *mut kex = (*ssh).kex;
@@ -1479,8 +1479,8 @@ pub unsafe extern "C" fn kex_input_ext_info(
     return sshpkt_get_end(ssh);
 }
 unsafe extern "C" fn kex_input_newkeys(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut kex: *mut kex = (*ssh).kex;
@@ -1614,8 +1614,8 @@ pub unsafe extern "C" fn kex_send_kexinit(mut ssh: *mut ssh) -> libc::c_int {
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn kex_input_kexinit(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut kex: *mut kex = (*ssh).kex;
@@ -1942,7 +1942,7 @@ unsafe extern "C" fn choose_enc(
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn choose_mac(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut mac: *mut sshmac,
     mut client: *mut libc::c_char,
     mut server: *mut libc::c_char,
@@ -2796,16 +2796,16 @@ pub unsafe extern "C" fn kex_exchange_identification(
         2 as libc::c_int,
         0 as libc::c_int,
         b"OpenSSH_9.3\0" as *const u8 as *const libc::c_char,
-        (if version_addendum.is_null() {
+        if version_addendum.is_null() {
             b"\0" as *const u8 as *const libc::c_char
         } else {
             b" \0" as *const u8 as *const libc::c_char
-        }),
-        (if version_addendum.is_null() {
+        },
+        if version_addendum.is_null() {
             b"\0" as *const u8 as *const libc::c_char
         } else {
             version_addendum
-        }),
+        },
     );
     if r != 0 as libc::c_int {
         oerrno = *__errno_location();

@@ -348,7 +348,7 @@ pub struct ServerOptions {
 }
 unsafe extern "C" fn userauth_passwd(
     mut ssh: *mut ssh,
-    mut method: *const libc::c_char,
+    mut _method: *const libc::c_char,
 ) -> libc::c_int {
     let mut password: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut authenticated: libc::c_int = 0 as libc::c_int;

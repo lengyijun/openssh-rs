@@ -332,7 +332,7 @@ pub struct ServerOptions {
 static mut none_enabled: libc::c_int = 1 as libc::c_int;
 unsafe extern "C" fn userauth_none(
     mut ssh: *mut ssh,
-    mut method: *const libc::c_char,
+    mut _method: *const libc::c_char,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     none_enabled = 0 as libc::c_int;

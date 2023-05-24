@@ -1255,7 +1255,7 @@ unsafe extern "C" fn prepare_auth_info_file(mut pw: *mut passwd, mut info: *mut 
     }
     restore_uid();
 }
-unsafe extern "C" fn set_fwdpermit_from_authopts(mut ssh: *mut ssh, mut opts: *const sshauthopt) {
+unsafe extern "C" fn set_fwdpermit_from_authopts(mut ssh: *mut ssh, mut _opts: *const sshauthopt) {
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut host: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -2304,7 +2304,7 @@ unsafe extern "C" fn do_setup_env(
     return env;
 }
 unsafe extern "C" fn do_rc_files(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut s: *mut Session,
     mut shell: *const libc::c_char,
 ) {
@@ -2558,7 +2558,7 @@ unsafe extern "C" fn do_nologin(mut pw: *mut passwd) {
     }
     exit(254 as libc::c_int);
 }
-unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut uid: uid_t) {
+unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut _uid: uid_t) {
     let mut cp: *const libc::c_char = 0 as *const libc::c_char;
     let mut component: [libc::c_char; 4096] = [0; 4096];
     let mut st: stat = stat {
@@ -4384,8 +4384,8 @@ unsafe extern "C" fn session_close_x11(mut ssh: *mut ssh, mut id: libc::c_int) {
 unsafe extern "C" fn session_close_single_x11(
     mut ssh: *mut ssh,
     mut id: libc::c_int,
-    mut force: libc::c_int,
-    mut arg: *mut libc::c_void,
+    mut _force: libc::c_int,
+    mut _arg: *mut libc::c_void,
 ) {
     let mut s: *mut Session = 0 as *mut Session;
     let mut i: u_int = 0;
@@ -4671,7 +4671,7 @@ pub unsafe extern "C" fn session_close_by_channel(
     mut ssh: *mut ssh,
     mut id: libc::c_int,
     mut force: libc::c_int,
-    mut arg: *mut libc::c_void,
+    mut _arg: *mut libc::c_void,
 ) {
     let mut s: *mut Session = session_by_channel(id);
     let mut i: u_int = 0;

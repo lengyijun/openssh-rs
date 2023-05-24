@@ -106,7 +106,7 @@ pub unsafe extern "C" fn chachapoly_crypt(
     mut src: *const u_char,
     mut len: u_int,
     mut aadlen: u_int,
-    mut authlen: u_int,
+    mut _authlen: u_int,
     mut do_encrypt: libc::c_int,
 ) -> libc::c_int {
     let mut current_block: u64;

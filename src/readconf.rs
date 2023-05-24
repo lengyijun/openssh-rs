@@ -3794,11 +3794,11 @@ unsafe extern "C" fn process_config_line_depth(
                 current_block = 7482270440933722938;
             } else if *arg as libc::c_int != '-' as i32
                 && ciphers_valid(
-                    (if *arg as libc::c_int == '+' as i32 || *arg as libc::c_int == '^' as i32 {
+                    if *arg as libc::c_int == '+' as i32 || *arg as libc::c_int == '^' as i32 {
                         arg.offset(1 as libc::c_int as isize)
                     } else {
                         arg
-                    }),
+                    },
                 ) == 0
             {
                 sshlog(
@@ -3849,11 +3849,11 @@ unsafe extern "C" fn process_config_line_depth(
                 current_block = 7482270440933722938;
             } else if *arg as libc::c_int != '-' as i32
                 && mac_valid(
-                    (if *arg as libc::c_int == '+' as i32 || *arg as libc::c_int == '^' as i32 {
+                    if *arg as libc::c_int == '+' as i32 || *arg as libc::c_int == '^' as i32 {
                         arg.offset(1 as libc::c_int as isize)
                     } else {
                         arg
-                    }),
+                    },
                 ) == 0
             {
                 sshlog(
@@ -3904,11 +3904,11 @@ unsafe extern "C" fn process_config_line_depth(
                 current_block = 7482270440933722938;
             } else if *arg as libc::c_int != '-' as i32
                 && kex_names_valid(
-                    (if *arg as libc::c_int == '+' as i32 || *arg as libc::c_int == '^' as i32 {
+                    if *arg as libc::c_int == '+' as i32 || *arg as libc::c_int == '^' as i32 {
                         arg.offset(1 as libc::c_int as isize)
                     } else {
                         arg
-                    }),
+                    },
                 ) == 0
             {
                 sshlog(
@@ -5643,11 +5643,11 @@ unsafe extern "C" fn process_config_line_depth(
                 current_block = 7482270440933722938;
             } else if *arg as libc::c_int != '-' as i32
                 && sshkey_names_valid2(
-                    (if *arg as libc::c_int == '+' as i32 || *arg as libc::c_int == '^' as i32 {
+                    if *arg as libc::c_int == '+' as i32 || *arg as libc::c_int == '^' as i32 {
                         arg.offset(1 as libc::c_int as isize)
                     } else {
                         arg
-                    }),
+                    },
                     1 as libc::c_int,
                 ) == 0
             {

@@ -629,7 +629,7 @@ unsafe extern "C" fn valid_request(
         0 as libc::c_int
     };
 }
-unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> libc::c_int {
+unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> libc::c_int {
     let mut b: *mut sshbuf = 0 as *mut sshbuf;
     let mut options: Options = Options {
         host_arg: 0 as *mut libc::c_char,

@@ -1346,11 +1346,11 @@ unsafe extern "C" fn send_status_errmsg(
     if version >= 3 as libc::c_int as libc::c_uint {
         r = sshbuf_put_cstring(
             msg,
-            (if errmsg.is_null() {
+            if errmsg.is_null() {
                 status_to_message(status)
             } else {
                 errmsg
-            }),
+            },
         );
         if r != 0 as libc::c_int || {
             r = sshbuf_put_cstring(msg, b"\0" as *const u8 as *const libc::c_char);

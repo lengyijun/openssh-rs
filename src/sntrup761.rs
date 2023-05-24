@@ -1237,7 +1237,7 @@ unsafe extern "C" fn ZDecrypt(
 unsafe extern "C" fn HashConfirm(
     mut h: *mut libc::c_uchar,
     mut r: *const libc::c_uchar,
-    mut pk: *const libc::c_uchar,
+    mut _pk: *const libc::c_uchar,
     mut cache: *const libc::c_uchar,
 ) {
     let mut x: [libc::c_uchar; 64] = [0; 64];

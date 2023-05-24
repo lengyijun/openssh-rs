@@ -1112,10 +1112,10 @@ static mut ec_key_idx: libc::c_int = 0 as libc::c_int;
 unsafe extern "C" fn pkcs11_k11_free(
     mut parent: *mut libc::c_void,
     mut ptr: *mut libc::c_void,
-    mut ad: *mut CRYPTO_EX_DATA,
+    mut _ad: *mut CRYPTO_EX_DATA,
     mut idx: libc::c_int,
-    mut argl: libc::c_long,
-    mut argp: *mut libc::c_void,
+    mut _argl: libc::c_long,
+    mut _argp: *mut libc::c_void,
 ) {
     let mut k11: *mut pkcs11_key = ptr as *mut pkcs11_key;
     sshlog(
@@ -1617,7 +1617,7 @@ unsafe extern "C" fn pkcs11_rsa_private_encrypt(
     mut from: *const u_char,
     mut to: *mut u_char,
     mut rsa: *mut RSA,
-    mut padding: libc::c_int,
+    mut _padding: libc::c_int,
 ) -> libc::c_int {
     let mut k11: *mut pkcs11_key = 0 as *mut pkcs11_key;
     let mut si: *mut pkcs11_slotinfo = 0 as *mut pkcs11_slotinfo;
@@ -1687,11 +1687,11 @@ unsafe extern "C" fn pkcs11_rsa_private_encrypt(
     return rval;
 }
 unsafe extern "C" fn pkcs11_rsa_private_decrypt(
-    mut flen: libc::c_int,
-    mut from: *const u_char,
-    mut to: *mut u_char,
-    mut rsa: *mut RSA,
-    mut padding: libc::c_int,
+    mut _flen: libc::c_int,
+    mut _from: *const u_char,
+    mut _to: *mut u_char,
+    mut _rsa: *mut RSA,
+    mut _padding: libc::c_int,
 ) -> libc::c_int {
     return -(1 as libc::c_int);
 }
@@ -1802,8 +1802,8 @@ unsafe extern "C" fn pkcs11_rsa_wrap(
 unsafe extern "C" fn ecdsa_do_sign(
     mut dgst: *const libc::c_uchar,
     mut dgst_len: libc::c_int,
-    mut inv: *const BIGNUM,
-    mut rp: *const BIGNUM,
+    mut _inv: *const BIGNUM,
+    mut _rp: *const BIGNUM,
     mut ec: *mut EC_KEY,
 ) -> *mut ECDSA_SIG {
     let mut k11: *mut pkcs11_key = 0 as *mut pkcs11_key;

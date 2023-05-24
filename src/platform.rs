@@ -44,7 +44,7 @@ pub unsafe extern "C" fn platform_pre_fork() {}
 pub unsafe extern "C" fn platform_pre_restart() {
     oom_adjust_restore();
 }
-pub unsafe extern "C" fn platform_post_fork_parent(mut child_pid: pid_t) {}
+pub unsafe extern "C" fn platform_post_fork_parent(mut _child_pid: pid_t) {}
 pub unsafe extern "C" fn platform_post_fork_child() {
     oom_adjust_restore();
 }
@@ -52,10 +52,10 @@ pub unsafe extern "C" fn platform_privileged_uidswap() -> libc::c_int {
     return (getuid() == 0 as libc::c_int as libc::c_uint
         || geteuid() == 0 as libc::c_int as libc::c_uint) as libc::c_int;
 }
-pub unsafe extern "C" fn platform_setusercontext(mut pw: *mut passwd) {}
-pub unsafe extern "C" fn platform_setusercontext_post_groups(mut pw: *mut passwd) {}
+pub unsafe extern "C" fn platform_setusercontext(mut _pw: *mut passwd) {}
+pub unsafe extern "C" fn platform_setusercontext_post_groups(mut _pw: *mut passwd) {}
 pub unsafe extern "C" fn platform_krb5_get_principal_name(
-    mut pw_name: *const libc::c_char,
+    mut _pw_name: *const libc::c_char,
 ) -> *mut libc::c_char {
     return 0 as *mut libc::c_char;
 }

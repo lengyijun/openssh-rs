@@ -948,11 +948,11 @@ pub unsafe extern "C" fn auth_check_authkey_line(
                                                     0 as libc::c_int,
                                                     0 as libc::c_int,
                                                     0 as libc::c_int,
-                                                    (if ((*keyopts).cert_principals).is_null() {
+                                                    if ((*keyopts).cert_principals).is_null() {
                                                         (*pw).pw_name
                                                     } else {
                                                         0 as *mut libc::c_char
-                                                    }),
+                                                    },
                                                     &mut reason,
                                                 ) != 0 as libc::c_int
                                                 {

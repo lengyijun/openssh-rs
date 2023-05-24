@@ -899,7 +899,7 @@ unsafe extern "C" fn bind_permitted(mut port: libc::c_int, mut uid: uid_t) -> li
     }
     return 1 as libc::c_int;
 }
-unsafe extern "C" fn sigchld_handler(mut sig: libc::c_int) {
+unsafe extern "C" fn sigchld_handler(mut _sig: libc::c_int) {
     ::core::ptr::write_volatile(&mut child_terminated as *mut sig_atomic_t, 1 as libc::c_int);
 }
 unsafe extern "C" fn sigterm_handler(mut sig: libc::c_int) {
@@ -1179,7 +1179,7 @@ unsafe extern "C" fn process_input(
     }
     return -(1 as libc::c_int);
 }
-unsafe extern "C" fn process_output(mut ssh: *mut ssh, mut connection_out: libc::c_int) {
+unsafe extern "C" fn process_output(mut ssh: *mut ssh, mut _connection_out: libc::c_int) {
     let mut r: libc::c_int = 0;
     r = ssh_packet_write_poll(ssh);
     if r != 0 as libc::c_int {
@@ -1227,7 +1227,7 @@ unsafe extern "C" fn collect_children(mut ssh: *mut ssh) {
         ::core::ptr::write_volatile(&mut child_terminated as *mut sig_atomic_t, 0 as libc::c_int);
     }
 }
-pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut authctxt: *mut Authctxt) {
+pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Authctxt) {
     let mut pfd: *mut pollfd = 0 as *mut pollfd;
     let mut npfd_alloc: u_int = 0 as libc::c_int as u_int;
     let mut npfd_active: u_int = 0 as libc::c_int as u_int;
@@ -1863,8 +1863,8 @@ unsafe extern "C" fn server_request_session(mut ssh: *mut ssh) -> *mut Channel {
     return c;
 }
 unsafe extern "C" fn server_input_channel_open(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut c: *mut Channel = 0 as *mut Channel;
@@ -2257,8 +2257,8 @@ unsafe extern "C" fn server_input_hostkeys_prove(
     return success;
 }
 unsafe extern "C" fn server_input_global_request(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut rtype: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -2591,8 +2591,8 @@ unsafe extern "C" fn server_input_global_request(
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn server_input_channel_req(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut c: *mut Channel = 0 as *mut Channel;

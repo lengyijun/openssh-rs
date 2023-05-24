@@ -681,8 +681,8 @@ pub unsafe extern "C" fn do_authentication2(mut ssh: *mut ssh) {
     (*ssh).authctxt = 0 as *mut libc::c_void;
 }
 unsafe extern "C" fn input_service_request(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
@@ -866,8 +866,8 @@ unsafe extern "C" fn ensure_minimum_time_since(
     nanosleep(&mut ts, 0 as *mut timespec);
 }
 unsafe extern "C" fn input_userauth_request(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
@@ -1292,11 +1292,11 @@ unsafe extern "C" fn authmethods_get(mut authctxt: *mut Authctxt) -> *mut libc::
                     r = sshbuf_putf(
                         b,
                         b"%s%s\0" as *const u8 as *const libc::c_char,
-                        (if sshbuf_len(b) != 0 {
+                        if sshbuf_len(b) != 0 {
                             b",\0" as *const u8 as *const libc::c_char
                         } else {
                             b"\0" as *const u8 as *const libc::c_char
-                        }),
+                        },
                         (*authmethods[i as usize]).name,
                     );
                     if r != 0 as libc::c_int {
@@ -1898,16 +1898,16 @@ pub unsafe extern "C" fn auth2_update_session_info(
         (*authctxt).session_info,
         b"%s%s%s\0" as *const u8 as *const libc::c_char,
         method,
-        (if submethod.is_null() {
+        if submethod.is_null() {
             b"\0" as *const u8 as *const libc::c_char
         } else {
             b"/\0" as *const u8 as *const libc::c_char
-        }),
-        (if submethod.is_null() {
+        },
+        if submethod.is_null() {
             b"\0" as *const u8 as *const libc::c_char
         } else {
             submethod
-        }),
+        },
     );
     if r != 0 as libc::c_int {
         sshfatal(

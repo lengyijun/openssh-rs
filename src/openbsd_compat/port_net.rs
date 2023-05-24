@@ -613,7 +613,7 @@ pub unsafe extern "C" fn sys_tun_open(
 }
 #[no_mangle]
 pub unsafe extern "C" fn sys_tun_infilter(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut c: *mut Channel,
     mut buf: *mut libc::c_char,
     mut _len: libc::c_int,
@@ -693,13 +693,13 @@ pub unsafe extern "C" fn sys_tun_infilter(
 }
 #[no_mangle]
 pub unsafe extern "C" fn sys_tun_outfilter(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut c: *mut Channel,
     mut data: *mut *mut u_char,
     mut dlen: *mut size_t,
 ) -> *mut u_char {
     let mut buf: *mut u_char = 0 as *mut u_char;
-    let mut af: u_int32_t = 0;
+    let mut _af: u_int32_t = 0;
     let mut r: libc::c_int = 0;
     r = sshbuf_get_string((*c).output, data, dlen);
     if r != 0 as libc::c_int {

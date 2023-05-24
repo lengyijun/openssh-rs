@@ -995,7 +995,7 @@ static mut cmds: [CMD; 38] = [
         init
     },
 ];
-unsafe extern "C" fn killchild(mut signo: libc::c_int) {
+unsafe extern "C" fn killchild(mut _signo: libc::c_int) {
     let mut pid: pid_t = 0;
     pid = sshpid;
     if pid > 1 as libc::c_int {
@@ -1013,7 +1013,7 @@ unsafe extern "C" fn suspchild(mut signo: libc::c_int) {
     }
     kill(getpid(), 19 as libc::c_int);
 }
-unsafe extern "C" fn cmd_interrupt(mut signo: libc::c_int) {
+unsafe extern "C" fn cmd_interrupt(mut _signo: libc::c_int) {
     let msg: [libc::c_char; 14] =
         *::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"\rInterrupt  \n\0");
     let mut olderrno: libc::c_int = *__errno_location();
@@ -1026,10 +1026,10 @@ unsafe extern "C" fn cmd_interrupt(mut signo: libc::c_int) {
     ::core::ptr::write_volatile(&mut interrupted as *mut sig_atomic_t, 1 as libc::c_int);
     *__errno_location() = olderrno;
 }
-unsafe extern "C" fn read_interrupt(mut signo: libc::c_int) {
+unsafe extern "C" fn read_interrupt(mut _signo: libc::c_int) {
     ::core::ptr::write_volatile(&mut interrupted as *mut sig_atomic_t, 1 as libc::c_int);
 }
-unsafe extern "C" fn sigchld_handler(mut sig: libc::c_int) {
+unsafe extern "C" fn sigchld_handler(mut _sig: libc::c_int) {
     let mut save_errno: libc::c_int = *__errno_location();
     let mut pid: pid_t = 0;
     let msg: [libc::c_char; 23] =
@@ -2115,22 +2115,22 @@ unsafe extern "C" fn sdirent_comp(
             * (if (*a).a.mtime == (*b).a.mtime {
                 0 as libc::c_int
             } else {
-                (if (*a).a.mtime < (*b).a.mtime {
+                if (*a).a.mtime < (*b).a.mtime {
                     1 as libc::c_int
                 } else {
                     -(1 as libc::c_int)
-                })
+                }
             });
     } else if sort_flag & 0x20 as libc::c_int != 0 {
         return rmul
             * (if (*a).a.size == (*b).a.size {
                 0 as libc::c_int
             } else {
-                (if (*a).a.size < (*b).a.size {
+                if (*a).a.size < (*b).a.size {
                     1 as libc::c_int
                 } else {
                     -(1 as libc::c_int)
-                })
+                }
             });
     }
     sshfatal(
@@ -2358,11 +2358,11 @@ unsafe extern "C" fn sglob_comp(
             * (if (*as_0).st_size == (*bs).st_size {
                 0 as libc::c_int
             } else {
-                (if (*as_0).st_size < (*bs).st_size {
+                if (*as_0).st_size < (*bs).st_size {
                     1 as libc::c_int
                 } else {
                     -(1 as libc::c_int)
-                })
+                }
             });
     }
     sshfatal(

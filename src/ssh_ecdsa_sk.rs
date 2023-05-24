@@ -401,8 +401,8 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
     mut siglen: size_t,
     mut data: *const u_char,
     mut dlen: size_t,
-    mut alg: *const libc::c_char,
-    mut compat: u_int,
+    mut _alg: *const libc::c_char,
+    mut _compat: u_int,
     mut detailsp: *mut *mut sshkey_sig_details,
 ) -> libc::c_int {
     let mut current_block: u64;

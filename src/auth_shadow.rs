@@ -166,11 +166,11 @@ pub unsafe extern "C" fn auth_shadow_acctexpired(mut spw: *mut spwd) -> libc::c_
             loginmsg,
             b"Your account will expire in %lld day%s.\n\0" as *const u8 as *const libc::c_char,
             daysleft,
-            (if daysleft == 1 as libc::c_int as libc::c_longlong {
+            if daysleft == 1 as libc::c_int as libc::c_longlong {
                 b"\0" as *const u8 as *const libc::c_char
             } else {
                 b"s\0" as *const u8 as *const libc::c_char
-            }),
+            },
         );
         if r != 0 as libc::c_int {
             sshfatal(
@@ -299,11 +299,11 @@ pub unsafe extern "C" fn auth_shadow_pwexpired(mut ctxt: *mut Authctxt) -> libc:
             loginmsg,
             b"Your password will expire in %d day%s.\n\0" as *const u8 as *const libc::c_char,
             daysleft,
-            (if daysleft == 1 as libc::c_int {
+            if daysleft == 1 as libc::c_int {
                 b"\0" as *const u8 as *const libc::c_char
             } else {
                 b"s\0" as *const u8 as *const libc::c_char
-            }),
+            },
         );
         if r != 0 as libc::c_int {
             sshfatal(

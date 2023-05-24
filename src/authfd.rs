@@ -719,7 +719,7 @@ pub unsafe extern "C" fn ssh_agent_sign(
     mut data: *const u_char,
     mut datalen: size_t,
     mut alg: *const libc::c_char,
-    mut compat: u_int,
+    mut _compat: u_int,
 ) -> libc::c_int {
     let mut msg: *mut sshbuf = 0 as *mut sshbuf;
     let mut sig: *mut u_char = 0 as *mut u_char;

@@ -1714,8 +1714,8 @@ pub unsafe extern "C" fn sshsig_verify_fd(
 }
 pub unsafe extern "C" fn sshsigopt_parse(
     mut opts: *const libc::c_char,
-    mut path: *const libc::c_char,
-    mut linenum: u_long,
+    mut _path: *const libc::c_char,
+    mut _linenum: u_long,
     mut errstrp: *mut *const libc::c_char,
 ) -> *mut sshsigopt {
     let mut current_block: u64;
@@ -2176,11 +2176,11 @@ unsafe extern "C" fn cert_filter_principals(
                         r = sshbuf_putf(
                             nprincipals,
                             b"%s%s\0" as *const u8 as *const libc::c_char,
-                            (if sshbuf_len(nprincipals) != 0 as libc::c_int as libc::c_ulong {
+                            if sshbuf_len(nprincipals) != 0 as libc::c_int as libc::c_ulong {
                                 b",\0" as *const u8 as *const libc::c_char
                             } else {
                                 b"\0" as *const u8 as *const libc::c_char
-                            }),
+                            },
                             *((*(*cert).cert).principals).offset(i as isize),
                         );
                         if r != 0 as libc::c_int {

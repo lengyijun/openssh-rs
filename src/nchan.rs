@@ -798,7 +798,7 @@ pub unsafe extern "C" fn chan_write_failed(mut ssh: *mut ssh, mut c: *mut Channe
         }
     };
 }
-pub unsafe extern "C" fn chan_mark_dead(mut ssh: *mut ssh, mut c: *mut Channel) {
+pub unsafe extern "C" fn chan_mark_dead(mut _ssh: *mut ssh, mut c: *mut Channel) {
     (*c).type_0 = 14 as libc::c_int;
 }
 pub unsafe extern "C" fn chan_is_dead(

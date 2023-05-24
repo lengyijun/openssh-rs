@@ -324,8 +324,8 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
     mut siglen: size_t,
     mut data: *const u_char,
     mut dlen: size_t,
-    mut alg: *const libc::c_char,
-    mut compat: u_int,
+    mut _alg: *const libc::c_char,
+    mut _compat: u_int,
     mut detailsp: *mut *mut sshkey_sig_details,
 ) -> libc::c_int {
     let mut b: *mut sshbuf = 0 as *mut sshbuf;

@@ -106,7 +106,7 @@ static mut preauth_program: sock_fprog = sock_fprog {
     len: 0,
     filter: 0 as *const sock_filter as *mut sock_filter,
 };
-pub unsafe extern "C" fn ssh_sandbox_init(mut monitor: *mut monitor) -> *mut ssh_sandbox {
+pub unsafe extern "C" fn ssh_sandbox_init(mut _monitor: *mut monitor) -> *mut ssh_sandbox {
     let mut box_0: *mut ssh_sandbox = 0 as *mut ssh_sandbox;
     sshlog(
         b"sandbox-seccomp-filter.c\0" as *const u8 as *const libc::c_char,
@@ -125,7 +125,7 @@ pub unsafe extern "C" fn ssh_sandbox_init(mut monitor: *mut monitor) -> *mut ssh
     (*box_0).child_pid = 0 as libc::c_int;
     return box_0;
 }
-pub unsafe extern "C" fn ssh_sandbox_child(mut box_0: *mut ssh_sandbox) {
+pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
     let mut rl_zero: rlimit = rlimit {
         rlim_cur: 0,
         rlim_max: 0,

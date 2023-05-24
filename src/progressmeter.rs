@@ -297,7 +297,7 @@ pub unsafe extern "C" fn refresh_progress_meter(mut force_update: libc::c_int) {
     free(buf as *mut libc::c_void);
     free(obuf as *mut libc::c_void);
 }
-unsafe extern "C" fn sig_alarm(mut ignore: libc::c_int) {
+unsafe extern "C" fn sig_alarm(mut _ignore: libc::c_int) {
     ::core::ptr::write_volatile(&mut alarm_fired as *mut sig_atomic_t, 1 as libc::c_int);
     alarm(1 as libc::c_int as libc::c_uint);
 }
@@ -347,7 +347,7 @@ pub unsafe extern "C" fn stop_progress_meter() {
         1 as libc::c_int as size_t,
     );
 }
-unsafe extern "C" fn sig_winch(mut sig: libc::c_int) {
+unsafe extern "C" fn sig_winch(mut _sig: libc::c_int) {
     ::core::ptr::write_volatile(&mut win_resized as *mut sig_atomic_t, 1 as libc::c_int);
 }
 unsafe extern "C" fn setscreensize() {

@@ -129,7 +129,7 @@ pub unsafe extern "C" fn match_pattern_list(
                     & _ISupper as libc::c_int as libc::c_ushort as libc::c_int
                     != 0
             {
-                ({
+                {
                     let mut __res: libc::c_int = 0;
                     if ::core::mem::size_of::<u_char>() as libc::c_ulong
                         > 1 as libc::c_int as libc::c_ulong
@@ -150,7 +150,7 @@ pub unsafe extern "C" fn match_pattern_list(
                             .offset(*pattern.offset(i as isize) as u_char as libc::c_int as isize);
                     }
                     __res
-                })
+                }
             } else {
                 *pattern.offset(i as isize) as libc::c_int
             }) as libc::c_char;

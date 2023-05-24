@@ -702,7 +702,7 @@ pub unsafe extern "C" fn sshlogdie(
     mut func: *const libc::c_char,
     mut line: libc::c_int,
     mut showfunc: libc::c_int,
-    mut level: LogLevel,
+    mut _level: LogLevel,
     mut suffix: *const libc::c_char,
     mut fmt: *const libc::c_char,
     mut args: ...
@@ -726,7 +726,7 @@ pub unsafe extern "C" fn sshsigdie(
     mut func: *const libc::c_char,
     mut line: libc::c_int,
     mut showfunc: libc::c_int,
-    mut level: LogLevel,
+    mut _level: LogLevel,
     mut suffix: *const libc::c_char,
     mut fmt: *const libc::c_char,
     mut args: ...

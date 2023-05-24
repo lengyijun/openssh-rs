@@ -196,11 +196,11 @@ pub unsafe extern "C" fn scan_scaled(
                         if 0 != 0 {
                             let mut __c: libc::c_int =
                                 scale_chars[i as usize] as libc::c_uchar as libc::c_int;
-                            __res = (if __c < -(128 as libc::c_int) || __c > 255 as libc::c_int {
+                            __res = if __c < -(128 as libc::c_int) || __c > 255 as libc::c_int {
                                 __c
                             } else {
                                 *(*__ctype_tolower_loc()).offset(__c as isize)
-                            });
+                            };
                         } else {
                             __res =
                                 tolower(scale_chars[i as usize] as libc::c_uchar as libc::c_int);

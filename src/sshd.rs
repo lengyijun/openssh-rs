@@ -1400,7 +1400,7 @@ unsafe extern "C" fn close_startup_pipes() {
         }
     }
 }
-unsafe extern "C" fn sighup_handler(mut sig: libc::c_int) {
+unsafe extern "C" fn sighup_handler(mut _sig: libc::c_int) {
     ::core::ptr::write_volatile(&mut received_sighup as *mut sig_atomic_t, 1 as libc::c_int);
 }
 unsafe extern "C" fn sighup_restart() {
@@ -1445,7 +1445,7 @@ unsafe extern "C" fn sighup_restart() {
 unsafe extern "C" fn sigterm_handler(mut sig: libc::c_int) {
     ::core::ptr::write_volatile(&mut received_sigterm as *mut sig_atomic_t, sig);
 }
-unsafe extern "C" fn main_sigchld_handler(mut sig: libc::c_int) {
+unsafe extern "C" fn main_sigchld_handler(mut _sig: libc::c_int) {
     let mut save_errno: libc::c_int = *__errno_location();
     let mut pid: pid_t = 0;
     let mut status: libc::c_int = 0;
@@ -1459,7 +1459,7 @@ unsafe extern "C" fn main_sigchld_handler(mut sig: libc::c_int) {
     }
     *__errno_location() = save_errno;
 }
-unsafe extern "C" fn grace_alarm_handler(mut sig: libc::c_int) {
+unsafe extern "C" fn grace_alarm_handler(mut _sig: libc::c_int) {
     if getpgid(0 as libc::c_int) == getpid() {
         ssh_signal(
             15 as libc::c_int,
@@ -1828,11 +1828,11 @@ unsafe extern "C" fn append_hostkey_type(mut b: *mut sshbuf, mut s: *const libc:
     r = sshbuf_putf(
         b,
         b"%s%s\0" as *const u8 as *const libc::c_char,
-        (if sshbuf_len(b) > 0 as libc::c_int as libc::c_ulong {
+        if sshbuf_len(b) > 0 as libc::c_int as libc::c_ulong {
             b",\0" as *const u8 as *const libc::c_char
         } else {
             b"\0" as *const u8 as *const libc::c_char
-        }),
+        },
         s,
     );
     if r != 0 as libc::c_int {
@@ -1959,7 +1959,7 @@ unsafe extern "C" fn get_hostkey_by_type(
     mut type_0: libc::c_int,
     mut nid: libc::c_int,
     mut need_private: libc::c_int,
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
 ) -> *mut sshkey {
     let mut i: u_int = 0;
     let mut key: *mut sshkey = 0 as *mut sshkey;
@@ -2028,7 +2028,7 @@ pub unsafe extern "C" fn get_hostkey_by_index(mut ind: libc::c_int) -> *mut sshk
 }
 pub unsafe extern "C" fn get_hostkey_public_by_index(
     mut ind: libc::c_int,
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
 ) -> *mut sshkey {
     if ind < 0 as libc::c_int || ind as u_int >= options.num_host_key_files {
         return 0 as *mut sshkey;
@@ -2038,7 +2038,7 @@ pub unsafe extern "C" fn get_hostkey_public_by_index(
 pub unsafe extern "C" fn get_hostkey_index(
     mut key: *mut sshkey,
     mut compare: libc::c_int,
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
 ) -> libc::c_int {
     let mut i: u_int = 0;
     i = 0 as libc::c_int as u_int;
@@ -3565,7 +3565,7 @@ unsafe extern "C" fn check_ip_options(mut ssh: *mut ssh) {
         );
     }
 }
-unsafe extern "C" fn set_process_rdomain(mut ssh: *mut ssh, mut name: *const libc::c_char) {
+unsafe extern "C" fn set_process_rdomain(mut _ssh: *mut ssh, mut _name: *const libc::c_char) {
     sshfatal(
         b"sshd.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"set_process_rdomain\0"))

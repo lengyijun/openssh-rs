@@ -1617,7 +1617,7 @@ unsafe extern "C" fn monitor_reset_key_state() {
     hostbased_chost = 0 as *mut libc::c_char;
 }
 pub unsafe extern "C" fn mm_answer_moduli(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut sock: libc::c_int,
     mut m: *mut sshbuf,
 ) -> libc::c_int {
@@ -2685,7 +2685,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn mm_answer_auth2_read_banner(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut sock: libc::c_int,
     mut m: *mut sshbuf,
 ) -> libc::c_int {
@@ -2695,11 +2695,11 @@ pub unsafe extern "C" fn mm_answer_auth2_read_banner(
     banner = auth2_read_banner();
     r = sshbuf_put_cstring(
         m,
-        (if !banner.is_null() {
+        if !banner.is_null() {
             banner as *const libc::c_char
         } else {
             b"\0" as *const u8 as *const libc::c_char
-        }),
+        },
     );
     if r != 0 as libc::c_int {
         sshfatal(
@@ -2720,8 +2720,8 @@ pub unsafe extern "C" fn mm_answer_auth2_read_banner(
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn mm_answer_authserv(
-    mut ssh: *mut ssh,
-    mut sock: libc::c_int,
+    mut _ssh: *mut ssh,
+    mut _sock: libc::c_int,
     mut m: *mut sshbuf,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
@@ -4103,8 +4103,8 @@ pub unsafe extern "C" fn mm_answer_pty(
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn mm_answer_pty_cleanup(
-    mut ssh: *mut ssh,
-    mut sock: libc::c_int,
+    mut _ssh: *mut ssh,
+    mut _sock: libc::c_int,
     mut m: *mut sshbuf,
 ) -> libc::c_int {
     let mut s: *mut Session = 0 as *mut Session;
@@ -4141,13 +4141,13 @@ pub unsafe extern "C" fn mm_answer_pty_cleanup(
     free(tty as *mut libc::c_void);
     return 0 as libc::c_int;
 }
-pub unsafe extern "C" fn monitor_clear_keystate(mut ssh: *mut ssh, mut pmonitor: *mut monitor) {
+pub unsafe extern "C" fn monitor_clear_keystate(mut ssh: *mut ssh, mut _pmonitor: *mut monitor) {
     ssh_clear_newkeys(ssh, MODE_IN as libc::c_int);
     ssh_clear_newkeys(ssh, MODE_OUT as libc::c_int);
     sshbuf_free(child_state);
     child_state = 0 as *mut sshbuf;
 }
-pub unsafe extern "C" fn monitor_apply_keystate(mut ssh: *mut ssh, mut pmonitor: *mut monitor) {
+pub unsafe extern "C" fn monitor_apply_keystate(mut ssh: *mut ssh, mut _pmonitor: *mut monitor) {
     let mut kex: *mut kex = 0 as *mut kex;
     let mut r: libc::c_int = 0;
     sshlog(
@@ -4273,7 +4273,7 @@ pub unsafe extern "C" fn monitor_apply_keystate(mut ssh: *mut ssh, mut pmonitor:
             ) -> libc::c_int,
     );
 }
-pub unsafe extern "C" fn mm_get_keystate(mut ssh: *mut ssh, mut pmonitor: *mut monitor) {
+pub unsafe extern "C" fn mm_get_keystate(mut _ssh: *mut ssh, mut pmonitor: *mut monitor) {
     sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"mm_get_keystate\0")).as_ptr(),

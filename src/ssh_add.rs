@@ -1157,11 +1157,11 @@ unsafe extern "C" fn update_card(
         agent_fd,
         add,
         id,
-        (if pin.is_null() {
+        if pin.is_null() {
             b"\0" as *const u8 as *const libc::c_char
         } else {
             pin as *const libc::c_char
-        }),
+        },
         lifetime as u_int,
         confirm as u_int,
         dest_constraints,
@@ -2129,11 +2129,11 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             } else if xflag != 0 {
                 if lock_agent(
                     agent_fd,
-                    (if xflag == 'x' as i32 {
+                    if xflag == 'x' as i32 {
                         1 as libc::c_int
                     } else {
                         0 as libc::c_int
-                    }),
+                    },
                 ) == -(1 as libc::c_int)
                 {
                     ret = 1 as libc::c_int;
@@ -2141,11 +2141,11 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             } else if lflag != 0 {
                 if list_identities(
                     agent_fd,
-                    (if lflag == 'l' as i32 {
+                    if lflag == 'l' as i32 {
                         1 as libc::c_int
                     } else {
                         0 as libc::c_int
-                    }),
+                    },
                 ) == -(1 as libc::c_int)
                 {
                     ret = 1 as libc::c_int;

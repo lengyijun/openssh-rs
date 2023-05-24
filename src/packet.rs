@@ -2196,7 +2196,7 @@ pub unsafe extern "C" fn ssh_packet_read_expect(
 unsafe extern "C" fn ssh_packet_read_poll2_mux(
     mut ssh: *mut ssh,
     mut typep: *mut u_char,
-    mut seqnr_p: *mut u_int32_t,
+    mut _seqnr_p: *mut u_int32_t,
 ) -> libc::c_int {
     let mut state: *mut session_state = (*ssh).state;
     let mut cp: *const u_char = 0 as *const u_char;

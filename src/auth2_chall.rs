@@ -273,11 +273,11 @@ unsafe extern "C" fn kbdint_alloc(mut devs: *const libc::c_char) -> *mut KbdintA
             r = sshbuf_putf(
                 b,
                 b"%s%s\0" as *const u8 as *const libc::c_char,
-                (if sshbuf_len(b) != 0 {
+                if sshbuf_len(b) != 0 {
                     b",\0" as *const u8 as *const libc::c_char
                 } else {
                     b"\0" as *const u8 as *const libc::c_char
-                }),
+                },
                 (*devices[i as usize]).name,
             );
             if r != 0 as libc::c_int {
@@ -623,8 +623,8 @@ unsafe extern "C" fn send_userauth_info_request(mut ssh: *mut ssh) -> libc::c_in
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn input_userauth_info_response(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;

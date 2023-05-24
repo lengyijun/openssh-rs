@@ -295,7 +295,7 @@ unsafe extern "C" fn ssh_dss_equal(mut a: *const sshkey, mut b: *const sshkey) -
 unsafe extern "C" fn ssh_dss_serialize_public(
     mut key: *const sshkey,
     mut b: *mut sshbuf,
-    mut opts: sshkey_serialize_rep,
+    mut _opts: sshkey_serialize_rep,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     let mut dsa_p: *const BIGNUM = 0 as *const BIGNUM;
@@ -426,7 +426,7 @@ unsafe extern "C" fn ssh_dss_copy_public(
     return r;
 }
 unsafe extern "C" fn ssh_dss_deserialize_public(
-    mut ktype: *const libc::c_char,
+    mut _ktype: *const libc::c_char,
     mut b: *mut sshbuf,
     mut key: *mut sshkey,
 ) -> libc::c_int {
@@ -489,10 +489,10 @@ unsafe extern "C" fn ssh_dss_sign(
     mut lenp: *mut size_t,
     mut data: *const u_char,
     mut datalen: size_t,
-    mut alg: *const libc::c_char,
-    mut sk_provider: *const libc::c_char,
-    mut sk_pin: *const libc::c_char,
-    mut compat: u_int,
+    mut _alg: *const libc::c_char,
+    mut _sk_provider: *const libc::c_char,
+    mut _sk_pin: *const libc::c_char,
+    mut _compat: u_int,
 ) -> libc::c_int {
     let mut current_block: u64;
     let mut sig: *mut DSA_SIG = 0 as *mut DSA_SIG;
@@ -618,9 +618,9 @@ unsafe extern "C" fn ssh_dss_verify(
     mut siglen: size_t,
     mut data: *const u_char,
     mut dlen: size_t,
-    mut alg: *const libc::c_char,
-    mut compat: u_int,
-    mut detailsp: *mut *mut sshkey_sig_details,
+    mut _alg: *const libc::c_char,
+    mut _compat: u_int,
+    mut _detailsp: *mut *mut sshkey_sig_details,
 ) -> libc::c_int {
     let mut dsig: *mut DSA_SIG = 0 as *mut DSA_SIG;
     let mut sig_r: *mut BIGNUM = 0 as *mut BIGNUM;

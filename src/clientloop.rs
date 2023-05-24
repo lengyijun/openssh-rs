@@ -1171,7 +1171,7 @@ unsafe extern "C" fn quit_message(mut fmt: *const libc::c_char, mut args: ...) {
     }
     ::core::ptr::write_volatile(&mut quit_pending as *mut sig_atomic_t, 1 as libc::c_int);
 }
-unsafe extern "C" fn window_change_handler(mut sig: libc::c_int) {
+unsafe extern "C" fn window_change_handler(mut _sig: libc::c_int) {
     ::core::ptr::write_volatile(
         &mut received_window_change_signal as *mut sig_atomic_t,
         1 as libc::c_int,
@@ -2008,8 +2008,8 @@ unsafe extern "C" fn client_status_confirm(
     free(cr as *mut libc::c_void);
 }
 unsafe extern "C" fn client_abandon_status_confirm(
-    mut ssh: *mut ssh,
-    mut c: *mut Channel,
+    mut _ssh: *mut ssh,
+    mut _c: *mut Channel,
     mut ctx: *mut libc::c_void,
 ) {
     free(ctx);
@@ -3265,8 +3265,8 @@ pub unsafe extern "C" fn client_new_escape_filter_ctx(
     return ret as *mut libc::c_void;
 }
 pub unsafe extern "C" fn client_filter_cleanup(
-    mut ssh: *mut ssh,
-    mut cid: libc::c_int,
+    mut _ssh: *mut ssh,
+    mut _cid: libc::c_int,
     mut ctx: *mut libc::c_void,
 ) {
     free(ctx);
@@ -3285,8 +3285,8 @@ pub unsafe extern "C" fn client_simple_escape_filter(
 unsafe extern "C" fn client_channel_closed(
     mut ssh: *mut ssh,
     mut id: libc::c_int,
-    mut force: libc::c_int,
-    mut arg: *mut libc::c_void,
+    mut _force: libc::c_int,
+    mut _arg: *mut libc::c_void,
 ) {
     channel_cancel_cleanup(ssh, id);
     session_closed = 1 as libc::c_int;
@@ -4014,8 +4014,8 @@ unsafe extern "C" fn client_request_forwarded_tcpip(
 }
 unsafe extern "C" fn client_request_forwarded_streamlocal(
     mut ssh: *mut ssh,
-    mut request_type: *const libc::c_char,
-    mut rchan: libc::c_int,
+    mut _request_type: *const libc::c_char,
+    mut _rchan: libc::c_int,
 ) -> *mut Channel {
     let mut c: *mut Channel = 0 as *mut Channel;
     let mut listen_path: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -4069,8 +4069,8 @@ unsafe extern "C" fn client_request_forwarded_streamlocal(
 }
 unsafe extern "C" fn client_request_x11(
     mut ssh: *mut ssh,
-    mut request_type: *const libc::c_char,
-    mut rchan: libc::c_int,
+    mut _request_type: *const libc::c_char,
+    mut _rchan: libc::c_int,
 ) -> *mut Channel {
     let mut c: *mut Channel = 0 as *mut Channel;
     let mut originator: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -4172,8 +4172,8 @@ unsafe extern "C" fn client_request_x11(
 }
 unsafe extern "C" fn client_request_agent(
     mut ssh: *mut ssh,
-    mut request_type: *const libc::c_char,
-    mut rchan: libc::c_int,
+    mut _request_type: *const libc::c_char,
+    mut _rchan: libc::c_int,
 ) -> *mut Channel {
     let mut c: *mut Channel = 0 as *mut Channel;
     let mut r: libc::c_int = 0;
@@ -4415,8 +4415,8 @@ pub unsafe extern "C" fn client_request_tun_fwd(
     return ifname;
 }
 unsafe extern "C" fn client_input_channel_open(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut c: *mut Channel = 0 as *mut Channel;
@@ -5353,16 +5353,16 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
                 options.user_hostfiles[i as usize],
                 (*ctx).host_str,
                 (*ctx).ip_str,
-                (if i == 0 as libc::c_int as libc::c_ulong {
+                if i == 0 as libc::c_int as libc::c_ulong {
                     (*ctx).keys
                 } else {
                     0 as *mut *mut sshkey
-                }),
-                (if i == 0 as libc::c_int as libc::c_ulong {
+                },
+                if i == 0 as libc::c_int as libc::c_ulong {
                     (*ctx).nkeys
                 } else {
                     0 as libc::c_int as libc::c_ulong
-                }),
+                },
                 options.hash_known_hosts,
                 0 as libc::c_int,
                 options.fingerprint_hash,
@@ -5390,7 +5390,7 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
 unsafe extern "C" fn client_global_hostkeys_prove_confirm(
     mut ssh: *mut ssh,
     mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _seq: u_int32_t,
     mut _ctx: *mut libc::c_void,
 ) {
     let mut current_block: u64;
@@ -5580,11 +5580,11 @@ unsafe extern "C" fn client_global_hostkeys_prove_confirm(
                         siglen,
                         sshbuf_ptr(signdata),
                         sshbuf_len(signdata),
-                        (if plaintype == KEY_RSA as libc::c_int {
+                        if plaintype == KEY_RSA as libc::c_int {
                             rsa_kexalg
                         } else {
                             0 as *const libc::c_char
-                        }),
+                        },
                         0 as libc::c_int as u_int,
                         0 as *mut *mut sshkey_sig_details,
                     );
@@ -6294,8 +6294,8 @@ unsafe extern "C" fn client_input_hostkeys(mut ssh: *mut ssh) -> libc::c_int {
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn client_input_global_request(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut current_block: u64;

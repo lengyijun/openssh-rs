@@ -178,7 +178,7 @@ pub unsafe extern "C" fn pty_allocate(
     strlcpy(namebuf, name, namebuflen);
     return 1 as libc::c_int;
 }
-pub unsafe extern "C" fn pty_release(mut tty: *const libc::c_char) {}
+pub unsafe extern "C" fn pty_release(mut _tty: *const libc::c_char) {}
 pub unsafe extern "C" fn pty_make_controlling_tty(
     mut ttyfd: *mut libc::c_int,
     mut tty: *const libc::c_char,

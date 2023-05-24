@@ -240,7 +240,7 @@ unsafe extern "C" fn ssh_ed25519_equal(mut a: *const sshkey, mut b: *const sshke
 unsafe extern "C" fn ssh_ed25519_serialize_public(
     mut key: *const sshkey,
     mut b: *mut sshbuf,
-    mut opts: sshkey_serialize_rep,
+    mut _opts: sshkey_serialize_rep,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     if ((*key).ed25519_pk).is_null() {
@@ -259,7 +259,7 @@ unsafe extern "C" fn ssh_ed25519_serialize_public(
 unsafe extern "C" fn ssh_ed25519_serialize_private(
     mut key: *const sshkey,
     mut b: *mut sshbuf,
-    mut opts: sshkey_serialize_rep,
+    mut _opts: sshkey_serialize_rep,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     r = sshbuf_put_string(
@@ -281,7 +281,7 @@ unsafe extern "C" fn ssh_ed25519_serialize_private(
 }
 unsafe extern "C" fn ssh_ed25519_generate(
     mut k: *mut sshkey,
-    mut bits: libc::c_int,
+    mut _bits: libc::c_int,
 ) -> libc::c_int {
     (*k).ed25519_pk = malloc(32 as libc::c_uint as libc::c_ulong) as *mut u_char;
     if ((*k).ed25519_pk).is_null() || {
@@ -312,7 +312,7 @@ unsafe extern "C" fn ssh_ed25519_copy_public(
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn ssh_ed25519_deserialize_public(
-    mut ktype: *const libc::c_char,
+    mut _ktype: *const libc::c_char,
     mut b: *mut sshbuf,
     mut key: *mut sshkey,
 ) -> libc::c_int {
@@ -331,7 +331,7 @@ unsafe extern "C" fn ssh_ed25519_deserialize_public(
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn ssh_ed25519_deserialize_private(
-    mut ktype: *const libc::c_char,
+    mut _ktype: *const libc::c_char,
     mut b: *mut sshbuf,
     mut key: *mut sshkey,
 ) -> libc::c_int {
@@ -360,10 +360,10 @@ unsafe extern "C" fn ssh_ed25519_sign(
     mut lenp: *mut size_t,
     mut data: *const u_char,
     mut datalen: size_t,
-    mut alg: *const libc::c_char,
-    mut sk_provider: *const libc::c_char,
-    mut sk_pin: *const libc::c_char,
-    mut compat: u_int,
+    mut _alg: *const libc::c_char,
+    mut _sk_provider: *const libc::c_char,
+    mut _sk_pin: *const libc::c_char,
+    mut _compat: u_int,
 ) -> libc::c_int {
     let mut current_block: u64;
     let mut sig: *mut u_char = 0 as *mut u_char;
@@ -458,9 +458,9 @@ unsafe extern "C" fn ssh_ed25519_verify(
     mut siglen: size_t,
     mut data: *const u_char,
     mut dlen: size_t,
-    mut alg: *const libc::c_char,
-    mut compat: u_int,
-    mut detailsp: *mut *mut sshkey_sig_details,
+    mut _alg: *const libc::c_char,
+    mut _compat: u_int,
+    mut _detailsp: *mut *mut sshkey_sig_details,
 ) -> libc::c_int {
     let mut b: *mut sshbuf = 0 as *mut sshbuf;
     let mut ktype: *mut libc::c_char = 0 as *mut libc::c_char;

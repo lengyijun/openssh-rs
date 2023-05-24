@@ -2567,7 +2567,7 @@ unsafe extern "C" fn prepare_remote_path(
     return 0 as *mut libc::c_char;
 }
 pub unsafe extern "C" fn source_sftp(
-    mut argc: libc::c_int,
+    mut _argc: libc::c_int,
     mut src: *mut libc::c_char,
     mut targ: *mut libc::c_char,
     mut conn: *mut sftp_conn,
@@ -3268,7 +3268,7 @@ pub unsafe extern "C" fn rsource(mut name: *mut libc::c_char, mut statp: *mut st
     response();
 }
 pub unsafe extern "C" fn sink_sftp(
-    mut argc: libc::c_int,
+    mut _argc: libc::c_int,
     mut dst: *mut libc::c_char,
     mut src: *const libc::c_char,
     mut conn: *mut sftp_conn,

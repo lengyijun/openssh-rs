@@ -379,8 +379,8 @@ pub unsafe extern "C" fn kexgex_client(mut ssh: *mut ssh) -> libc::c_int {
     return r;
 }
 unsafe extern "C" fn input_kex_dh_gex_group(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut kex: *mut kex = (*ssh).kex;
@@ -494,8 +494,8 @@ unsafe extern "C" fn input_kex_dh_gex_group(
     return r;
 }
 unsafe extern "C" fn input_kex_dh_gex_reply(
-    mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _type_0: libc::c_int,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut kex: *mut kex = (*ssh).kex;

@@ -1542,11 +1542,11 @@ unsafe extern "C" fn deserialise_nullable_string(
     if r != 0 as libc::c_int || {
         r = sshbuf_get_cstring(
             m,
-            (if flag as libc::c_int != 0 {
+            if flag as libc::c_int != 0 {
                 0 as *mut *mut libc::c_char
             } else {
                 sp
-            }),
+            },
             0 as *mut size_t,
         );
         r != 0 as libc::c_int
@@ -1609,11 +1609,11 @@ pub unsafe extern "C" fn sshauthopt_serialise(
     if r != 0 as libc::c_int || {
         r = sshbuf_put_u32(
             m,
-            (if (*opts).force_tun_device < 0 as libc::c_int {
+            if (*opts).force_tun_device < 0 as libc::c_int {
                 0 as libc::c_int as libc::c_uint
             } else {
                 (*opts).force_tun_device as u_int
-            }),
+            },
         );
         r != 0 as libc::c_int
     } {
@@ -1621,43 +1621,43 @@ pub unsafe extern "C" fn sshauthopt_serialise(
     }
     r = serialise_nullable_string(
         m,
-        (if untrusted != 0 {
+        if untrusted != 0 {
             b"yes\0" as *const u8 as *const libc::c_char
         } else {
             (*opts).cert_principals as *const libc::c_char
-        }),
+        },
     );
     if r != 0 as libc::c_int
         || {
             r = serialise_nullable_string(
                 m,
-                (if untrusted != 0 {
+                if untrusted != 0 {
                     b"true\0" as *const u8 as *const libc::c_char
                 } else {
                     (*opts).force_command as *const libc::c_char
-                }),
+                },
             );
             r != 0 as libc::c_int
         }
         || {
             r = serialise_nullable_string(
                 m,
-                (if untrusted != 0 {
+                if untrusted != 0 {
                     0 as *mut libc::c_char
                 } else {
                     (*opts).required_from_host_cert
-                }),
+                },
             );
             r != 0 as libc::c_int
         }
         || {
             r = serialise_nullable_string(
                 m,
-                (if untrusted != 0 {
+                if untrusted != 0 {
                     0 as *mut libc::c_char
                 } else {
                     (*opts).required_from_host_keys
-                }),
+                },
             );
             r != 0 as libc::c_int
         }
@@ -1667,22 +1667,22 @@ pub unsafe extern "C" fn sshauthopt_serialise(
     r = serialise_array(
         m,
         (*opts).env,
-        (if untrusted != 0 {
+        if untrusted != 0 {
             0 as libc::c_int as libc::c_ulong
         } else {
             (*opts).nenv
-        }),
+        },
     );
     if r != 0 as libc::c_int
         || {
             r = serialise_array(
                 m,
                 (*opts).permitopen,
-                (if untrusted != 0 {
+                if untrusted != 0 {
                     0 as libc::c_int as libc::c_ulong
                 } else {
                     (*opts).npermitopen
-                }),
+                },
             );
             r != 0 as libc::c_int
         }
@@ -1690,11 +1690,11 @@ pub unsafe extern "C" fn sshauthopt_serialise(
             r = serialise_array(
                 m,
                 (*opts).permitlisten,
-                (if untrusted != 0 {
+                if untrusted != 0 {
                     0 as libc::c_int as libc::c_ulong
                 } else {
                     (*opts).npermitlisten
-                }),
+                },
             );
             r != 0 as libc::c_int
         }

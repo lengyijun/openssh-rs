@@ -288,7 +288,7 @@ pub unsafe extern "C" fn kex_c25519_keypair(mut kex: *mut kex) -> libc::c_int {
     return r;
 }
 pub unsafe extern "C" fn kex_c25519_enc(
-    mut kex: *mut kex,
+    mut _kex: *mut kex,
     mut client_blob: *const sshbuf,
     mut server_blobp: *mut *mut sshbuf,
     mut shared_secretp: *mut *mut sshbuf,

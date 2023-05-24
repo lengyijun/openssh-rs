@@ -344,22 +344,22 @@ pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 pub static mut use_privsep: libc::c_int = 0 as libc::c_int;
 pub unsafe extern "C" fn mm_sshkey_sign(
-    mut key: *mut sshkey,
-    mut sigp: *mut *mut u_char,
-    mut lenp: *mut u_int,
-    mut data: *const u_char,
-    mut datalen: u_int,
-    mut alg: *const libc::c_char,
-    mut sk_provider: *const libc::c_char,
-    mut sk_pin: *const libc::c_char,
-    mut compat: u_int,
+    mut _key: *mut sshkey,
+    mut _sigp: *mut *mut u_char,
+    mut _lenp: *mut u_int,
+    mut _data: *const u_char,
+    mut _datalen: u_int,
+    mut _alg: *const libc::c_char,
+    mut _sk_provider: *const libc::c_char,
+    mut _sk_pin: *const libc::c_char,
+    mut _compat: u_int,
 ) -> libc::c_int {
     return -(1 as libc::c_int);
 }
 pub unsafe extern "C" fn mm_choose_dh(
-    mut min: libc::c_int,
-    mut nbits: libc::c_int,
-    mut max: libc::c_int,
+    mut _min: libc::c_int,
+    mut _nbits: libc::c_int,
+    mut _max: libc::c_int,
 ) -> *mut DH {
     return 0 as *mut DH;
 }
@@ -1119,7 +1119,7 @@ pub unsafe extern "C" fn _ssh_order_hostkeyalgs(mut ssh: *mut ssh) -> libc::c_in
 pub unsafe extern "C" fn _ssh_host_key_sign(
     mut ssh: *mut ssh,
     mut privkey: *mut sshkey,
-    mut pubkey: *mut sshkey,
+    mut _pubkey: *mut sshkey,
     mut signature: *mut *mut u_char,
     mut slen: *mut size_t,
     mut data: *const u_char,

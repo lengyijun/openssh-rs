@@ -274,7 +274,7 @@ unsafe extern "C" fn ssh_ecdsa_equal(mut a: *const sshkey, mut b: *const sshkey)
 unsafe extern "C" fn ssh_ecdsa_serialize_public(
     mut key: *const sshkey,
     mut b: *mut sshbuf,
-    mut opts: sshkey_serialize_rep,
+    mut _opts: sshkey_serialize_rep,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     if ((*key).ecdsa).is_null() {
@@ -417,10 +417,10 @@ unsafe extern "C" fn ssh_ecdsa_sign(
     mut lenp: *mut size_t,
     mut data: *const u_char,
     mut dlen: size_t,
-    mut alg: *const libc::c_char,
-    mut sk_provider: *const libc::c_char,
-    mut sk_pin: *const libc::c_char,
-    mut compat: u_int,
+    mut _alg: *const libc::c_char,
+    mut _sk_provider: *const libc::c_char,
+    mut _sk_pin: *const libc::c_char,
+    mut _compat: u_int,
 ) -> libc::c_int {
     let mut current_block: u64;
     let mut esig: *mut ECDSA_SIG = 0 as *mut ECDSA_SIG;
@@ -528,9 +528,9 @@ unsafe extern "C" fn ssh_ecdsa_verify(
     mut siglen: size_t,
     mut data: *const u_char,
     mut dlen: size_t,
-    mut alg: *const libc::c_char,
-    mut compat: u_int,
-    mut detailsp: *mut *mut sshkey_sig_details,
+    mut _alg: *const libc::c_char,
+    mut _compat: u_int,
+    mut _detailsp: *mut *mut sshkey_sig_details,
 ) -> libc::c_int {
     let mut esig: *mut ECDSA_SIG = 0 as *mut ECDSA_SIG;
     let mut sig_r: *mut BIGNUM = 0 as *mut BIGNUM;

@@ -901,7 +901,7 @@ pub unsafe extern "C" fn channel_set_xtype(
     );
 }
 unsafe extern "C" fn channel_register_fds(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut c: *mut Channel,
     mut rfd: libc::c_int,
     mut wfd: libc::c_int,
@@ -1126,7 +1126,7 @@ pub unsafe extern "C" fn channel_new(
     return c;
 }
 pub unsafe extern "C" fn channel_close_fd(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut c: *mut Channel,
     mut fdp: *mut libc::c_int,
 ) -> libc::c_int {
@@ -2333,10 +2333,10 @@ pub unsafe extern "C" fn channel_set_fds(
         );
     }
 }
-unsafe extern "C" fn channel_pre_listener(mut ssh: *mut ssh, mut c: *mut Channel) {
+unsafe extern "C" fn channel_pre_listener(mut _ssh: *mut ssh, mut c: *mut Channel) {
     (*c).io_want = 0x10 as libc::c_int as u_int;
 }
-unsafe extern "C" fn channel_pre_connecting(mut ssh: *mut ssh, mut c: *mut Channel) {
+unsafe extern "C" fn channel_pre_connecting(mut _ssh: *mut ssh, mut c: *mut Channel) {
     sshlog(
         b"channels.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(b"channel_pre_connecting\0"))
@@ -5465,11 +5465,11 @@ unsafe extern "C" fn channel_before_prepare_io(mut ssh: *mut ssh) {
     }
 }
 unsafe extern "C" fn dump_channel_poll(
-    mut func: *const libc::c_char,
-    mut what: *const libc::c_char,
-    mut c: *mut Channel,
-    mut pollfd_offset: u_int,
-    mut pfd: *mut pollfd,
+    mut _func: *const libc::c_char,
+    mut _what: *const libc::c_char,
+    mut _c: *mut Channel,
+    mut _pollfd_offset: u_int,
+    mut _pfd: *mut pollfd,
 ) {
 }
 unsafe extern "C" fn channel_prepare_pollfd(
@@ -6794,7 +6794,7 @@ pub unsafe extern "C" fn channel_proxy_downstream(
 pub unsafe extern "C" fn channel_proxy_upstream(
     mut c: *mut Channel,
     mut type_0: libc::c_int,
-    mut seq: u_int32_t,
+    mut _seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut b: *mut sshbuf = 0 as *mut sshbuf;
@@ -8254,7 +8254,7 @@ unsafe extern "C" fn channel_setup_fwd_listener_streamlocal(
     mut fwd: *mut Forward,
     mut fwd_opts: *mut ForwardOptions,
 ) -> libc::c_int {
-    let mut sunaddr: sockaddr_un = sockaddr_un {
+    let mut _sunaddr: sockaddr_un = sockaddr_un {
         sun_family: 0,
         sun_path: [0; 108],
     };
@@ -9542,8 +9542,8 @@ unsafe extern "C" fn connect_to_helper(
     mut name: *const libc::c_char,
     mut port: libc::c_int,
     mut socktype: libc::c_int,
-    mut ctype: *mut libc::c_char,
-    mut rname: *mut libc::c_char,
+    mut _ctype: *mut libc::c_char,
+    mut _rname: *mut libc::c_char,
     mut cctx: *mut channel_connect,
     mut reason: *mut libc::c_int,
     mut errmsg: *mut *const libc::c_char,

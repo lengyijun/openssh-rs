@@ -290,7 +290,7 @@ pub struct queued_listenaddr {
 }
 pub unsafe extern "C" fn get_last_login_time(
     mut uid: uid_t,
-    mut logname: *const libc::c_char,
+    mut _logname: *const libc::c_char,
     mut buf: *mut libc::c_char,
     mut bufsize: size_t,
 ) -> time_t {

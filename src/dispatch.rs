@@ -141,7 +141,7 @@ pub unsafe extern "C" fn dispatch_protocol_error(
 pub unsafe extern "C" fn dispatch_protocol_ignore(
     mut type_0: libc::c_int,
     mut seq: u_int32_t,
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
 ) -> libc::c_int {
     sshlog(
         b"dispatch.c\0" as *const u8 as *const libc::c_char,

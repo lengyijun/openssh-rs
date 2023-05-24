@@ -293,7 +293,7 @@ pub struct ServerOptions {
 }
 unsafe extern "C" fn userauth_kbdint(
     mut ssh: *mut ssh,
-    mut method: *const libc::c_char,
+    mut _method: *const libc::c_char,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     let mut authenticated: libc::c_int = 0 as libc::c_int;

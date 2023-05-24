@@ -1137,8 +1137,8 @@ pub unsafe extern "C" fn mm_sshkey_sign(
     mut data: *const u_char,
     mut datalen: size_t,
     mut hostkey_alg: *const libc::c_char,
-    mut sk_provider: *const libc::c_char,
-    mut sk_pin: *const libc::c_char,
+    mut _sk_provider: *const libc::c_char,
+    mut _sk_pin: *const libc::c_char,
     mut compat: u_int,
 ) -> libc::c_int {
     let mut kex: *mut kex = *(*pmonitor).m_pkex;
@@ -2135,11 +2135,11 @@ pub unsafe extern "C" fn mm_inform_authserv(
     if r != 0 as libc::c_int || {
         r = sshbuf_put_cstring(
             m,
-            (if !style.is_null() {
+            if !style.is_null() {
                 style as *const libc::c_char
             } else {
                 b"\0" as *const u8 as *const libc::c_char
-            }),
+            },
         );
         r != 0 as libc::c_int
     } {
@@ -2158,7 +2158,7 @@ pub unsafe extern "C" fn mm_inform_authserv(
     sshbuf_free(m);
 }
 pub unsafe extern "C" fn mm_auth_password(
-    mut ssh: *mut ssh,
+    mut _ssh: *mut ssh,
     mut password: *mut libc::c_char,
 ) -> libc::c_int {
     let mut m: *mut sshbuf = 0 as *mut sshbuf;
@@ -2241,8 +2241,8 @@ pub unsafe extern "C" fn mm_auth_password(
     return authenticated;
 }
 pub unsafe extern "C" fn mm_user_key_allowed(
-    mut ssh: *mut ssh,
-    mut pw: *mut passwd,
+    mut _ssh: *mut ssh,
+    mut _pw: *mut passwd,
     mut key: *mut sshkey,
     mut pubkey_auth_attempt: libc::c_int,
     mut authoptp: *mut *mut sshauthopt,
@@ -2257,8 +2257,8 @@ pub unsafe extern "C" fn mm_user_key_allowed(
     );
 }
 pub unsafe extern "C" fn mm_hostbased_key_allowed(
-    mut ssh: *mut ssh,
-    mut pw: *mut passwd,
+    mut _ssh: *mut ssh,
+    mut _pw: *mut passwd,
     mut user: *const libc::c_char,
     mut host: *const libc::c_char,
     mut key: *mut sshkey,
@@ -2314,22 +2314,22 @@ pub unsafe extern "C" fn mm_key_allowed(
         || {
             r = sshbuf_put_cstring(
                 m,
-                (if !user.is_null() {
+                if !user.is_null() {
                     user
                 } else {
                     b"\0" as *const u8 as *const libc::c_char
-                }),
+                },
             );
             r != 0 as libc::c_int
         }
         || {
             r = sshbuf_put_cstring(
                 m,
-                (if !host.is_null() {
+                if !host.is_null() {
                     host
                 } else {
                     b"\0" as *const u8 as *const libc::c_char
-                }),
+                },
             );
             r != 0 as libc::c_int
         }
@@ -2407,7 +2407,7 @@ pub unsafe extern "C" fn mm_sshkey_verify(
     mut data: *const u_char,
     mut datalen: size_t,
     mut sigalg: *const libc::c_char,
-    mut compat: u_int,
+    mut _compat: u_int,
     mut sig_detailsp: *mut *mut sshkey_sig_details,
 ) -> libc::c_int {
     let mut m: *mut sshbuf = 0 as *mut sshbuf;
@@ -2454,11 +2454,11 @@ pub unsafe extern "C" fn mm_sshkey_verify(
         || {
             r = sshbuf_put_cstring(
                 m,
-                (if sigalg.is_null() {
+                if sigalg.is_null() {
                     b"\0" as *const u8 as *const libc::c_char
                 } else {
                     sigalg
-                }),
+                },
             );
             r != 0 as libc::c_int
         }
@@ -2805,7 +2805,7 @@ unsafe extern "C" fn mm_chall_setup(
     *(*echo_on).offset(0 as libc::c_int as isize) = 0 as libc::c_int as u_int;
 }
 pub unsafe extern "C" fn mm_bsdauth_query(
-    mut ctx: *mut libc::c_void,
+    mut _ctx: *mut libc::c_void,
     mut name: *mut *mut libc::c_char,
     mut infotxt: *mut *mut libc::c_char,
     mut numprompts: *mut u_int,
@@ -2897,7 +2897,7 @@ pub unsafe extern "C" fn mm_bsdauth_query(
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn mm_bsdauth_respond(
-    mut ctx: *mut libc::c_void,
+    mut _ctx: *mut libc::c_void,
     mut numresponses: u_int,
     mut responses: *mut *mut libc::c_char,
 ) -> libc::c_int {

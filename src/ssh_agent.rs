@@ -1159,16 +1159,16 @@ unsafe extern "C" fn confirm_key(
             b"Allow use of key %s?\nKey fingerprint %s.%s%s\0" as *const u8 as *const libc::c_char,
             (*id).comment,
             p,
-            (if extra.is_null() {
+            if extra.is_null() {
                 b"\0" as *const u8 as *const libc::c_char
             } else {
                 b"\n\0" as *const u8 as *const libc::c_char
-            }),
-            (if extra.is_null() {
+            },
+            if extra.is_null() {
                 b"\0" as *const u8 as *const libc::c_char
             } else {
                 extra
-            }),
+            },
         ) != 0
     {
         ret = 0 as libc::c_int;
@@ -4709,7 +4709,7 @@ pub unsafe extern "C" fn cleanup_exit(mut i: libc::c_int) -> ! {
     cleanup_socket();
     _exit(i);
 }
-unsafe extern "C" fn cleanup_handler(mut sig: libc::c_int) {
+unsafe extern "C" fn cleanup_handler(mut _sig: libc::c_int) {
     cleanup_socket();
     pkcs11_terminate();
     _exit(2 as libc::c_int);

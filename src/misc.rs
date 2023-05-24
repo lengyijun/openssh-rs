@@ -2188,16 +2188,16 @@ pub unsafe extern "C" fn tilde_expand(
                 &mut s as *mut *mut libc::c_char,
                 b"%s%s%s\0" as *const u8 as *const libc::c_char,
                 (*pw).pw_dir,
-                (if slash != 0 {
+                if slash != 0 {
                     b"/\0" as *const u8 as *const libc::c_char
                 } else {
                     b"\0" as *const u8 as *const libc::c_char
-                }),
-                (if !path.is_null() {
+                },
+                if !path.is_null() {
                     path
                 } else {
                     b"\0" as *const u8 as *const libc::c_char
-                }),
+                },
             );
             if r <= 0 as libc::c_int {
                 sshlog(
@@ -4709,7 +4709,7 @@ pub unsafe extern "C" fn stdfd_devnull(
 pub unsafe extern "C" fn subprocess(
     mut tag: *const libc::c_char,
     mut command: *const libc::c_char,
-    mut ac: libc::c_int,
+    mut _ac: libc::c_int,
     mut av: *mut *mut libc::c_char,
     mut child: *mut *mut FILE,
     mut flags: u_int,

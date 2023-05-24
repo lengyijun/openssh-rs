@@ -4711,7 +4711,7 @@ unsafe extern "C" fn sshkey_private_to_blob_pem_pkcs8(
     mut buf: *mut sshbuf,
     mut format: libc::c_int,
     mut _passphrase: *const libc::c_char,
-    mut comment: *const libc::c_char,
+    mut _comment: *const libc::c_char,
 ) -> libc::c_int {
     let mut current_block: u64;
     let mut was_shielded: libc::c_int = sshkey_is_shielded(key);
@@ -4930,7 +4930,7 @@ unsafe extern "C" fn convert_libcrypto_error() -> libc::c_int {
 unsafe extern "C" fn pem_passphrase_cb(
     mut buf: *mut libc::c_char,
     mut size: libc::c_int,
-    mut rwflag: libc::c_int,
+    mut _rwflag: libc::c_int,
     mut u: *mut libc::c_void,
 ) -> libc::c_int {
     let mut p: *mut libc::c_char = u as *mut libc::c_char;
@@ -5144,23 +5144,23 @@ pub unsafe extern "C" fn sshkey_parse_pubkey_from_private_fileblob_type(
 pub unsafe extern "C" fn sshkey_private_serialize_maxsign(
     mut k: *mut sshkey,
     mut b: *mut sshbuf,
-    mut maxsign: u_int32_t,
-    mut printerror: libc::c_int,
+    mut _maxsign: u_int32_t,
+    mut _printerror: libc::c_int,
 ) -> libc::c_int {
     return sshkey_private_serialize_opt(k, b, SSHKEY_SERIALIZE_DEFAULT);
 }
-pub unsafe extern "C" fn sshkey_signatures_left(mut k: *const sshkey) -> u_int32_t {
+pub unsafe extern "C" fn sshkey_signatures_left(mut _k: *const sshkey) -> u_int32_t {
     return 0 as libc::c_int as u_int32_t;
 }
 pub unsafe extern "C" fn sshkey_enable_maxsign(
-    mut k: *mut sshkey,
-    mut maxsign: u_int32_t,
+    mut _k: *mut sshkey,
+    mut _maxsign: u_int32_t,
 ) -> libc::c_int {
     return -(10 as libc::c_int);
 }
 pub unsafe extern "C" fn sshkey_set_filename(
     mut k: *mut sshkey,
-    mut filename: *const libc::c_char,
+    mut _filename: *const libc::c_char,
 ) -> libc::c_int {
     if k.is_null() {
         return -(10 as libc::c_int);

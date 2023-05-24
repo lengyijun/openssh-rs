@@ -957,7 +957,7 @@ static mut matching_host_key_dns: libc::c_int = 0 as libc::c_int;
 static mut proxy_command_pid: pid_t = 0 as libc::c_int;
 unsafe extern "C" fn expand_proxy_command(
     mut proxy_command: *const libc::c_char,
-    mut user: *const libc::c_char,
+    mut _user: *const libc::c_char,
     mut host: *const libc::c_char,
     mut host_arg: *const libc::c_char,
     mut port: libc::c_int,
@@ -1287,7 +1287,7 @@ pub unsafe extern "C" fn ssh_kill_proxy_command() {
     }
 }
 unsafe extern "C" fn check_ifaddrs(
-    mut ifname: *const libc::c_char,
+    mut _ifname: *const libc::c_char,
     mut af: libc::c_int,
     mut ifaddrs: *const ifaddrs,
     mut resultp: *mut sockaddr_storage,
@@ -1754,7 +1754,7 @@ unsafe extern "C" fn ssh_connect_direct(
     mut host: *const libc::c_char,
     mut aitop: *mut addrinfo,
     mut hostaddr: *mut sockaddr_storage,
-    mut port: u_short,
+    mut _port: u_short,
     mut connection_attempts: libc::c_int,
     mut timeout_ms: *mut libc::c_int,
     mut want_keepalive: libc::c_int,
@@ -2061,7 +2061,7 @@ unsafe extern "C" fn sockaddr_is_local(mut hostaddr: *mut sockaddr) -> libc::c_i
                 == 127 as libc::c_int as libc::c_uint) as libc::c_int;
         }
         10 => {
-            return ({
+            return {
                 let mut __a: *const in6_addr = &mut (*(hostaddr as *mut sockaddr_in6)).sin6_addr
                     as *mut in6_addr
                     as *const in6_addr;
@@ -2074,7 +2074,7 @@ unsafe extern "C" fn sockaddr_is_local(mut hostaddr: *mut sockaddr) -> libc::c_i
                     && (*__a).__in6_u.__u6_addr32[3 as libc::c_int as usize]
                         == __bswap_32(1 as libc::c_int as __uint32_t))
                     as libc::c_int
-            });
+            };
         }
         _ => return 0 as libc::c_int,
     };
@@ -2927,11 +2927,11 @@ unsafe extern "C" fn check_host_key(
                 if want_cert != 0 {
                     if sshkey_cert_check_host(
                         host_key,
-                        (if (options.host_key_alias).is_null() {
+                        if (options.host_key_alias).is_null() {
                             hostname
                         } else {
                             options.host_key_alias
-                        }),
+                        },
                         0 as libc::c_int,
                         options.ca_sign_algorithms,
                         &mut fail_reason,
@@ -4714,7 +4714,7 @@ pub unsafe extern "C" fn maybe_add_key_to_agent(
     mut authfile: *const libc::c_char,
     mut private: *mut sshkey,
     mut comment: *const libc::c_char,
-    mut passphrase: *const libc::c_char,
+    mut _passphrase: *const libc::c_char,
 ) {
     let mut auth_sock: libc::c_int = -(1 as libc::c_int);
     let mut r: libc::c_int = 0;
@@ -4766,7 +4766,7 @@ pub unsafe extern "C" fn maybe_add_key_to_agent(
     r = ssh_add_identity_constrained(
         auth_sock,
         private,
-        (if comment.is_null() { authfile } else { comment }),
+        if comment.is_null() { authfile } else { comment },
         options.add_keys_to_agent_lifespan as u_int,
         (options.add_keys_to_agent == 3 as libc::c_int) as libc::c_int as u_int,
         0 as libc::c_int as u_int,

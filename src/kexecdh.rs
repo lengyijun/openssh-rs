@@ -285,7 +285,7 @@ pub unsafe extern "C" fn kex_ecdh_enc(
     return r;
 }
 unsafe extern "C" fn kex_ecdh_dec_key_group(
-    mut kex: *mut kex,
+    mut _kex: *mut kex,
     mut ec_blob: *const sshbuf,
     mut key: *mut EC_KEY,
     mut group: *const EC_GROUP,
