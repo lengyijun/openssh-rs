@@ -940,7 +940,7 @@ pub static mut iamremote: libc::c_int = 0;
 pub static mut iamrecursive: libc::c_int = 0;
 pub static mut targetshouldbedirectory: libc::c_int = 0;
 pub static mut cmd: [libc::c_char; 64] = [0; 64];
-unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> libc::c_int {
+pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> libc::c_int {
     let mut ch: libc::c_int = 0;
     let mut fflag: libc::c_int = 0;
     let mut tflag: libc::c_int = 0;
