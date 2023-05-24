@@ -32,16 +32,7 @@ extern "C" {
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshkey_new(_: libc::c_int) -> *mut sshkey;
     fn sshkey_write(_: *const sshkey, _: *mut FILE) -> libc::c_int;
     fn sshkey_private_to_fileblob(
@@ -321,7 +312,7 @@ pub unsafe extern "C" fn sshkey_perm_ok(
     if st.st_uid == getuid()
         && st.st_mode & 0o77 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint
     {
-        sshlog(
+        crate::log::sshlog(
             b"authfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"sshkey_perm_ok\0"))
                 .as_ptr(),
@@ -332,7 +323,7 @@ pub unsafe extern "C" fn sshkey_perm_ok(
             b"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\0" as *const u8
                 as *const libc::c_char,
         );
-        sshlog(
+        crate::log::sshlog(
             b"authfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"sshkey_perm_ok\0"))
                 .as_ptr(),
@@ -343,7 +334,7 @@ pub unsafe extern "C" fn sshkey_perm_ok(
             b"@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @\0" as *const u8
                 as *const libc::c_char,
         );
-        sshlog(
+        crate::log::sshlog(
             b"authfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"sshkey_perm_ok\0"))
                 .as_ptr(),
@@ -354,7 +345,7 @@ pub unsafe extern "C" fn sshkey_perm_ok(
             b"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\0" as *const u8
                 as *const libc::c_char,
         );
-        sshlog(
+        crate::log::sshlog(
             b"authfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"sshkey_perm_ok\0"))
                 .as_ptr(),
@@ -366,7 +357,7 @@ pub unsafe extern "C" fn sshkey_perm_ok(
             st.st_mode & 0o777 as libc::c_int as libc::c_uint,
             filename,
         );
-        sshlog(
+        crate::log::sshlog(
             b"authfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"sshkey_perm_ok\0"))
                 .as_ptr(),
@@ -377,7 +368,7 @@ pub unsafe extern "C" fn sshkey_perm_ok(
             b"It is required that your private key files are NOT accessible by others.\0"
                 as *const u8 as *const libc::c_char,
         );
-        sshlog(
+        crate::log::sshlog(
             b"authfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"sshkey_perm_ok\0"))
                 .as_ptr(),

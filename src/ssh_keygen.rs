@@ -300,16 +300,7 @@ extern "C" {
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn log_level_get() -> LogLevel;
     fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -1556,7 +1547,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut sshbuf) -> *mut sshkey 
         );
     }
     if magic != 0x3f6ff9eb as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                 b"do_convert_private_ssh2\0",
@@ -1608,7 +1599,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut sshbuf) -> *mut sshkey 
             b"parse\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(b"do_convert_private_ssh2\0"))
             .as_ptr(),
@@ -1623,7 +1614,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut sshbuf) -> *mut sshkey 
         i4,
     );
     if strcmp(cipher, b"none\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                 b"do_convert_private_ssh2\0",
@@ -1764,7 +1755,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut sshbuf) -> *mut sshkey 
                 );
             }
             e = e1 as u_long;
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                     b"do_convert_private_ssh2\0",
@@ -1780,7 +1771,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut sshbuf) -> *mut sshkey 
             if e < 30 as libc::c_int as libc::c_ulong {
                 e <<= 8 as libc::c_int;
                 e = (e as libc::c_ulong).wrapping_add(e2 as libc::c_ulong) as u_long as u_long;
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                         b"do_convert_private_ssh2\0",
@@ -1795,7 +1786,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut sshbuf) -> *mut sshkey 
                 );
                 e <<= 8 as libc::c_int;
                 e = (e as libc::c_ulong).wrapping_add(e3 as libc::c_ulong) as u_long as u_long;
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                         b"do_convert_private_ssh2\0",
@@ -1921,7 +1912,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut sshbuf) -> *mut sshkey 
     }
     rlen = sshbuf_len(b) as libc::c_int;
     if rlen != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                 b"do_convert_private_ssh2\0",
@@ -1947,7 +1938,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut sshbuf) -> *mut sshkey 
         0 as libc::c_int as u_int,
     );
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                 b"do_convert_private_ssh2\0",
@@ -1971,7 +1962,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut sshbuf) -> *mut sshkey 
             0 as *mut *mut sshkey_sig_details,
         );
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                     b"do_convert_private_ssh2\0",
@@ -2601,7 +2592,7 @@ unsafe extern "C" fn do_print_public(mut pw: *mut passwd) {
     }
     fprintf(stdout, b"\n\0" as *const u8 as *const libc::c_char);
     if sshkey_is_sk(prv) != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"do_print_public\0"))
                 .as_ptr(),
@@ -2824,7 +2815,7 @@ unsafe extern "C" fn fingerprint_private(mut path: *const libc::c_char) {
     }
     r = sshkey_load_public(path, &mut pubkey, &mut comment);
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"fingerprint_private\0"))
                 .as_ptr(),
@@ -2840,7 +2831,7 @@ unsafe extern "C" fn fingerprint_private(mut path: *const libc::c_char) {
         free(comment as *mut libc::c_void);
         r = sshkey_load_private(path, 0 as *const libc::c_char, &mut privkey, &mut comment);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"fingerprint_private\0",
@@ -2975,7 +2966,7 @@ unsafe extern "C" fn do_fingerprint(mut pw: *mut passwd) {
             public = try_read_key(&mut cp);
             public.is_null()
         } {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_fingerprint\0"))
                     .as_ptr(),
@@ -3118,7 +3109,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                 current_block = 11650488183268122163;
             }
         } else if *__errno_location() != 2 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"do_gen_all_hostkeys\0",
@@ -3171,7 +3162,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                 type_0 = sshkey_type_from_name(key_types[i as usize].key_type);
                 fd = _ssh_mkstemp(prv_tmp);
                 if fd == -(1 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                             b"do_gen_all_hostkeys\0",
@@ -3193,7 +3184,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                     type_bits_valid(type_0, 0 as *const libc::c_char, &mut bits);
                     r = sshkey_generate(type_0, bits, &mut private);
                     if r != 0 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                 b"do_gen_all_hostkeys\0",
@@ -3239,7 +3230,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                             rounds,
                         );
                         if r != 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                     b"do_gen_all_hostkeys\0",
@@ -3256,7 +3247,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                         } else {
                             fd = _ssh_mkstemp(pub_tmp);
                             if fd == -(1 as libc::c_int) {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                         b"do_gen_all_hostkeys\0",
@@ -3277,7 +3268,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                                 close(fd);
                                 r = sshkey_save_public(public, pub_tmp, comment.as_mut_ptr());
                                 if r != 0 as libc::c_int {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                             b"do_gen_all_hostkeys\0",
@@ -3293,7 +3284,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                                     );
                                     current_block = 10340423718687530949;
                                 } else if rename(pub_tmp, pub_file) != 0 as libc::c_int {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                             b"do_gen_all_hostkeys\0",
@@ -3310,7 +3301,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                                     );
                                     current_block = 10340423718687530949;
                                 } else if rename(prv_tmp, prv_file) != 0 as libc::c_int {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                             b"do_gen_all_hostkeys\0",
@@ -3379,7 +3370,7 @@ unsafe extern "C" fn known_hosts_hash(
                     (*l).line,
                 );
                 if has_wild != 0 && (*ctx).find_host == 0 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                             b"known_hosts_hash\0",
@@ -3435,7 +3426,7 @@ unsafe extern "C" fn known_hosts_hash(
         }
         1 => {
             (*ctx).invalid = 1 as libc::c_int;
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"known_hosts_hash\0"))
                     .as_ptr(),
@@ -3559,7 +3550,7 @@ unsafe extern "C" fn known_hosts_find_delete(
     } else if (*ctx).delete_host != 0 {
         if (*l).status == 1 as libc::c_int as libc::c_uint {
             (*ctx).invalid = 1 as libc::c_int;
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                     b"known_hosts_find_delete\0",
@@ -3803,7 +3794,7 @@ unsafe extern "C" fn do_known_hosts(
         fclose(ctx.out);
     }
     if ctx.invalid != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_known_hosts\0"))
                 .as_ptr(),
@@ -3815,7 +3806,7 @@ unsafe extern "C" fn do_known_hosts(
             identity_file.as_mut_ptr(),
         );
         if inplace != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_known_hosts\0"))
                     .as_ptr(),
@@ -3830,7 +3821,7 @@ unsafe extern "C" fn do_known_hosts(
         }
         exit(1 as libc::c_int);
     } else if delete_host != 0 && ctx.found_key == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_known_hosts\0"))
                 .as_ptr(),
@@ -3878,7 +3869,7 @@ unsafe extern "C" fn do_known_hosts(
             );
         }
         if rename(tmp.as_mut_ptr(), identity_file.as_mut_ptr()) == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_known_hosts\0"))
                     .as_ptr(),
@@ -3904,7 +3895,7 @@ unsafe extern "C" fn do_known_hosts(
             old.as_mut_ptr(),
         );
         if ctx.has_unhashed != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_known_hosts\0"))
                     .as_ptr(),
@@ -3915,7 +3906,7 @@ unsafe extern "C" fn do_known_hosts(
                 b"WARNING: %s contains unhashed entries\0" as *const u8 as *const libc::c_char,
                 old.as_mut_ptr(),
             );
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_known_hosts\0"))
                     .as_ptr(),
@@ -4075,7 +4066,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut passwd) {
         rounds,
     );
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"do_change_passphrase\0"))
                 .as_ptr(),
@@ -4165,7 +4156,7 @@ unsafe extern "C" fn do_print_resource_record(
                 );
             }
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                     b"do_print_resource_record\0",
@@ -4349,7 +4340,7 @@ unsafe extern "C" fn do_change_comment(
         && (*private).type_0 != KEY_XMSS as libc::c_int
         && private_key_format != SSHKEY_PRIVATE_OPENSSH as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"do_change_comment\0"))
                 .as_ptr(),
@@ -4414,7 +4405,7 @@ unsafe extern "C" fn do_change_comment(
         rounds,
     );
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"do_change_comment\0"))
                 .as_ptr(),
@@ -4559,7 +4550,7 @@ unsafe extern "C" fn prepare_options_buf(mut c: *mut sshbuf, mut which: libc::c_
             || (*ext).crit == 0 && which & 1 as libc::c_int != 0)
         {
             if ((*ext).val).is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                         b"prepare_options_buf\0",
@@ -4591,7 +4582,7 @@ unsafe extern "C" fn prepare_options_buf(mut c: *mut sshbuf, mut which: libc::c_
                     );
                 }
             } else {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                         b"prepare_options_buf\0",
@@ -4755,7 +4746,7 @@ unsafe extern "C" fn load_pkcs11_key(mut path: *mut libc::c_char) -> *mut sshkey
         &mut keys,
         0 as *mut *mut *mut libc::c_char,
     );
-    sshlog(
+    crate::log::sshlog(
         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"load_pkcs11_key\0")).as_ptr(),
         1722 as libc::c_int,
@@ -5172,7 +5163,7 @@ unsafe extern "C" fn do_ca_sign(
                 valid.as_mut_ptr(),
                 ::core::mem::size_of::<[libc::c_char; 64]>() as libc::c_ulong,
             );
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"do_ca_sign\0"))
                     .as_ptr(),
@@ -5910,7 +5901,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut passwd) {
         }
         r = sshkey_read(key, &mut cp);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_show_cert\0"))
                     .as_ptr(),
@@ -5923,7 +5914,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut passwd) {
                 lnum,
             );
         } else if sshkey_is_cert(key) == 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_show_cert\0"))
                     .as_ptr(),
@@ -6816,7 +6807,7 @@ unsafe extern "C" fn load_sign_key(
             ) != 0 as libc::c_int)
         {
             *privpath.offset(plen.wrapping_sub(slen) as isize) = '\0' as i32 as libc::c_char;
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"load_sign_key\0"))
                     .as_ptr(),
@@ -6857,7 +6848,7 @@ unsafe extern "C" fn load_sign_key(
         0 as *mut *mut libc::c_char,
     );
     if r != 0 as libc::c_int && r != -(43 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"load_sign_key\0"))
                 .as_ptr(),
@@ -6883,7 +6874,7 @@ unsafe extern "C" fn load_sign_key(
         privkey = load_identity(privpath, 0 as *mut *mut libc::c_char);
     }
     if sshkey_equal_public(pubkey, privkey) == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"load_sign_key\0"))
                 .as_ptr(),
@@ -6899,7 +6890,7 @@ unsafe extern "C" fn load_sign_key(
         if sshkey_is_cert(pubkey) != 0 && sshkey_is_cert(privkey) == 0 {
             r = sshkey_to_certified(privkey);
             if r != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"load_sign_key\0"))
                         .as_ptr(),
@@ -6913,7 +6904,7 @@ unsafe extern "C" fn load_sign_key(
             } else {
                 r = sshkey_cert_copy(pubkey, privkey);
                 if r != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(
                             b"load_sign_key\0",
@@ -7035,7 +7026,7 @@ unsafe extern "C" fn sign_one(
         signer_ctx,
     );
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"sign_one\0")).as_ptr(),
             2598 as libc::c_int,
@@ -7048,7 +7039,7 @@ unsafe extern "C" fn sign_one(
     } else {
         r = sshsig_armor(sigbuf, &mut abuf);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"sign_one\0")).as_ptr(),
                 2602 as libc::c_int,
@@ -7060,7 +7051,7 @@ unsafe extern "C" fn sign_one(
         } else {
             asig = sshbuf_dup_string(abuf);
             if asig.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"sign_one\0"))
                         .as_ptr(),
@@ -7090,7 +7081,7 @@ unsafe extern "C" fn sign_one(
                         );
                         if wfd == -(1 as libc::c_int) {
                             oerrno = *__errno_location();
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(
                                     b"sign_one\0",
@@ -7140,7 +7131,7 @@ unsafe extern "C" fn sign_one(
                         ) != strlen(asig)
                         {
                             oerrno = *__errno_location();
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(
                                     b"sign_one\0",
@@ -7235,7 +7226,7 @@ unsafe extern "C" fn sig_process_opts(
             ) != 0 as libc::c_int
                 || *verify_timep == 0 as libc::c_int as libc::c_ulong
             {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                         b"sig_process_opts\0",
@@ -7257,7 +7248,7 @@ unsafe extern "C" fn sig_process_opts(
         {
             *print_pubkey = 1 as libc::c_int;
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"sig_process_opts\0"))
                     .as_ptr(),
@@ -7276,7 +7267,7 @@ unsafe extern "C" fn sig_process_opts(
     if !verify_timep.is_null() && *verify_timep == 0 as libc::c_int as libc::c_ulong {
         now = time(0 as *mut time_t);
         if now < 0 as libc::c_int as libc::c_long {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"sig_process_opts\0"))
                     .as_ptr(),
@@ -7346,7 +7337,7 @@ unsafe extern "C" fn sig_sign(
     {
         r = sshkey_load_public(keypath, &mut pubkey, 0 as *mut *mut libc::c_char);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"sig_sign\0")).as_ptr(),
                 2721 as libc::c_int,
@@ -7371,7 +7362,7 @@ unsafe extern "C" fn sig_sign(
                         b"Couldn't get agent socket\0" as *const u8 as *const libc::c_char,
                     );
                 }
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"sig_sign\0"))
                         .as_ptr(),
@@ -7414,7 +7405,7 @@ unsafe extern "C" fn sig_sign(
                             b"Couldn't find key in agent\0" as *const u8 as *const libc::c_char,
                         );
                     }
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"sig_sign\0"))
                             .as_ptr(),
@@ -7472,7 +7463,7 @@ unsafe extern "C" fn sig_sign(
                             } else {
                                 fd = libc::open(*argv.offset(i as isize), 0 as libc::c_int);
                                 if fd == -(1 as libc::c_int) {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(
                                             b"sig_sign\0",
@@ -7564,7 +7555,7 @@ unsafe extern "C" fn sig_verify(
         );
         r = sshbuf_load_file(signature, &mut abuf);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"sig_verify\0"))
                     .as_ptr(),
@@ -7577,7 +7568,7 @@ unsafe extern "C" fn sig_verify(
         } else {
             r = sshsig_dearmor(abuf, &mut sigbuf);
             if r != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"sig_verify\0"))
                         .as_ptr(),
@@ -7611,7 +7602,7 @@ unsafe extern "C" fn sig_verify(
                             b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
                         );
                     }
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"sig_verify\0",
@@ -7626,7 +7617,7 @@ unsafe extern "C" fn sig_verify(
                         fp,
                     );
                     if !sig_details.is_null() {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                 b"sig_verify\0",
@@ -7647,7 +7638,7 @@ unsafe extern "C" fn sig_verify(
                     if !revoked_keys.is_null() {
                         r = sshkey_check_revoked(sign_key, revoked_keys);
                         if r != 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                     b"sig_verify\0",
@@ -7679,7 +7670,7 @@ unsafe extern "C" fn sig_verify(
                                 );
                                 r != 0 as libc::c_int
                             } {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                         b"sig_verify\0",
@@ -7742,7 +7733,7 @@ unsafe extern "C" fn sig_verify(
         if r == 0 as libc::c_int {
             fputc('\n' as i32, stdout);
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"sig_verify\0"))
                     .as_ptr(),
@@ -7787,7 +7778,7 @@ unsafe extern "C" fn sig_find_principals(
     {
         r = sshbuf_load_file(signature, &mut abuf);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"sig_find_principals\0",
@@ -7802,7 +7793,7 @@ unsafe extern "C" fn sig_find_principals(
         } else {
             r = sshsig_dearmor(abuf, &mut sigbuf);
             if r != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                         b"sig_find_principals\0",
@@ -7817,7 +7808,7 @@ unsafe extern "C" fn sig_find_principals(
             } else {
                 r = sshsig_get_pubkey(sigbuf, &mut sign_key);
                 if r != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                             b"sig_find_principals\0",
@@ -7838,7 +7829,7 @@ unsafe extern "C" fn sig_find_principals(
                     );
                     if r != 0 as libc::c_int {
                         if r != -(46 as libc::c_int) {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                     b"sig_find_principals\0",
@@ -7901,7 +7892,7 @@ unsafe extern "C" fn sig_match_principals(
     }
     r = sshsig_match_principals(allowed_keys, principal, &mut principals, &mut nprincipals);
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"sig_match_principals\0"))
                 .as_ptr(),
@@ -8436,7 +8427,7 @@ unsafe extern "C" fn do_download_sk(
         if !pin.is_null() {
             freezero(pin as *mut libc::c_void, strlen(pin));
         }
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_download_sk\0"))
                 .as_ptr(),
@@ -8449,7 +8440,7 @@ unsafe extern "C" fn do_download_sk(
         return -(1 as libc::c_int);
     }
     if nsrks == 0 as libc::c_int as libc::c_ulong {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_download_sk\0"))
                 .as_ptr(),
@@ -8469,7 +8460,7 @@ unsafe extern "C" fn do_download_sk(
         if (*key).type_0 != KEY_ECDSA_SK as libc::c_int
             && (*key).type_0 != KEY_ED25519_SK as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_download_sk\0"))
                     .as_ptr(),
@@ -8497,7 +8488,7 @@ unsafe extern "C" fn do_download_sk(
                     b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_download_sk\0"))
                     .as_ptr(),
@@ -8549,7 +8540,7 @@ unsafe extern "C" fn do_download_sk(
                     rounds,
                 );
                 if r != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                             b"do_download_sk\0",
@@ -8590,7 +8581,7 @@ unsafe extern "C" fn do_download_sk(
                     free(path as *mut libc::c_void);
                     r = sshkey_save_public(key, pubpath, (*key).sk_application);
                     if r != 0 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                                 b"do_download_sk\0",
@@ -9153,7 +9144,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         ) == 0 as libc::c_int
         {
             if ca_key_path.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3583 as libc::c_int,
@@ -9166,7 +9157,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 exit(1 as libc::c_int);
             }
             if have_identity == 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3588 as libc::c_int,
@@ -9186,7 +9177,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         ) == 0 as libc::c_int
         {
             if have_identity == 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3596 as libc::c_int,
@@ -9199,7 +9190,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 exit(1 as libc::c_int);
             }
             if cert_key_id.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3601 as libc::c_int,
@@ -9219,7 +9210,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         ) == 0 as libc::c_int
         {
             if cert_principals.is_null() || *cert_principals as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3611 as libc::c_int,
@@ -9232,7 +9223,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 exit(1 as libc::c_int);
             }
             if have_identity == 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3616 as libc::c_int,
@@ -9260,7 +9251,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         ) == 0 as libc::c_int
         {
             if cert_principals.is_null() || *cert_principals as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3626 as libc::c_int,
@@ -9273,7 +9264,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 exit(1 as libc::c_int);
             }
             if ca_key_path.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3631 as libc::c_int,
@@ -9301,7 +9292,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         ) == 0 as libc::c_int
         {
             if cert_principals.is_null() || *cert_principals as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3641 as libc::c_int,
@@ -9314,7 +9305,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 exit(1 as libc::c_int);
             }
             if ca_key_path.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3646 as libc::c_int,
@@ -9327,7 +9318,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 exit(1 as libc::c_int);
             }
             if have_identity == 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3651 as libc::c_int,
@@ -9340,7 +9331,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 exit(1 as libc::c_int);
             }
             if cert_key_id.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     3656 as libc::c_int,
@@ -9362,7 +9353,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 nopts,
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
             3663 as libc::c_int,
@@ -9376,7 +9367,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     }
     if !ca_key_path.is_null() {
         if argc < 1 as libc::c_int && gen_krl == 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                 3670 as libc::c_int,
@@ -9393,7 +9384,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         && do_gen_candidates == 0
         && do_screen_candidates == 0
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
             3675 as libc::c_int,
@@ -9405,7 +9396,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         usage();
     }
     if change_passphrase != 0 && change_comment != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
             3679 as libc::c_int,
@@ -9417,7 +9408,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         usage();
     }
     if print_fingerprint != 0 && (delete_host != 0 || hash_hosts != 0) {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
             3683 as libc::c_int,
@@ -9835,7 +9826,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                             b"Key enrollment failed\0" as *const u8 as *const libc::c_char,
                         );
                     } else if !passphrase.is_null() {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0"))
                                 .as_ptr(),
@@ -9935,7 +9926,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         rounds,
     );
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
             3907 as libc::c_int,

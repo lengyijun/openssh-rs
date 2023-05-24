@@ -95,16 +95,7 @@ extern "C" {
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn cleanup_exit(_: libc::c_int) -> !;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
@@ -917,7 +908,7 @@ unsafe extern "C" fn client_alive_check(mut ssh: *mut ssh) {
             remote_id.as_mut_ptr(),
             ::core::mem::size_of::<[libc::c_char; 512]>() as libc::c_ulong,
         );
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"client_alive_check\0"))
                 .as_ptr(),
@@ -1115,7 +1106,7 @@ unsafe extern "C" fn wait_until_can_do_something(
             remote_id.as_mut_ptr(),
             ::core::mem::size_of::<[libc::c_char; 512]>() as libc::c_ulong,
         );
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"wait_until_can_do_something\0",
@@ -1148,7 +1139,7 @@ unsafe extern "C" fn process_input(
             return 0 as libc::c_int;
         }
         if *__errno_location() == 32 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"serverloop.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"process_input\0"))
                     .as_ptr(),
@@ -1162,7 +1153,7 @@ unsafe extern "C" fn process_input(
             );
             return -(1 as libc::c_int);
         }
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"process_input\0"))
                 .as_ptr(),
@@ -1203,7 +1194,7 @@ unsafe extern "C" fn collect_children(mut ssh: *mut ssh) {
     let mut pid: pid_t = 0;
     let mut status: libc::c_int = 0;
     if child_terminated != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"collect_children\0"))
                 .as_ptr(),
@@ -1238,7 +1229,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
     let mut connection_out: u_int = 0;
     let mut bsigset: sigset_t = sigset_t { __val: [0; 16] };
     let mut osigset: sigset_t = sigset_t { __val: [0; 16] };
-    sshlog(
+    crate::log::sshlog(
         b"serverloop.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"server_loop2\0")).as_ptr(),
         348 as libc::c_int,
@@ -1250,7 +1241,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
     if sigemptyset(&mut bsigset) == -(1 as libc::c_int)
         || sigaddset(&mut bsigset, 17 as libc::c_int) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"server_loop2\0")).as_ptr(),
             351 as libc::c_int,
@@ -1289,7 +1280,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
             channel_output_poll(ssh);
         }
         if sigprocmask(0 as libc::c_int, &mut bsigset, &mut osigset) == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"serverloop.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"server_loop2\0"))
                     .as_ptr(),
@@ -1314,7 +1305,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
             &mut conn_out_ready,
         );
         if sigprocmask(1 as libc::c_int, &mut bsigset, &mut osigset) == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"serverloop.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"server_loop2\0"))
                     .as_ptr(),
@@ -1327,7 +1318,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
             );
         }
         if received_sigterm != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"serverloop.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"server_loop2\0"))
                     .as_ptr(),
@@ -1372,7 +1363,7 @@ unsafe extern "C" fn server_input_keep_alive(
     mut seq: u_int32_t,
     mut ssh: *mut ssh,
 ) -> libc::c_int {
-    sshlog(
+    crate::log::sshlog(
         b"serverloop.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(b"server_input_keep_alive\0"))
             .as_ptr(),
@@ -1428,7 +1419,7 @@ unsafe extern "C" fn server_request_direct_tcpip(
         );
     }
     if target_port > 0xffff as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"server_request_direct_tcpip\0",
@@ -1442,7 +1433,7 @@ unsafe extern "C" fn server_request_direct_tcpip(
         );
         *reason = 1 as libc::c_int;
     } else if originator_port > 0xffff as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"server_request_direct_tcpip\0",
@@ -1456,7 +1447,7 @@ unsafe extern "C" fn server_request_direct_tcpip(
         );
         *reason = 1 as libc::c_int;
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"server_request_direct_tcpip\0",
@@ -1486,7 +1477,7 @@ unsafe extern "C" fn server_request_direct_tcpip(
                 errmsg,
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"serverloop.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                     b"server_request_direct_tcpip\0",
@@ -1559,7 +1550,7 @@ unsafe extern "C" fn server_request_direct_streamlocal(mut ssh: *mut ssh) -> *mu
         );
     }
     if originator_port > 0xffff as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 34], &[libc::c_char; 34]>(
                 b"server_request_direct_streamlocal\0",
@@ -1572,7 +1563,7 @@ unsafe extern "C" fn server_request_direct_streamlocal(mut ssh: *mut ssh) -> *mu
             b"invalid originator port\0" as *const u8 as *const libc::c_char,
         );
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 34], &[libc::c_char; 34]>(
                 b"server_request_direct_streamlocal\0",
@@ -1601,7 +1592,7 @@ unsafe extern "C" fn server_request_direct_streamlocal(mut ssh: *mut ssh) -> *mu
                 b"direct-streamlocal\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"serverloop.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 34], &[libc::c_char; 34]>(
                     b"server_request_direct_streamlocal\0",
@@ -1670,7 +1661,7 @@ unsafe extern "C" fn server_request_tun(mut ssh: *mut ssh) -> *mut Channel {
         );
     }
     if tun > 2147483647 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"server_request_tun\0"))
                 .as_ptr(),
@@ -1698,7 +1689,7 @@ unsafe extern "C" fn server_request_tun(mut ssh: *mut ssh) -> *mut Channel {
             _ => {
                 sock = tun_open(tun as libc::c_int, mode as libc::c_int, &mut ifname);
                 if !(sock < 0 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"serverloop.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                             b"server_request_tun\0",
@@ -1787,7 +1778,7 @@ unsafe extern "C" fn server_request_tun(mut ssh: *mut ssh) -> *mut Channel {
 unsafe extern "C" fn server_request_session(mut ssh: *mut ssh) -> *mut Channel {
     let mut c: *mut Channel = 0 as *mut Channel;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"serverloop.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(b"server_request_session\0"))
             .as_ptr(),
@@ -1830,7 +1821,7 @@ unsafe extern "C" fn server_request_session(mut ssh: *mut ssh) -> *mut Channel {
         1 as libc::c_int,
     );
     if session_open(the_authctxt, (*c).self_0) != 1 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"server_request_session\0",
@@ -1900,7 +1891,7 @@ unsafe extern "C" fn server_input_channel_open(
             .as_ptr(),
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"serverloop.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(b"server_input_channel_open\0"))
             .as_ptr(),
@@ -1934,7 +1925,7 @@ unsafe extern "C" fn server_input_channel_open(
         c = server_request_tun(ssh);
     }
     if !c.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"server_input_channel_open\0",
@@ -1987,7 +1978,7 @@ unsafe extern "C" fn server_input_channel_open(
             }
         }
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"server_input_channel_open\0",
@@ -2100,7 +2091,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
             r = sshkey_from_blob(blob, blen, &mut key);
             r != 0 as libc::c_int
         } {
-            sshlog(
+            crate::log::sshlog(
                 b"serverloop.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                     b"server_input_hostkeys_prove\0",
@@ -2121,7 +2112,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
                 ssh,
             );
             if ndx == -(1 as libc::c_int) {
-                sshlog(
+                crate::log::sshlog(
                     b"serverloop.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                         b"server_input_hostkeys_prove\0",
@@ -2142,7 +2133,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
                     key_pub = get_hostkey_public_by_index(ndx, ssh);
                     key_pub.is_null()
                 } {
-                    sshlog(
+                    crate::log::sshlog(
                         b"serverloop.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                             b"server_input_hostkeys_prove\0",
@@ -2171,7 +2162,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
                             sigalg = b"rsa-sha2-256\0" as *const u8 as *const libc::c_char;
                         }
                     }
-                    sshlog(
+                    crate::log::sshlog(
                         b"serverloop.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                             b"server_input_hostkeys_prove\0",
@@ -2224,7 +2215,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
                     {
                         continue;
                     }
-                    sshlog(
+                    crate::log::sshlog(
                         b"serverloop.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                             b"server_input_hostkeys_prove\0",
@@ -2313,7 +2304,7 @@ unsafe extern "C" fn server_input_global_request(
             .as_ptr(),
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"serverloop.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
             b"server_input_global_request\0",
@@ -2347,7 +2338,7 @@ unsafe extern "C" fn server_input_global_request(
                 .as_ptr(),
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"server_input_global_request\0",
@@ -2437,7 +2428,7 @@ unsafe extern "C" fn server_input_global_request(
                 .as_ptr(),
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"server_input_global_request\0",
@@ -2472,7 +2463,7 @@ unsafe extern "C" fn server_input_global_request(
                 .as_ptr(),
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"server_input_global_request\0",
@@ -2522,7 +2513,7 @@ unsafe extern "C" fn server_input_global_request(
                 .as_ptr(),
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"server_input_global_request\0",
@@ -2622,7 +2613,7 @@ unsafe extern "C" fn server_input_channel_req(
             .as_ptr(),
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"serverloop.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"server_input_channel_req\0"))
             .as_ptr(),
@@ -2722,7 +2713,7 @@ unsafe extern "C" fn server_input_channel_req(
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
-    sshlog(
+    crate::log::sshlog(
         b"serverloop.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"server_init_dispatch\0"))
             .as_ptr(),

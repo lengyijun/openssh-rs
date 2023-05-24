@@ -68,16 +68,7 @@ extern "C" {
         _: *const sshbuf,
         _: *mut *mut sshbuf,
     ) -> libc::c_int;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
@@ -457,7 +448,7 @@ pub unsafe extern "C" fn kex_gen_client(mut ssh: *mut ssh) -> libc::c_int {
     {
         return r;
     }
-    sshlog(
+    crate::log::sshlog(
         b"kexgen.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"kex_gen_client\0")).as_ptr(),
         133 as libc::c_int,
@@ -492,7 +483,7 @@ unsafe extern "C" fn input_kex_gen_reply(
     let mut slen: size_t = 0;
     let mut hashlen: size_t = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"kexgen.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"input_kex_gen_reply\0"))
             .as_ptr(),
@@ -645,7 +636,7 @@ unsafe extern "C" fn input_kex_gen_reply(
     return r;
 }
 pub unsafe extern "C" fn kex_gen_server(mut ssh: *mut ssh) -> libc::c_int {
-    sshlog(
+    crate::log::sshlog(
         b"kexgen.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"kex_gen_server\0")).as_ptr(),
         260 as libc::c_int,
@@ -681,7 +672,7 @@ unsafe extern "C" fn input_kex_gen_init(
     let mut slen: size_t = 0;
     let mut hashlen: size_t = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"kexgen.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"input_kex_gen_init\0"))
             .as_ptr(),

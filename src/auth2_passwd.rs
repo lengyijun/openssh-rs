@@ -16,16 +16,7 @@ extern "C" {
     ) -> libc::c_int;
     fn sshpkt_get_u8(ssh: *mut ssh, valp: *mut u_char) -> libc::c_int;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -383,7 +374,7 @@ unsafe extern "C" fn userauth_passwd(
         );
     }
     if change != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"auth2-passwd.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"userauth_passwd\0"))
                 .as_ptr(),

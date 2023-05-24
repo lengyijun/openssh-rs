@@ -28,16 +28,7 @@ extern "C" {
     fn free(_: *mut libc::c_void);
     fn temporarily_use_uid(_: *mut passwd);
     fn restore_uid();
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn unset_nonblock(_: libc::c_int) -> libc::c_int;
     fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn auth_debug_add(fmt: *const libc::c_char, _: ...);
@@ -373,7 +364,7 @@ unsafe extern "C" fn check_rhosts_file(
     if !(st.st_mode & 0o170000 as libc::c_int as libc::c_uint
         == 0o100000 as libc::c_int as libc::c_uint)
     {
-        sshlog(
+        crate::log::sshlog(
             b"auth-rhosts.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"check_rhosts_file\0"))
                 .as_ptr(),
@@ -570,7 +561,7 @@ pub unsafe extern "C" fn auth_rhosts2(
     ];
     let mut rhosts_file_index: u_int = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"auth-rhosts.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"auth_rhosts2\0")).as_ptr(),
         202 as libc::c_int,
@@ -610,7 +601,7 @@ pub unsafe extern "C" fn auth_rhosts2(
             &mut st,
         ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"auth-rhosts.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"auth_rhosts2\0")).as_ptr(),
             232 as libc::c_int,
@@ -622,7 +613,7 @@ pub unsafe extern "C" fn auth_rhosts2(
         return 0 as libc::c_int;
     }
     if (*pw).pw_uid == 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"auth-rhosts.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"auth_rhosts2\0")).as_ptr(),
             241 as libc::c_int,
@@ -666,7 +657,7 @@ pub unsafe extern "C" fn auth_rhosts2(
         }
     }
     if stat((*pw).pw_dir, &mut st) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"auth-rhosts.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"auth_rhosts2\0")).as_ptr(),
             263 as libc::c_int,
@@ -690,7 +681,7 @@ pub unsafe extern "C" fn auth_rhosts2(
         && (st.st_uid != 0 as libc::c_int as libc::c_uint && st.st_uid != (*pw).pw_uid
             || st.st_mode & 0o22 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint)
     {
-        sshlog(
+        crate::log::sshlog(
             b"auth-rhosts.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<
                 &[u8; 13],
@@ -722,7 +713,7 @@ pub unsafe extern "C" fn auth_rhosts2(
             rhosts_files[rhosts_file_index as usize],
         );
         if stat(path, &mut st) == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"auth-rhosts.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"auth_rhosts2\0"))
                     .as_ptr(),
@@ -740,7 +731,7 @@ pub unsafe extern "C" fn auth_rhosts2(
                 || st.st_mode & 0o22 as libc::c_int as libc::c_uint
                     != 0 as libc::c_int as libc::c_uint)
         {
-            sshlog(
+            crate::log::sshlog(
                 b"auth-rhosts.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"auth_rhosts2\0"))
                     .as_ptr(),

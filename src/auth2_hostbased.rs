@@ -30,16 +30,7 @@ extern "C" {
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -646,7 +637,7 @@ unsafe extern "C" fn userauth_hostbased(
             b"parse packet\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"userauth_hostbased\0"))
             .as_ptr(),
@@ -662,7 +653,7 @@ unsafe extern "C" fn userauth_hostbased(
     );
     pktype = sshkey_type_from_name(pkalg);
     if pktype == KEY_UNSPEC as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"userauth_hostbased\0"))
                 .as_ptr(),
@@ -676,7 +667,7 @@ unsafe extern "C" fn userauth_hostbased(
     } else {
         r = sshkey_from_blob(pkblob, blen, &mut key);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"userauth_hostbased\0",
@@ -689,7 +680,7 @@ unsafe extern "C" fn userauth_hostbased(
                 b"key_from_blob\0" as *const u8 as *const libc::c_char,
             );
         } else if key.is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"userauth_hostbased\0",
@@ -703,7 +694,7 @@ unsafe extern "C" fn userauth_hostbased(
                 pkalg,
             );
         } else if (*key).type_0 != pktype {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"userauth_hostbased\0",
@@ -721,7 +712,7 @@ unsafe extern "C" fn userauth_hostbased(
         } else if match_pattern_list(pkalg, options.hostbased_accepted_algos, 0 as libc::c_int)
             != 1 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"userauth_hostbased\0",
@@ -738,7 +729,7 @@ unsafe extern "C" fn userauth_hostbased(
         } else {
             r = sshkey_check_cert_sigtype(key, options.ca_sign_algorithms);
             if r != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"userauth_hostbased\0",
@@ -758,7 +749,7 @@ unsafe extern "C" fn userauth_hostbased(
             } else {
                 r = sshkey_check_rsa_length(key, options.required_rsa_size);
                 if r != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                             b"userauth_hostbased\0",
@@ -772,7 +763,7 @@ unsafe extern "C" fn userauth_hostbased(
                         sshkey_type(key),
                     );
                 } else if (*authctxt).valid == 0 || ((*authctxt).user).is_null() {
-                    sshlog(
+                    crate::log::sshlog(
                         b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                             b"userauth_hostbased\0",
@@ -893,7 +884,7 @@ unsafe extern "C" fn userauth_hostbased(
             }
         }
     }
-    sshlog(
+    crate::log::sshlog(
         b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"userauth_hostbased\0"))
             .as_ptr(),
@@ -931,7 +922,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
     }
     resolvedname = auth_get_canonical_hostname(ssh, options.use_dns);
     ipaddr = ssh_remote_ipaddr(ssh);
-    sshlog(
+    crate::log::sshlog(
         b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"hostbased_key_allowed\0"))
             .as_ptr(),
@@ -948,7 +939,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
     if len > 0 as libc::c_int
         && *chost.offset((len - 1 as libc::c_int) as isize) as libc::c_int == '.' as i32
     {
-        sshlog(
+        crate::log::sshlog(
             b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"hostbased_key_allowed\0"))
                 .as_ptr(),
@@ -963,7 +954,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
     }
     if options.hostbased_uses_name_from_packet_only != 0 {
         if auth_rhosts2(pw, cuser, chost, chost) == 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"hostbased_key_allowed\0",
@@ -983,7 +974,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
         lookup = chost;
     } else {
         if strcasecmp(resolvedname, chost) != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"hostbased_key_allowed\0",
@@ -1001,7 +992,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
             );
         }
         if auth_rhosts2(pw, cuser, resolvedname, ipaddr) == 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"hostbased_key_allowed\0",
@@ -1021,7 +1012,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
         }
         lookup = resolvedname;
     }
-    sshlog(
+    crate::log::sshlog(
         b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"hostbased_key_allowed\0"))
             .as_ptr(),
@@ -1041,7 +1032,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
             &mut reason,
         ) != 0
     {
-        sshlog(
+        crate::log::sshlog(
             b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"hostbased_key_allowed\0"))
                 .as_ptr(),
@@ -1100,7 +1091,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
                     b"sshkey_fingerprint fail\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"hostbased_key_allowed\0",
@@ -1134,7 +1125,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
                     b"sshkey_fingerprint fail\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"hostbased_key_allowed\0",

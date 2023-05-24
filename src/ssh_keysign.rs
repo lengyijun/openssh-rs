@@ -19,16 +19,7 @@ extern "C" {
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
@@ -522,7 +513,7 @@ unsafe extern "C" fn valid_request(
     } else {
         r = sshkey_from_blob(pkblob, blen, &mut key);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"valid_request\0"))
                     .as_ptr(),
@@ -552,7 +543,7 @@ unsafe extern "C" fn valid_request(
             b"parse hostname\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"valid_request\0")).as_ptr(),
         134 as libc::c_int,
@@ -601,7 +592,7 @@ unsafe extern "C" fn valid_request(
         fail;
     }
     sshbuf_free(b);
-    sshlog(
+    crate::log::sshlog(
         b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"valid_request\0")).as_ptr(),
         156 as libc::c_int,
@@ -925,7 +916,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             );
             close(key_fd[i as usize]);
             if r != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                     246 as libc::c_int,

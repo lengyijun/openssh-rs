@@ -23,16 +23,7 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
     fn sshpkt_put_stringb(ssh: *mut ssh, v: *const sshbuf) -> libc::c_int;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
@@ -225,7 +216,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
     }
     if tiop.is_null() {
         if fd == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"ttymodes.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"ssh_tty_make_modes\0",
@@ -239,7 +230,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             );
             current_block = 10500593165445915707;
         } else if tcgetattr(fd, &mut tio) == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"ttymodes.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"ssh_tty_make_modes\0",
@@ -601,7 +592,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 );
             }
             if 30 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -640,7 +631,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 31 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -679,7 +670,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 32 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -718,7 +709,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 33 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -757,7 +748,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 34 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -796,7 +787,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 35 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -835,7 +826,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 36 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -874,7 +865,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 37 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -913,7 +904,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 38 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -952,7 +943,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 39 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -991,7 +982,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 40 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1030,7 +1021,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 41 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1069,7 +1060,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 42 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1108,7 +1099,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 50 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1147,7 +1138,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 51 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1186,7 +1177,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 52 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1225,7 +1216,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 53 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1264,7 +1255,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 54 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1303,7 +1294,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 55 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1342,7 +1333,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 56 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1381,7 +1372,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 57 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1420,7 +1411,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 58 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1459,7 +1450,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 59 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1498,7 +1489,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 60 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1537,7 +1528,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 61 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1576,7 +1567,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 62 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1615,7 +1606,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 70 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1654,7 +1645,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 71 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1693,7 +1684,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 72 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1732,7 +1723,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 73 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1771,7 +1762,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 74 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1810,7 +1801,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 75 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1849,7 +1840,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 90 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1888,7 +1879,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 91 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1927,7 +1918,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 92 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -1966,7 +1957,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 }
             }
             if 93 as libc::c_int == 42 as libc::c_int && (*ssh).compat & 0x1 as libc::c_int != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"ssh_tty_make_modes\0",
@@ -2062,7 +2053,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
     }
     buf = sshbuf_from(data as *const libc::c_void, len);
     if buf.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"ttymodes.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"ssh_tty_parse_modes\0"))
                 .as_ptr(),
@@ -2075,7 +2066,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
         return;
     }
     if tcgetattr(fd, &mut tio) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"ttymodes.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"ssh_tty_parse_modes\0"))
                 .as_ptr(),
@@ -2128,7 +2119,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                     && cfsetispeed(&mut tio, baud_to_speed(baud as libc::c_int))
                         == -(1 as libc::c_int)
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ttymodes.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                             b"ssh_tty_parse_modes\0",
@@ -2163,7 +2154,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                     && cfsetospeed(&mut tio, baud_to_speed(baud as libc::c_int))
                         == -(1 as libc::c_int)
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ttymodes.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                             b"ssh_tty_parse_modes\0",
@@ -3273,7 +3264,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             _ => {
-                sshlog(
+                crate::log::sshlog(
                     b"ttymodes.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                         b"ssh_tty_parse_modes\0",
@@ -3307,7 +3298,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                         );
                     }
                 } else {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ttymodes.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                             b"ssh_tty_parse_modes\0",
@@ -3328,7 +3319,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
     len = sshbuf_len(buf);
     sshbuf_free(buf);
     if len > 0 as libc::c_int as libc::c_ulong {
-        sshlog(
+        crate::log::sshlog(
             b"ttymodes.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"ssh_tty_parse_modes\0"))
                 .as_ptr(),
@@ -3345,7 +3336,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
         return;
     }
     if tcsetattr(fd, 0 as libc::c_int, &mut tio) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"ttymodes.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"ssh_tty_parse_modes\0"))
                 .as_ptr(),

@@ -225,16 +225,7 @@ extern "C" {
     );
     fn log_level_name(_: LogLevel) -> *const libc::c_char;
     fn cleanup_exit(_: libc::c_int) -> !;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -1115,7 +1106,7 @@ pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor: 
     let mut ent: *mut mon_table = 0 as *mut mon_table;
     let mut authenticated: libc::c_int = 0 as libc::c_int;
     let mut partial: libc::c_int = 0 as libc::c_int;
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"monitor_child_preauth\0"))
             .as_ptr(),
@@ -1155,7 +1146,7 @@ pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor: 
             if authenticated != 0
                 && auth2_update_methods_lists(authctxt, auth_method, auth_submethod) == 0
             {
-                sshlog(
+                crate::log::sshlog(
                     b"monitor.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                         b"monitor_child_preauth\0",
@@ -1233,7 +1224,7 @@ pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor: 
             b"authentication method name unknown\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"monitor_child_preauth\0"))
             .as_ptr(),
@@ -1312,7 +1303,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
     {
         if *__errno_location() == 32 as libc::c_int {
             sshbuf_free(logmsg);
-            sshlog(
+            crate::log::sshlog(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"monitor_read_log\0"))
                     .as_ptr(),
@@ -1527,7 +1518,7 @@ unsafe extern "C" fn monitor_read(
             b"parse type\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"monitor_read\0")).as_ptr(),
         502 as libc::c_int,
@@ -1562,7 +1553,7 @@ unsafe extern "C" fn monitor_read(
             .expect("non-null function pointer")(ssh, (*pmonitor).m_sendfd, m);
         sshbuf_free(m);
         if (*ent).flags & 0x10 as libc::c_int != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"monitor_read\0"))
                     .as_ptr(),
@@ -1653,7 +1644,7 @@ pub unsafe extern "C" fn mm_answer_moduli(
             b"parse\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_answer_moduli\0")).as_ptr(),
         575 as libc::c_int,
@@ -1749,7 +1740,7 @@ pub unsafe extern "C" fn mm_answer_sign(
     let proof_req: [libc::c_char; 30] = *::core::mem::transmute::<&[u8; 30], &[libc::c_char; 30]>(
         b"hostkeys-prove-00@openssh.com\0",
     );
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"mm_answer_sign\0")).as_ptr(),
         615 as libc::c_int,
@@ -1966,7 +1957,7 @@ pub unsafe extern "C" fn mm_answer_sign(
             );
         }
     }
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"mm_answer_sign\0")).as_ptr(),
         680 as libc::c_int,
@@ -2012,7 +2003,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     let mut r: libc::c_int = 0;
     let mut allowed: libc::c_int = 0 as libc::c_int;
     let mut i: u_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"mm_answer_pwnamallow\0"))
             .as_ptr(),
@@ -2656,7 +2647,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         i;
     }
     if auth2_setup_methods_lists(authctxt) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"monitor.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"mm_answer_pwnamallow\0"))
                 .as_ptr(),
@@ -2667,7 +2658,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
             b"no valid authentication method lists\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"mm_answer_pwnamallow\0"))
             .as_ptr(),
@@ -2745,7 +2736,7 @@ pub unsafe extern "C" fn mm_answer_authserv(
             b"parse\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"mm_answer_authserv\0"))
             .as_ptr(),
@@ -2783,7 +2774,7 @@ unsafe extern "C" fn key_base_type_match(
         }
     }
     if found == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"monitor.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"key_base_type_match\0"))
                 .as_ptr(),
@@ -2858,7 +2849,7 @@ pub unsafe extern "C" fn mm_answer_authpassword(
             b"assemble\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(b"mm_answer_authpassword\0"))
             .as_ptr(),
@@ -2871,7 +2862,7 @@ pub unsafe extern "C" fn mm_answer_authpassword(
             .as_ptr(),
         authenticated,
     );
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(b"mm_answer_authpassword\0"))
             .as_ptr(),
@@ -2905,7 +2896,7 @@ pub unsafe extern "C" fn mm_answer_keyallowed(
     let mut r: libc::c_int = 0;
     let mut allowed: libc::c_int = 0 as libc::c_int;
     let mut opts: *mut sshauthopt = 0 as *mut sshauthopt;
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"mm_answer_keyallowed\0"))
             .as_ptr(),
@@ -3006,7 +2997,7 @@ pub unsafe extern "C" fn mm_answer_keyallowed(
             }
         }
     }
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"mm_answer_keyallowed\0"))
             .as_ptr(),
@@ -3238,7 +3229,7 @@ unsafe extern "C" fn monitor_valid_userblob(
         },
     );
     if strcmp(userstyle, cp) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"monitor.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"monitor_valid_userblob\0",
@@ -3461,7 +3452,7 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
         },
     );
     if strcmp(userstyle, cp) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"monitor.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"monitor_valid_hostbasedblob\0",
@@ -3716,7 +3707,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
         (*ssh).compat as u_int,
         &mut sig_details,
     );
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"mm_answer_keyverify\0"))
             .as_ptr(),
@@ -3757,7 +3748,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
         if req_presence != 0
             && (*sig_details).sk_flags as libc::c_int & 0x1 as libc::c_int == 0 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<
                     &[u8; 20],
@@ -3788,7 +3779,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
         if req_verify != 0
             && (*sig_details).sk_flags as libc::c_int & 0x4 as libc::c_int == 0 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<
                     &[u8; 20],
@@ -3891,7 +3882,7 @@ unsafe extern "C" fn mm_record_login(mut ssh: *mut ssh, mut s: *mut Session, mut
             &mut fromlen,
         ) == -(1 as libc::c_int)
         {
-            sshlog(
+            crate::log::sshlog(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"mm_record_login\0"))
                     .as_ptr(),
@@ -3916,7 +3907,7 @@ unsafe extern "C" fn mm_record_login(mut ssh: *mut ssh, mut s: *mut Session, mut
     );
 }
 unsafe extern "C" fn mm_session_close(mut s: *mut Session) {
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_session_close\0")).as_ptr(),
         1533 as libc::c_int,
@@ -3928,7 +3919,7 @@ unsafe extern "C" fn mm_session_close(mut s: *mut Session) {
         (*s).pid as libc::c_long,
     );
     if (*s).ttyfd != -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"monitor.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_session_close\0"))
                 .as_ptr(),
@@ -3956,7 +3947,7 @@ pub unsafe extern "C" fn mm_answer_pty(
     let mut r: libc::c_int = 0;
     let mut res: libc::c_int = 0;
     let mut fd0: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"mm_answer_pty\0")).as_ptr(),
         1548 as libc::c_int,
@@ -4056,7 +4047,7 @@ pub unsafe extern "C" fn mm_answer_pty(
                 );
             }
             if fd0 != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"monitor.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"mm_answer_pty\0"))
                         .as_ptr(),
@@ -4071,7 +4062,7 @@ pub unsafe extern "C" fn mm_answer_pty(
             close((*s).ttyfd);
             (*s).ttyfd = (*s).ptyfd;
             (*s).ptymaster = (*s).ptyfd;
-            sshlog(
+            crate::log::sshlog(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"mm_answer_pty\0"))
                     .as_ptr(),
@@ -4113,7 +4104,7 @@ pub unsafe extern "C" fn mm_answer_pty_cleanup(
     let mut s: *mut Session = 0 as *mut Session;
     let mut tty: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"mm_answer_pty_cleanup\0"))
             .as_ptr(),
@@ -4153,7 +4144,7 @@ pub unsafe extern "C" fn monitor_clear_keystate(mut ssh: *mut ssh, mut _pmonitor
 pub unsafe extern "C" fn monitor_apply_keystate(mut ssh: *mut ssh, mut _pmonitor: *mut monitor) {
     let mut kex: *mut kex = 0 as *mut kex;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(b"monitor_apply_keystate\0"))
             .as_ptr(),
@@ -4277,7 +4268,7 @@ pub unsafe extern "C" fn monitor_apply_keystate(mut ssh: *mut ssh, mut _pmonitor
     );
 }
 pub unsafe extern "C" fn mm_get_keystate(mut _ssh: *mut ssh, mut pmonitor: *mut monitor) {
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"mm_get_keystate\0")).as_ptr(),
         1757 as libc::c_int,
@@ -4300,7 +4291,7 @@ pub unsafe extern "C" fn mm_get_keystate(mut _ssh: *mut ssh, mut pmonitor: *mut 
         );
     }
     mm_request_receive_expect((*pmonitor).m_sendfd, MONITOR_REQ_KEYEXPORT, child_state);
-    sshlog(
+    crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"mm_get_keystate\0")).as_ptr(),
         1763 as libc::c_int,

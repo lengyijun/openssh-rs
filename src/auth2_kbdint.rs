@@ -13,16 +13,7 @@ extern "C" {
     ) -> libc::c_int;
     fn auth2_challenge(_: *mut ssh, _: *mut libc::c_char) -> libc::c_int;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -321,7 +312,7 @@ unsafe extern "C" fn userauth_kbdint(
             b"parse packet\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"auth2-kbdint.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"userauth_kbdint\0")).as_ptr(),
         57 as libc::c_int,

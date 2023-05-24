@@ -1,4 +1,5 @@
 use ::libc;
+
 extern "C" {
     pub type sshbuf;
     pub type dsa_st;
@@ -15,16 +16,7 @@ extern "C" {
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_get_cstring(
@@ -212,7 +204,7 @@ unsafe extern "C" fn cert_option_list(
     let mut found: libc::c_int = 0;
     c = sshbuf_fromb(oblob);
     if c.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"auth-options.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"cert_option_list\0"))
                 .as_ptr(),
@@ -235,7 +227,7 @@ unsafe extern "C" fn cert_option_list(
                 r = sshbuf_froms(c, &mut data);
                 r != 0 as libc::c_int
             } {
-                sshlog(
+                crate::log::sshlog(
                     b"auth-options.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                         b"cert_option_list\0",
@@ -250,7 +242,7 @@ unsafe extern "C" fn cert_option_list(
                 current_block = 10905793257652027281;
                 break;
             } else {
-                sshlog(
+                crate::log::sshlog(
                     b"auth-options.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                         b"cert_option_list\0",
@@ -324,7 +316,7 @@ unsafe extern "C" fn cert_option_list(
                     {
                         r = sshbuf_get_cstring(data, &mut command, 0 as *mut size_t);
                         if r != 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"auth-options.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                                     b"cert_option_list\0",
@@ -341,7 +333,7 @@ unsafe extern "C" fn cert_option_list(
                             current_block = 10905793257652027281;
                             break;
                         } else if !((*opts).force_command).is_null() {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"auth-options.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                                     b"cert_option_list\0",
@@ -368,7 +360,7 @@ unsafe extern "C" fn cert_option_list(
                     {
                         r = sshbuf_get_cstring(data, &mut allowed, 0 as *mut size_t);
                         if r != 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"auth-options.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                                     b"cert_option_list\0",
@@ -385,7 +377,7 @@ unsafe extern "C" fn cert_option_list(
                             current_block = 10905793257652027281;
                             break;
                         } else if !((*opts).required_from_host_cert).is_null() {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"auth-options.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                                     b"cert_option_list\0",
@@ -404,7 +396,7 @@ unsafe extern "C" fn cert_option_list(
                         } else if addr_match_cidr_list(0 as *const libc::c_char, allowed)
                             == -(1 as libc::c_int)
                         {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"auth-options.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                                     b"cert_option_list\0",
@@ -427,7 +419,7 @@ unsafe extern "C" fn cert_option_list(
                 }
                 if found == 0 {
                     if crit != 0 {
-                        sshlog(
+                        crate::log::sshlog(
                             b"auth-options.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                                 b"cert_option_list\0",
@@ -444,7 +436,7 @@ unsafe extern "C" fn cert_option_list(
                         current_block = 10905793257652027281;
                         break;
                     } else {
-                        sshlog(
+                        crate::log::sshlog(
                             b"auth-options.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                                 b"cert_option_list\0",
@@ -460,7 +452,7 @@ unsafe extern "C" fn cert_option_list(
                         );
                     }
                 } else if sshbuf_len(data) != 0 as libc::c_int as libc::c_ulong {
-                    sshlog(
+                    crate::log::sshlog(
                         b"auth-options.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                             b"cert_option_list\0",

@@ -19,16 +19,7 @@ extern "C" {
     fn sshpkt_put_u32(ssh: *mut ssh, val: u_int32_t) -> libc::c_int;
     fn channel_close_fd(_: *mut ssh, _: *mut Channel, _: *mut libc::c_int) -> libc::c_int;
     fn channel_format_extended_usage(_: *const Channel) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -261,7 +252,7 @@ unsafe extern "C" fn chan_set_istate(mut c: *mut Channel, mut next: u_int) {
             next,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"chan_set_istate\0")).as_ptr(),
         98 as libc::c_int,
@@ -290,7 +281,7 @@ unsafe extern "C" fn chan_set_ostate(mut c: *mut Channel, mut next: u_int) {
             next,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"chan_set_ostate\0")).as_ptr(),
         108 as libc::c_int,
@@ -305,7 +296,7 @@ unsafe extern "C" fn chan_set_ostate(mut c: *mut Channel, mut next: u_int) {
     (*c).ostate = next;
 }
 pub unsafe extern "C" fn chan_read_failed(mut ssh: *mut ssh, mut c: *mut Channel) {
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"chan_read_failed\0")).as_ptr(),
         115 as libc::c_int,
@@ -321,7 +312,7 @@ pub unsafe extern "C" fn chan_read_failed(mut ssh: *mut ssh, mut c: *mut Channel
             chan_set_istate(c, 1 as libc::c_int as u_int);
         }
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"nchan.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"chan_read_failed\0"))
                     .as_ptr(),
@@ -337,7 +328,7 @@ pub unsafe extern "C" fn chan_read_failed(mut ssh: *mut ssh, mut c: *mut Channel
     };
 }
 pub unsafe extern "C" fn chan_ibuf_empty(mut ssh: *mut ssh, mut c: *mut Channel) {
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"chan_ibuf_empty\0")).as_ptr(),
         131 as libc::c_int,
@@ -348,7 +339,7 @@ pub unsafe extern "C" fn chan_ibuf_empty(mut ssh: *mut ssh, mut c: *mut Channel)
         (*c).self_0,
     );
     if sshbuf_len((*c).input) != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"chan_ibuf_empty\0"))
                 .as_ptr(),
@@ -370,7 +361,7 @@ pub unsafe extern "C" fn chan_ibuf_empty(mut ssh: *mut ssh, mut c: *mut Channel)
             chan_set_istate(c, 3 as libc::c_int as u_int);
         }
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"nchan.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"chan_ibuf_empty\0"))
                     .as_ptr(),
@@ -386,7 +377,7 @@ pub unsafe extern "C" fn chan_ibuf_empty(mut ssh: *mut ssh, mut c: *mut Channel)
     };
 }
 pub unsafe extern "C" fn chan_obuf_empty(mut ssh: *mut ssh, mut c: *mut Channel) {
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"chan_obuf_empty\0")).as_ptr(),
         153 as libc::c_int,
@@ -397,7 +388,7 @@ pub unsafe extern "C" fn chan_obuf_empty(mut ssh: *mut ssh, mut c: *mut Channel)
         (*c).self_0,
     );
     if sshbuf_len((*c).output) != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"chan_obuf_empty\0"))
                 .as_ptr(),
@@ -417,7 +408,7 @@ pub unsafe extern "C" fn chan_obuf_empty(mut ssh: *mut ssh, mut c: *mut Channel)
             chan_set_ostate(c, 3 as libc::c_int as u_int);
         }
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"nchan.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"chan_obuf_empty\0"))
                     .as_ptr(),
@@ -434,7 +425,7 @@ pub unsafe extern "C" fn chan_obuf_empty(mut ssh: *mut ssh, mut c: *mut Channel)
     };
 }
 pub unsafe extern "C" fn chan_rcvd_eow(mut ssh: *mut ssh, mut c: *mut Channel) {
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"chan_rcvd_eow\0")).as_ptr(),
         174 as libc::c_int,
@@ -454,7 +445,7 @@ pub unsafe extern "C" fn chan_rcvd_eow(mut ssh: *mut ssh, mut c: *mut Channel) {
 }
 unsafe extern "C" fn chan_send_eof2(mut ssh: *mut ssh, mut c: *mut Channel) {
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"chan_send_eof2\0")).as_ptr(),
         188 as libc::c_int,
@@ -508,7 +499,7 @@ unsafe extern "C" fn chan_send_eof2(mut ssh: *mut ssh, mut c: *mut Channel) {
             (*c).flags |= 0x4 as libc::c_int;
         }
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"nchan.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"chan_send_eof2\0"))
                     .as_ptr(),
@@ -525,7 +516,7 @@ unsafe extern "C" fn chan_send_eof2(mut ssh: *mut ssh, mut c: *mut Channel) {
 }
 unsafe extern "C" fn chan_send_close2(mut ssh: *mut ssh, mut c: *mut Channel) {
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"chan_send_close2\0")).as_ptr(),
         211 as libc::c_int,
@@ -538,7 +529,7 @@ unsafe extern "C" fn chan_send_close2(mut ssh: *mut ssh, mut c: *mut Channel) {
     if (*c).ostate != 3 as libc::c_int as libc::c_uint
         || (*c).istate != 3 as libc::c_int as libc::c_uint
     {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"chan_send_close2\0"))
                 .as_ptr(),
@@ -553,7 +544,7 @@ unsafe extern "C" fn chan_send_close2(mut ssh: *mut ssh, mut c: *mut Channel) {
             (*c).ostate,
         );
     } else if (*c).flags & 0x1 as libc::c_int != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"chan_send_close2\0"))
                 .as_ptr(),
@@ -605,7 +596,7 @@ unsafe extern "C" fn chan_send_close2(mut ssh: *mut ssh, mut c: *mut Channel) {
 }
 unsafe extern "C" fn chan_send_eow2(mut ssh: *mut ssh, mut c: *mut Channel) {
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"chan_send_eow2\0")).as_ptr(),
         234 as libc::c_int,
@@ -616,7 +607,7 @@ unsafe extern "C" fn chan_send_eow2(mut ssh: *mut ssh, mut c: *mut Channel) {
         (*c).self_0,
     );
     if (*c).ostate == 3 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"chan_send_eow2\0"))
                 .as_ptr(),
@@ -680,7 +671,7 @@ unsafe extern "C" fn chan_send_eow2(mut ssh: *mut ssh, mut c: *mut Channel) {
     }
 }
 pub unsafe extern "C" fn chan_rcvd_ieof(mut ssh: *mut ssh, mut c: *mut Channel) {
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"chan_rcvd_ieof\0")).as_ptr(),
         257 as libc::c_int,
@@ -705,7 +696,7 @@ pub unsafe extern "C" fn chan_rcvd_ieof(mut ssh: *mut ssh, mut c: *mut Channel) 
     }
 }
 pub unsafe extern "C" fn chan_rcvd_oclose(mut ssh: *mut ssh, mut c: *mut Channel) {
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"chan_rcvd_oclose\0")).as_ptr(),
         270 as libc::c_int,
@@ -717,7 +708,7 @@ pub unsafe extern "C" fn chan_rcvd_oclose(mut ssh: *mut ssh, mut c: *mut Channel
     );
     if (*c).flags & 0x10 as libc::c_int == 0 {
         if (*c).flags & 0x2 as libc::c_int != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"nchan.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"chan_rcvd_oclose\0"))
                     .as_ptr(),
@@ -760,7 +751,7 @@ pub unsafe extern "C" fn chan_rcvd_oclose(mut ssh: *mut ssh, mut c: *mut Channel
     };
 }
 pub unsafe extern "C" fn chan_write_failed(mut ssh: *mut ssh, mut c: *mut Channel) {
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"chan_write_failed\0"))
             .as_ptr(),
@@ -782,7 +773,7 @@ pub unsafe extern "C" fn chan_write_failed(mut ssh: *mut ssh, mut c: *mut Channe
             chan_set_ostate(c, 3 as libc::c_int as u_int);
         }
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"nchan.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"chan_write_failed\0"))
                     .as_ptr(),
@@ -807,7 +798,7 @@ pub unsafe extern "C" fn chan_is_dead(
     mut do_send: libc::c_int,
 ) -> libc::c_int {
     if (*c).type_0 == 14 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"chan_is_dead\0")).as_ptr(),
             336 as libc::c_int,
@@ -829,7 +820,7 @@ pub unsafe extern "C" fn chan_is_dead(
         && (*c).efd != -(1 as libc::c_int)
         && sshbuf_len((*c).extended) > 0 as libc::c_int as libc::c_ulong
     {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"chan_is_dead\0")).as_ptr(),
             346 as libc::c_int,
@@ -844,7 +835,7 @@ pub unsafe extern "C" fn chan_is_dead(
         return 0 as libc::c_int;
     }
     if (*c).flags & 0x10 as libc::c_int != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"chan_is_dead\0")).as_ptr(),
             350 as libc::c_int,
@@ -860,7 +851,7 @@ pub unsafe extern "C" fn chan_is_dead(
         if do_send != 0 {
             chan_send_close2(ssh, c);
         } else if (*c).flags & 0x2 as libc::c_int != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"nchan.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"chan_is_dead\0"))
                     .as_ptr(),
@@ -875,7 +866,7 @@ pub unsafe extern "C" fn chan_is_dead(
         }
     }
     if (*c).flags & 0x1 as libc::c_int != 0 && (*c).flags & 0x2 as libc::c_int != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"chan_is_dead\0")).as_ptr(),
             367 as libc::c_int,
@@ -894,7 +885,7 @@ unsafe extern "C" fn chan_shutdown_write(mut ssh: *mut ssh, mut c: *mut Channel)
     if (*c).type_0 == 10 as libc::c_int {
         return;
     }
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"chan_shutdown_write\0"))
             .as_ptr(),
@@ -913,7 +904,7 @@ unsafe extern "C" fn chan_shutdown_write(mut ssh: *mut ssh, mut c: *mut Channel)
     );
     if (*c).sock != -(1 as libc::c_int) {
         if shutdown((*c).sock, SHUT_WR as libc::c_int) == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"nchan.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"chan_shutdown_write\0",
@@ -933,7 +924,7 @@ unsafe extern "C" fn chan_shutdown_write(mut ssh: *mut ssh, mut c: *mut Channel)
             );
         }
     } else if channel_close_fd(ssh, c, &mut (*c).wfd) < 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"chan_shutdown_write\0"))
                 .as_ptr(),
@@ -955,7 +946,7 @@ unsafe extern "C" fn chan_shutdown_read(mut ssh: *mut ssh, mut c: *mut Channel) 
     if (*c).type_0 == 10 as libc::c_int {
         return;
     }
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"chan_shutdown_read\0"))
             .as_ptr(),
@@ -976,7 +967,7 @@ unsafe extern "C" fn chan_shutdown_read(mut ssh: *mut ssh, mut c: *mut Channel) 
         if shutdown((*c).sock, SHUT_RD as libc::c_int) == -(1 as libc::c_int)
             && *__errno_location() != 107 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"nchan.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"chan_shutdown_read\0",
@@ -996,7 +987,7 @@ unsafe extern "C" fn chan_shutdown_read(mut ssh: *mut ssh, mut c: *mut Channel) 
             );
         }
     } else if channel_close_fd(ssh, c, &mut (*c).rfd) < 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"chan_shutdown_read\0"))
                 .as_ptr(),
@@ -1021,7 +1012,7 @@ unsafe extern "C" fn chan_shutdown_extended_read(mut ssh: *mut ssh, mut c: *mut 
     if (*c).extended_usage != 1 as libc::c_int && (*c).extended_usage != 0 as libc::c_int {
         return;
     }
-    sshlog(
+    crate::log::sshlog(
         b"nchan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
             b"chan_shutdown_extended_read\0",
@@ -1041,7 +1032,7 @@ unsafe extern "C" fn chan_shutdown_extended_read(mut ssh: *mut ssh, mut c: *mut 
         channel_format_extended_usage(c),
     );
     if channel_close_fd(ssh, c, &mut (*c).efd) < 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"chan_shutdown_extended_read\0",

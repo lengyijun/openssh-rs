@@ -38,16 +38,7 @@ extern "C" {
         valp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -236,7 +227,7 @@ pub unsafe extern "C" fn decode_attrib(mut b: *mut sshbuf, mut a: *mut Attrib) -
             } {
                 return r;
             }
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-common.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"decode_attrib\0"))
                     .as_ptr(),

@@ -187,16 +187,7 @@ extern "C" {
     fn sshkey_private_deserialize(buf: *mut sshbuf, keyp: *mut *mut sshkey) -> libc::c_int;
     fn sshkey_enable_maxsign(_: *mut sshkey, _: u_int32_t) -> libc::c_int;
     fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
@@ -693,7 +684,7 @@ unsafe extern "C" fn match_key_hop(
             b"fingerprint failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"match_key_hop\0")).as_ptr(),
         275 as libc::c_int,
@@ -731,7 +722,7 @@ unsafe extern "C" fn match_key_hop(
                 b"fingerprint failed\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"match_key_hop\0"))
                 .as_ptr(),
@@ -775,7 +766,7 @@ unsafe extern "C" fn match_key_hop(
                     &mut reason,
                 ) != 0 as libc::c_int
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<
                             &[u8; 14],
@@ -818,7 +809,7 @@ unsafe extern "C" fn permitted_by_dest_constraints(
     i = 0 as libc::c_int as size_t;
     while i < (*id).ndest_constraints {
         d = ((*id).dest_constraints).offset(i as isize);
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 30], &[libc::c_char; 30]>(
                 b"permitted_by_dest_constraints\0",
@@ -898,7 +889,7 @@ unsafe extern "C" fn permitted_by_dest_constraints(
                         if !hostnamep.is_null() {
                             *hostnamep = (*d).to.hostname;
                         }
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 30], &[libc::c_char; 30]>(
                                 b"permitted_by_dest_constraints\0",
@@ -924,7 +915,7 @@ unsafe extern "C" fn permitted_by_dest_constraints(
         i = i.wrapping_add(1);
         i;
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 30], &[libc::c_char; 30]>(
             b"permitted_by_dest_constraints\0",
@@ -955,7 +946,7 @@ unsafe extern "C" fn identity_permitted(
     let mut test_user: *const libc::c_char = 0 as *const libc::c_char;
     let mut fp1: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut fp2: *mut libc::c_char = 0 as *mut libc::c_char;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"identity_permitted\0"))
             .as_ptr(),
@@ -1027,7 +1018,7 @@ unsafe extern "C" fn identity_permitted(
                 b"fingerprint failed\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"identity_permitted\0"))
                 .as_ptr(),
@@ -1074,7 +1065,7 @@ unsafe extern "C" fn identity_permitted(
         if i == ((*e).nsession_ids).wrapping_sub(1 as libc::c_int as libc::c_ulong) {
             test_user = user;
             if (*hks).forwarded != 0 && !user.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"identity_permitted\0",
@@ -1089,7 +1080,7 @@ unsafe extern "C" fn identity_permitted(
                 return -(1 as libc::c_int);
             }
         } else if (*hks).forwarded == 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"identity_permitted\0",
@@ -1124,7 +1115,7 @@ unsafe extern "C" fn identity_permitted(
             0 as *mut *const libc::c_char,
         ) != 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"identity_permitted\0"))
                 .as_ptr(),
@@ -1209,7 +1200,7 @@ unsafe extern "C" fn process_request_identities(mut e: *mut SocketEntry) {
     let mut keys: *mut sshbuf = 0 as *mut sshbuf;
     let mut r: libc::c_int = 0;
     let mut nentries: u_int = 0 as libc::c_int as u_int;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
             b"process_request_identities\0",
@@ -1254,7 +1245,7 @@ unsafe extern "C" fn process_request_identities(mut e: *mut SocketEntry) {
                 r = sshbuf_put_cstring(keys, (*id).comment);
                 r != 0 as libc::c_int
             } {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                         b"process_request_identities\0",
@@ -1273,7 +1264,7 @@ unsafe extern "C" fn process_request_identities(mut e: *mut SocketEntry) {
         }
         id = (*id).next.tqe_next;
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
             b"process_request_identities\0",
@@ -1460,7 +1451,7 @@ unsafe extern "C" fn parse_userauth_request(
                                 r = -(4 as libc::c_int);
                             } else {
                                 r = 0 as libc::c_int;
-                                sshlog(
+                                crate::log::sshlog(
                                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                                         b"parse_userauth_request\0",
@@ -1566,7 +1557,7 @@ unsafe extern "C" fn check_websafe_message_contents(
         0 as *mut *mut sshkey,
     ) == 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                 b"check_websafe_message_contents\0",
@@ -1582,7 +1573,7 @@ unsafe extern "C" fn check_websafe_message_contents(
         return 1 as libc::c_int;
     }
     if parse_sshsig_request(data) == 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                 b"check_websafe_message_contents\0",
@@ -1596,7 +1587,7 @@ unsafe extern "C" fn check_websafe_message_contents(
         );
         return 1 as libc::c_int;
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
             b"check_websafe_message_contents\0",
@@ -1650,7 +1641,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
     let mut hostkey: *mut sshkey = 0 as *mut sshkey;
     let mut id: *mut identity = 0 as *mut identity;
     let mut notifier: *mut notifier_ctx = 0 as *mut notifier_ctx;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"process_sign_request2\0"))
             .as_ptr(),
@@ -1687,7 +1678,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
             r != 0 as libc::c_int
         }
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"process_sign_request2\0"))
                 .as_ptr(),
@@ -1700,7 +1691,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
     } else {
         id = lookup_identity(key);
         if id.is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"process_sign_request2\0",
@@ -1731,7 +1722,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
             }
             if (*id).ndest_constraints != 0 as libc::c_int as libc::c_ulong {
                 if (*e).nsession_ids == 0 as libc::c_int as libc::c_ulong {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<
                             &[u8; 22],
@@ -1749,7 +1740,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                 } else if parse_userauth_request(data, key, &mut user, &mut sid, &mut hostkey)
                     != 0 as libc::c_int
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<
                             &[u8; 22],
@@ -1765,7 +1756,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                     );
                     current_block = 13457127675253637570;
                 } else {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                             b"process_sign_request2\0",
@@ -1791,7 +1782,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                         .sid,
                     ) != 0 as libc::c_int
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<
                                 &[u8; 22],
@@ -1813,7 +1804,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                     } else if (*e).nsession_ids > 1 as libc::c_int as libc::c_ulong
                         && hostkey.is_null()
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<
                                 &[u8; 22],
@@ -1838,7 +1829,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                             .key,
                         ) == 0
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<
                                 &[u8; 22],
@@ -1870,7 +1861,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                 13457127675253637570 => {}
                 _ => {
                     if (*id).confirm != 0 && confirm_key(id, sig_dest) != 0 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                                 b"process_sign_request2\0",
@@ -1933,7 +1924,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                                     compat,
                                 );
                                 if r != 0 as libc::c_int {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                                             b"process_sign_request2\0",
@@ -1971,7 +1962,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                                         pin = read_passphrase(prompt, 0x8 as libc::c_int);
                                         retried = 1 as libc::c_int;
                                     } else {
-                                        sshlog(
+                                        crate::log::sshlog(
                                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
                                                 &[u8; 22],
@@ -1999,7 +1990,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
             }
         }
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"process_sign_request2\0"))
             .as_ptr(),
@@ -2081,7 +2072,7 @@ unsafe extern "C" fn process_remove_identity(mut e: *mut SocketEntry) {
     let mut success: libc::c_int = 0 as libc::c_int;
     let mut key: *mut sshkey = 0 as *mut sshkey;
     let mut id: *mut Identity = 0 as *mut Identity;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(b"process_remove_identity\0"))
             .as_ptr(),
@@ -2093,7 +2084,7 @@ unsafe extern "C" fn process_remove_identity(mut e: *mut SocketEntry) {
     );
     r = sshkey_froms((*e).request, &mut key);
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                 b"process_remove_identity\0",
@@ -2108,7 +2099,7 @@ unsafe extern "C" fn process_remove_identity(mut e: *mut SocketEntry) {
     } else {
         id = lookup_identity(key);
         if id.is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                     b"process_remove_identity\0",
@@ -2160,7 +2151,7 @@ unsafe extern "C" fn process_remove_identity(mut e: *mut SocketEntry) {
 }
 unsafe extern "C" fn process_remove_all_identities(mut e: *mut SocketEntry) {
     let mut id: *mut Identity = 0 as *mut Identity;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 30], &[libc::c_char; 30]>(
             b"process_remove_all_identities\0",
@@ -2196,7 +2187,7 @@ unsafe extern "C" fn reaper() -> time_t {
         nxt = (*id).next.tqe_next;
         if !((*id).death == 0 as libc::c_int as libc::c_long) {
             if now >= (*id).death {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 7], &[libc::c_char; 7]>(b"reaper\0")).as_ptr(),
                     938 as libc::c_int,
@@ -2259,7 +2250,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
             r != 0 as libc::c_int
         }
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"parse_dest_constraint_hop\0",
@@ -2272,7 +2263,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
             b"parse\0" as *const u8 as *const libc::c_char,
         );
     } else if elen != 0 as libc::c_int as libc::c_ulong {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"parse_dest_constraint_hop\0",
@@ -2335,7 +2326,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
                     b"fingerprint failed\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"parse_dest_constraint_hop\0",
@@ -2393,7 +2384,7 @@ unsafe extern "C" fn parse_dest_constraint(
     let mut tobuf: *mut sshbuf = 0 as *mut sshbuf;
     let mut r: libc::c_int = 0;
     let mut elen: size_t = 0 as libc::c_int as size_t;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"parse_dest_constraint\0"))
             .as_ptr(),
@@ -2423,7 +2414,7 @@ unsafe extern "C" fn parse_dest_constraint(
             r != 0 as libc::c_int
         }
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"parse_dest_constraint\0"))
                 .as_ptr(),
@@ -2440,7 +2431,7 @@ unsafe extern "C" fn parse_dest_constraint(
             r != 0 as libc::c_int
         }) {
             if elen != 0 as libc::c_int as libc::c_ulong {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                         b"parse_dest_constraint\0",
@@ -2455,7 +2446,7 @@ unsafe extern "C" fn parse_dest_constraint(
                 );
                 r = -(59 as libc::c_int);
             } else {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                         b"parse_dest_constraint\0",
@@ -2494,7 +2485,7 @@ unsafe extern "C" fn parse_dest_constraint(
                     != ((*dc).from.nkeys == 0 as libc::c_int as libc::c_uint) as libc::c_int
                     || !((*dc).from.user).is_null()
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                             b"parse_dest_constraint\0",
@@ -2511,7 +2502,7 @@ unsafe extern "C" fn parse_dest_constraint(
                 } else if ((*dc).to.hostname).is_null()
                     || (*dc).to.nkeys == 0 as libc::c_int as libc::c_uint
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                             b"parse_dest_constraint\0",
@@ -2547,7 +2538,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
     let mut b: *mut sshbuf = 0 as *mut sshbuf;
     r = sshbuf_get_cstring(m, &mut ext_name, 0 as *mut size_t);
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                 b"parse_key_constraint_extension\0",
@@ -2560,7 +2551,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
             b"parse constraint extension\0" as *const u8 as *const libc::c_char,
         );
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                 b"parse_key_constraint_extension\0",
@@ -2579,7 +2570,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
         ) == 0 as libc::c_int
         {
             if sk_providerp.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                         b"parse_key_constraint_extension\0",
@@ -2595,7 +2586,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
                 r = -(4 as libc::c_int);
                 current_block = 4252588936699793226;
             } else if !(*sk_providerp).is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                         b"parse_key_constraint_extension\0",
@@ -2613,7 +2604,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
             } else {
                 r = sshbuf_get_cstring(m, sk_providerp, 0 as *mut size_t);
                 if r != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                             b"parse_key_constraint_extension\0",
@@ -2637,7 +2628,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
         ) == 0 as libc::c_int
         {
             if !(*dcsp).is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                         b"parse_key_constraint_extension\0",
@@ -2654,7 +2645,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
             } else {
                 r = sshbuf_froms(m, &mut b);
                 if r != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                             b"parse_key_constraint_extension\0",
@@ -2675,7 +2666,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
                             break;
                         }
                         if *ndcsp >= 1024 as libc::c_int as libc::c_ulong {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                                     b"parse_key_constraint_extension\0",
@@ -2709,7 +2700,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
                 }
             }
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                     b"parse_key_constraint_extension\0",
@@ -2758,7 +2749,7 @@ unsafe extern "C" fn parse_key_constraints(
         }
         r = sshbuf_get_u8(m, &mut ctype);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"parse_key_constraints\0",
@@ -2776,7 +2767,7 @@ unsafe extern "C" fn parse_key_constraints(
             match ctype as libc::c_int {
                 1 => {
                     if *deathp != 0 as libc::c_int as libc::c_long {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                                 b"parse_key_constraints\0",
@@ -2794,7 +2785,7 @@ unsafe extern "C" fn parse_key_constraints(
                     } else {
                         r = sshbuf_get_u32(m, &mut seconds);
                         if r != 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                                     b"parse_key_constraints\0",
@@ -2816,7 +2807,7 @@ unsafe extern "C" fn parse_key_constraints(
                 }
                 2 => {
                     if *confirmp != 0 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                                 b"parse_key_constraints\0",
@@ -2837,7 +2828,7 @@ unsafe extern "C" fn parse_key_constraints(
                 }
                 3 => {
                     if k.is_null() {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                                 b"parse_key_constraints\0",
@@ -2853,7 +2844,7 @@ unsafe extern "C" fn parse_key_constraints(
                         current_block = 16812902527858607079;
                         break;
                     } else if maxsign != 0 as libc::c_int as libc::c_uint {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                                 b"parse_key_constraints\0",
@@ -2871,7 +2862,7 @@ unsafe extern "C" fn parse_key_constraints(
                     } else {
                         r = sshbuf_get_u32(m, &mut maxsign);
                         if r != 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                                     b"parse_key_constraints\0",
@@ -2890,7 +2881,7 @@ unsafe extern "C" fn parse_key_constraints(
                             if !(r != 0 as libc::c_int) {
                                 continue;
                             }
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                                     b"parse_key_constraints\0",
@@ -2915,7 +2906,7 @@ unsafe extern "C" fn parse_key_constraints(
                     }
                 }
                 _ => {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                             b"parse_key_constraints\0",
@@ -2958,7 +2949,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
     let mut ndest_constraints: size_t = 0 as libc::c_int as size_t;
     let mut k: *mut sshkey = 0 as *mut sshkey;
     let mut r: libc::c_int = -(1 as libc::c_int);
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"process_add_identity\0"))
             .as_ptr(),
@@ -2973,7 +2964,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
         r = sshbuf_get_cstring((*e).request, &mut comment, 0 as *mut size_t);
         r != 0 as libc::c_int
     } {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"process_add_identity\0"))
                 .as_ptr(),
@@ -2994,7 +2985,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
         &mut ndest_constraints,
     ) != 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"process_add_identity\0"))
                 .as_ptr(),
@@ -3008,7 +2999,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
     } else {
         if !sk_provider.is_null() {
             if sshkey_is_sk(k) == 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                         b"process_add_identity\0",
@@ -3028,7 +3019,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                 b"internal\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
             {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                         b"process_add_identity\0",
@@ -3042,7 +3033,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                 );
                 current_block = 11584701595673473500;
             } else if (realpath(sk_provider, canonical_provider.as_mut_ptr())).is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                         b"process_add_identity\0",
@@ -3064,7 +3055,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                 if match_pattern_list(sk_provider, allowed_providers, 0 as libc::c_int)
                     != 1 as libc::c_int
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                             b"process_add_identity\0",
@@ -3091,7 +3082,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
             _ => {
                 r = sshkey_shield_private(k);
                 if r != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                             b"process_add_identity\0",
@@ -3162,7 +3153,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                                         as *const libc::c_char,
                                 );
                             }
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<
                                     &[u8; 21],
@@ -3214,7 +3205,7 @@ unsafe extern "C" fn process_lock_agent(mut e: *mut SocketEntry, mut lock: libc:
     let mut passwdhash: [u_char; 32] = [0; 32];
     static mut fail_count: u_int = 0 as libc::c_int as u_int;
     let mut pwlen: size_t = 0;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"process_lock_agent\0"))
             .as_ptr(),
@@ -3238,7 +3229,7 @@ unsafe extern "C" fn process_lock_agent(mut e: *mut SocketEntry, mut lock: libc:
         );
     }
     if pwlen == 0 as libc::c_int as libc::c_ulong {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"process_lock_agent\0"))
                 .as_ptr(),
@@ -3278,7 +3269,7 @@ unsafe extern "C" fn process_lock_agent(mut e: *mut SocketEntry, mut lock: libc:
             32 as libc::c_int as size_t,
         ) == 0 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"process_lock_agent\0",
@@ -3303,7 +3294,7 @@ unsafe extern "C" fn process_lock_agent(mut e: *mut SocketEntry, mut lock: libc:
                 fail_count;
             }
             delay = (100000 as libc::c_int as libc::c_uint).wrapping_mul(fail_count) as libc::c_int;
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"process_lock_agent\0",
@@ -3323,7 +3314,7 @@ unsafe extern "C" fn process_lock_agent(mut e: *mut SocketEntry, mut lock: libc:
             ::core::mem::size_of::<[u_char; 32]>() as libc::c_ulong,
         );
     } else if locked == 0 && lock != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"process_lock_agent\0"))
                 .as_ptr(),
@@ -3423,7 +3414,7 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
     let mut id: *mut Identity = 0 as *mut Identity;
     let mut dest_constraints: *mut dest_constraint = 0 as *mut dest_constraint;
     let mut ndest_constraints: size_t = 0 as libc::c_int as size_t;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(b"process_add_smartcard_key\0"))
             .as_ptr(),
@@ -3438,7 +3429,7 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
         r = sshbuf_get_cstring((*e).request, &mut pin, 0 as *mut size_t);
         r != 0 as libc::c_int
     } {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"process_add_smartcard_key\0",
@@ -3461,7 +3452,7 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
         &mut ndest_constraints,
     ) != 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"process_add_smartcard_key\0",
@@ -3474,7 +3465,7 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
             b"failed to parse constraints\0" as *const u8 as *const libc::c_char,
         );
     } else if (realpath(provider, canonical_provider.as_mut_ptr())).is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"process_add_smartcard_key\0",
@@ -3494,7 +3485,7 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
         0 as libc::c_int,
     ) != 1 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"process_add_smartcard_key\0",
@@ -3509,7 +3500,7 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
             canonical_provider.as_mut_ptr(),
         );
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"process_add_smartcard_key\0",
@@ -3585,7 +3576,7 @@ unsafe extern "C" fn process_remove_smartcard_key(mut e: *mut SocketEntry) {
     let mut success: libc::c_int = 0 as libc::c_int;
     let mut id: *mut Identity = 0 as *mut Identity;
     let mut nxt: *mut Identity = 0 as *mut Identity;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
             b"process_remove_smartcard_key\0",
@@ -3602,7 +3593,7 @@ unsafe extern "C" fn process_remove_smartcard_key(mut e: *mut SocketEntry) {
         r = sshbuf_get_cstring((*e).request, &mut pin, 0 as *mut size_t);
         r != 0 as libc::c_int
     } {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                 b"process_remove_smartcard_key\0",
@@ -3617,7 +3608,7 @@ unsafe extern "C" fn process_remove_smartcard_key(mut e: *mut SocketEntry) {
     } else {
         free(pin as *mut libc::c_void);
         if (realpath(provider, canonical_provider.as_mut_ptr())).is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                     b"process_remove_smartcard_key\0",
@@ -3633,7 +3624,7 @@ unsafe extern "C" fn process_remove_smartcard_key(mut e: *mut SocketEntry) {
                 strerror(*__errno_location()),
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                     b"process_remove_smartcard_key\0",
@@ -3667,7 +3658,7 @@ unsafe extern "C" fn process_remove_smartcard_key(mut e: *mut SocketEntry) {
             if pkcs11_del_provider(canonical_provider.as_mut_ptr()) == 0 as libc::c_int {
                 success = 1 as libc::c_int;
             } else {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                         b"process_remove_smartcard_key\0",
@@ -3696,7 +3687,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
     let mut fp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut i: size_t = 0;
     let mut fwd: u_char = 0 as libc::c_int as u_char;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"process_ext_session_bind\0"))
             .as_ptr(),
@@ -3721,7 +3712,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
             r != 0 as libc::c_int
         }
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                 b"process_ext_session_bind\0",
@@ -3760,7 +3751,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
             0 as *mut *mut sshkey_sig_details,
         );
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                     b"process_ext_session_bind\0",
@@ -3782,7 +3773,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
                     break;
                 }
                 if (*((*e).session_ids).offset(i as isize)).forwarded == 0 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<
                             &[u8; 25],
@@ -3804,7 +3795,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
                         == 0 as libc::c_int) as libc::c_int;
                     key_match = sshkey_equal(key, (*((*e).session_ids).offset(i as isize)).key);
                     if sid_match != 0 && key_match != 0 {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                                 b"process_ext_session_bind\0",
@@ -3823,7 +3814,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
                         current_block = 2759485078803402792;
                         break;
                     } else if sid_match != 0 {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                                 b"process_ext_session_bind\0",
@@ -3851,7 +3842,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
                 2759485078803402792 => {}
                 _ => {
                     if (*e).nsession_ids >= 16 as libc::c_int as libc::c_ulong {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                                 b"process_ext_session_bind\0",
@@ -3873,7 +3864,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
                         let fresh4 = (*e).nsession_ids;
                         (*e).nsession_ids = ((*e).nsession_ids).wrapping_add(1);
                         i = fresh4;
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                                 b"process_ext_session_bind\0",
@@ -3946,7 +3937,7 @@ unsafe extern "C" fn process_extension(mut e: *mut SocketEntry) {
     let mut r: libc::c_int = 0;
     let mut success: libc::c_int = 0 as libc::c_int;
     let mut name: *mut libc::c_char = 0 as *mut libc::c_char;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"process_extension\0"))
             .as_ptr(),
@@ -3958,7 +3949,7 @@ unsafe extern "C" fn process_extension(mut e: *mut SocketEntry) {
     );
     r = sshbuf_get_cstring((*e).request, &mut name, 0 as *mut size_t);
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"process_extension\0"))
                 .as_ptr(),
@@ -3976,7 +3967,7 @@ unsafe extern "C" fn process_extension(mut e: *mut SocketEntry) {
         {
             success = process_ext_session_bind(e);
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"process_extension\0"))
                     .as_ptr(),
@@ -4022,7 +4013,7 @@ unsafe extern "C" fn process_message(mut socknum: u_int) -> libc::c_int {
         | (*cp.offset(2 as libc::c_int as isize) as u_int32_t) << 8 as libc::c_int
         | *cp.offset(3 as libc::c_int as isize) as u_int32_t;
     if msg_len > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"process_message\0"))
                 .as_ptr(),
@@ -4050,7 +4041,7 @@ unsafe extern "C" fn process_message(mut socknum: u_int) -> libc::c_int {
         r != 0 as libc::c_int
     } {
         if r == -(3 as libc::c_int) || r == -(6 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"process_message\0"))
                     .as_ptr(),
@@ -4073,7 +4064,7 @@ unsafe extern "C" fn process_message(mut socknum: u_int) -> libc::c_int {
             b"parse\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"process_message\0")).as_ptr(),
         1629 as libc::c_int,
@@ -4132,7 +4123,7 @@ unsafe extern "C" fn process_message(mut socknum: u_int) -> libc::c_int {
             process_extension(e);
         }
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"process_message\0"))
                     .as_ptr(),
@@ -4153,7 +4144,7 @@ unsafe extern "C" fn new_socket(mut type_0: sock_type, mut fd: libc::c_int) {
     let mut i: u_int = 0;
     let mut old_alloc: u_int = 0;
     let mut new_alloc: u_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"new_socket\0")).as_ptr(),
         1699 as libc::c_int,
@@ -4270,7 +4261,7 @@ unsafe extern "C" fn handle_socket_read(mut socknum: u_int) -> libc::c_int {
         &mut slen,
     );
     if fd == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"handle_socket_read\0"))
                 .as_ptr(),
@@ -4284,7 +4275,7 @@ unsafe extern "C" fn handle_socket_read(mut socknum: u_int) -> libc::c_int {
         return -(1 as libc::c_int);
     }
     if getpeereid(fd, &mut euid, &mut egid) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"handle_socket_read\0"))
                 .as_ptr(),
@@ -4300,7 +4291,7 @@ unsafe extern "C" fn handle_socket_read(mut socknum: u_int) -> libc::c_int {
         return -(1 as libc::c_int);
     }
     if euid != 0 as libc::c_int as libc::c_uint && getuid() != euid {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"handle_socket_read\0"))
                 .as_ptr(),
@@ -4332,7 +4323,7 @@ unsafe extern "C" fn handle_conn_read(mut socknum: u_int) -> libc::c_int {
             if *__errno_location() == 11 as libc::c_int || *__errno_location() == 4 as libc::c_int {
                 return 0 as libc::c_int;
             }
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"handle_conn_read\0"))
                     .as_ptr(),
@@ -4395,7 +4386,7 @@ unsafe extern "C" fn handle_conn_write(mut socknum: u_int) -> libc::c_int {
             if *__errno_location() == 11 as libc::c_int || *__errno_location() == 4 as libc::c_int {
                 return 0 as libc::c_int;
             }
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"handle_conn_write\0"))
                     .as_ptr(),
@@ -4448,7 +4439,7 @@ unsafe extern "C" fn after_poll(mut pfd: *mut pollfd, mut npfd: size_t, mut maxf
                 socknum;
             }
             if socknum >= sockets_alloc {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"after_poll\0"))
                         .as_ptr(),
@@ -4468,7 +4459,7 @@ unsafe extern "C" fn after_poll(mut pfd: *mut pollfd, mut npfd: size_t, mut maxf
                             == 0 as libc::c_int)
                         {
                             if npfd > maxfds as libc::c_ulong {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                         b"after_poll\0",
@@ -4602,7 +4593,7 @@ unsafe extern "C" fn prepare_poll(
         match (*sockets.offset(i as isize)).type_0 as libc::c_uint {
             1 => {
                 if npfd > maxfds as libc::c_ulong {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                             b"prepare_poll\0",
@@ -4691,7 +4682,7 @@ unsafe extern "C" fn cleanup_socket() {
     if cleanup_pid != 0 as libc::c_int && getpid() != cleanup_pid {
         return;
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"cleanup_socket\0")).as_ptr(),
         1949 as libc::c_int,
@@ -5134,7 +5125,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             0 as libc::c_int,
         );
         if setsid() == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                 2218 as libc::c_int,
@@ -5150,7 +5141,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         if stdfd_devnull(1 as libc::c_int, 1 as libc::c_int, 1 as libc::c_int)
             == -(1 as libc::c_int)
         {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                 2224 as libc::c_int,
@@ -5163,7 +5154,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         rlim.rlim_max = 0 as libc::c_int as rlim_t;
         rlim.rlim_cur = rlim.rlim_max;
         if setrlimit(RLIMIT_CORE, &mut rlim) == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
                 2230 as libc::c_int,

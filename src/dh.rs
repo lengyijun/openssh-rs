@@ -47,16 +47,7 @@ extern "C" {
     fn DH_generate_key(dh: *mut DH) -> libc::c_int;
     fn DH_free(dh: *mut DH);
     fn DH_new() -> *mut DH;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn strdelim(_: *mut *mut libc::c_char) -> *mut libc::c_char;
 }
 pub type __u_int = libc::c_uint;
@@ -180,7 +171,7 @@ unsafe extern "C" fn parse_prime(
                 &mut errstr,
             );
             if !errstr.is_null() || n != 2 as libc::c_int as libc::c_longlong {
-                sshlog(
+                crate::log::sshlog(
                     b"dh.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"parse_prime\0"))
                         .as_ptr(),
@@ -208,7 +199,7 @@ unsafe extern "C" fn parse_prime(
                         || n & 0x1 as libc::c_int as libc::c_longlong != 0
                         || n & !(0x1 as libc::c_int) as libc::c_longlong == 0
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"dh.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                 b"parse_prime\0",
@@ -235,7 +226,7 @@ unsafe extern "C" fn parse_prime(
                                 &mut errstr,
                             );
                             if !errstr.is_null() || n == 0 as libc::c_int as libc::c_longlong {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"dh.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                         b"parse_prime\0",
@@ -268,7 +259,7 @@ unsafe extern "C" fn parse_prime(
                                     }
                                     || !errstr.is_null()
                                 {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"dh.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                             b"parse_prime\0",
@@ -303,7 +294,7 @@ unsafe extern "C" fn parse_prime(
                                                 (*dhg).p = BN_new();
                                                 ((*dhg).p).is_null()
                                             } {
-                                                sshlog(
+                                                crate::log::sshlog(
                                                     b"dh.c\0" as *const u8 as *const libc::c_char,
                                                     (*::core::mem::transmute::<
                                                         &[u8; 12],
@@ -322,7 +313,7 @@ unsafe extern "C" fn parse_prime(
                                             } else if BN_hex2bn(&mut (*dhg).g, gen)
                                                 == 0 as libc::c_int
                                             {
-                                                sshlog(
+                                                crate::log::sshlog(
                                                     b"dh.c\0" as *const u8 as *const libc::c_char,
                                                     (*::core::mem::transmute::<
                                                         &[u8; 12],
@@ -343,7 +334,7 @@ unsafe extern "C" fn parse_prime(
                                             } else if BN_hex2bn(&mut (*dhg).p, prime)
                                                 == 0 as libc::c_int
                                             {
-                                                sshlog(
+                                                crate::log::sshlog(
                                                     b"dh.c\0" as *const u8 as *const libc::c_char,
                                                     (*::core::mem::transmute::<
                                                         &[u8; 12],
@@ -362,7 +353,7 @@ unsafe extern "C" fn parse_prime(
                                                     linenum,
                                                 );
                                             } else if BN_num_bits((*dhg).p) != (*dhg).size {
-                                                sshlog(
+                                                crate::log::sshlog(
                                                     b"dh.c\0" as *const u8 as *const libc::c_char,
                                                     (*::core::mem::transmute::<
                                                         &[u8; 12],
@@ -382,7 +373,7 @@ unsafe extern "C" fn parse_prime(
                                             } else if BN_cmp((*dhg).g, BN_value_one())
                                                 <= 0 as libc::c_int
                                             {
-                                                sshlog(
+                                                crate::log::sshlog(
                                                     b"dh.c\0" as *const u8 as *const libc::c_char,
                                                     (*::core::mem::transmute::<
                                                         &[u8; 12],
@@ -416,7 +407,7 @@ unsafe extern "C" fn parse_prime(
     }
     match current_block {
         12731601281199319562 => {
-            sshlog(
+            crate::log::sshlog(
                 b"dh.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"parse_prime\0"))
                     .as_ptr(),
@@ -458,7 +449,7 @@ pub unsafe extern "C" fn choose_dh(
         b"r\0" as *const u8 as *const libc::c_char,
     );
     if f.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"dh.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"choose_dh\0")).as_ptr(),
             169 as libc::c_int,
@@ -501,7 +492,7 @@ pub unsafe extern "C" fn choose_dh(
     rewind(f);
     if bestcount == 0 as libc::c_int {
         fclose(f);
-        sshlog(
+        crate::log::sshlog(
             b"dh.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"choose_dh\0")).as_ptr(),
             201 as libc::c_int,
@@ -536,7 +527,7 @@ pub unsafe extern "C" fn choose_dh(
     line = 0 as *mut libc::c_char;
     fclose(f);
     if bestcount != which + 1 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"dh.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"choose_dh\0")).as_ptr(),
             226 as libc::c_int,
@@ -567,7 +558,7 @@ pub unsafe extern "C" fn dh_pub_is_valid(
         0 as *mut *const BIGNUM,
     );
     if BN_is_negative(dh_pub) != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"dh.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"dh_pub_is_valid\0"))
                 .as_ptr(),
@@ -580,7 +571,7 @@ pub unsafe extern "C" fn dh_pub_is_valid(
         return 0 as libc::c_int;
     }
     if BN_cmp(dh_pub, BN_value_one()) != 1 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"dh.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"dh_pub_is_valid\0"))
                 .as_ptr(),
@@ -594,7 +585,7 @@ pub unsafe extern "C" fn dh_pub_is_valid(
     }
     tmp = BN_new();
     if tmp.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"dh.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"dh_pub_is_valid\0"))
                 .as_ptr(),
@@ -608,7 +599,7 @@ pub unsafe extern "C" fn dh_pub_is_valid(
     }
     if BN_sub(tmp, dh_p, BN_value_one()) == 0 || BN_cmp(dh_pub, tmp) != -(1 as libc::c_int) {
         BN_clear_free(tmp);
-        sshlog(
+        crate::log::sshlog(
             b"dh.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"dh_pub_is_valid\0"))
                 .as_ptr(),
@@ -630,7 +621,7 @@ pub unsafe extern "C" fn dh_pub_is_valid(
         i += 1;
         i;
     }
-    sshlog(
+    crate::log::sshlog(
         b"dh.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"dh_pub_is_valid\0")).as_ptr(),
         270 as libc::c_int,
@@ -642,7 +633,7 @@ pub unsafe extern "C" fn dh_pub_is_valid(
         BN_num_bits(dh_p),
     );
     if bits_set < 4 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"dh.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"dh_pub_is_valid\0"))
                 .as_ptr(),
@@ -766,7 +757,7 @@ pub unsafe extern "C" fn dh_new_group18() -> *mut DH {
     return dh_new_group_asc(gen, group18);
 }
 pub unsafe extern "C" fn dh_new_group_fallback(mut max: libc::c_int) -> *mut DH {
-    sshlog(
+    crate::log::sshlog(
         b"dh.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"dh_new_group_fallback\0"))
             .as_ptr(),
@@ -778,7 +769,7 @@ pub unsafe extern "C" fn dh_new_group_fallback(mut max: libc::c_int) -> *mut DH 
         max,
     );
     if max < 3072 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"dh.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"dh_new_group_fallback\0"))
                 .as_ptr(),
@@ -790,7 +781,7 @@ pub unsafe extern "C" fn dh_new_group_fallback(mut max: libc::c_int) -> *mut DH 
         );
         return dh_new_group14();
     } else if max < 6144 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"dh.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"dh_new_group_fallback\0"))
                 .as_ptr(),
@@ -802,7 +793,7 @@ pub unsafe extern "C" fn dh_new_group_fallback(mut max: libc::c_int) -> *mut DH 
         );
         return dh_new_group16();
     }
-    sshlog(
+    crate::log::sshlog(
         b"dh.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"dh_new_group_fallback\0"))
             .as_ptr(),

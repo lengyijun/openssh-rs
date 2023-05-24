@@ -17,16 +17,7 @@ extern "C" {
     ) -> libc::c_int;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshbuf_get_string_direct(
         buf: *mut sshbuf,
         valp: *mut *const u_char,
@@ -425,7 +416,7 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
                 } else {
                     ret = crypto_sign_ed25519_open(m, &mut mlen, sm, smlen, (*key).ed25519_pk);
                     if ret != 0 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-ed25519-sk.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                                 b"ssh_ed25519_sk_verify\0",

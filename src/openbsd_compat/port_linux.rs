@@ -10,16 +10,7 @@ extern "C" {
     fn fscanf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn rewind(__stream: *mut FILE);
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
 }
 pub type __off_t = libc::c_long;
 pub type __off64_t = libc::c_long;
@@ -107,7 +98,7 @@ pub unsafe extern "C" fn oom_adjust_setup() {
     let mut i: libc::c_int = 0;
     let mut value: libc::c_int = 0;
     let mut fp: *mut FILE = 0 as *mut FILE;
-    sshlog(
+    crate::log::sshlog(
         b"port-linux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"oom_adjust_setup\0")).as_ptr(),
         266 as libc::c_int,
@@ -129,7 +120,7 @@ pub unsafe extern "C" fn oom_adjust_setup() {
                 &mut oom_adj_save as *mut libc::c_int,
             ) != 1 as libc::c_int
             {
-                sshlog(
+                crate::log::sshlog(
                     b"port-linux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                         b"oom_adjust_setup\0",
@@ -148,7 +139,7 @@ pub unsafe extern "C" fn oom_adjust_setup() {
                 if fprintf(fp, b"%d\n\0" as *const u8 as *const libc::c_char, value)
                     <= 0 as libc::c_int
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"port-linux.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                             b"oom_adjust_setup\0",
@@ -163,7 +154,7 @@ pub unsafe extern "C" fn oom_adjust_setup() {
                         strerror(*__errno_location()),
                     );
                 } else {
-                    sshlog(
+                    crate::log::sshlog(
                         b"port-linux.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                             b"oom_adjust_setup\0",
@@ -191,7 +182,7 @@ pub unsafe extern "C" fn oom_adjust_setup() {
 #[no_mangle]
 pub unsafe extern "C" fn oom_adjust_restore() {
     let mut fp: *mut FILE = 0 as *mut FILE;
-    sshlog(
+    crate::log::sshlog(
         b"port-linux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"oom_adjust_restore\0"))
             .as_ptr(),
@@ -218,7 +209,7 @@ pub unsafe extern "C" fn oom_adjust_restore() {
         oom_adj_save,
     ) <= 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"port-linux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"oom_adjust_restore\0"))
                 .as_ptr(),
@@ -231,7 +222,7 @@ pub unsafe extern "C" fn oom_adjust_restore() {
             strerror(*__errno_location()),
         );
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"port-linux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"oom_adjust_restore\0"))
                 .as_ptr(),

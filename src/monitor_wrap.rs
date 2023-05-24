@@ -62,16 +62,7 @@ extern "C" {
     fn log_verbose_add(_: *const libc::c_char);
     fn log_verbose_reset();
     fn cleanup_exit(_: libc::c_int) -> !;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
@@ -801,7 +792,7 @@ pub unsafe extern "C" fn mm_request_send(
 ) {
     let mut mlen: size_t = sshbuf_len(m);
     let mut buf: [u_char; 5] = [0; 5];
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"mm_request_send\0")).as_ptr(),
         128 as libc::c_int,
@@ -888,7 +879,7 @@ pub unsafe extern "C" fn mm_request_receive(mut sock: libc::c_int, mut m: *mut s
     let mut p: *mut u_char = 0 as *mut u_char;
     let mut msg_len: u_int = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"mm_request_receive\0"))
             .as_ptr(),
@@ -981,7 +972,7 @@ pub unsafe extern "C" fn mm_request_receive_expect(
 ) {
     let mut rtype: u_char = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(b"mm_request_receive_expect\0"))
             .as_ptr(),
@@ -1069,7 +1060,7 @@ pub unsafe extern "C" fn mm_choose_dh(
         );
     }
     mm_request_send((*pmonitor).m_recvfd, MONITOR_REQ_MODULI, m);
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"mm_choose_dh\0")).as_ptr(),
         197 as libc::c_int,
@@ -1117,7 +1108,7 @@ pub unsafe extern "C" fn mm_choose_dh(
             b"parse group\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"mm_choose_dh\0")).as_ptr(),
         209 as libc::c_int,
@@ -1148,7 +1139,7 @@ pub unsafe extern "C" fn mm_sshkey_sign(
         ((*kex).host_key_index).expect("non-null function pointer")(key, 0 as libc::c_int, ssh)
             as u_int;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"mm_sshkey_sign\0")).as_ptr(),
         226 as libc::c_int,
@@ -1197,7 +1188,7 @@ pub unsafe extern "C" fn mm_sshkey_sign(
         );
     }
     mm_request_send((*pmonitor).m_recvfd, MONITOR_REQ_SIGN, m);
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"mm_sshkey_sign\0")).as_ptr(),
         237 as libc::c_int,
@@ -1235,7 +1226,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
     let mut r: libc::c_int = 0;
     let mut ok: u_char = 0;
     let mut p: *const u_char = 0 as *const u_char;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_getpwnamallow\0")).as_ptr(),
         267 as libc::c_int,
@@ -1271,7 +1262,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
         );
     }
     mm_request_send((*pmonitor).m_recvfd, MONITOR_REQ_PWNAM, m);
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_getpwnamallow\0")).as_ptr(),
         276 as libc::c_int,
@@ -2057,7 +2048,7 @@ pub unsafe extern "C" fn mm_auth2_read_banner() -> *mut libc::c_char {
     let mut m: *mut sshbuf = 0 as *mut sshbuf;
     let mut banner: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"mm_auth2_read_banner\0"))
             .as_ptr(),
@@ -2109,7 +2100,7 @@ pub unsafe extern "C" fn mm_inform_authserv(
 ) {
     let mut m: *mut sshbuf = 0 as *mut sshbuf;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"mm_inform_authserv\0"))
             .as_ptr(),
@@ -2165,7 +2156,7 @@ pub unsafe extern "C" fn mm_auth_password(
     let mut m: *mut sshbuf = 0 as *mut sshbuf;
     let mut r: libc::c_int = 0;
     let mut authenticated: libc::c_int = 0 as libc::c_int;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_auth_password\0")).as_ptr(),
         409 as libc::c_int,
@@ -2201,7 +2192,7 @@ pub unsafe extern "C" fn mm_auth_password(
         );
     }
     mm_request_send((*pmonitor).m_recvfd, MONITOR_REQ_AUTHPASSWORD, m);
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_auth_password\0")).as_ptr(),
         417 as libc::c_int,
@@ -2225,7 +2216,7 @@ pub unsafe extern "C" fn mm_auth_password(
         );
     }
     sshbuf_free(m);
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_auth_password\0")).as_ptr(),
         433 as libc::c_int,
@@ -2285,7 +2276,7 @@ pub unsafe extern "C" fn mm_key_allowed(
     let mut r: libc::c_int = 0;
     let mut allowed: libc::c_int = 0 as libc::c_int;
     let mut opts: *mut sshauthopt = 0 as *mut sshauthopt;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"mm_key_allowed\0")).as_ptr(),
         460 as libc::c_int,
@@ -2355,7 +2346,7 @@ pub unsafe extern "C" fn mm_key_allowed(
         );
     }
     mm_request_send((*pmonitor).m_recvfd, MONITOR_REQ_KEYALLOWED, m);
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"mm_key_allowed\0")).as_ptr(),
         476 as libc::c_int,
@@ -2417,7 +2408,7 @@ pub unsafe extern "C" fn mm_sshkey_verify(
     let mut sig_details_present: u_char = 0;
     let mut flags: u_char = 0;
     let mut counter: u_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_sshkey_verify\0")).as_ptr(),
         513 as libc::c_int,
@@ -2476,7 +2467,7 @@ pub unsafe extern "C" fn mm_sshkey_verify(
         );
     }
     mm_request_send((*pmonitor).m_recvfd, MONITOR_REQ_KEYVERIFY, m);
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_sshkey_verify\0")).as_ptr(),
         527 as libc::c_int,
@@ -2564,7 +2555,7 @@ pub unsafe extern "C" fn mm_send_keystate(mut ssh: *mut ssh, mut monitor: *mut m
         );
     }
     mm_request_send((*monitor).m_recvfd, MONITOR_REQ_KEYEXPORT, m);
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_send_keystate\0")).as_ptr(),
         563 as libc::c_int,
@@ -2593,7 +2584,7 @@ pub unsafe extern "C" fn mm_pty_allocate(
         tmp2 = dup((*pmonitor).m_recvfd);
         tmp2 == -(1 as libc::c_int)
     } {
-        sshlog(
+        crate::log::sshlog(
             b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"mm_pty_allocate\0"))
                 .as_ptr(),
@@ -2624,7 +2615,7 @@ pub unsafe extern "C" fn mm_pty_allocate(
         );
     }
     mm_request_send((*pmonitor).m_recvfd, MONITOR_REQ_PTY, m);
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"mm_pty_allocate\0")).as_ptr(),
         589 as libc::c_int,
@@ -2648,7 +2639,7 @@ pub unsafe extern "C" fn mm_pty_allocate(
         );
     }
     if success == 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"mm_pty_allocate\0"))
                 .as_ptr(),
@@ -2751,7 +2742,7 @@ pub unsafe extern "C" fn mm_session_pty_cleanup2(mut s: *mut Session) {
     mm_request_send((*pmonitor).m_recvfd, MONITOR_REQ_PTYCLEANUP, m);
     sshbuf_free(m);
     if (*s).ptymaster != -(1 as libc::c_int) && close((*s).ptymaster) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                 b"mm_session_pty_cleanup2\0",
@@ -2817,7 +2808,7 @@ pub unsafe extern "C" fn mm_bsdauth_query(
     let mut success: u_int = 0;
     let mut challenge: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_bsdauth_query\0")).as_ptr(),
         829 as libc::c_int,
@@ -2855,7 +2846,7 @@ pub unsafe extern "C" fn mm_bsdauth_query(
         );
     }
     if success == 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_bsdauth_query\0"))
                 .as_ptr(),
@@ -2885,7 +2876,7 @@ pub unsafe extern "C" fn mm_bsdauth_query(
     mm_chall_setup(name, infotxt, numprompts, prompts, echo_on);
     let ref mut fresh0 = *(*prompts).offset(0 as libc::c_int as isize);
     *fresh0 = challenge;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mm_bsdauth_query\0")).as_ptr(),
         853 as libc::c_int,
@@ -2905,7 +2896,7 @@ pub unsafe extern "C" fn mm_bsdauth_respond(
     let mut m: *mut sshbuf = 0 as *mut sshbuf;
     let mut r: libc::c_int = 0;
     let mut authok: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"mm_bsdauth_respond\0"))
             .as_ptr(),

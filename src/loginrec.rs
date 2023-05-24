@@ -58,16 +58,7 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn time(__timer: *mut time_t) -> time_t;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -466,7 +457,7 @@ pub unsafe extern "C" fn login_get_lastlog(mut li: *mut logininfo, uid: uid_t) -
         ::core::mem::size_of::<[libc::c_char; 512]>() as libc::c_ulong,
     ) >= ::core::mem::size_of::<[libc::c_char; 512]>() as libc::c_ulong
     {
-        sshlog(
+        crate::log::sshlog(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"login_get_lastlog\0"))
                 .as_ptr(),
@@ -583,7 +574,7 @@ pub unsafe extern "C" fn login_set_addr(
 }
 pub unsafe extern "C" fn login_write(mut li: *mut logininfo) -> libc::c_int {
     if geteuid() != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"login_write\0")).as_ptr(),
             444 as libc::c_int,
@@ -779,7 +770,7 @@ unsafe extern "C" fn syslogin_perform_logout(mut li: *mut logininfo) -> libc::c_
         ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong as libc::c_int,
     );
     if logout(line.as_mut_ptr()) == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                 b"syslogin_perform_logout\0",
@@ -809,7 +800,7 @@ pub unsafe extern "C" fn syslogin_write_entry(mut li: *mut logininfo) -> libc::c
         7 => return syslogin_perform_login(li),
         8 => return syslogin_perform_logout(li),
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"loginrec.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                     b"syslogin_write_entry\0",
@@ -867,7 +858,7 @@ unsafe extern "C" fn lastlog_openseek(
         &mut st,
     ) != 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"lastlog_openseek\0"))
                 .as_ptr(),
@@ -902,7 +893,7 @@ unsafe extern "C" fn lastlog_openseek(
             ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
         );
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"lastlog_openseek\0"))
                 .as_ptr(),
@@ -919,7 +910,7 @@ unsafe extern "C" fn lastlog_openseek(
     }
     *fd = libc::open(lastlog_file.as_mut_ptr(), filemode, 0o600 as libc::c_int);
     if *fd < 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"lastlog_openseek\0"))
                 .as_ptr(),
@@ -942,7 +933,7 @@ unsafe extern "C" fn lastlog_openseek(
             .wrapping_mul(::core::mem::size_of::<lastlog>() as libc::c_ulong)
             as off_t;
         if lseek(*fd, offset, 0 as libc::c_int) != offset {
-            sshlog(
+            crate::log::sshlog(
                 b"loginrec.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"lastlog_openseek\0"))
                     .as_ptr(),
@@ -1016,7 +1007,7 @@ pub unsafe extern "C" fn lastlog_write_entry(mut li: *mut logininfo) -> libc::c_
             ) != ::core::mem::size_of::<lastlog>() as libc::c_ulong
             {
                 close(fd);
-                sshlog(
+                crate::log::sshlog(
                     b"loginrec.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                         b"lastlog_write_entry\0",
@@ -1040,7 +1031,7 @@ pub unsafe extern "C" fn lastlog_write_entry(mut li: *mut logininfo) -> libc::c_
             return 1 as libc::c_int;
         }
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"loginrec.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"lastlog_write_entry\0",
@@ -1088,7 +1079,7 @@ pub unsafe extern "C" fn lastlog_get_entry(mut li: *mut logininfo) -> libc::c_in
         }
         292 => {}
         -1 => {
-            sshlog(
+            crate::log::sshlog(
                 b"loginrec.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"lastlog_get_entry\0"))
                     .as_ptr(),
@@ -1105,7 +1096,7 @@ pub unsafe extern "C" fn lastlog_get_entry(mut li: *mut logininfo) -> libc::c_in
             return 0 as libc::c_int;
         }
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"loginrec.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"lastlog_get_entry\0"))
                     .as_ptr(),
@@ -1213,7 +1204,7 @@ pub unsafe extern "C" fn record_failed_login(
         0o1 as libc::c_int | 0o2000 as libc::c_int,
     );
     if fd < 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"record_failed_login\0"))
                 .as_ptr(),
@@ -1228,7 +1219,7 @@ pub unsafe extern "C" fn record_failed_login(
         return;
     }
     if fstat(fd, &mut fst) < 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"record_failed_login\0"))
                 .as_ptr(),
@@ -1250,7 +1241,7 @@ pub unsafe extern "C" fn record_failed_login(
         != 0
         || fst.st_uid != 0 as libc::c_int as libc::c_uint
     {
-        sshlog(
+        crate::log::sshlog(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"record_failed_login\0"))
                 .as_ptr(),
@@ -1340,7 +1331,7 @@ pub unsafe extern "C" fn record_failed_login(
             ::core::mem::size_of::<utmp>() as libc::c_ulong,
         ) != ::core::mem::size_of::<utmp>() as libc::c_ulong
         {
-            sshlog(
+            crate::log::sshlog(
                 b"loginrec.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"record_failed_login\0",

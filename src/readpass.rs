@@ -65,16 +65,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
 }
 pub type __builtin_va_list = [__va_list_tag; 1];
 #[derive(Copy, Clone)]
@@ -160,7 +151,7 @@ unsafe extern "C" fn ssh_askpass(
     let mut buf: [libc::c_char; 1024] = [0; 1024];
     let mut osigchld: Option<unsafe extern "C" fn(libc::c_int) -> ()> = None;
     if fflush(stdout) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"readpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"ssh_askpass\0")).as_ptr(),
             61 as libc::c_int,
@@ -183,7 +174,7 @@ unsafe extern "C" fn ssh_askpass(
         );
     }
     if pipe(p.as_mut_ptr()) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"readpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"ssh_askpass\0")).as_ptr(),
             65 as libc::c_int,
@@ -198,7 +189,7 @@ unsafe extern "C" fn ssh_askpass(
     osigchld = ssh_signal(17 as libc::c_int, None);
     pid = fork();
     if pid == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"readpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"ssh_askpass\0")).as_ptr(),
             70 as libc::c_int,
@@ -345,7 +336,7 @@ pub unsafe extern "C" fn read_passphrase(
         0 as libc::c_int
     };
     if use_askpass != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"readpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"read_passphrase\0"))
                 .as_ptr(),
@@ -359,7 +350,7 @@ pub unsafe extern "C" fn read_passphrase(
         use_askpass = 1 as libc::c_int;
     } else if flags & 0x2 as libc::c_int != 0 {
         if isatty(0 as libc::c_int) == 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"readpass.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"read_passphrase\0"))
                     .as_ptr(),
@@ -385,7 +376,7 @@ pub unsafe extern "C" fn read_passphrase(
             );
             close(ttyfd);
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"readpass.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"read_passphrase\0"))
                     .as_ptr(),
@@ -504,7 +495,7 @@ pub unsafe extern "C" fn notify_start(
     args_0 = args.clone();
     xvasprintf(&mut prompt, fmt, args_0.as_va_list());
     if fflush(0 as *mut FILE) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"readpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"notify_start\0")).as_ptr(),
             253 as libc::c_int,
@@ -524,7 +515,7 @@ pub unsafe extern "C" fn notify_start(
             askpass = b"/usr/local/libexec/ssh-askpass\0" as *const u8 as *const libc::c_char;
         }
         if *askpass as libc::c_int == '\0' as i32 {
-            sshlog(
+            crate::log::sshlog(
                 b"readpass.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"notify_start\0"))
                     .as_ptr(),
@@ -540,7 +531,7 @@ pub unsafe extern "C" fn notify_start(
             s.is_null()
                 || strcmp(s, b"force\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
         } {
-            sshlog(
+            crate::log::sshlog(
                 b"readpass.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"notify_start\0"))
                     .as_ptr(),
@@ -555,7 +546,7 @@ pub unsafe extern "C" fn notify_start(
             osigchld = ssh_signal(17 as libc::c_int, None);
             pid = fork();
             if pid == -(1 as libc::c_int) {
-                sshlog(
+                crate::log::sshlog(
                     b"readpass.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"notify_start\0"))
                         .as_ptr(),
@@ -599,7 +590,7 @@ pub unsafe extern "C" fn notify_start(
                     prompt,
                     0 as *mut libc::c_void as *mut libc::c_char,
                 );
-                sshlog(
+                crate::log::sshlog(
                     b"readpass.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"notify_start\0"))
                         .as_ptr(),

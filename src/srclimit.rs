@@ -18,16 +18,7 @@ extern "C" {
     fn addr_ntop(n: *const xaddr, p: *mut libc::c_char, len: size_t) -> libc::c_int;
     fn addr_and(dst: *mut xaddr, a: *const xaddr, b: *const xaddr) -> libc::c_int;
     fn addr_cmp(a: *const xaddr, b: *const xaddr) -> libc::c_int;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -172,7 +163,7 @@ pub unsafe extern "C" fn srclimit_init(
     if max_persource == 2147483647 as libc::c_int {
         return;
     }
-    sshlog(
+    crate::log::sshlog(
         b"srclimit.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"srclimit_init\0")).as_ptr(),
         54 as libc::c_int,
@@ -253,7 +244,7 @@ pub unsafe extern "C" fn srclimit_check_allow(
     if max_persource == 2147483647 as libc::c_int {
         return 1 as libc::c_int;
     }
-    sshlog(
+    crate::log::sshlog(
         b"srclimit.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"srclimit_check_allow\0"))
             .as_ptr(),
@@ -282,7 +273,7 @@ pub unsafe extern "C" fn srclimit_check_allow(
     if addr_netmask(xa.af as libc::c_int, bits as u_int, &mut xmask) != 0 as libc::c_int
         || addr_and(&mut xb, &mut xa, &mut xmask) != 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"srclimit.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"srclimit_check_allow\0"))
                 .as_ptr(),
@@ -317,7 +308,7 @@ pub unsafe extern "C" fn srclimit_check_allow(
         ::core::mem::size_of::<[libc::c_char; 1025]>() as libc::c_ulong,
     ) != 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"srclimit.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"srclimit_check_allow\0"))
                 .as_ptr(),
@@ -331,7 +322,7 @@ pub unsafe extern "C" fn srclimit_check_allow(
         );
         return 1 as libc::c_int;
     }
-    sshlog(
+    crate::log::sshlog(
         b"srclimit.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"srclimit_check_allow\0"))
             .as_ptr(),
@@ -349,7 +340,7 @@ pub unsafe extern "C" fn srclimit_check_allow(
         max_persource,
     );
     if first_unused == max_children {
-        sshlog(
+        crate::log::sshlog(
             b"srclimit.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"srclimit_check_allow\0"))
                 .as_ptr(),
@@ -393,7 +384,7 @@ pub unsafe extern "C" fn srclimit_done(mut id: libc::c_int) {
     if max_persource == 2147483647 as libc::c_int {
         return;
     }
-    sshlog(
+    crate::log::sshlog(
         b"srclimit.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"srclimit_done\0")).as_ptr(),
         132 as libc::c_int,

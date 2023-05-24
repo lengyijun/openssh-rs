@@ -35,16 +35,7 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn time(__timer: *mut time_t) -> time_t;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -332,7 +323,7 @@ pub unsafe extern "C" fn auth_authorise_keyopts(
             buf.as_mut_ptr(),
             ::core::mem::size_of::<[libc::c_char; 64]>() as libc::c_ulong,
         );
-        sshlog(
+        crate::log::sshlog(
             b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"auth_authorise_keyopts\0",
@@ -354,7 +345,7 @@ pub unsafe extern "C" fn auth_authorise_keyopts(
         return -(1 as libc::c_int);
     }
     if !((*opts).cert_principals).is_null() && (*opts).cert_authority == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"auth_authorise_keyopts\0",
@@ -374,7 +365,7 @@ pub unsafe extern "C" fn auth_authorise_keyopts(
         return -(1 as libc::c_int);
     }
     if allow_cert_authority == 0 && (*opts).cert_authority != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"auth_authorise_keyopts\0",
@@ -401,7 +392,7 @@ pub unsafe extern "C" fn auth_authorise_keyopts(
                 }
                 0 => {}
                 -1 | _ => {
-                    sshlog(
+                    crate::log::sshlog(
                         b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                             b"auth_authorise_keyopts\0",
@@ -420,7 +411,7 @@ pub unsafe extern "C" fn auth_authorise_keyopts(
                     );
                 }
             }
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<
                     &[u8; 23],
@@ -456,7 +447,7 @@ pub unsafe extern "C" fn auth_authorise_keyopts(
                 }
                 0 => {}
                 -1 | _ => {
-                    sshlog(
+                    crate::log::sshlog(
                         b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                             b"auth_authorise_keyopts\0",
@@ -472,7 +463,7 @@ pub unsafe extern "C" fn auth_authorise_keyopts(
                     );
                 }
             }
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<
                     &[u8; 23],
@@ -515,7 +506,7 @@ unsafe extern "C" fn match_principals_option(
             0 as *mut u_int,
         );
         if !result.is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                     b"match_principals_option\0",
@@ -579,7 +570,7 @@ pub unsafe extern "C" fn auth_check_principals_line(
     }
     opts = sshauthopt_parse(line_opts, &mut reason);
     if opts.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                 b"auth_check_principals_line\0",
@@ -603,7 +594,7 @@ pub unsafe extern "C" fn auth_check_principals_line(
     i = 0 as libc::c_int as u_int;
     while i < (*cert).nprincipals {
         if !(strcmp(cp, *((*cert).principals).offset(i as isize)) != 0 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                     b"auth_check_principals_line\0",
@@ -681,7 +672,7 @@ pub unsafe extern "C" fn auth_process_principals(
             found_principal = 1 as libc::c_int as u_int;
         }
     }
-    sshlog(
+    crate::log::sshlog(
         b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(b"auth_process_principals\0"))
             .as_ptr(),
@@ -725,7 +716,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
     }
     found = sshkey_new(want_keytype);
     if found.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                 b"auth_check_authkey_line\0",
@@ -740,7 +731,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
         );
     } else {
         if sshkey_read(found, &mut cp) != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                     b"auth_check_authkey_line\0",
@@ -761,7 +752,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
             } else {
                 skip_space(&mut cp);
                 if sshkey_read(found, &mut cp) != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                             b"auth_check_authkey_line\0",
@@ -790,7 +781,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
                     11050875288958768710 => {
                         keyopts = sshauthopt_parse(key_options, &mut reason);
                         if keyopts.is_null() {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                                     b"auth_check_authkey_line\0",
@@ -850,7 +841,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
                                                 as *const libc::c_char,
                                         );
                                     }
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                                             b"auth_check_authkey_line\0",
@@ -885,7 +876,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
                                         current_block = 13338124556963691996;
                                     } else {
                                         if sshkey_is_cert(key) == 0 {
-                                            sshlog(
+                                            crate::log::sshlog(
                                                 b"auth2-pubkeyfile.c\0" as *const u8
                                                     as *const libc::c_char,
                                                 (*::core::mem::transmute::<
@@ -960,7 +951,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
                                                 {
                                                     current_block = 13338124556963691996;
                                                 } else {
-                                                    sshlog(
+                                                    crate::log::sshlog(
                                                         b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                                                         (*::core::mem::transmute::<
                                                             &[u8; 24],
@@ -1024,7 +1015,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
                 match current_block {
                     15639534262997179764 => {}
                     _ => {
-                        sshlog(
+                        crate::log::sshlog(
                             b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                                 b"auth_check_authkey_line\0",
@@ -1103,7 +1094,7 @@ pub unsafe extern "C" fn auth_check_authkeys_file(
         }
     }
     free(line as *mut libc::c_void);
-    sshlog(
+    crate::log::sshlog(
         b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"auth_check_authkeys_file\0"))
             .as_ptr(),
@@ -1157,7 +1148,7 @@ unsafe extern "C" fn auth_openfile(
     fd = libc::open(file, 0 as libc::c_int | 0o4000 as libc::c_int);
     if fd == -(1 as libc::c_int) {
         if *__errno_location() != 2 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"auth_openfile\0"))
                     .as_ptr(),
@@ -1172,7 +1163,7 @@ unsafe extern "C" fn auth_openfile(
                 strerror(*__errno_location()),
             );
         } else if log_missing != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"auth_openfile\0"))
                     .as_ptr(),
@@ -1196,7 +1187,7 @@ unsafe extern "C" fn auth_openfile(
     if !(st.st_mode & 0o170000 as libc::c_int as libc::c_uint
         == 0o100000 as libc::c_int as libc::c_uint)
     {
-        sshlog(
+        crate::log::sshlog(
             b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"auth_openfile\0"))
                 .as_ptr(),
@@ -1228,7 +1219,7 @@ unsafe extern "C" fn auth_openfile(
         ) != 0 as libc::c_int
     {
         fclose(f);
-        sshlog(
+        crate::log::sshlog(
             b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"auth_openfile\0"))
                 .as_ptr(),

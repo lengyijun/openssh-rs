@@ -61,16 +61,7 @@ extern "C" {
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn cleanup_exit(_: libc::c_int) -> !;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -1003,7 +994,7 @@ unsafe extern "C" fn mux_master_session_cleanup_cb(
 ) {
     let mut cc: *mut Channel = 0 as *mut Channel;
     let mut c: *mut Channel = channel_by_id(ssh, cid);
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 30], &[libc::c_char; 30]>(
             b"mux_master_session_cleanup_cb\0",
@@ -1064,7 +1055,7 @@ unsafe extern "C" fn mux_master_control_cleanup_cb(
 ) {
     let mut sc: *mut Channel = 0 as *mut Channel;
     let mut c: *mut Channel = channel_by_id(ssh, cid);
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 30], &[libc::c_char; 30]>(
             b"mux_master_control_cleanup_cb\0",
@@ -1114,7 +1105,7 @@ unsafe extern "C" fn mux_master_control_cleanup_cb(
         (*c).have_remote_id = 0 as libc::c_int;
         (*sc).ctl_chan = -(1 as libc::c_int);
         if (*sc).type_0 != 4 as libc::c_int && (*sc).type_0 != 3 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 30], &[libc::c_char; 30]>(
                     b"mux_master_control_cleanup_cb\0",
@@ -1158,7 +1149,7 @@ unsafe extern "C" fn env_permitted(mut env: *const libc::c_char) -> libc::c_int 
     if ret <= 0 as libc::c_int
         || ret as size_t >= ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong
     {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"env_permitted\0"))
                 .as_ptr(),
@@ -1207,7 +1198,7 @@ unsafe extern "C" fn mux_master_process_hello(
         );
     }
     if (*state).hello_rcvd != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                 b"mux_master_process_hello\0",
@@ -1223,7 +1214,7 @@ unsafe extern "C" fn mux_master_process_hello(
     }
     r = sshbuf_get_u32(m, &mut ver);
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                 b"mux_master_process_hello\0",
@@ -1238,7 +1229,7 @@ unsafe extern "C" fn mux_master_process_hello(
         return -(1 as libc::c_int);
     }
     if ver != 4 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                 b"mux_master_process_hello\0",
@@ -1255,7 +1246,7 @@ unsafe extern "C" fn mux_master_process_hello(
         );
         return -(1 as libc::c_int);
     }
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"mux_master_process_hello\0"))
             .as_ptr(),
@@ -1275,7 +1266,7 @@ unsafe extern "C" fn mux_master_process_hello(
             r = sshbuf_get_string_direct(m, 0 as *mut *const u_char, &mut value_len);
             r != 0 as libc::c_int
         } {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                     b"mux_master_process_hello\0",
@@ -1289,7 +1280,7 @@ unsafe extern "C" fn mux_master_process_hello(
             );
             return -(1 as libc::c_int);
         }
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                 b"mux_master_process_hello\0",
@@ -1442,7 +1433,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                 if !(env_len > 4096 as libc::c_int as libc::c_uint) {
                     continue;
                 }
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                         b"mux_master_process_new_session\0",
@@ -1463,7 +1454,7 @@ unsafe extern "C" fn mux_master_process_new_session(
         match current_block {
             12595637239762536930 => {}
             _ => {
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<
                         &[u8; 31],
@@ -1521,7 +1512,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                 while i < 3 as libc::c_int as libc::c_uint {
                     new_fd[i as usize] = mm_receive_fd((*c).sock);
                     if new_fd[i as usize] == -(1 as libc::c_int) {
-                        sshlog(
+                        crate::log::sshlog(
                             b"mux.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                                 b"mux_master_process_new_session\0",
@@ -1563,7 +1554,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                     i = i.wrapping_add(1);
                     i;
                 }
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                         b"mux_master_process_new_session\0",
@@ -1579,7 +1570,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                     new_fd[2 as libc::c_int as usize],
                 );
                 if (*c).have_remote_id != 0 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"mux.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                             b"mux_master_process_new_session\0",
@@ -1607,7 +1598,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                             host,
                         ) == 0
                         {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"mux.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                                     b"mux_master_process_new_session\0",
@@ -1639,7 +1630,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                                 && tcgetattr(new_fd[0 as libc::c_int as usize], &mut (*cctx).tio)
                                     == -(1 as libc::c_int)
                             {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"mux.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                                         b"mux_master_process_new_session\0",
@@ -1704,7 +1695,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                                     client_new_escape_filter_ctx(escape_char as libc::c_int),
                                 );
                             }
-                            sshlog(
+                            crate::log::sshlog(
                                 b"mux.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
                                     b"mux_master_process_new_session\0",
@@ -1784,7 +1775,7 @@ unsafe extern "C" fn mux_master_process_new_session(
     free((*cctx).env as *mut libc::c_void);
     free((*cctx).term as *mut libc::c_void);
     free(cctx as *mut libc::c_void);
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
             b"mux_master_process_new_session\0",
@@ -1806,7 +1797,7 @@ unsafe extern "C" fn mux_master_process_alive_check(
     mut reply: *mut sshbuf,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
             b"mux_master_process_alive_check\0",
@@ -1852,7 +1843,7 @@ unsafe extern "C" fn mux_master_process_terminate(
     mut _m: *mut sshbuf,
     mut reply: *mut sshbuf,
 ) -> libc::c_int {
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
             b"mux_master_process_terminate\0",
@@ -1871,7 +1862,7 @@ unsafe extern "C" fn mux_master_process_terminate(
             host,
         ) == 0
         {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                     b"mux_master_process_terminate\0",
@@ -2024,7 +2015,7 @@ unsafe extern "C" fn mux_confirm_remote_forward(
     let mut r: libc::c_int = 0;
     c = channel_by_id(ssh, (*fctx).cid as libc::c_int);
     if c.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                 b"mux_confirm_remote_forward\0",
@@ -2065,7 +2056,7 @@ unsafe extern "C" fn mux_confirm_remote_forward(
         current_block = 7428911785391588765;
     } else {
         rfwd = &mut *(options.remote_forwards).offset((*fctx).fid as isize) as *mut Forward;
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                 b"mux_confirm_remote_forward\0",
@@ -2125,7 +2116,7 @@ unsafe extern "C" fn mux_confirm_remote_forward(
                     );
                 }
                 (*rfwd).allocated_port = port as libc::c_int;
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                         b"mux_confirm_remote_forward\0",
@@ -2189,7 +2180,7 @@ unsafe extern "C" fn mux_confirm_remote_forward(
                     (*rfwd).listen_port,
                 );
             }
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                     b"mux_confirm_remote_forward\0",
@@ -2223,7 +2214,7 @@ unsafe extern "C" fn mux_confirm_remote_forward(
     }
     match current_block {
         7428911785391588765 => {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                     b"mux_confirm_remote_forward\0",
@@ -2328,7 +2319,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
         || lport != -(2 as libc::c_int) as u_int && lport > 65535 as libc::c_int as libc::c_uint
         || cport != -(2 as libc::c_int) as u_int && cport > 65535 as libc::c_int as libc::c_uint
     {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"mux_master_process_open_fwd\0",
@@ -2368,7 +2359,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
             fwd.connect_host = connect_addr;
         }
         fwd_desc = format_forward(ftype, &mut fwd);
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"mux_master_process_open_fwd\0",
@@ -2386,7 +2377,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
             && ftype != 2 as libc::c_int as libc::c_uint
             && ftype != 3 as libc::c_int as libc::c_uint
         {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                     b"mux_master_process_open_fwd\0",
@@ -2401,7 +2392,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
             );
             current_block = 5047716924377657291;
         } else if ftype == 3 as libc::c_int as libc::c_uint && !(fwd.listen_path).is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                     b"mux_master_process_open_fwd\0",
@@ -2417,7 +2408,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
             current_block = 5047716924377657291;
         } else if fwd.listen_port != -(2 as libc::c_int) && fwd.listen_port >= 65536 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                     b"mux_master_process_open_fwd\0",
@@ -2437,7 +2428,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
                 && ftype != 2 as libc::c_int as libc::c_uint
                 && fwd.connect_port == 0 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                     b"mux_master_process_open_fwd\0",
@@ -2455,7 +2446,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
             && (fwd.connect_host).is_null()
             && (fwd.connect_path).is_null()
         {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                     b"mux_master_process_open_fwd\0",
@@ -2504,7 +2495,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
                                 current_block = 13052835669559576429;
                                 break;
                             }
-                            sshlog(
+                            crate::log::sshlog(
                                 b"mux.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                     b"mux_master_process_open_fwd\0",
@@ -2559,7 +2550,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
                 _ => {
                     match current_block {
                         13052835669559576429 => {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"mux.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                     b"mux_master_process_open_fwd\0",
@@ -2583,7 +2574,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
                                     host,
                                 ) == 0
                                 {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"mux.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                             b"mux_master_process_open_fwd\0",
@@ -2668,7 +2659,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
                                     match current_block {
                                         5412649325144431251 => {}
                                         _ => {
-                                            sshlog(
+                                            crate::log::sshlog(
                                                 b"mux.c\0" as *const u8 as *const libc::c_char,
                                                 (*::core::mem::transmute::<
                                                     &[u8; 28],
@@ -2780,7 +2771,7 @@ unsafe extern "C" fn mux_master_process_close_fwd(
         || lport != -(2 as libc::c_int) as u_int && lport > 65535 as libc::c_int as libc::c_uint
         || cport != -(2 as libc::c_int) as u_int && cport > 65535 as libc::c_int as libc::c_uint
     {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                 b"mux_master_process_close_fwd\0",
@@ -2820,7 +2811,7 @@ unsafe extern "C" fn mux_master_process_close_fwd(
             fwd.connect_host = connect_addr;
         }
         fwd_desc = format_forward(ftype, &mut fwd);
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                 b"mux_master_process_close_fwd\0",
@@ -2927,7 +2918,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
         }
     {
         free(chost as *mut libc::c_void);
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                 b"mux_master_process_stdio_fwd\0",
@@ -2941,7 +2932,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
         );
         return -(1 as libc::c_int);
     }
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
             b"mux_master_process_stdio_fwd\0",
@@ -2960,7 +2951,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
     while i < 2 as libc::c_int as libc::c_uint {
         new_fd[i as usize] = mm_receive_fd((*c).sock);
         if new_fd[i as usize] == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                     b"mux_master_process_stdio_fwd\0",
@@ -2991,7 +2982,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
         i = i.wrapping_add(1);
         i;
     }
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
             b"mux_master_process_stdio_fwd\0",
@@ -3006,7 +2997,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
         new_fd[1 as libc::c_int as usize],
     );
     if (*c).have_remote_id != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                 b"mux_master_process_stdio_fwd\0",
@@ -3033,7 +3024,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
                 cport,
             ) == 0
             {
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                         b"mux_master_process_stdio_fwd\0",
@@ -3073,7 +3064,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
                 (*nc).ctl_chan = (*c).self_0;
                 (*c).remote_id = (*nc).self_0 as uint32_t;
                 (*c).have_remote_id = 1 as libc::c_int;
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                         b"mux_master_process_stdio_fwd\0",
@@ -3196,7 +3187,7 @@ unsafe extern "C" fn mux_stdio_confirm(
         );
     }
     if success == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"mux_stdio_confirm\0"))
                 .as_ptr(),
@@ -3213,7 +3204,7 @@ unsafe extern "C" fn mux_stdio_confirm(
             b"Session open refused by peer\0" as *const u8 as *const libc::c_char,
         );
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"mux_stdio_confirm\0"))
                 .as_ptr(),
@@ -3284,7 +3275,7 @@ unsafe extern "C" fn mux_master_process_stop_listening(
     mut _m: *mut sshbuf,
     mut reply: *mut sshbuf,
 ) -> libc::c_int {
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 34], &[libc::c_char; 34]>(
             b"mux_master_process_stop_listening\0",
@@ -3304,7 +3295,7 @@ unsafe extern "C" fn mux_master_process_stop_listening(
             host,
         ) == 0
         {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 34], &[libc::c_char; 34]>(
                     b"mux_master_process_stop_listening\0",
@@ -3344,7 +3335,7 @@ unsafe extern "C" fn mux_master_process_proxy(
     mut reply: *mut sshbuf,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"mux_master_process_proxy\0"))
             .as_ptr(),
@@ -3454,7 +3445,7 @@ unsafe extern "C" fn mux_master_read_cb(mut ssh: *mut ssh, mut c: *mut Channel) 
                 b"enqueue\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"mux_master_read_cb\0"))
                 .as_ptr(),
@@ -3475,7 +3466,7 @@ unsafe extern "C" fn mux_master_read_cb(mut ssh: *mut ssh, mut c: *mut Channel) 
             if r != 0 as libc::c_int {
                 current_block = 15549934470666749764;
             } else {
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"mux_master_read_cb\0",
@@ -3494,7 +3485,7 @@ unsafe extern "C" fn mux_master_read_cb(mut ssh: *mut ssh, mut c: *mut Channel) 
                     rid = 0 as libc::c_int as u_int;
                     current_block = 13242334135786603907;
                 } else if (*state).hello_rcvd == 0 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"mux.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                             b"mux_master_read_cb\0",
@@ -3536,7 +3527,7 @@ unsafe extern "C" fn mux_master_read_cb(mut ssh: *mut ssh, mut c: *mut Channel) 
                             }
                         }
                         if (mux_master_handlers[i as usize].handler).is_none() {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"mux.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                                     b"mux_master_read_cb\0",
@@ -3583,7 +3574,7 @@ unsafe extern "C" fn mux_master_read_cb(mut ssh: *mut ssh, mut c: *mut Channel) 
         match current_block {
             3075895876153858643 => {}
             _ => {
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"mux_master_read_cb\0",
@@ -3610,7 +3601,7 @@ pub unsafe extern "C" fn mux_exit_message(
     let mut m: *mut sshbuf = 0 as *mut sshbuf;
     let mut mux_chan: *mut Channel = 0 as *mut Channel;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mux_exit_message\0")).as_ptr(),
         1216 as libc::c_int,
@@ -3681,7 +3672,7 @@ pub unsafe extern "C" fn mux_tty_alloc_failed(mut ssh: *mut ssh, mut c: *mut Cha
     let mut m: *mut sshbuf = 0 as *mut sshbuf;
     let mut mux_chan: *mut Channel = 0 as *mut Channel;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"mux_tty_alloc_failed\0"))
             .as_ptr(),
@@ -3754,7 +3745,7 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
     if (options.control_path).is_null() || options.control_master == 0 as libc::c_int {
         return;
     }
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"muxserver_listen\0")).as_ptr(),
         1268 as libc::c_int,
@@ -3795,7 +3786,7 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
         orig_control_path,
         rbuf.as_mut_ptr(),
     );
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"muxserver_listen\0")).as_ptr(),
         1285 as libc::c_int,
@@ -3811,7 +3802,7 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
     libc::umask(old_umask);
     if muxserver_sock < 0 as libc::c_int {
         if oerrno == 22 as libc::c_int || oerrno == 98 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"muxserver_listen\0"))
                     .as_ptr(),
@@ -3842,7 +3833,7 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
                 strerror(*__errno_location()),
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"muxserver_listen\0"))
                 .as_ptr(),
@@ -3875,7 +3866,7 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
         );
         (*mux_listener_channel).mux_rcb =
             Some(mux_master_read_cb as unsafe extern "C" fn(*mut ssh, *mut Channel) -> libc::c_int);
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"muxserver_listen\0"))
                 .as_ptr(),
@@ -3966,7 +3957,7 @@ unsafe extern "C" fn mux_session_confirm(
         );
     }
     if success == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"mux_session_confirm\0"))
                 .as_ptr(),
@@ -3997,7 +3988,7 @@ unsafe extern "C" fn mux_session_confirm(
                 &mut data,
             ) == 0 as libc::c_int
             {
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                         b"mux_session_confirm\0",
@@ -4027,7 +4018,7 @@ unsafe extern "C" fn mux_session_confirm(
             }
         }
         if (*cctx).want_agent_fwd != 0 && options.forward_agent != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"mux_session_confirm\0",
@@ -4074,7 +4065,7 @@ unsafe extern "C" fn mux_session_confirm(
             (*cctx).cmd,
             (*cctx).env,
         );
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"mux_session_confirm\0"))
                 .as_ptr(),
@@ -4334,7 +4325,7 @@ unsafe extern "C" fn mux_client_read_packet(
     if mux_client_read(fd, queue, 4 as libc::c_int as size_t) != 0 as libc::c_int {
         oerrno = *__errno_location();
         if oerrno == 32 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                     b"mux_client_read_packet\0",
@@ -4360,7 +4351,7 @@ unsafe extern "C" fn mux_client_read_packet(
         | *(sshbuf_ptr(queue)).offset(3 as libc::c_int as isize) as u_int32_t) as size_t;
     if mux_client_read(fd, queue, need) != 0 as libc::c_int {
         oerrno = *__errno_location();
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"mux_client_read_packet\0",
@@ -4439,7 +4430,7 @@ unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_i
         );
     }
     if mux_client_write_packet(fd, m) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"mux_client_hello_exchange\0",
@@ -4455,7 +4446,7 @@ unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_i
     } else {
         sshbuf_reset(m);
         if mux_client_read_packet(fd, m) != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"mux_client_hello_exchange\0",
@@ -4484,7 +4475,7 @@ unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_i
                 );
             }
             if type_0 != 0x1 as libc::c_int as libc::c_uint {
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"mux_client_hello_exchange\0",
@@ -4515,7 +4506,7 @@ unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_i
                     );
                 }
                 if ver != 4 as libc::c_int as libc::c_uint {
-                    sshlog(
+                    crate::log::sshlog(
                         b"mux.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"mux_client_hello_exchange\0",
@@ -4531,7 +4522,7 @@ unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_i
                         4 as libc::c_int,
                     );
                 } else {
-                    sshlog(
+                    crate::log::sshlog(
                         b"mux.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"mux_client_hello_exchange\0",
@@ -4559,7 +4550,7 @@ unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_i
                             );
                             r != 0 as libc::c_int
                         } {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"mux.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                     b"mux_client_hello_exchange\0",
@@ -4574,7 +4565,7 @@ unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_i
                             current_block = 4930925120023413099;
                             break;
                         } else {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"mux.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                     b"mux_client_hello_exchange\0",
@@ -4611,7 +4602,7 @@ unsafe extern "C" fn mux_client_request_alive(mut fd: libc::c_int) -> u_int {
     let mut type_0: u_int = 0;
     let mut rid: u_int = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"mux_client_request_alive\0"))
             .as_ptr(),
@@ -4766,7 +4757,7 @@ unsafe extern "C" fn mux_client_request_alive(mut fd: libc::c_int) -> u_int {
         );
     }
     sshbuf_free(m);
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"mux_client_request_alive\0"))
             .as_ptr(),
@@ -4787,7 +4778,7 @@ unsafe extern "C" fn mux_client_request_terminate(mut fd: libc::c_int) {
     let mut type_0: u_int = 0;
     let mut rid: u_int = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
             b"mux_client_request_terminate\0",
@@ -4998,7 +4989,7 @@ unsafe extern "C" fn mux_client_forward(
     let mut rid: u_int = 0;
     let mut r: libc::c_int = 0;
     fwd_desc = format_forward(ftype, fwd);
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"mux_client_forward\0"))
             .as_ptr(),
@@ -5170,7 +5161,7 @@ unsafe extern "C" fn mux_client_forward(
                     b"parse port\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"mux_client_forward\0",
@@ -5215,7 +5206,7 @@ unsafe extern "C" fn mux_client_forward(
                 );
             }
             sshbuf_free(m);
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"mux_client_forward\0",
@@ -5247,7 +5238,7 @@ unsafe extern "C" fn mux_client_forward(
                 );
             }
             sshbuf_free(m);
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"mux_client_forward\0",
@@ -5289,7 +5280,7 @@ unsafe extern "C" fn mux_client_forwards(
 ) -> libc::c_int {
     let mut i: libc::c_int = 0;
     let mut ret: libc::c_int = 0 as libc::c_int;
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"mux_client_forwards\0"))
             .as_ptr(),
@@ -5358,7 +5349,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
     }
     let mut r: libc::c_int = 0;
     let mut rawmode: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
             b"mux_client_request_session\0",
@@ -5372,7 +5363,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
     );
     muxserver_pid = mux_client_request_alive(fd);
     if muxserver_pid == 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                 b"mux_client_request_session\0",
@@ -5574,7 +5565,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
             b"send fds failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
             b"mux_client_request_session\0",
@@ -5588,7 +5579,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
     );
     sshbuf_reset(m);
     if mux_client_read_packet(fd, m) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                 b"mux_client_request_session\0",
@@ -5655,7 +5646,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
                     b"parse session ID\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                     b"mux_client_request_session\0",
@@ -5685,7 +5676,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
                     b"parse error message\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                     b"mux_client_request_session\0",
@@ -5717,7 +5708,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
                     b"parse error message\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                     b"mux_client_request_session\0",
@@ -5735,7 +5726,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
         }
         _ => {
             sshbuf_free(m);
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                     b"mux_client_request_session\0",
@@ -5953,7 +5944,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
         leave_raw_mode((options.request_tty == 3 as libc::c_int) as libc::c_int);
     }
     if muxclient_terminate != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                 b"mux_client_request_session\0",
@@ -5968,7 +5959,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
         );
         exitval = 255 as libc::c_int as u_int;
     } else if exitval_seen == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                 b"mux_client_request_session\0",
@@ -5982,7 +5973,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
         );
         exitval = 255 as libc::c_int as u_int;
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                 b"mux_client_request_session\0",
@@ -6115,7 +6106,7 @@ unsafe extern "C" fn mux_client_proxy(mut fd: libc::c_int) -> libc::c_int {
         );
     }
     sshbuf_free(m);
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mux_client_proxy\0")).as_ptr(),
         2081 as libc::c_int,
@@ -6135,7 +6126,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
     let mut rid: u_int = 0;
     let mut sid: u_int = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
             b"mux_client_request_stdio_fwd\0",
@@ -6149,7 +6140,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
     );
     muxserver_pid = mux_client_request_alive(fd);
     if muxserver_pid == 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                 b"mux_client_request_stdio_fwd\0",
@@ -6284,7 +6275,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
         );
     }
     platform_pledge_mux();
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
             b"mux_client_request_stdio_fwd\0",
@@ -6298,7 +6289,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
     );
     sshbuf_reset(m);
     if mux_client_read_packet(fd, m) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                 b"mux_client_request_stdio_fwd\0",
@@ -6365,7 +6356,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
                     b"parse session ID\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                     b"mux_client_request_stdio_fwd\0",
@@ -6444,7 +6435,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
         }
         _ => {
             sshbuf_free(m);
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
                     b"mux_client_request_stdio_fwd\0",
@@ -6519,7 +6510,7 @@ unsafe extern "C" fn mux_client_request_stop_listening(mut fd: libc::c_int) {
     let mut type_0: u_int = 0;
     let mut rid: u_int = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 34], &[libc::c_char; 34]>(
             b"mux_client_request_stop_listening\0",
@@ -6727,7 +6718,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
     }
     match options.control_master {
         2 | 4 => {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"muxclient\0"))
                     .as_ptr(),
@@ -6808,7 +6799,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
             }
         }
         if *__errno_location() == 111 as libc::c_int && options.control_master != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"muxclient\0"))
                     .as_ptr(),
@@ -6821,7 +6812,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
             );
             unlink(path);
         } else if *__errno_location() == 2 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"muxclient\0"))
                     .as_ptr(),
@@ -6833,7 +6824,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
                 path,
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"muxclient\0"))
                     .as_ptr(),
@@ -6851,7 +6842,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
     }
     set_nonblock(sock);
     if mux_client_hello_exchange(sock) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"muxclient\0")).as_ptr(),
             2297 as libc::c_int,
@@ -6912,7 +6903,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
         }
         1 => {
             if mux_client_forwards(sock, 0 as libc::c_int) != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"muxclient\0"))
                         .as_ptr(),
@@ -6943,7 +6934,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
         }
         7 => {
             if mux_client_forwards(sock, 1 as libc::c_int) != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"muxclient\0"))
                         .as_ptr(),

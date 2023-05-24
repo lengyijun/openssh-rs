@@ -29,16 +29,7 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -180,7 +171,7 @@ pub unsafe extern "C" fn ipv64_normalise_mapped(
     {
         return;
     }
-    sshlog(
+    crate::log::sshlog(
         b"canohost.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(b"ipv64_normalise_mapped\0"))
             .as_ptr(),
@@ -270,7 +261,7 @@ unsafe extern "C" fn get_socket_address(
                 flags,
             );
             if r != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"canohost.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"get_socket_address\0",
@@ -324,7 +315,7 @@ pub unsafe extern "C" fn get_local_name(mut fd: libc::c_int) -> *mut libc::c_cha
         ::core::mem::size_of::<[libc::c_char; 1025]>() as libc::c_ulong,
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"canohost.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"get_local_name\0"))
                 .as_ptr(),
@@ -368,7 +359,7 @@ unsafe extern "C" fn get_sock_port(mut sock: libc::c_int, mut local: libc::c_int
             &mut fromlen,
         ) == -(1 as libc::c_int)
         {
-            sshlog(
+            crate::log::sshlog(
                 b"canohost.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"get_sock_port\0"))
                     .as_ptr(),
@@ -389,7 +380,7 @@ unsafe extern "C" fn get_sock_port(mut sock: libc::c_int, mut local: libc::c_int
         &mut fromlen,
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"canohost.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"get_sock_port\0"))
                 .as_ptr(),

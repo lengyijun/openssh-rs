@@ -49,16 +49,7 @@ extern "C" {
         _: *mut u_char,
         _: *mut size_t,
     ) -> libc::c_int;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> libc::c_int;
@@ -299,7 +290,7 @@ pub unsafe extern "C" fn kexgex_server(mut ssh: *mut ssh) -> libc::c_int {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    sshlog(
+    crate::log::sshlog(
         b"kexgexs.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"kexgex_server\0")).as_ptr(),
         66 as libc::c_int,
@@ -322,7 +313,7 @@ unsafe extern "C" fn input_kex_dh_gex_request(
     let mut nbits: u_int = 0 as libc::c_int as u_int;
     let mut dh_p: *const BIGNUM = 0 as *const BIGNUM;
     let mut dh_g: *const BIGNUM = 0 as *const BIGNUM;
-    sshlog(
+    crate::log::sshlog(
         b"kexgexs.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"input_kex_dh_gex_request\0"))
             .as_ptr(),
@@ -397,7 +388,7 @@ unsafe extern "C" fn input_kex_dh_gex_request(
                 );
                 r = -(2 as libc::c_int);
             } else {
-                sshlog(
+                crate::log::sshlog(
                     b"kexgexs.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                         b"input_kex_dh_gex_request\0",
@@ -431,7 +422,7 @@ unsafe extern "C" fn input_kex_dh_gex_request(
                             as libc::c_int,
                     );
                     if !(r != 0 as libc::c_int) {
-                        sshlog(
+                        crate::log::sshlog(
                             b"kexgexs.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                                 b"input_kex_dh_gex_request\0",
@@ -484,7 +475,7 @@ unsafe extern "C" fn input_kex_dh_gex_init(
     let mut slen: size_t = 0;
     let mut hashlen: size_t = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"kexgexs.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"input_kex_dh_gex_init\0"))
             .as_ptr(),

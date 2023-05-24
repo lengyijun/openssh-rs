@@ -67,16 +67,7 @@ extern "C" {
     fn sshbuf_free(buf: *mut sshbuf);
     fn sshbuf_froms(buf: *mut sshbuf, bufp: *mut *mut sshbuf) -> libc::c_int;
     fn sshbuf_new() -> *mut sshbuf;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -489,7 +480,7 @@ unsafe extern "C" fn get_msg_extended(
         );
     }
     if msg_len > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"get_msg_extended\0"))
                 .as_ptr(),
@@ -616,7 +607,7 @@ unsafe extern "C" fn send_string_request(
         );
     }
     send_msg(conn, msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"send_string_request\0"))
             .as_ptr(),
@@ -685,7 +676,7 @@ unsafe extern "C" fn send_string_attrs_request(
         );
     }
     send_msg(conn, msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(b"send_string_attrs_request\0"))
             .as_ptr(),
@@ -775,7 +766,7 @@ unsafe extern "C" fn get_status(mut conn: *mut sftp_conn, mut expected_id: u_int
         );
     }
     sshbuf_free(msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"get_status\0")).as_ptr(),
         295 as libc::c_int,
@@ -873,7 +864,7 @@ unsafe extern "C" fn get_handle(
             );
         }
         if !errfmt.is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"get_handle\0"))
                     .as_ptr(),
@@ -1001,7 +992,7 @@ unsafe extern "C" fn get_decode_stat(
             );
         }
         if quiet != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"get_decode_stat\0"))
                     .as_ptr(),
@@ -1013,7 +1004,7 @@ unsafe extern "C" fn get_decode_stat(
                 fx2txt(status as libc::c_int),
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"get_decode_stat\0"))
                     .as_ptr(),
@@ -1043,7 +1034,7 @@ unsafe extern "C" fn get_decode_stat(
     }
     r = decode_attrib(msg, &mut a);
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"get_decode_stat\0"))
                 .as_ptr(),
@@ -1056,7 +1047,7 @@ unsafe extern "C" fn get_decode_stat(
         sshbuf_free(msg);
         return 0 as *mut Attrib;
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"get_decode_stat\0")).as_ptr(),
         386 as libc::c_int,
@@ -1113,7 +1104,7 @@ unsafe extern "C" fn get_decode_statvfs(
             b"parse\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"get_decode_statvfs\0"))
             .as_ptr(),
@@ -1157,7 +1148,7 @@ unsafe extern "C" fn get_decode_statvfs(
             );
         }
         if quiet != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"get_decode_statvfs\0",
@@ -1171,7 +1162,7 @@ unsafe extern "C" fn get_decode_statvfs(
                 fx2txt(status as libc::c_int),
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"get_decode_statvfs\0",
@@ -1347,7 +1338,7 @@ pub unsafe extern "C" fn do_init(
         );
     }
     if type_0 as libc::c_int != 2 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_init\0")).as_ptr(),
             486 as libc::c_int,
@@ -1374,7 +1365,7 @@ pub unsafe extern "C" fn do_init(
             b"parse version\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_init\0")).as_ptr(),
         494 as libc::c_int,
@@ -1514,7 +1505,7 @@ pub unsafe extern "C" fn do_init(
             known = 1 as libc::c_int;
         }
         if known != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_init\0")).as_ptr(),
                 550 as libc::c_int,
@@ -1527,7 +1518,7 @@ pub unsafe extern "C" fn do_init(
                 value,
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_init\0")).as_ptr(),
                 552 as libc::c_int,
@@ -1585,7 +1576,7 @@ pub unsafe extern "C" fn do_init(
             } else {
                 64 as libc::c_int as libc::c_uint
             };
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_init\0")).as_ptr(),
                 578 as libc::c_int,
@@ -1609,7 +1600,7 @@ pub unsafe extern "C" fn do_init(
             if (*ret).num_requests == 0 as libc::c_int as libc::c_uint {
                 (*ret).num_requests = 1 as libc::c_int as u_int;
             }
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_init\0")).as_ptr(),
                 589 as libc::c_int,
@@ -1662,7 +1653,7 @@ pub unsafe extern "C" fn do_limits(
     let mut msg: *mut sshbuf = 0 as *mut sshbuf;
     let mut r: libc::c_int = 0;
     if (*conn).exts & 0x40 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_limits\0")).as_ptr(),
             625 as libc::c_int,
@@ -1714,7 +1705,7 @@ pub unsafe extern "C" fn do_limits(
         );
     }
     send_msg(conn, msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_limits\0")).as_ptr(),
         638 as libc::c_int,
@@ -1740,7 +1731,7 @@ pub unsafe extern "C" fn do_limits(
             b"parse\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_limits\0")).as_ptr(),
         646 as libc::c_int,
@@ -1765,7 +1756,7 @@ pub unsafe extern "C" fn do_limits(
         );
     }
     if type_0 as libc::c_int != 201 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_limits\0")).as_ptr(),
             651 as libc::c_int,
@@ -1860,7 +1851,7 @@ pub unsafe extern "C" fn do_close(
         );
     }
     send_msg(conn, msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"do_close\0")).as_ptr(),
         686 as libc::c_int,
@@ -1872,7 +1863,7 @@ pub unsafe extern "C" fn do_close(
     );
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"do_close\0")).as_ptr(),
             690 as libc::c_int,
@@ -1977,7 +1968,7 @@ unsafe extern "C" fn do_lsreaddir(
         (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
         expected_id = fresh4;
         id = expected_id;
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_lsreaddir\0")).as_ptr(),
             738 as libc::c_int,
@@ -2029,7 +2020,7 @@ unsafe extern "C" fn do_lsreaddir(
                 b"parse\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_lsreaddir\0")).as_ptr(),
             755 as libc::c_int,
@@ -2069,7 +2060,7 @@ unsafe extern "C" fn do_lsreaddir(
                     b"parse status\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_lsreaddir\0"))
                     .as_ptr(),
@@ -2084,7 +2075,7 @@ unsafe extern "C" fn do_lsreaddir(
                 current_block = 17233182392562552756;
                 break;
             }
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_lsreaddir\0"))
                     .as_ptr(),
@@ -2142,7 +2133,7 @@ unsafe extern "C" fn do_lsreaddir(
                 current_block = 17233182392562552756;
                 break;
             }
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_lsreaddir\0"))
                     .as_ptr(),
@@ -2186,7 +2177,7 @@ unsafe extern "C" fn do_lsreaddir(
                 }
                 r = decode_attrib(msg, &mut a);
                 if r != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                             b"do_lsreaddir\0",
@@ -2207,7 +2198,7 @@ unsafe extern "C" fn do_lsreaddir(
                         mprintf(b"%s\n\0" as *const u8 as *const libc::c_char, longname);
                     }
                     if !(strpbrk(filename, b"/\0" as *const u8 as *const libc::c_char)).is_null() {
-                        sshlog(
+                        crate::log::sshlog(
                             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                                 b"do_lsreaddir\0",
@@ -2309,7 +2300,7 @@ pub unsafe extern "C" fn do_rm(
 ) -> libc::c_int {
     let mut status: u_int = 0;
     let mut id: u_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 6], &[libc::c_char; 6]>(b"do_rm\0")).as_ptr(),
         866 as libc::c_int,
@@ -2331,7 +2322,7 @@ pub unsafe extern "C" fn do_rm(
     );
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 6], &[libc::c_char; 6]>(b"do_rm\0")).as_ptr(),
             872 as libc::c_int,
@@ -2357,7 +2348,7 @@ pub unsafe extern "C" fn do_mkdir(
 ) -> libc::c_int {
     let mut status: u_int = 0;
     let mut id: u_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"do_mkdir\0")).as_ptr(),
         881 as libc::c_int,
@@ -2380,7 +2371,7 @@ pub unsafe extern "C" fn do_mkdir(
     );
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint && print_flag != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"do_mkdir\0")).as_ptr(),
             889 as libc::c_int,
@@ -2404,7 +2395,7 @@ pub unsafe extern "C" fn do_rmdir(
 ) -> libc::c_int {
     let mut status: u_int = 0;
     let mut id: u_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"do_rmdir\0")).as_ptr(),
         899 as libc::c_int,
@@ -2426,7 +2417,7 @@ pub unsafe extern "C" fn do_rmdir(
     );
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"do_rmdir\0")).as_ptr(),
             907 as libc::c_int,
@@ -2450,7 +2441,7 @@ pub unsafe extern "C" fn do_stat(
     mut quiet: libc::c_int,
 ) -> *mut Attrib {
     let mut id: u_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_stat\0")).as_ptr(),
         917 as libc::c_int,
@@ -2484,7 +2475,7 @@ pub unsafe extern "C" fn do_lstat(
     let mut id: u_int = 0;
     if (*conn).version == 0 as libc::c_int as libc::c_uint {
         if quiet != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"do_lstat\0")).as_ptr(),
                 935 as libc::c_int,
@@ -2495,7 +2486,7 @@ pub unsafe extern "C" fn do_lstat(
                     as *const libc::c_char,
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"do_lstat\0")).as_ptr(),
                 937 as libc::c_int,
@@ -2527,7 +2518,7 @@ pub unsafe extern "C" fn do_setstat(
 ) -> libc::c_int {
     let mut status: u_int = 0;
     let mut id: u_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"do_setstat\0")).as_ptr(),
         970 as libc::c_int,
@@ -2550,7 +2541,7 @@ pub unsafe extern "C" fn do_setstat(
     );
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"do_setstat\0")).as_ptr(),
             978 as libc::c_int,
@@ -2576,7 +2567,7 @@ pub unsafe extern "C" fn do_fsetstat(
 ) -> libc::c_int {
     let mut status: u_int = 0;
     let mut id: u_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_fsetstat\0")).as_ptr(),
         989 as libc::c_int,
@@ -2598,7 +2589,7 @@ pub unsafe extern "C" fn do_fsetstat(
     );
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_fsetstat\0")).as_ptr(),
             997 as libc::c_int,
@@ -2659,7 +2650,7 @@ unsafe extern "C" fn do_realpath_expand(
     id = fresh16;
     expected_id = id;
     if expand != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"do_realpath_expand\0"))
                 .as_ptr(),
@@ -2705,7 +2696,7 @@ unsafe extern "C" fn do_realpath_expand(
         }
         send_msg(conn, msg);
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"do_realpath_expand\0"))
                 .as_ptr(),
@@ -2776,7 +2767,7 @@ unsafe extern "C" fn do_realpath_expand(
                 b"parse status\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"do_realpath_expand\0"))
                 .as_ptr(),
@@ -2863,7 +2854,7 @@ unsafe extern "C" fn do_realpath_expand(
             b"parse filename/attrib\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"do_realpath_expand\0"))
             .as_ptr(),
@@ -2895,7 +2886,7 @@ pub unsafe extern "C" fn do_expand_path(
     mut path: *const libc::c_char,
 ) -> *mut libc::c_char {
     if can_expand_path(conn) == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_expand_path\0"))
                 .as_ptr(),
@@ -2934,7 +2925,7 @@ pub unsafe extern "C" fn do_copy(
     let mut new_handle_len: size_t = 0;
     let mut r: libc::c_int = 0;
     if (*conn).exts & 0x100 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_copy\0")).as_ptr(),
             1112 as libc::c_int,
@@ -2954,7 +2945,7 @@ pub unsafe extern "C" fn do_copy(
         if !((*a).perm & 0o170000 as libc::c_int as libc::c_uint
             == 0o100000 as libc::c_int as libc::c_uint)
         {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_copy\0")).as_ptr(),
                 1125 as libc::c_int,
@@ -3021,7 +3012,7 @@ pub unsafe extern "C" fn do_copy(
         );
     }
     send_msg(conn, msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_copy\0")).as_ptr(),
         1152 as libc::c_int,
@@ -3082,7 +3073,7 @@ pub unsafe extern "C" fn do_copy(
         );
     }
     send_msg(conn, msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_copy\0")).as_ptr(),
         1173 as libc::c_int,
@@ -3153,7 +3144,7 @@ pub unsafe extern "C" fn do_copy(
         );
     }
     send_msg(conn, msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_copy\0")).as_ptr(),
         1198 as libc::c_int,
@@ -3166,7 +3157,7 @@ pub unsafe extern "C" fn do_copy(
     );
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_copy\0")).as_ptr(),
             1203 as libc::c_int,
@@ -3218,7 +3209,7 @@ pub unsafe extern "C" fn do_rename(
     (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
     id = fresh20;
     if use_ext != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_rename\0")).as_ptr(),
             1230 as libc::c_int,
@@ -3256,7 +3247,7 @@ pub unsafe extern "C" fn do_rename(
             );
         }
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_rename\0")).as_ptr(),
             1238 as libc::c_int,
@@ -3300,7 +3291,7 @@ pub unsafe extern "C" fn do_rename(
         );
     }
     send_msg(conn, msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_rename\0")).as_ptr(),
         1249 as libc::c_int,
@@ -3319,7 +3310,7 @@ pub unsafe extern "C" fn do_rename(
     sshbuf_free(msg);
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_rename\0")).as_ptr(),
             1255 as libc::c_int,
@@ -3348,7 +3339,7 @@ pub unsafe extern "C" fn do_hardlink(
     let mut id: u_int = 0;
     let mut r: libc::c_int = 0;
     if (*conn).exts & 0x8 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_hardlink\0")).as_ptr(),
             1268 as libc::c_int,
@@ -3360,7 +3351,7 @@ pub unsafe extern "C" fn do_hardlink(
         );
         return -(1 as libc::c_int);
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_hardlink\0")).as_ptr(),
         1272 as libc::c_int,
@@ -3420,7 +3411,7 @@ pub unsafe extern "C" fn do_hardlink(
         );
     }
     send_msg(conn, msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_hardlink\0")).as_ptr(),
         1287 as libc::c_int,
@@ -3434,7 +3425,7 @@ pub unsafe extern "C" fn do_hardlink(
     sshbuf_free(msg);
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_hardlink\0")).as_ptr(),
             1293 as libc::c_int,
@@ -3463,7 +3454,7 @@ pub unsafe extern "C" fn do_symlink(
     let mut id: u_int = 0;
     let mut r: libc::c_int = 0;
     if (*conn).version < 3 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"do_symlink\0")).as_ptr(),
             1306 as libc::c_int,
@@ -3475,7 +3466,7 @@ pub unsafe extern "C" fn do_symlink(
         );
         return 8 as libc::c_int;
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"do_symlink\0")).as_ptr(),
         1309 as libc::c_int,
@@ -3527,7 +3518,7 @@ pub unsafe extern "C" fn do_symlink(
         );
     }
     send_msg(conn, msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"do_symlink\0")).as_ptr(),
         1323 as libc::c_int,
@@ -3541,7 +3532,7 @@ pub unsafe extern "C" fn do_symlink(
     sshbuf_free(msg);
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"do_symlink\0")).as_ptr(),
             1329 as libc::c_int,
@@ -3572,7 +3563,7 @@ pub unsafe extern "C" fn do_fsync(
     if (*conn).exts & 0x10 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint {
         return -(1 as libc::c_int);
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"do_fsync\0")).as_ptr(),
         1344 as libc::c_int,
@@ -3625,7 +3616,7 @@ pub unsafe extern "C" fn do_fsync(
         );
     }
     send_msg(conn, msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"do_fsync\0")).as_ptr(),
         1356 as libc::c_int,
@@ -3638,7 +3629,7 @@ pub unsafe extern "C" fn do_fsync(
     sshbuf_free(msg);
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"do_fsync\0")).as_ptr(),
             1361 as libc::c_int,
@@ -3665,7 +3656,7 @@ pub unsafe extern "C" fn do_statvfs(
     let mut id: u_int = 0;
     let mut r: libc::c_int = 0;
     if (*conn).exts & 0x2 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"do_statvfs\0")).as_ptr(),
             1434 as libc::c_int,
@@ -3677,7 +3668,7 @@ pub unsafe extern "C" fn do_statvfs(
         );
         return -(1 as libc::c_int);
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"do_statvfs\0")).as_ptr(),
         1438 as libc::c_int,
@@ -3745,7 +3736,7 @@ pub unsafe extern "C" fn do_lsetstat(
     let mut id: u_int = 0;
     let mut r: libc::c_int = 0;
     if (*conn).exts & 0x20 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_lsetstat\0")).as_ptr(),
             1494 as libc::c_int,
@@ -3757,7 +3748,7 @@ pub unsafe extern "C" fn do_lsetstat(
         );
         return -(1 as libc::c_int);
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_lsetstat\0")).as_ptr(),
         1498 as libc::c_int,
@@ -3819,7 +3810,7 @@ pub unsafe extern "C" fn do_lsetstat(
     sshbuf_free(msg);
     status = get_status(conn, id);
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_lsetstat\0")).as_ptr(),
             1514 as libc::c_int,
@@ -3916,7 +3907,7 @@ unsafe extern "C" fn send_open(
     let mut msg: *mut sshbuf = 0 as *mut sshbuf;
     let mut r: libc::c_int = 0;
     let mut id: u_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"send_open\0")).as_ptr(),
         1549 as libc::c_int,
@@ -3979,7 +3970,7 @@ unsafe extern "C" fn send_open(
     }
     send_msg(conn, msg);
     sshbuf_free(msg);
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"send_open\0")).as_ptr(),
         1571 as libc::c_int,
@@ -4084,7 +4075,7 @@ pub unsafe extern "C" fn do_download(
     };
     let mut req: *mut request = 0 as *mut request;
     let mut type_0: u_char = 0;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_download\0")).as_ptr(),
         1613 as libc::c_int,
@@ -4112,7 +4103,7 @@ pub unsafe extern "C" fn do_download(
         && !((*a).perm & 0o170000 as libc::c_int as libc::c_uint
             == 0o100000 as libc::c_int as libc::c_uint)
     {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_download\0")).as_ptr(),
             1628 as libc::c_int,
@@ -4154,7 +4145,7 @@ pub unsafe extern "C" fn do_download(
         mode | 0o200 as libc::c_int as libc::c_uint,
     );
     if local_fd == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_download\0")).as_ptr(),
             1647 as libc::c_int,
@@ -4168,7 +4159,7 @@ pub unsafe extern "C" fn do_download(
     } else {
         if resume_flag != 0 {
             if fstat(local_fd, &mut st) == -(1 as libc::c_int) {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_download\0"))
                         .as_ptr(),
@@ -4182,7 +4173,7 @@ pub unsafe extern "C" fn do_download(
                 );
                 current_block = 1623598053124096515;
             } else if st.st_size < 0 as libc::c_int as libc::c_long {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_download\0"))
                         .as_ptr(),
@@ -4195,7 +4186,7 @@ pub unsafe extern "C" fn do_download(
                 );
                 current_block = 1623598053124096515;
             } else if st.st_size as u_int64_t > size {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_download\0"))
                         .as_ptr(),
@@ -4260,7 +4251,7 @@ pub unsafe extern "C" fn do_download(
                         max_req = 0 as libc::c_int as u_int;
                     }
                     while num_req < max_req {
-                        sshlog(
+                        crate::log::sshlog(
                             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                 b"do_download\0",
@@ -4315,7 +4306,7 @@ pub unsafe extern "C" fn do_download(
                             b"parse\0" as *const u8 as *const libc::c_char,
                         );
                     }
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                             b"do_download\0",
@@ -4393,7 +4384,7 @@ pub unsafe extern "C" fn do_download(
                                     b"parse data\0" as *const u8 as *const libc::c_char,
                                 );
                             }
-                            sshlog(
+                            crate::log::sshlog(
                                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                     b"do_download\0",
@@ -4489,7 +4480,7 @@ pub unsafe extern "C" fn do_download(
                                 num_req = num_req.wrapping_sub(1);
                                 num_req;
                             } else {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                         b"do_download\0",
@@ -4536,7 +4527,7 @@ pub unsafe extern "C" fn do_download(
                             }
                             if max_req > 0 as libc::c_int as libc::c_uint {
                                 if size > 0 as libc::c_int as libc::c_ulong && offset > size {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                             b"do_download\0",
@@ -4603,7 +4594,7 @@ pub unsafe extern "C" fn do_download(
                         && resume_flag != 0
                         && (read_error != 0 || write_error != 0 || interrupted != 0)
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                 b"do_download\0",
@@ -4618,7 +4609,7 @@ pub unsafe extern "C" fn do_download(
                             local_path,
                         );
                     }
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                             b"do_download\0",
@@ -4632,7 +4623,7 @@ pub unsafe extern "C" fn do_download(
                         highwater as libc::c_ulonglong,
                     );
                     if ftruncate(local_fd, highwater as __off_t) == -(1 as libc::c_int) {
-                        sshlog(
+                        crate::log::sshlog(
                             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                 b"do_download\0",
@@ -4649,7 +4640,7 @@ pub unsafe extern "C" fn do_download(
                     }
                 }
                 if read_error != 0 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                             b"do_download\0",
@@ -4666,7 +4657,7 @@ pub unsafe extern "C" fn do_download(
                     status = -(1 as libc::c_int) as u_int;
                     do_close(conn, handle, handle_len as u_int);
                 } else if write_error != 0 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                             b"do_download\0",
@@ -4691,7 +4682,7 @@ pub unsafe extern "C" fn do_download(
                         status = 0 as libc::c_int as u_int;
                     }
                     if preserve_flag != 0 && libc::fchmod(local_fd, mode) == -(1 as libc::c_int) {
-                        sshlog(
+                        crate::log::sshlog(
                             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                 b"do_download\0",
@@ -4719,7 +4710,7 @@ pub unsafe extern "C" fn do_download(
                         if utimes(local_path, tv.as_mut_ptr() as *const timeval)
                             == -(1 as libc::c_int)
                         {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                     b"do_download\0",
@@ -4736,7 +4727,7 @@ pub unsafe extern "C" fn do_download(
                         }
                     }
                     if resume_flag != 0 && lmodified == 0 {
-                        sshlog(
+                        crate::log::sshlog(
                             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                 b"do_download\0",
@@ -4750,7 +4741,7 @@ pub unsafe extern "C" fn do_download(
                             local_path,
                         );
                     } else if fsync_flag != 0 {
-                        sshlog(
+                        crate::log::sshlog(
                             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                 b"do_download\0",
@@ -4764,7 +4755,7 @@ pub unsafe extern "C" fn do_download(
                             local_path,
                         );
                         if fsync(local_fd) == -(1 as libc::c_int) {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                     b"do_download\0",
@@ -4821,7 +4812,7 @@ unsafe extern "C" fn download_dir_internal(
     let mut mode: mode_t = 0o777 as libc::c_int as mode_t;
     let mut tmpmode: mode_t = mode;
     if depth >= 64 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"download_dir_internal\0"))
                 .as_ptr(),
@@ -4834,7 +4825,7 @@ unsafe extern "C" fn download_dir_internal(
         );
         return -(1 as libc::c_int);
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"download_dir_internal\0"))
             .as_ptr(),
@@ -4850,7 +4841,7 @@ unsafe extern "C" fn download_dir_internal(
         dirattrib = do_stat(conn, src, 1 as libc::c_int);
         dirattrib.is_null()
     } {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"download_dir_internal\0"))
                 .as_ptr(),
@@ -4866,7 +4857,7 @@ unsafe extern "C" fn download_dir_internal(
     if !((*dirattrib).perm & 0o170000 as libc::c_int as libc::c_uint
         == 0o40000 as libc::c_int as libc::c_uint)
     {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"download_dir_internal\0"))
                 .as_ptr(),
@@ -4889,7 +4880,7 @@ unsafe extern "C" fn download_dir_internal(
         mode = (*dirattrib).perm & 0o1777 as libc::c_int as libc::c_uint;
         tmpmode = mode | (0o200 as libc::c_int | 0o100 as libc::c_int) as libc::c_uint;
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"download_dir_internal\0"))
                 .as_ptr(),
@@ -4903,7 +4894,7 @@ unsafe extern "C" fn download_dir_internal(
         );
     }
     if libc::mkdir(dst, tmpmode) == -(1 as libc::c_int) && *__errno_location() != 17 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"download_dir_internal\0"))
                 .as_ptr(),
@@ -4918,7 +4909,7 @@ unsafe extern "C" fn download_dir_internal(
         return -(1 as libc::c_int);
     }
     if do_readdir(conn, src, &mut dir_entries) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"download_dir_internal\0"))
                 .as_ptr(),
@@ -4988,7 +4979,7 @@ unsafe extern "C" fn download_dir_internal(
                 inplace_flag,
             ) == -(1 as libc::c_int)
             {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                         b"download_dir_internal\0",
@@ -5005,7 +4996,7 @@ unsafe extern "C" fn download_dir_internal(
                 ret = -(1 as libc::c_int);
             }
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"download_dir_internal\0",
@@ -5035,7 +5026,7 @@ unsafe extern "C" fn download_dir_internal(
             tv[1 as libc::c_int as usize].tv_usec = 0 as libc::c_int as __suseconds_t;
             tv[0 as libc::c_int as usize].tv_usec = tv[1 as libc::c_int as usize].tv_usec;
             if utimes(dst, tv.as_mut_ptr() as *const timeval) == -(1 as libc::c_int) {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                         b"download_dir_internal\0",
@@ -5051,7 +5042,7 @@ unsafe extern "C" fn download_dir_internal(
                 );
             }
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"download_dir_internal\0",
@@ -5068,7 +5059,7 @@ unsafe extern "C" fn download_dir_internal(
         }
     }
     if mode != tmpmode && libc::chmod(dst, mode) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"download_dir_internal\0"))
                 .as_ptr(),
@@ -5100,7 +5091,7 @@ pub unsafe extern "C" fn download_dir(
     let mut ret: libc::c_int = 0;
     src_canon = do_realpath(conn, src);
     if src_canon.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"download_dir\0")).as_ptr(),
             2003 as libc::c_int,
@@ -5204,7 +5195,7 @@ pub unsafe extern "C" fn do_upload(
         tqh_last: 0 as *mut *mut request,
     };
     let mut handle_len: size_t = 0;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0")).as_ptr(),
         2033 as libc::c_int,
@@ -5219,7 +5210,7 @@ pub unsafe extern "C" fn do_upload(
     acks.tqh_last = &mut acks.tqh_first;
     local_fd = libc::open(local_path, 0 as libc::c_int);
     if local_fd == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0")).as_ptr(),
             2038 as libc::c_int,
@@ -5233,7 +5224,7 @@ pub unsafe extern "C" fn do_upload(
         return -(1 as libc::c_int);
     }
     if fstat(local_fd, &mut sb) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0")).as_ptr(),
             2042 as libc::c_int,
@@ -5250,7 +5241,7 @@ pub unsafe extern "C" fn do_upload(
     if !(sb.st_mode & 0o170000 as libc::c_int as libc::c_uint
         == 0o100000 as libc::c_int as libc::c_uint)
     {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0")).as_ptr(),
             2047 as libc::c_int,
@@ -5277,7 +5268,7 @@ pub unsafe extern "C" fn do_upload(
             return -(1 as libc::c_int);
         }
         if (*c).size as off_t >= sb.st_size {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0"))
                     .as_ptr(),
@@ -5416,7 +5407,7 @@ pub unsafe extern "C" fn do_upload(
                     );
                 }
                 send_msg(conn, msg);
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0"))
                         .as_ptr(),
@@ -5497,7 +5488,7 @@ pub unsafe extern "C" fn do_upload(
                         b"parse status\0" as *const u8 as *const libc::c_char,
                     );
                 }
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0"))
                         .as_ptr(),
@@ -5528,7 +5519,7 @@ pub unsafe extern "C" fn do_upload(
                     acks.tqh_last = (*ack).tq.tqe_prev;
                 }
                 *(*ack).tq.tqe_prev = (*ack).tq.tqe_next;
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0"))
                         .as_ptr(),
@@ -5552,7 +5543,7 @@ pub unsafe extern "C" fn do_upload(
                 if reordered == 0 && (*ack).offset <= highwater {
                     highwater = maxack;
                 } else if reordered == 0 && (*ack).offset > highwater {
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0"))
                             .as_ptr(),
@@ -5590,7 +5581,7 @@ pub unsafe extern "C" fn do_upload(
         highwater = maxack;
     }
     if status != 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0")).as_ptr(),
             2200 as libc::c_int,
@@ -5606,7 +5597,7 @@ pub unsafe extern "C" fn do_upload(
     if inplace_flag != 0
         || resume != 0 && (status != 0 as libc::c_int as libc::c_uint || interrupted != 0)
     {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0")).as_ptr(),
             2205 as libc::c_int,
@@ -5622,7 +5613,7 @@ pub unsafe extern "C" fn do_upload(
         do_fsetstat(conn, handle, handle_len as u_int, &mut t);
     }
     if close(local_fd) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0")).as_ptr(),
             2213 as libc::c_int,
@@ -5706,7 +5697,7 @@ unsafe extern "C" fn upload_dir_internal(
     };
     let mut dirattrib: *mut Attrib = 0 as *mut Attrib;
     let mut saved_perm: u_int32_t = 0;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"upload_dir_internal\0"))
             .as_ptr(),
@@ -5719,7 +5710,7 @@ unsafe extern "C" fn upload_dir_internal(
         dst,
     );
     if depth >= 64 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"upload_dir_internal\0"))
                 .as_ptr(),
@@ -5733,7 +5724,7 @@ unsafe extern "C" fn upload_dir_internal(
         return -(1 as libc::c_int);
     }
     if stat(src, &mut sb) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"upload_dir_internal\0"))
                 .as_ptr(),
@@ -5750,7 +5741,7 @@ unsafe extern "C" fn upload_dir_internal(
     if !(sb.st_mode & 0o170000 as libc::c_int as libc::c_uint
         == 0o40000 as libc::c_int as libc::c_uint)
     {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"upload_dir_internal\0"))
                 .as_ptr(),
@@ -5783,7 +5774,7 @@ unsafe extern "C" fn upload_dir_internal(
         if !((*dirattrib).perm & 0o170000 as libc::c_int as libc::c_uint
             == 0o40000 as libc::c_int as libc::c_uint)
         {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"upload_dir_internal\0",
@@ -5802,7 +5793,7 @@ unsafe extern "C" fn upload_dir_internal(
     a.perm = saved_perm;
     dirp = opendir(src);
     if dirp.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"upload_dir_internal\0"))
                 .as_ptr(),
@@ -5830,7 +5821,7 @@ unsafe extern "C" fn upload_dir_internal(
         new_dst = path_append(dst, filename);
         new_src = path_append(src, filename);
         if lstat(new_src, &mut sb) == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"upload_dir_internal\0",
@@ -5884,7 +5875,7 @@ unsafe extern "C" fn upload_dir_internal(
                 inplace_flag,
             ) == -(1 as libc::c_int)
             {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                         b"upload_dir_internal\0",
@@ -5901,7 +5892,7 @@ unsafe extern "C" fn upload_dir_internal(
                 ret = -(1 as libc::c_int);
             }
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"upload_dir_internal\0",
@@ -5937,7 +5928,7 @@ pub unsafe extern "C" fn upload_dir(
     let mut ret: libc::c_int = 0;
     dst_canon = do_realpath(conn, dst);
     if dst_canon.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"upload_dir\0")).as_ptr(),
             2345 as libc::c_int,
@@ -5995,7 +5986,7 @@ unsafe extern "C" fn handle_dest_replies(
         );
     }
     while *nreqsp > 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"handle_dest_replies\0"))
                 .as_ptr(),
@@ -6051,7 +6042,7 @@ unsafe extern "C" fn handle_dest_replies(
                 b"dest parse\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"handle_dest_replies\0"))
                 .as_ptr(),
@@ -6096,7 +6087,7 @@ unsafe extern "C" fn handle_dest_replies(
                 b"parse dest status\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"handle_dest_replies\0"))
                 .as_ptr(),
@@ -6115,7 +6106,7 @@ unsafe extern "C" fn handle_dest_replies(
         *nreqsp = (*nreqsp).wrapping_sub(1);
         *nreqsp;
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"handle_dest_replies\0"))
             .as_ptr(),
@@ -6159,7 +6150,7 @@ pub unsafe extern "C" fn do_crossload(
     };
     let mut req: *mut request = 0 as *mut request;
     let mut type_0: u_char = 0;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_crossload\0")).as_ptr(),
         2440 as libc::c_int,
@@ -6182,7 +6173,7 @@ pub unsafe extern "C" fn do_crossload(
         && !((*a).perm & 0o170000 as libc::c_int as libc::c_uint
             == 0o100000 as libc::c_int as libc::c_uint)
     {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_crossload\0")).as_ptr(),
             2449 as libc::c_int,
@@ -6270,7 +6261,7 @@ pub unsafe extern "C" fn do_crossload(
             max_req = 0 as libc::c_int as u_int;
         }
         while num_req < max_req {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_crossload\0"))
                     .as_ptr(),
@@ -6327,7 +6318,7 @@ pub unsafe extern "C" fn do_crossload(
                 b"parse\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_crossload\0")).as_ptr(),
             2529 as libc::c_int,
@@ -6400,7 +6391,7 @@ pub unsafe extern "C" fn do_crossload(
                         b"parse data\0" as *const u8 as *const libc::c_char,
                     );
                 }
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_crossload\0"))
                         .as_ptr(),
@@ -6467,7 +6458,7 @@ pub unsafe extern "C" fn do_crossload(
                     );
                 }
                 send_msg(to, msg);
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_crossload\0"))
                         .as_ptr(),
@@ -6497,7 +6488,7 @@ pub unsafe extern "C" fn do_crossload(
                     num_req = num_req.wrapping_sub(1);
                     num_req;
                 } else {
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                             b"do_crossload\0",
@@ -6540,7 +6531,7 @@ pub unsafe extern "C" fn do_crossload(
                 }
                 if max_req > 0 as libc::c_int as libc::c_uint {
                     if size > 0 as libc::c_int as libc::c_ulong && offset > size {
-                        sshlog(
+                        crate::log::sshlog(
                             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                                 b"do_crossload\0",
@@ -6581,7 +6572,7 @@ pub unsafe extern "C" fn do_crossload(
     if showprogress != 0 && size != 0 {
         stop_progress_meter();
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_crossload\0")).as_ptr(),
         2616 as libc::c_int,
@@ -6610,7 +6601,7 @@ pub unsafe extern "C" fn do_crossload(
         );
     }
     if read_error != 0 || write_error != 0 || interrupted != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_crossload\0")).as_ptr(),
             2624 as libc::c_int,
@@ -6632,7 +6623,7 @@ pub unsafe extern "C" fn do_crossload(
             &mut to_handle_len,
         ) != 0 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_crossload\0"))
                     .as_ptr(),
@@ -6647,7 +6638,7 @@ pub unsafe extern "C" fn do_crossload(
         }
     }
     if read_error != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_crossload\0")).as_ptr(),
             2635 as libc::c_int,
@@ -6664,7 +6655,7 @@ pub unsafe extern "C" fn do_crossload(
             do_close(to, to_handle, to_handle_len as u_int);
         }
     } else if write_error != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"do_crossload\0")).as_ptr(),
             2641 as libc::c_int,
@@ -6731,7 +6722,7 @@ unsafe extern "C" fn crossload_dir_internal(
         atime: 0,
         mtime: 0,
     };
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(b"crossload_dir_internal\0"))
             .as_ptr(),
@@ -6744,7 +6735,7 @@ unsafe extern "C" fn crossload_dir_internal(
         to_path,
     );
     if depth >= 64 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"crossload_dir_internal\0",
@@ -6763,7 +6754,7 @@ unsafe extern "C" fn crossload_dir_internal(
         dirattrib = do_stat(from, from_path, 1 as libc::c_int);
         dirattrib.is_null()
     } {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"crossload_dir_internal\0",
@@ -6781,7 +6772,7 @@ unsafe extern "C" fn crossload_dir_internal(
     if !((*dirattrib).perm & 0o170000 as libc::c_int as libc::c_uint
         == 0o40000 as libc::c_int as libc::c_uint)
     {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"crossload_dir_internal\0",
@@ -6806,7 +6797,7 @@ unsafe extern "C" fn crossload_dir_internal(
     curdir.flags &= !(0x1 as libc::c_int) as libc::c_uint;
     curdir.flags &= !(0x2 as libc::c_int) as libc::c_uint;
     if curdir.flags & 0x4 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"crossload_dir_internal\0",
@@ -6833,7 +6824,7 @@ unsafe extern "C" fn crossload_dir_internal(
         if !((*dirattrib).perm & 0o170000 as libc::c_int as libc::c_uint
             == 0o40000 as libc::c_int as libc::c_uint)
         {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                     b"crossload_dir_internal\0",
@@ -6851,7 +6842,7 @@ unsafe extern "C" fn crossload_dir_internal(
     }
     curdir.perm = mode;
     if do_readdir(from, from_path, &mut dir_entries) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"crossload_dir_internal\0",
@@ -6919,7 +6910,7 @@ unsafe extern "C" fn crossload_dir_internal(
                 preserve_flag,
             ) == -(1 as libc::c_int)
             {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                         b"crossload_dir_internal\0",
@@ -6936,7 +6927,7 @@ unsafe extern "C" fn crossload_dir_internal(
                 ret = -(1 as libc::c_int);
             }
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                     b"crossload_dir_internal\0",
@@ -6973,7 +6964,7 @@ pub unsafe extern "C" fn crossload_dir(
     let mut ret: libc::c_int = 0;
     from_path_canon = do_realpath(from, from_path);
     if from_path_canon.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"crossload_dir\0"))
                 .as_ptr(),
@@ -7057,7 +7048,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
     (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
     id = fresh32;
     expected_id = id;
-    sshlog(
+    crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(b"do_get_users_groups_by_id\0"))
             .as_ptr(),
@@ -7200,7 +7191,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
                 b"parse status\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"do_get_users_groups_by_id\0",

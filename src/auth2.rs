@@ -62,16 +62,7 @@ extern "C" {
     fn ssh_packet_set_log_preamble(_: *mut ssh, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
     fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
@@ -630,7 +621,7 @@ unsafe extern "C" fn userauth_send_banner(mut ssh: *mut ssh, mut msg: *const lib
             b"send packet\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"auth2.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"userauth_send_banner\0"))
             .as_ptr(),
@@ -750,7 +741,7 @@ unsafe extern "C" fn input_service_request(
                 r = 0 as libc::c_int;
             }
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"input_service_request\0",
@@ -817,7 +808,7 @@ unsafe extern "C" fn user_specific_delay(mut user: *const libc::c_char) -> libc:
         / 1000 as libc::c_int as libc::c_double
         / 1000 as libc::c_int as libc::c_double;
     freezero(hash as *mut libc::c_void, len);
-    sshlog(
+    crate::log::sshlog(
         b"auth2.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"user_specific_delay\0"))
             .as_ptr(),
@@ -851,7 +842,7 @@ unsafe extern "C" fn ensure_minimum_time_since(
     ts.tv_sec = remain as __time_t;
     ts.tv_nsec = ((remain - ts.tv_sec as libc::c_double)
         * 1000000000 as libc::c_int as libc::c_double) as __syscall_slong_t;
-    sshlog(
+    crate::log::sshlog(
         b"auth2.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(b"ensure_minimum_time_since\0"))
             .as_ptr(),
@@ -906,7 +897,7 @@ unsafe extern "C" fn input_userauth_request(
             r != 0 as libc::c_int
         })
     {
-        sshlog(
+        crate::log::sshlog(
             b"auth2.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"input_userauth_request\0",
@@ -922,7 +913,7 @@ unsafe extern "C" fn input_userauth_request(
             service,
             method,
         );
-        sshlog(
+        crate::log::sshlog(
             b"auth2.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"input_userauth_request\0",
@@ -961,7 +952,7 @@ unsafe extern "C" fn input_userauth_request(
                 ) == 0 as libc::c_int
             {
                 (*authctxt).valid = 1 as libc::c_int;
-                sshlog(
+                crate::log::sshlog(
                     b"auth2.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                         b"input_userauth_request\0",
@@ -1036,7 +1027,7 @@ unsafe extern "C" fn input_userauth_request(
         (*authctxt).server_caused_failure = 0 as libc::c_int;
         m = authmethod_lookup(authctxt, method);
         if !m.is_null() && (*authctxt).failures < options.max_authtries {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                     b"input_userauth_request\0",
@@ -1188,7 +1179,7 @@ pub unsafe extern "C" fn userauth_finish(
             auth_maxtries_exceeded(ssh);
         }
         methods = authmethods_get(authctxt);
-        sshlog(
+        crate::log::sshlog(
             b"auth2.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"userauth_finish\0"))
                 .as_ptr(),
@@ -1362,7 +1353,7 @@ unsafe extern "C" fn authmethod_byname(mut name: *const libc::c_char) -> *mut Au
         i += 1;
         i;
     }
-    sshlog(
+    crate::log::sshlog(
         b"auth2.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"authmethod_byname\0"))
             .as_ptr(),
@@ -1385,7 +1376,7 @@ unsafe extern "C" fn authmethod_lookup(
         return 0 as *mut Authmethod;
     }
     if ((*method).enabled).is_null() || *(*method).enabled == 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"auth2.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"authmethod_lookup\0"))
                 .as_ptr(),
@@ -1399,7 +1390,7 @@ unsafe extern "C" fn authmethod_lookup(
         return 0 as *mut Authmethod;
     }
     if auth2_method_allowed(authctxt, (*method).name, 0 as *const libc::c_char) == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"auth2.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"authmethod_lookup\0"))
                 .as_ptr(),
@@ -1427,7 +1418,7 @@ pub unsafe extern "C" fn auth2_methods_valid(
     let mut found: u_int = 0;
     let mut ret: libc::c_int = -(1 as libc::c_int);
     if *_methods as libc::c_int == '\0' as i32 {
-        sshlog(
+        crate::log::sshlog(
             b"auth2.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"auth2_methods_valid\0"))
                 .as_ptr(),
@@ -1462,7 +1453,7 @@ pub unsafe extern "C" fn auth2_methods_valid(
                     if ((*authmethods[i as usize]).enabled).is_null()
                         || *(*authmethods[i as usize]).enabled == 0 as libc::c_int
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"auth2.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                 b"auth2_methods_valid\0",
@@ -1488,7 +1479,7 @@ pub unsafe extern "C" fn auth2_methods_valid(
         if !(found == 0) {
             continue;
         }
-        sshlog(
+        crate::log::sshlog(
             b"auth2.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"auth2_methods_valid\0"))
                 .as_ptr(),
@@ -1527,7 +1518,7 @@ pub unsafe extern "C" fn auth2_setup_methods_lists(mut authctxt: *mut Authctxt) 
     if options.num_auth_methods == 0 as libc::c_int as libc::c_uint {
         return 0 as libc::c_int;
     }
-    sshlog(
+    crate::log::sshlog(
         b"auth2.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(b"auth2_setup_methods_lists\0"))
             .as_ptr(),
@@ -1547,7 +1538,7 @@ pub unsafe extern "C" fn auth2_setup_methods_lists(mut authctxt: *mut Authctxt) 
         if auth2_methods_valid(*(options.auth_methods).offset(i as isize), 1 as libc::c_int)
             != 0 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"auth2_setup_methods_lists\0",
@@ -1562,7 +1553,7 @@ pub unsafe extern "C" fn auth2_setup_methods_lists(mut authctxt: *mut Authctxt) 
                 *(options.auth_methods).offset(i as isize),
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"auth2.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"auth2_setup_methods_lists\0",
@@ -1585,7 +1576,7 @@ pub unsafe extern "C" fn auth2_setup_methods_lists(mut authctxt: *mut Authctxt) 
         i;
     }
     if (*authctxt).num_auth_methods == 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"auth2.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"auth2_setup_methods_lists\0",
@@ -1664,7 +1655,7 @@ pub unsafe extern "C" fn auth2_update_methods_lists(
 ) -> libc::c_int {
     let mut i: u_int = 0;
     let mut found: u_int = 0 as libc::c_int as u_int;
-    sshlog(
+    crate::log::sshlog(
         b"auth2.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
             b"auth2_update_methods_lists\0",
@@ -1687,7 +1678,7 @@ pub unsafe extern "C" fn auth2_update_methods_lists(
         {
             found = 1 as libc::c_int as u_int;
             if **((*authctxt).auth_methods).offset(i as isize) as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"auth2.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                         b"auth2_update_methods_lists\0",
@@ -1703,7 +1694,7 @@ pub unsafe extern "C" fn auth2_update_methods_lists(
                 );
                 return 1 as libc::c_int;
             }
-            sshlog(
+            crate::log::sshlog(
                 b"auth2.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                     b"auth2_update_methods_lists\0",
@@ -1847,7 +1838,7 @@ pub unsafe extern "C" fn auth2_key_already_used(
                 options.fingerprint_hash,
                 SSH_FP_DEFAULT,
             );
-            sshlog(
+            crate::log::sshlog(
                 b"auth2.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                     b"auth2_key_already_used\0",

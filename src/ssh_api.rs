@@ -64,16 +64,7 @@ extern "C" {
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn compat_banner(_: *mut ssh, _: *const libc::c_char);
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshbuf_reset(buf: *mut sshbuf);
     fn sshbuf_len(buf: *const sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const sshbuf) -> *const u_char;
@@ -735,7 +726,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
                 {
                     break;
                 }
-                sshlog(
+                crate::log::sshlog(
                     b"ssh_api.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                         b"_ssh_read_banner\0",
@@ -789,7 +780,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
     {
         r = -(4 as libc::c_int);
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"ssh_api.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"_ssh_read_banner\0"))
                 .as_ptr(),
@@ -811,7 +802,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
         if remote_major != 2 as libc::c_int {
             r = -(37 as libc::c_int);
         }
-        sshlog(
+        crate::log::sshlog(
             b"ssh_api.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"_ssh_read_banner\0"))
                 .as_ptr(),
@@ -853,7 +844,7 @@ pub unsafe extern "C" fn _ssh_send_banner(
     if cp.is_null() {
         return -(2 as libc::c_int);
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh_api.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"_ssh_send_banner\0")).as_ptr(),
         422 as libc::c_int,
@@ -913,7 +904,7 @@ pub unsafe extern "C" fn _ssh_host_public_key(
     mut ssh: *mut ssh,
 ) -> *mut sshkey {
     let mut k: *mut key_entry = 0 as *mut key_entry;
-    sshlog(
+    crate::log::sshlog(
         b"ssh_api.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"_ssh_host_public_key\0"))
             .as_ptr(),
@@ -926,7 +917,7 @@ pub unsafe extern "C" fn _ssh_host_public_key(
     );
     k = (*ssh).public_keys.tqh_first;
     while !k.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"ssh_api.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"_ssh_host_public_key\0"))
                 .as_ptr(),
@@ -952,7 +943,7 @@ pub unsafe extern "C" fn _ssh_host_private_key(
     mut ssh: *mut ssh,
 ) -> *mut sshkey {
     let mut k: *mut key_entry = 0 as *mut key_entry;
-    sshlog(
+    crate::log::sshlog(
         b"ssh_api.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"_ssh_host_private_key\0"))
             .as_ptr(),
@@ -965,7 +956,7 @@ pub unsafe extern "C" fn _ssh_host_private_key(
     );
     k = (*ssh).private_keys.tqh_first;
     while !k.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"ssh_api.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"_ssh_host_private_key\0"))
                 .as_ptr(),
@@ -990,7 +981,7 @@ pub unsafe extern "C" fn _ssh_verify_host_key(
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut k: *mut key_entry = 0 as *mut key_entry;
-    sshlog(
+    crate::log::sshlog(
         b"ssh_api.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"_ssh_verify_host_key\0"))
             .as_ptr(),
@@ -1003,7 +994,7 @@ pub unsafe extern "C" fn _ssh_verify_host_key(
     );
     k = (*ssh).public_keys.tqh_first;
     while !k.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"ssh_api.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"_ssh_verify_host_key\0"))
                 .as_ptr(),
@@ -1074,7 +1065,7 @@ pub unsafe extern "C" fn _ssh_order_hostkeyalgs(mut ssh: *mut ssh) -> libc::c_in
                 }
             }
             if *replace as libc::c_int != '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh_api.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                         b"_ssh_order_hostkeyalgs\0",
@@ -1088,7 +1079,7 @@ pub unsafe extern "C" fn _ssh_order_hostkeyalgs(mut ssh: *mut ssh) -> libc::c_in
                     (*(*ssh).kex).server,
                     orig,
                 );
-                sshlog(
+                crate::log::sshlog(
                     b"ssh_api.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                         b"_ssh_order_hostkeyalgs\0",

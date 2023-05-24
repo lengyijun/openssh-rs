@@ -11,16 +11,7 @@ extern "C" {
     fn sshbuf_max_size(buf: *const sshbuf) -> size_t;
     fn sshbuf_reset(buf: *mut sshbuf);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn atomicio(
         _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
         _: libc::c_int,
@@ -56,7 +47,7 @@ pub unsafe extern "C" fn ssh_msg_send(
 ) -> libc::c_int {
     let mut buf: [u_char; 5] = [0; 5];
     let mut mlen: u_int = sshbuf_len(m) as u_int;
-    sshlog(
+    crate::log::sshlog(
         b"msg.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"ssh_msg_send\0")).as_ptr(),
         50 as libc::c_int,
@@ -83,7 +74,7 @@ pub unsafe extern "C" fn ssh_msg_send(
         ::core::mem::size_of::<[u_char; 5]>() as libc::c_ulong,
     ) != ::core::mem::size_of::<[u_char; 5]>() as libc::c_ulong
     {
-        sshlog(
+        crate::log::sshlog(
             b"msg.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"ssh_msg_send\0")).as_ptr(),
             55 as libc::c_int,
@@ -107,7 +98,7 @@ pub unsafe extern "C" fn ssh_msg_send(
         mlen as size_t,
     ) != mlen as libc::c_ulong
     {
-        sshlog(
+        crate::log::sshlog(
             b"msg.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"ssh_msg_send\0")).as_ptr(),
             59 as libc::c_int,
@@ -126,7 +117,7 @@ pub unsafe extern "C" fn ssh_msg_recv(mut fd: libc::c_int, mut m: *mut sshbuf) -
     let mut p: *mut u_char = 0 as *mut u_char;
     let mut msg_len: u_int = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"msg.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"ssh_msg_recv\0")).as_ptr(),
         72 as libc::c_int,
@@ -143,7 +134,7 @@ pub unsafe extern "C" fn ssh_msg_recv(mut fd: libc::c_int, mut m: *mut sshbuf) -
     ) != ::core::mem::size_of::<[u_char; 4]>() as libc::c_ulong
     {
         if *__errno_location() != 32 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"msg.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"ssh_msg_recv\0"))
                     .as_ptr(),
@@ -159,7 +150,7 @@ pub unsafe extern "C" fn ssh_msg_recv(mut fd: libc::c_int, mut m: *mut sshbuf) -
     }
     msg_len = get_u32(buf.as_mut_ptr() as *const libc::c_void);
     if msg_len as libc::c_ulong > sshbuf_max_size(m) {
-        sshlog(
+        crate::log::sshlog(
             b"msg.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"ssh_msg_recv\0")).as_ptr(),
             81 as libc::c_int,
@@ -174,7 +165,7 @@ pub unsafe extern "C" fn ssh_msg_recv(mut fd: libc::c_int, mut m: *mut sshbuf) -
     sshbuf_reset(m);
     r = sshbuf_reserve(m, msg_len as size_t, &mut p);
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"msg.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"ssh_msg_recv\0")).as_ptr(),
             86 as libc::c_int,
@@ -192,7 +183,7 @@ pub unsafe extern "C" fn ssh_msg_recv(mut fd: libc::c_int, mut m: *mut sshbuf) -
         msg_len as size_t,
     ) != msg_len as libc::c_ulong
     {
-        sshlog(
+        crate::log::sshlog(
             b"msg.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"ssh_msg_recv\0")).as_ptr(),
             90 as libc::c_int,

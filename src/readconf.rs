@@ -81,16 +81,7 @@ extern "C" {
     fn log_facility_name(_: SyslogFacility) -> *const libc::c_char;
     fn log_level_number(_: *mut libc::c_char) -> LogLevel;
     fn log_level_name(_: LogLevel) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -1727,7 +1718,7 @@ pub unsafe extern "C" fn add_certificate_file(
         if (*options).certificate_file_userprovided[i as usize] == userprovided
             && strcmp((*options).certificate_files[i as usize], path) == 0 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                     b"add_certificate_file\0",
@@ -1798,7 +1789,7 @@ pub unsafe extern "C" fn add_identity_file(
         if (*options).identity_file_userprovided[i as usize] == userprovided
             && strcmp((*options).identity_files[i as usize], path) == 0 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"add_identity_file\0"))
                     .as_ptr(),
@@ -1858,7 +1849,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             strerror(*__errno_location()),
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"readconf.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"execute_in_shell\0")).as_ptr(),
         541 as libc::c_int,
@@ -1895,7 +1886,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             argv[0 as libc::c_int as usize],
             argv.as_mut_ptr() as *const *mut libc::c_char,
         );
-        sshlog(
+        crate::log::sshlog(
             b"readconf.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"execute_in_shell\0"))
                 .as_ptr(),
@@ -1940,7 +1931,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
         }
     }
     if !(status & 0x7f as libc::c_int == 0 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"readconf.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"execute_in_shell\0"))
                 .as_ptr(),
@@ -1953,7 +1944,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
         );
         return -(1 as libc::c_int);
     }
-    sshlog(
+    crate::log::sshlog(
         b"readconf.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"execute_in_shell\0")).as_ptr(),
         575 as libc::c_int,
@@ -2017,7 +2008,7 @@ unsafe extern "C" fn match_cfg_line(
     } else {
         host = xstrdup(host_arg);
     }
-    sshlog(
+    crate::log::sshlog(
         b"readconf.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"match_cfg_line\0")).as_ptr(),
         610 as libc::c_int,
@@ -2058,7 +2049,7 @@ unsafe extern "C" fn match_cfg_line(
                         && *arg as libc::c_int != '\0' as i32
                         && *arg as libc::c_int != '#' as i32
                 } {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                             b"match_cfg_line\0",
@@ -2114,7 +2105,7 @@ unsafe extern "C" fn match_cfg_line(
                         result = 0 as libc::c_int;
                         this_result = result;
                     }
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                             b"match_cfg_line\0",
@@ -2140,7 +2131,7 @@ unsafe extern "C" fn match_cfg_line(
                         || *arg as libc::c_int == '\0' as i32
                         || *arg as libc::c_int == '#' as i32
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                                 b"match_cfg_line\0",
@@ -2300,7 +2291,7 @@ unsafe extern "C" fn match_cfg_line(
                             );
                             free(conn_hash_hex as *mut libc::c_void);
                             if result != 1 as libc::c_int {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                                         b"match_cfg_line\0",
@@ -2351,7 +2342,7 @@ unsafe extern "C" fn match_cfg_line(
                                 }
                             }
                         } else {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                                     b"match_cfg_line\0",
@@ -2369,7 +2360,7 @@ unsafe extern "C" fn match_cfg_line(
                             current_block = 9655279610079891732;
                             break;
                         }
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                                 b"match_cfg_line\0",
@@ -2400,7 +2391,7 @@ unsafe extern "C" fn match_cfg_line(
     match current_block {
         13853033528615664019 => {
             if attributes == 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                         b"match_cfg_line\0",
@@ -2419,7 +2410,7 @@ unsafe extern "C" fn match_cfg_line(
         _ => {}
     }
     if result != -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"readconf.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"match_cfg_line\0"))
                 .as_ptr(),
@@ -2458,7 +2449,7 @@ unsafe extern "C" fn rm_env(
             i = i.wrapping_add(1);
             i;
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 7], &[libc::c_char; 7]>(b"rm_env\0")).as_ptr(),
                 767 as libc::c_int,
@@ -2517,7 +2508,7 @@ unsafe extern "C" fn parse_token(
     {
         return oIgnoredUnknownOption;
     }
-    sshlog(
+    crate::log::sshlog(
         b"readconf.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"parse_token\0")).as_ptr(),
         800 as libc::c_int,
@@ -3067,7 +3058,7 @@ unsafe extern "C" fn parse_multistate_value(
 ) -> libc::c_int {
     let mut i: libc::c_int = 0;
     if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-        sshlog(
+        crate::log::sshlog(
             b"readconf.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"parse_multistate_value\0",
@@ -3235,7 +3226,7 @@ unsafe extern "C" fn process_config_line_depth(
         str = str.offset(strspn(str, b" \t\r\n\0" as *const u8 as *const libc::c_char) as isize);
     }
     if str.is_null() || *str as libc::c_int == '\0' as i32 {
-        sshlog(
+        crate::log::sshlog(
             b"readconf.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"process_config_line_depth\0",
@@ -3254,7 +3245,7 @@ unsafe extern "C" fn process_config_line_depth(
     }
     opcode = parse_token(keyword, filename, linenum, (*options).ignored_unknown) as libc::c_int;
     if argv_split(str, &mut oac, &mut oav, 1 as libc::c_int) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"readconf.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"process_config_line_depth\0",
@@ -3281,7 +3272,7 @@ unsafe extern "C" fn process_config_line_depth(
             current_block = 3935247052025034411;
         }
         100 => {
-            sshlog(
+            crate::log::sshlog(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"process_config_line_depth\0",
@@ -3307,7 +3298,7 @@ unsafe extern "C" fn process_config_line_depth(
             intptr = &mut (*options).forward_agent;
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3437,7 +3428,7 @@ unsafe extern "C" fn process_config_line_depth(
         52 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3458,7 +3449,7 @@ unsafe extern "C" fn process_config_line_depth(
                     val64 = 0 as libc::c_int as libc::c_longlong;
                     current_block = 9521147444787763968;
                 } else if scan_scaled(arg, &mut val64) == -(1 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -3479,7 +3470,7 @@ unsafe extern "C" fn process_config_line_depth(
                 } else if val64 != 0 as libc::c_int as libc::c_longlong
                     && val64 < 16 as libc::c_int as libc::c_longlong
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -3528,7 +3519,7 @@ unsafe extern "C" fn process_config_line_depth(
         12 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3546,7 +3537,7 @@ unsafe extern "C" fn process_config_line_depth(
             } else if *activep != 0 {
                 intptr = &mut (*options).num_identity_files;
                 if *intptr >= 100 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -3579,7 +3570,7 @@ unsafe extern "C" fn process_config_line_depth(
         18 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3597,7 +3588,7 @@ unsafe extern "C" fn process_config_line_depth(
             } else if *activep != 0 {
                 intptr = &mut (*options).num_certificate_files;
                 if *intptr >= 100 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -3685,7 +3676,7 @@ unsafe extern "C" fn process_config_line_depth(
         }
         94 => {
             if str.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3703,7 +3694,7 @@ unsafe extern "C" fn process_config_line_depth(
             } else {
                 len = strspn(str, b" \t\r\n=\0" as *const u8 as *const libc::c_char);
                 if parse_jump(str.offset(len as isize), options, *activep) == -(1 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -3729,7 +3720,7 @@ unsafe extern "C" fn process_config_line_depth(
         14 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3747,7 +3738,7 @@ unsafe extern "C" fn process_config_line_depth(
             } else {
                 value = a2port(arg);
                 if value <= 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -3778,7 +3769,7 @@ unsafe extern "C" fn process_config_line_depth(
         36 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3802,7 +3793,7 @@ unsafe extern "C" fn process_config_line_depth(
                     },
                 ) == 0
             {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3833,7 +3824,7 @@ unsafe extern "C" fn process_config_line_depth(
         37 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3857,7 +3848,7 @@ unsafe extern "C" fn process_config_line_depth(
                     },
                 ) == 0
             {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3888,7 +3879,7 @@ unsafe extern "C" fn process_config_line_depth(
         73 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3912,7 +3903,7 @@ unsafe extern "C" fn process_config_line_depth(
                     },
                 ) == 0
             {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3953,7 +3944,7 @@ unsafe extern "C" fn process_config_line_depth(
             arg = argv_next(&mut ac, &mut av);
             value = log_level_number(arg) as libc::c_int;
             if value == SYSLOG_LEVEL_NOT_SET as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -3988,7 +3979,7 @@ unsafe extern "C" fn process_config_line_depth(
             arg = argv_next(&mut ac, &mut av);
             value = log_facility_number(arg) as libc::c_int;
             if value == SYSLOG_FACILITY_NOT_SET as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -4027,7 +4018,7 @@ unsafe extern "C" fn process_config_line_depth(
                     break;
                 }
                 if *arg as libc::c_int == '\0' as i32 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -4050,7 +4041,7 @@ unsafe extern "C" fn process_config_line_depth(
                         == 0 as libc::c_int
                     {
                         if i > 0 as libc::c_int as libc::c_uint || ac > 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                     b"process_config_line_depth\0",
@@ -4091,7 +4082,7 @@ unsafe extern "C" fn process_config_line_depth(
         16 | 15 | 42 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -4116,7 +4107,7 @@ unsafe extern "C" fn process_config_line_depth(
                             dynamicfwd = 1 as libc::c_int;
                             current_block = 15055213890147597004;
                         } else {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                     b"process_config_line_depth\0",
@@ -4159,7 +4150,7 @@ unsafe extern "C" fn process_config_line_depth(
                         if parse_forward(&mut fwd, fwdarg.as_mut_ptr(), dynamicfwd, remotefwd)
                             == 0 as libc::c_int
                         {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                     b"process_config_line_depth\0",
@@ -4207,7 +4198,7 @@ unsafe extern "C" fn process_config_line_depth(
                         == 0 as libc::c_int
                 {
                     if i > 0 as libc::c_int as libc::c_uint || ac > 0 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -4316,7 +4307,7 @@ unsafe extern "C" fn process_config_line_depth(
         }
         1 => {
             if cmdline != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -4340,7 +4331,7 @@ unsafe extern "C" fn process_config_line_depth(
                         break;
                     }
                     if *arg as libc::c_int == '\0' as i32 {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -4372,7 +4363,7 @@ unsafe extern "C" fn process_config_line_depth(
                             continue;
                         }
                         if negated != 0 {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<
                                     &[u8; 26],
@@ -4405,7 +4396,7 @@ unsafe extern "C" fn process_config_line_depth(
                     7482270440933722938 => {}
                     _ => {
                         if *activep != 0 {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                     b"process_config_line_depth\0",
@@ -4429,7 +4420,7 @@ unsafe extern "C" fn process_config_line_depth(
         }
         2 => {
             if cmdline != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -4456,7 +4447,7 @@ unsafe extern "C" fn process_config_line_depth(
                     linenum,
                 );
                 if value < 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -4489,7 +4480,7 @@ unsafe extern "C" fn process_config_line_depth(
             intptr = &mut (*options).escape_char;
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -4522,7 +4513,7 @@ unsafe extern "C" fn process_config_line_depth(
                         & 31 as libc::c_int;
                     current_block = 15439134456549723682;
                 } else {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -4578,7 +4569,7 @@ unsafe extern "C" fn process_config_line_depth(
                 break;
             }
             if *arg as libc::c_int == '\0' as i32 || !(strchr(arg, '=' as i32)).is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -4621,7 +4612,7 @@ unsafe extern "C" fn process_config_line_depth(
                     break;
                 }
                 if (strchr(arg, '=' as i32)).is_null() {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -4648,7 +4639,7 @@ unsafe extern "C" fn process_config_line_depth(
                     ))
                     .is_null()
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -4690,7 +4681,7 @@ unsafe extern "C" fn process_config_line_depth(
             intptr = &mut (*options).control_persist;
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -4728,7 +4719,7 @@ unsafe extern "C" fn process_config_line_depth(
                         value = 1 as libc::c_int;
                         current_block = 763911284580919563;
                     } else {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -4770,7 +4761,7 @@ unsafe extern "C" fn process_config_line_depth(
         68 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -4788,7 +4779,7 @@ unsafe extern "C" fn process_config_line_depth(
             } else {
                 value = a2tun(arg, &mut value2);
                 if value == 0x7fffffff as libc::c_int - 1 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -4830,7 +4821,7 @@ unsafe extern "C" fn process_config_line_depth(
         }
         3 => {
             if cmdline != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -4853,7 +4844,7 @@ unsafe extern "C" fn process_config_line_depth(
                         break;
                     }
                     if *arg as libc::c_int == '\0' as i32 {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -4874,7 +4865,7 @@ unsafe extern "C" fn process_config_line_depth(
                     } else if *arg as libc::c_int == '~' as i32
                         && flags & 2 as libc::c_int == 0 as libc::c_int
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -4914,7 +4905,7 @@ unsafe extern "C" fn process_config_line_depth(
                         );
                         r = _ssh__compat_glob(arg2, 0x800 as libc::c_int, None, &mut gl);
                         if r == -(3 as libc::c_int) {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                     b"process_config_line_depth\0",
@@ -4932,7 +4923,7 @@ unsafe extern "C" fn process_config_line_depth(
                             );
                             free(arg2 as *mut libc::c_void);
                         } else if r != 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                     b"process_config_line_depth\0",
@@ -4955,7 +4946,7 @@ unsafe extern "C" fn process_config_line_depth(
                             oactive = *activep;
                             i = 0 as libc::c_int as u_int;
                             while (i as libc::c_ulong) < gl.gl_pathc {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                         b"process_config_line_depth\0",
@@ -4996,7 +4987,7 @@ unsafe extern "C" fn process_config_line_depth(
                                 );
                                 if r != 1 as libc::c_int && *__errno_location() != 2 as libc::c_int
                                 {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                             b"process_config_line_depth\0",
@@ -5042,7 +5033,7 @@ unsafe extern "C" fn process_config_line_depth(
             arg = argv_next(&mut ac, &mut av);
             value = parse_ipqos(arg);
             if value == -(1 as libc::c_int) {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5066,7 +5057,7 @@ unsafe extern "C" fn process_config_line_depth(
                 } else {
                     value2 = parse_ipqos(arg);
                     if value2 == -(1 as libc::c_int) {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -5135,7 +5126,7 @@ unsafe extern "C" fn process_config_line_depth(
                     break;
                 }
                 if *arg as libc::c_int == '\0' as i32 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -5158,7 +5149,7 @@ unsafe extern "C" fn process_config_line_depth(
                         == 0 as libc::c_int
                     {
                         if i > 0 as libc::c_int as libc::c_uint || ac > 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                     b"process_config_line_depth\0",
@@ -5182,7 +5173,7 @@ unsafe extern "C" fn process_config_line_depth(
                     i = i.wrapping_add(1);
                     i;
                     if valid_domain(arg, 1 as libc::c_int, &mut errstr) == 0 {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -5204,7 +5195,7 @@ unsafe extern "C" fn process_config_line_depth(
                             continue;
                         }
                         if (*options).num_canonical_domains >= 32 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                     b"process_config_line_depth\0",
@@ -5243,7 +5234,7 @@ unsafe extern "C" fn process_config_line_depth(
                     == 0 as libc::c_int
                 {
                     if i > 0 as libc::c_int as libc::c_uint || ac > 0 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -5274,7 +5265,7 @@ unsafe extern "C" fn process_config_line_depth(
                     if arg2.is_null()
                         || *arg2.offset(1 as libc::c_int as isize) as libc::c_int == '\0' as i32
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -5304,7 +5295,7 @@ unsafe extern "C" fn process_config_line_depth(
                     continue;
                 }
                 if (*options).num_permitted_cnames >= 32 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -5348,7 +5339,7 @@ unsafe extern "C" fn process_config_line_depth(
         86 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5367,7 +5358,7 @@ unsafe extern "C" fn process_config_line_depth(
             } else {
                 value = strtol(arg, &mut endofnumber, 8 as libc::c_int) as libc::c_int;
                 if arg == endofnumber || value < 0 as libc::c_int || value > 0o777 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -5400,7 +5391,7 @@ unsafe extern "C" fn process_config_line_depth(
             intptr = &mut (*options).fingerprint_hash;
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5418,7 +5409,7 @@ unsafe extern "C" fn process_config_line_depth(
             } else {
                 value = ssh_digest_alg_by_name(arg);
                 if value == -(1 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -5465,7 +5456,7 @@ unsafe extern "C" fn process_config_line_depth(
             if value == 3 as libc::c_int && !arg2.is_null() {
                 value2 = convtime(arg2);
                 if value2 == -(1 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -5486,7 +5477,7 @@ unsafe extern "C" fn process_config_line_depth(
             } else if value == -(1 as libc::c_int) && arg2.is_null() {
                 value2 = convtime(arg);
                 if value2 == -(1 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -5506,7 +5497,7 @@ unsafe extern "C" fn process_config_line_depth(
                     current_block = 819159959065740665;
                 }
             } else if value == -(1 as libc::c_int) || !arg2.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5539,7 +5530,7 @@ unsafe extern "C" fn process_config_line_depth(
             charptr = &mut (*options).identity_agent;
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5567,7 +5558,7 @@ unsafe extern "C" fn process_config_line_depth(
             current_block = 17629687495357276654;
         }
         101 => {
-            sshlog(
+            crate::log::sshlog(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"process_config_line_depth\0",
@@ -5586,7 +5577,7 @@ unsafe extern "C" fn process_config_line_depth(
             current_block = 3935247052025034411;
         }
         102 => {
-            sshlog(
+            crate::log::sshlog(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"process_config_line_depth\0",
@@ -5605,7 +5596,7 @@ unsafe extern "C" fn process_config_line_depth(
             current_block = 3935247052025034411;
         }
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"process_config_line_depth\0",
@@ -5627,7 +5618,7 @@ unsafe extern "C" fn process_config_line_depth(
         11785309045061247795 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5652,7 +5643,7 @@ unsafe extern "C" fn process_config_line_depth(
                     1 as libc::c_int,
                 ) == 0
             {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5683,7 +5674,7 @@ unsafe extern "C" fn process_config_line_depth(
             arg = argv_next(&mut ac, &mut av);
             errstr = atoi_err(arg, &mut value);
             if !errstr.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5708,7 +5699,7 @@ unsafe extern "C" fn process_config_line_depth(
         }
         13881330248250323440 => {
             if str.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5742,7 +5733,7 @@ unsafe extern "C" fn process_config_line_depth(
                     break;
                 }
                 if *arg as libc::c_int == '\0' as i32 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -5765,7 +5756,7 @@ unsafe extern "C" fn process_config_line_depth(
                         == 0 as libc::c_int
                     {
                         if i > 0 as libc::c_int as libc::c_uint || ac > 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                     b"process_config_line_depth\0",
@@ -5792,7 +5783,7 @@ unsafe extern "C" fn process_config_line_depth(
                         continue;
                     }
                     if *uintptr >= max_entries {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -5822,7 +5813,7 @@ unsafe extern "C" fn process_config_line_depth(
         6865066298509711319 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5847,7 +5838,7 @@ unsafe extern "C" fn process_config_line_depth(
         11955811698013090598 => {
             arg = argv_next(&mut ac, &mut av);
             if arg.is_null() || *arg as libc::c_int == '\0' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5869,7 +5860,7 @@ unsafe extern "C" fn process_config_line_depth(
                 } else {
                     value = convtime(arg);
                     if value == -(1 as libc::c_int) {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                                 b"process_config_line_depth\0",
@@ -5903,7 +5894,7 @@ unsafe extern "C" fn process_config_line_depth(
         16523242387479284007 => {
             arg2 = dollar_expand(&mut r as *mut libc::c_int, arg);
             if arg2.is_null() || r != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5926,7 +5917,7 @@ unsafe extern "C" fn process_config_line_depth(
                     && *arg.offset(1 as libc::c_int as isize) as libc::c_int != '{' as i32
                     && valid_env_name(arg.offset(1 as libc::c_int as isize)) == 0
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                             b"process_config_line_depth\0",
@@ -5962,7 +5953,7 @@ unsafe extern "C" fn process_config_line_depth(
             arg = argv_next(&mut ac, &mut av);
             value = parse_multistate_value(arg, filename, linenum, multistate_ptr);
             if value == -(1 as libc::c_int) {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -5990,7 +5981,7 @@ unsafe extern "C" fn process_config_line_depth(
     match current_block {
         3935247052025034411 => {
             if ac > 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                         b"process_config_line_depth\0",
@@ -6132,7 +6123,7 @@ unsafe extern "C" fn read_config_file_depth(
             );
         }
     }
-    sshlog(
+    crate::log::sshlog(
         b"readconf.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(b"read_config_file_depth\0"))
             .as_ptr(),
@@ -6669,7 +6660,7 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
     );
     r = kex_assemble_names(&mut (*options).ciphers, def_cipher, all_cipher);
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"readconf.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"fill_default_options\0"))
                 .as_ptr(),
@@ -6683,7 +6674,7 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
     } else {
         r = kex_assemble_names(&mut (*options).macs, def_mac, all_mac);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                     b"fill_default_options\0",
@@ -6699,7 +6690,7 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
         } else {
             r = kex_assemble_names(&mut (*options).kex_algorithms, def_kex, all_kex);
             if r != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                         b"fill_default_options\0",
@@ -6715,7 +6706,7 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
             } else {
                 r = kex_assemble_names(&mut (*options).hostbased_accepted_algos, def_key, all_key);
                 if r != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                             b"fill_default_options\0",
@@ -6731,7 +6722,7 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
                 } else {
                     r = kex_assemble_names(&mut (*options).pubkey_accepted_algos, def_key, all_key);
                     if r != 0 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                                 b"fill_default_options\0",
@@ -6751,7 +6742,7 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
                             all_sig,
                         );
                         if r != 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                                     b"fill_default_options\0",

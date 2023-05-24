@@ -34,16 +34,7 @@ extern "C" {
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -370,7 +361,7 @@ pub unsafe extern "C" fn sys_get_rdomain(mut fd: libc::c_int) -> *mut libc::c_ch
         &mut len,
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"port-net.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"sys_get_rdomain\0"))
                 .as_ptr(),
@@ -402,7 +393,7 @@ pub unsafe extern "C" fn sys_set_rdomain(
         strlen(name) as socklen_t,
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"port-net.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"sys_set_rdomain\0"))
                 .as_ptr(),
@@ -472,7 +463,7 @@ pub unsafe extern "C" fn sys_tun_open(
         0o2 as libc::c_int,
     );
     if fd == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"port-net.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"sys_tun_open\0")).as_ptr(),
             154 as libc::c_int,
@@ -502,7 +493,7 @@ pub unsafe extern "C" fn sys_tun_open(
         (ifr.ifr_ifru.ifru_flags as libc::c_int | 0x1000 as libc::c_int) as libc::c_short;
     if tun != 0x7fffffff as libc::c_int {
         if tun > 0x7fffffff as libc::c_int - 2 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"port-net.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"sys_tun_open\0"))
                     .as_ptr(),
@@ -543,7 +534,7 @@ pub unsafe extern "C" fn sys_tun_open(
                 &mut ifr as *mut ifreq,
             ) == -(1 as libc::c_int)
             {
-                sshlog(
+                crate::log::sshlog(
                     b"port-net.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"sys_tun_open\0"))
                         .as_ptr(),
@@ -560,7 +551,7 @@ pub unsafe extern "C" fn sys_tun_open(
                 );
             } else {
                 if tun == 0x7fffffff as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"port-net.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                             b"sys_tun_open\0",
@@ -579,7 +570,7 @@ pub unsafe extern "C" fn sys_tun_open(
                         fd,
                     );
                 } else {
-                    sshlog(
+                    crate::log::sshlog(
                         b"port-net.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                             b"sys_tun_open\0",

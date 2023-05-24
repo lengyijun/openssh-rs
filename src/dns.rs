@@ -36,16 +36,7 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -360,7 +351,7 @@ unsafe extern "C" fn is_numeric_hostname(mut hostname: *const libc::c_char) -> l
     };
     let mut ai: *mut addrinfo = 0 as *mut addrinfo;
     if hostname.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"dns.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"is_numeric_hostname\0"))
                 .as_ptr(),
@@ -402,7 +393,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
     let mut dnskey_digest: *mut u_char = 0 as *mut u_char;
     let mut dnskey_digest_len: size_t = 0;
     *flags = 0 as libc::c_int;
-    sshlog(
+    crate::log::sshlog(
         b"dns.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"verify_host_key_dns\0"))
             .as_ptr(),
@@ -425,7 +416,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
         );
     }
     if is_numeric_hostname(hostname) != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"dns.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"verify_host_key_dns\0"))
                 .as_ptr(),
@@ -445,7 +436,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
         &mut fingerprints,
     );
     if result != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"dns.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"verify_host_key_dns\0"))
                 .as_ptr(),
@@ -460,7 +451,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
     }
     if (*fingerprints).rri_flags & 1 as libc::c_int as libc::c_uint != 0 {
         *flags |= 0x4 as libc::c_int;
-        sshlog(
+        crate::log::sshlog(
             b"dns.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"verify_host_key_dns\0"))
                 .as_ptr(),
@@ -472,7 +463,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
             (*fingerprints).rri_nrdatas,
         );
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"dns.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"verify_host_key_dns\0"))
                 .as_ptr(),
@@ -498,7 +489,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
             (*((*fingerprints).rri_rdatas).offset(counter as isize)).rdi_length as libc::c_int,
         ) == 0
         {
-            sshlog(
+            crate::log::sshlog(
                 b"dns.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"verify_host_key_dns\0",
@@ -511,7 +502,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
                 b"Error parsing fingerprint from DNS.\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"dns.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"verify_host_key_dns\0",
@@ -533,7 +524,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
                 hostkey,
             ) == 0
             {
-                sshlog(
+                crate::log::sshlog(
                     b"dns.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                         b"verify_host_key_dns\0",
@@ -558,7 +549,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
                     hostkey_digest_len,
                 ) == 0 as libc::c_int
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"dns.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                             b"verify_host_key_dns\0",
@@ -574,7 +565,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
                     );
                     *flags |= 0x2 as libc::c_int;
                 } else {
-                    sshlog(
+                    crate::log::sshlog(
                         b"dns.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                             b"verify_host_key_dns\0",
@@ -603,7 +594,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
     }
     if *flags & 0x1 as libc::c_int != 0 {
         if *flags & 0x2 as libc::c_int != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"dns.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"verify_host_key_dns\0",
@@ -616,7 +607,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
                 b"matching host key fingerprint found in DNS\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"dns.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"verify_host_key_dns\0",
@@ -631,7 +622,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
             );
         }
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"dns.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"verify_host_key_dns\0"))
                 .as_ptr(),
@@ -708,7 +699,7 @@ pub unsafe extern "C" fn export_dns_rr(
         dtype;
     }
     if success == 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"dns.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"export_dns_rr\0"))
                 .as_ptr(),

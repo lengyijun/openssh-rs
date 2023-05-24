@@ -6,16 +6,7 @@ extern "C" {
     fn prctl(__option: libc::c_int, _: ...) -> libc::c_int;
     fn free(_: *mut libc::c_void);
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -108,7 +99,7 @@ static mut preauth_program: sock_fprog = sock_fprog {
 };
 pub unsafe extern "C" fn ssh_sandbox_init(mut _monitor: *mut monitor) -> *mut ssh_sandbox {
     let mut box_0: *mut ssh_sandbox = 0 as *mut ssh_sandbox;
-    sshlog(
+    crate::log::sshlog(
         b"sandbox-seccomp-filter.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"ssh_sandbox_init\0")).as_ptr(),
         445 as libc::c_int,
@@ -185,7 +176,7 @@ pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
             strerror(*__errno_location()),
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"sandbox-seccomp-filter.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"ssh_sandbox_child\0"))
             .as_ptr(),
@@ -205,7 +196,7 @@ pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
         0 as libc::c_int,
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"sandbox-seccomp-filter.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"ssh_sandbox_child\0"))
                 .as_ptr(),
@@ -220,7 +211,7 @@ pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
         );
         nnp_failed = 1 as libc::c_int;
     }
-    sshlog(
+    crate::log::sshlog(
         b"sandbox-seccomp-filter.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"ssh_sandbox_child\0"))
             .as_ptr(),
@@ -238,7 +229,7 @@ pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
         &preauth_program as *const sock_fprog,
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"sandbox-seccomp-filter.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"ssh_sandbox_child\0"))
                 .as_ptr(),
@@ -269,7 +260,7 @@ pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
 }
 pub unsafe extern "C" fn ssh_sandbox_parent_finish(mut box_0: *mut ssh_sandbox) {
     free(box_0 as *mut libc::c_void);
-    sshlog(
+    crate::log::sshlog(
         b"sandbox-seccomp-filter.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(b"ssh_sandbox_parent_finish\0"))
             .as_ptr(),

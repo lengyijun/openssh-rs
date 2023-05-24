@@ -104,16 +104,7 @@ extern "C" {
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -1087,7 +1078,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
     }
     if pid == 0 as libc::c_int {
         if !args.is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"local_do_shell\0"))
                     .as_ptr(),
@@ -1107,7 +1098,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
                 0 as *mut libc::c_void as *mut libc::c_char,
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"local_do_shell\0"))
                     .as_ptr(),
@@ -1144,7 +1135,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
         }
     }
     if !(status & 0x7f as libc::c_int == 0 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sftp.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"local_do_shell\0"))
                 .as_ptr(),
@@ -1155,7 +1146,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
             b"Shell exited abnormally\0" as *const u8 as *const libc::c_char,
         );
     } else if (status & 0xff00 as libc::c_int) >> 8 as libc::c_int != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"sftp.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"local_do_shell\0"))
                 .as_ptr(),
@@ -1261,7 +1252,7 @@ unsafe extern "C" fn parse_getput_flags(
                 *rflag = 1 as libc::c_int;
             }
             _ => {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"parse_getput_flags\0",
@@ -1318,7 +1309,7 @@ unsafe extern "C" fn parse_link_flags(
                 *sflag = 1 as libc::c_int;
             }
             _ => {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                         b"parse_link_flags\0",
@@ -1375,7 +1366,7 @@ unsafe extern "C" fn parse_rename_flags(
                 *lflag = 1 as libc::c_int;
             }
             _ => {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"parse_rename_flags\0",
@@ -1467,7 +1458,7 @@ unsafe extern "C" fn parse_ls_flags(
                 *lflag |= 0x10 as libc::c_int;
             }
             _ => {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                         b"parse_ls_flags\0",
@@ -1528,7 +1519,7 @@ unsafe extern "C" fn parse_df_flags(
                 *iflag = 1 as libc::c_int;
             }
             _ => {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                         b"parse_df_flags\0",
@@ -1585,7 +1576,7 @@ unsafe extern "C" fn parse_ch_flags(
                 *hflag = 1 as libc::c_int;
             }
             _ => {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(
                         b"parse_ch_flags\0",
@@ -1635,7 +1626,7 @@ unsafe extern "C" fn parse_no_flags(
         match ch {
             _ => {}
         }
-        sshlog(
+        crate::log::sshlog(
             b"sftp.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"parse_no_flags\0"))
                 .as_ptr(),
@@ -1736,7 +1727,7 @@ unsafe extern "C" fn process_get(
         0 as libc::c_int,
         ::core::mem::size_of::<_ssh_compat_glob_t>() as libc::c_ulong,
     );
-    sshlog(
+    crate::log::sshlog(
         b"sftp.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"process_get\0")).as_ptr(),
         647 as libc::c_int,
@@ -1749,7 +1740,7 @@ unsafe extern "C" fn process_get(
     r = remote_glob(conn, abs_src, 0x8 as libc::c_int, None, &mut g);
     if r != 0 as libc::c_int {
         if r == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"process_get\0"))
                     .as_ptr(),
@@ -1761,7 +1752,7 @@ unsafe extern "C" fn process_get(
                 abs_src,
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"process_get\0"))
                     .as_ptr(),
@@ -1778,7 +1769,7 @@ unsafe extern "C" fn process_get(
         && !dst.is_null()
         && local_is_dir(dst) == 0
     {
-        sshlog(
+        crate::log::sshlog(
             b"sftp.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"process_get\0")).as_ptr(),
             664 as libc::c_int,
@@ -1796,7 +1787,7 @@ unsafe extern "C" fn process_get(
             tmp = xstrdup(*(g.gl_pathv).offset(i as isize));
             filename = __xpg_basename(tmp);
             if filename.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"process_get\0"))
                         .as_ptr(),
@@ -1946,7 +1937,7 @@ unsafe extern "C" fn process_put(
         0 as libc::c_int,
         ::core::mem::size_of::<_ssh_compat_glob_t>() as libc::c_ulong,
     );
-    sshlog(
+    crate::log::sshlog(
         b"sftp.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"process_put\0")).as_ptr(),
         738 as libc::c_int,
@@ -1957,7 +1948,7 @@ unsafe extern "C" fn process_put(
         src,
     );
     if _ssh__compat_glob(src, 0x10 as libc::c_int | 0x8 as libc::c_int, None, &mut g) != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"sftp.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"process_put\0")).as_ptr(),
             740 as libc::c_int,
@@ -1974,7 +1965,7 @@ unsafe extern "C" fn process_put(
         }
         if g.gl_matchc > 1 as libc::c_int as libc::c_ulong && !tmp_dst.is_null() && dst_is_dir == 0
         {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"process_put\0"))
                     .as_ptr(),
@@ -1992,7 +1983,7 @@ unsafe extern "C" fn process_put(
             while !(*(g.gl_pathv).offset(i as isize)).is_null() && interrupted == 0 {
                 if stat(*(g.gl_pathv).offset(i as isize), &mut sb) == -(1 as libc::c_int) {
                     err = -(1 as libc::c_int);
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                             b"process_put\0",
@@ -2010,7 +2001,7 @@ unsafe extern "C" fn process_put(
                     tmp = xstrdup(*(g.gl_pathv).offset(i as isize));
                     filename = __xpg_basename(tmp);
                     if filename.is_null() {
-                        sshlog(
+                        crate::log::sshlog(
                             b"sftp.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
                                 b"process_put\0",
@@ -2436,7 +2427,7 @@ unsafe extern "C" fn do_globbed_ls(
             _ssh__compat_globfree(&mut g);
         }
         if r == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"do_globbed_ls\0"))
                     .as_ptr(),
@@ -2448,7 +2439,7 @@ unsafe extern "C" fn do_globbed_ls(
                 path,
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"do_globbed_ls\0"))
                     .as_ptr(),
@@ -2549,7 +2540,7 @@ unsafe extern "C" fn do_globbed_ls(
             fname = path_strip(*(g.gl_pathv).offset(i as isize), strip_path);
             if lflag & 0x1 as libc::c_int != 0 {
                 if (*(g.gl_statv).offset(i as isize)).is_null() {
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(
                             b"do_globbed_ls\0",
@@ -2848,7 +2839,7 @@ unsafe extern "C" fn makeargv(
                 >= (::core::mem::size_of::<[*mut libc::c_char; 129]>() as libc::c_ulong)
                     .wrapping_div(::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong)
             {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"makeargv\0"))
                         .as_ptr(),
@@ -3019,7 +3010,7 @@ unsafe extern "C" fn makeargv(
                                 *terminated = 0 as libc::c_int as u_int;
                             }
                         } else {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"sftp.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(
                                     b"makeargv\0",
@@ -3097,7 +3088,7 @@ unsafe extern "C" fn makeargv(
             }
         }
     }
-    sshlog(
+    crate::log::sshlog(
         b"sftp.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"makeargv\0")).as_ptr(),
         1194 as libc::c_int,
@@ -3183,7 +3174,7 @@ unsafe extern "C" fn parse_args(
         cp;
         cmdnum = I_SHELL as libc::c_int;
     } else if cmdnum == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sftp.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"parse_args\0")).as_ptr(),
             1381 as libc::c_int,
@@ -3212,7 +3203,7 @@ unsafe extern "C" fn parse_args(
                 return -(1 as libc::c_int);
             }
             if argc - optidx < 1 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"parse_args\0"))
                         .as_ptr(),
@@ -3335,7 +3326,7 @@ unsafe extern "C" fn parse_args(
             }
             if argc - optidx < 1 as libc::c_int {
                 if !(path1_mandatory == 0) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"parse_args\0",
@@ -3360,7 +3351,7 @@ unsafe extern "C" fn parse_args(
         }
         11651839663461973003 => {
             if argc - optidx < 2 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"parse_args\0"))
                         .as_ptr(),
@@ -3404,7 +3395,7 @@ unsafe extern "C" fn parse_args(
                         current_block = 17769492591016358583;
                     } else {
                         if argc - optidx < 2 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"sftp.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                     b"parse_args\0",
@@ -3428,7 +3419,7 @@ unsafe extern "C" fn parse_args(
             match current_block {
                 17769492591016358583 => {}
                 _ => {
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"parse_args\0",
@@ -3620,7 +3611,7 @@ unsafe extern "C" fn parse_dispatch_command(
                     free(tmp as *mut libc::c_void);
                     err = 1 as libc::c_int;
                 } else if (*aa).flags & 0x4 as libc::c_int as libc::c_uint == 0 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                             b"parse_dispatch_command\0",
@@ -3638,7 +3629,7 @@ unsafe extern "C" fn parse_dispatch_command(
                 } else if !((*aa).perm & 0o170000 as libc::c_int as libc::c_uint
                     == 0o40000 as libc::c_int as libc::c_uint)
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                             b"parse_dispatch_command\0",
@@ -3690,7 +3681,7 @@ unsafe extern "C" fn parse_dispatch_command(
             free(path1 as *mut libc::c_void);
             path1 = tmp;
             if chdir(path1) == -(1 as libc::c_int) {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                         b"parse_dispatch_command\0",
@@ -3711,7 +3702,7 @@ unsafe extern "C" fn parse_dispatch_command(
         }
         12 => {
             if libc::mkdir(path1, 0o777 as libc::c_int as __mode_t) == -(1 as libc::c_int) {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                         b"parse_dispatch_command\0",
@@ -3827,7 +3818,7 @@ unsafe extern "C" fn parse_dispatch_command(
                         break;
                     }
                 } else if (*aa).flags & 0x2 as libc::c_int as libc::c_uint == 0 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"sftp.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                             b"parse_dispatch_command\0",
@@ -3913,7 +3904,7 @@ unsafe extern "C" fn parse_dispatch_command(
             ))
             .is_null()
             {
-                sshlog(
+                crate::log::sshlog(
                     b"sftp.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                         b"parse_dispatch_command\0",
@@ -4149,7 +4140,7 @@ unsafe extern "C" fn interactive_loop(
             Some(killchild as unsafe extern "C" fn(libc::c_int) -> ())
         };
         if sigaction(2 as libc::c_int, &mut sa, 0 as *mut sigaction) == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"interactive_loop\0"))
                     .as_ptr(),

@@ -66,16 +66,7 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -222,7 +213,7 @@ unsafe extern "C" fn sieve_large(mut s32: u_int32_t) {
     let mut r: u_int64_t = 0;
     let mut u: u_int64_t = 0;
     let mut s: u_int64_t = s32 as u_int64_t;
-    sshlog(
+    crate::log::sshlog(
         b"moduli.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"sieve_large\0")).as_ptr(),
         191 as libc::c_int,
@@ -311,7 +302,7 @@ pub unsafe extern "C" fn gen_candidates(
         && ((memory as libc::c_ulong) < 8 as libc::c_ulong
             || memory as libc::c_ulong > 127 as libc::c_ulong)
     {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0"))
                 .as_ptr(),
@@ -326,7 +317,7 @@ pub unsafe extern "C" fn gen_candidates(
         return -(1 as libc::c_int);
     }
     if power as libc::c_ulong > (1 as libc::c_ulong) << 16 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0"))
                 .as_ptr(),
@@ -340,7 +331,7 @@ pub unsafe extern "C" fn gen_candidates(
         );
         return -(1 as libc::c_int);
     } else if power < (511 as libc::c_int + 1 as libc::c_int) as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0"))
                 .as_ptr(),
@@ -359,7 +350,7 @@ pub unsafe extern "C" fn gen_candidates(
     largewords =
         power.wrapping_mul(power) >> 3 as libc::c_int + 2 as libc::c_int - 3 as libc::c_int;
     if largememory as libc::c_ulong > 127 as libc::c_ulong {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0"))
                 .as_ptr(),
@@ -374,7 +365,7 @@ pub unsafe extern "C" fn gen_candidates(
         largememory = 127 as libc::c_ulong as u_int32_t;
     }
     if largewords <= largememory << 20 as libc::c_int - 2 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0"))
                 .as_ptr(),
@@ -388,7 +379,7 @@ pub unsafe extern "C" fn gen_candidates(
         );
         largewords = largememory << 20 as libc::c_int - 2 as libc::c_int;
     } else if largememory > 0 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0"))
                 .as_ptr(),
@@ -497,7 +488,7 @@ pub unsafe extern "C" fn gen_candidates(
         );
     }
     time(&mut time_start);
-    sshlog(
+    crate::log::sshlog(
         b"moduli.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0")).as_ptr(),
         346 as libc::c_int,
@@ -509,7 +500,7 @@ pub unsafe extern "C" fn gen_candidates(
         largenumbers,
         power,
     );
-    sshlog(
+    crate::log::sshlog(
         b"moduli.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0")).as_ptr(),
         347 as libc::c_int,
@@ -606,7 +597,7 @@ pub unsafe extern "C" fn gen_candidates(
             as u_int32_t as u_int32_t;
     }
     time(&mut time_stop);
-    sshlog(
+    crate::log::sshlog(
         b"moduli.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0")).as_ptr(),
         418 as libc::c_int,
@@ -626,7 +617,7 @@ pub unsafe extern "C" fn gen_candidates(
             & (1 as libc::c_long) << (j & 31 as libc::c_int as libc::c_uint)
             != 0)
         {
-            sshlog(
+            crate::log::sshlog(
                 b"moduli.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0"))
                     .as_ptr(),
@@ -693,7 +684,7 @@ pub unsafe extern "C" fn gen_candidates(
     free(LargeSieve as *mut libc::c_void);
     free(SmallSieve as *mut libc::c_void);
     free(TinySieve as *mut libc::c_void);
-    sshlog(
+    crate::log::sshlog(
         b"moduli.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0")).as_ptr(),
         445 as libc::c_int,
@@ -719,7 +710,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
         cpfile,
     );
     if r < 0 as libc::c_int || r >= 4096 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"write_checkpoint\0"))
                 .as_ptr(),
@@ -733,7 +724,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
     }
     r = _ssh_mkstemp(tmp.as_mut_ptr());
     if r == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"write_checkpoint\0"))
                 .as_ptr(),
@@ -749,7 +740,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
     }
     fp = fdopen(r, b"w\0" as *const u8 as *const libc::c_char);
     if fp.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"write_checkpoint\0"))
                 .as_ptr(),
@@ -771,7 +762,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
     ) > 0 as libc::c_int) as libc::c_int;
     closeok = (fclose(fp) == 0 as libc::c_int) as libc::c_int;
     if writeok != 0 && closeok != 0 && rename(tmp.as_mut_ptr(), cpfile) == 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"write_checkpoint\0"))
                 .as_ptr(),
@@ -784,7 +775,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
             cpfile,
         );
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"write_checkpoint\0"))
                 .as_ptr(),
@@ -812,7 +803,7 @@ unsafe extern "C" fn read_checkpoint(mut cpfile: *mut libc::c_char) -> libc::c_u
         &mut lineno as *mut libc::c_ulong,
     ) < 1 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"read_checkpoint\0"))
                 .as_ptr(),
@@ -824,7 +815,7 @@ unsafe extern "C" fn read_checkpoint(mut cpfile: *mut libc::c_char) -> libc::c_u
             cpfile,
         );
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"read_checkpoint\0"))
                 .as_ptr(),
@@ -844,7 +835,7 @@ unsafe extern "C" fn count_lines(mut f: *mut FILE) -> libc::c_ulong {
     let mut count: libc::c_ulong = 0 as libc::c_int as libc::c_ulong;
     let mut lp: [libc::c_char; 8293] = [0; 8293];
     if fseek(f, 0 as libc::c_int as libc::c_long, 0 as libc::c_int) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"count_lines\0")).as_ptr(),
             507 as libc::c_int,
@@ -868,7 +859,7 @@ unsafe extern "C" fn count_lines(mut f: *mut FILE) -> libc::c_ulong {
         count;
     }
     rewind(f);
-    sshlog(
+    crate::log::sshlog(
         b"moduli.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"count_lines\0")).as_ptr(),
         513 as libc::c_int,
@@ -950,7 +941,7 @@ unsafe extern "C" fn print_progress(
             .wrapping_mul(2 as libc::c_ulong)
             .wrapping_add(1 as libc::c_ulong)
     {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"print_progress\0"))
                 .as_ptr(),
@@ -970,7 +961,7 @@ unsafe extern "C" fn print_progress(
         .wrapping_div(num_to_process);
     eta = (time_per_line * remaining as libc::c_double) as libc::c_ulong;
     eta_str = xstrdup(fmt_time(eta as time_t));
-    sshlog(
+    crate::log::sshlog(
         b"moduli.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"print_progress\0")).as_ptr(),
         569 as libc::c_int,
@@ -1016,7 +1007,7 @@ pub unsafe extern "C" fn prime_test(
     let mut res: libc::c_int = 0;
     let mut is_prime: libc::c_int = 0;
     if trials < 4 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"prime_test\0")).as_ptr(),
             592 as libc::c_int,
@@ -1058,7 +1049,7 @@ pub unsafe extern "C" fn prime_test(
             b"BN_new failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"moduli.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"prime_test\0")).as_ptr(),
         609 as libc::c_int,
@@ -1084,7 +1075,7 @@ pub unsafe extern "C" fn prime_test(
             .wrapping_mul(2 as libc::c_ulong)
             .wrapping_add(1 as libc::c_ulong)
     {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"prime_test\0")).as_ptr(),
             615 as libc::c_int,
@@ -1095,7 +1086,7 @@ pub unsafe extern "C" fn prime_test(
             last_processed,
         );
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"prime_test\0")).as_ptr(),
             618 as libc::c_int,
@@ -1121,7 +1112,7 @@ pub unsafe extern "C" fn prime_test(
         count_in = count_in.wrapping_add(1);
         count_in;
         if count_in as libc::c_ulong <= last_processed {
-            sshlog(
+            crate::log::sshlog(
                 b"moduli.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"prime_test\0"))
                     .as_ptr(),
@@ -1142,7 +1133,7 @@ pub unsafe extern "C" fn prime_test(
                 || *lp as libc::c_int == '!' as i32
                 || *lp as libc::c_int == '#' as i32
             {
-                sshlog(
+                crate::log::sshlog(
                     b"moduli.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"prime_test\0"))
                         .as_ptr(),
@@ -1158,7 +1149,7 @@ pub unsafe extern "C" fn prime_test(
                 in_type = strtoul(cp, &mut cp, 10 as libc::c_int) as u_int32_t;
                 in_tests = strtoul(cp, &mut cp, 10 as libc::c_int) as u_int32_t;
                 if in_tests & 0x1 as libc::c_int as libc::c_uint != 0 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"moduli.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"prime_test\0",
@@ -1178,7 +1169,7 @@ pub unsafe extern "C" fn prime_test(
                     cp = cp.offset(strspn(cp, b" \0" as *const u8 as *const libc::c_char) as isize);
                     match in_type {
                         4 => {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"moduli.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                     b"prime_test\0",
@@ -1242,7 +1233,7 @@ pub unsafe extern "C" fn prime_test(
                             generator_known = 0 as libc::c_int as u_int32_t;
                         }
                         1 | 2 | 3 | 5 | 0 => {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"moduli.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                     b"prime_test\0",
@@ -1287,7 +1278,7 @@ pub unsafe extern "C" fn prime_test(
                             }
                         }
                         _ => {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"moduli.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                     b"prime_test\0",
@@ -1304,7 +1295,7 @@ pub unsafe extern "C" fn prime_test(
                     if BN_num_bits(p) as u_int32_t
                         != in_size.wrapping_add(1 as libc::c_int as libc::c_uint)
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"moduli.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                 b"prime_test\0",
@@ -1319,7 +1310,7 @@ pub unsafe extern "C" fn prime_test(
                             in_size,
                         );
                     } else if in_size < 511 as libc::c_int as libc::c_uint {
-                        sshlog(
+                        crate::log::sshlog(
                             b"moduli.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                 b"prime_test\0",
@@ -1358,7 +1349,7 @@ pub unsafe extern "C" fn prime_test(
                         if generator_wanted > 0 as libc::c_int as libc::c_uint
                             && generator_wanted != generator_known
                         {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"moduli.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                     b"prime_test\0",
@@ -1374,7 +1365,7 @@ pub unsafe extern "C" fn prime_test(
                                 generator_wanted,
                             );
                         } else if generator_known == 0 as libc::c_int as libc::c_uint {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"moduli.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                     b"prime_test\0",
@@ -1411,7 +1402,7 @@ pub unsafe extern "C" fn prime_test(
                                 );
                             }
                             if is_prime == 0 as libc::c_int {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"moduli.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                         b"prime_test\0",
@@ -1448,7 +1439,7 @@ pub unsafe extern "C" fn prime_test(
                                     );
                                 }
                                 if is_prime == 0 as libc::c_int {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"moduli.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                             b"prime_test\0",
@@ -1463,7 +1454,7 @@ pub unsafe extern "C" fn prime_test(
                                         count_in,
                                     );
                                 } else {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"moduli.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                             b"prime_test\0",
@@ -1503,7 +1494,7 @@ pub unsafe extern "C" fn prime_test(
                                         );
                                     }
                                     if is_prime == 0 as libc::c_int {
-                                        sshlog(
+                                        crate::log::sshlog(
                                             b"moduli.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
                                                 &[u8; 11],
@@ -1521,7 +1512,7 @@ pub unsafe extern "C" fn prime_test(
                                             count_in,
                                         );
                                     } else {
-                                        sshlog(
+                                        crate::log::sshlog(
                                             b"moduli.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
                                                 &[u8; 11],
@@ -1570,7 +1561,7 @@ pub unsafe extern "C" fn prime_test(
     if !checkpoint_file.is_null() {
         unlink(checkpoint_file);
     }
-    sshlog(
+    crate::log::sshlog(
         b"moduli.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"prime_test\0")).as_ptr(),
         811 as libc::c_int,

@@ -6,16 +6,7 @@ extern "C" {
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
 }
 pub type __ssize_t = libc::c_long;
 pub type __caddr_t = *mut libc::c_char;
@@ -152,7 +143,7 @@ pub unsafe extern "C" fn mm_send_fd(mut sock: libc::c_int, mut fd: libc::c_int) 
         {
             break;
         }
-        sshlog(
+        crate::log::sshlog(
             b"monitor_fdpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"mm_send_fd\0")).as_ptr(),
             92 as libc::c_int,
@@ -166,7 +157,7 @@ pub unsafe extern "C" fn mm_send_fd(mut sock: libc::c_int, mut fd: libc::c_int) 
         poll(&mut pfd, 1 as libc::c_int as nfds_t, -(1 as libc::c_int));
     }
     if n == -(1 as libc::c_int) as libc::c_long {
-        sshlog(
+        crate::log::sshlog(
             b"monitor_fdpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"mm_send_fd\0")).as_ptr(),
             96 as libc::c_int,
@@ -180,7 +171,7 @@ pub unsafe extern "C" fn mm_send_fd(mut sock: libc::c_int, mut fd: libc::c_int) 
         return -(1 as libc::c_int);
     }
     if n != 1 as libc::c_int as libc::c_long {
-        sshlog(
+        crate::log::sshlog(
             b"monitor_fdpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"mm_send_fd\0")).as_ptr(),
             101 as libc::c_int,
@@ -251,7 +242,7 @@ pub unsafe extern "C" fn mm_receive_fd(mut sock: libc::c_int) -> libc::c_int {
         {
             break;
         }
-        sshlog(
+        crate::log::sshlog(
             b"monitor_fdpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"mm_receive_fd\0"))
                 .as_ptr(),
@@ -265,7 +256,7 @@ pub unsafe extern "C" fn mm_receive_fd(mut sock: libc::c_int) -> libc::c_int {
         poll(&mut pfd, 1 as libc::c_int as nfds_t, -(1 as libc::c_int));
     }
     if n == -(1 as libc::c_int) as libc::c_long {
-        sshlog(
+        crate::log::sshlog(
             b"monitor_fdpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"mm_receive_fd\0"))
                 .as_ptr(),
@@ -279,7 +270,7 @@ pub unsafe extern "C" fn mm_receive_fd(mut sock: libc::c_int) -> libc::c_int {
         return -(1 as libc::c_int);
     }
     if n != 1 as libc::c_int as libc::c_long {
-        sshlog(
+        crate::log::sshlog(
             b"monitor_fdpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"mm_receive_fd\0"))
                 .as_ptr(),
@@ -298,7 +289,7 @@ pub unsafe extern "C" fn mm_receive_fd(mut sock: libc::c_int) -> libc::c_int {
         0 as *mut cmsghdr
     };
     if cmsg.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"monitor_fdpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"mm_receive_fd\0"))
                 .as_ptr(),
@@ -311,7 +302,7 @@ pub unsafe extern "C" fn mm_receive_fd(mut sock: libc::c_int) -> libc::c_int {
         return -(1 as libc::c_int);
     }
     if (*cmsg).cmsg_type != SCM_RIGHTS as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"monitor_fdpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"mm_receive_fd\0"))
                 .as_ptr(),

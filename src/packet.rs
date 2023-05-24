@@ -133,16 +133,7 @@ extern "C" {
     ) -> libc::c_int;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn cleanup_exit(_: libc::c_int) -> !;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshlogdie(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -750,7 +741,7 @@ pub unsafe extern "C" fn ssh_packet_set_connection(
     let mut none: *const sshcipher = cipher_by_name(b"none\0" as *const u8 as *const libc::c_char);
     let mut r: libc::c_int = 0;
     if none.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"packet.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"ssh_packet_set_connection\0",
@@ -768,7 +759,7 @@ pub unsafe extern "C" fn ssh_packet_set_connection(
         ssh = ssh_alloc_session_state();
     }
     if ssh.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"packet.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"ssh_packet_set_connection\0",
@@ -806,7 +797,7 @@ pub unsafe extern "C" fn ssh_packet_set_connection(
         );
         r != 0 as libc::c_int
     } {
-        sshlog(
+        crate::log::sshlog(
             b"packet.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"ssh_packet_set_connection\0",
@@ -905,7 +896,7 @@ pub unsafe extern "C" fn ssh_packet_stop_discard(mut ssh: *mut ssh) -> libc::c_i
             0 as libc::c_int as size_t,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(b"ssh_packet_stop_discard\0"))
             .as_ptr(),
@@ -1118,7 +1109,7 @@ unsafe extern "C" fn ssh_packet_close_internal(mut ssh: *mut ssh, mut do_close: 
         sshbuf_free((*state).compression_buffer);
         if (*state).compression_out_started != 0 {
             let mut stream: z_streamp = &mut (*state).compression_out_stream;
-            sshlog(
+            crate::log::sshlog(
                 b"packet.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"ssh_packet_close_internal\0",
@@ -1144,7 +1135,7 @@ unsafe extern "C" fn ssh_packet_close_internal(mut ssh: *mut ssh, mut do_close: 
         }
         if (*state).compression_in_started != 0 {
             let mut stream_0: z_streamp = &mut (*state).compression_in_stream;
-            sshlog(
+            crate::log::sshlog(
                 b"packet.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"ssh_packet_close_internal\0",
@@ -1215,7 +1206,7 @@ unsafe extern "C" fn start_compression_out(
     if level < 1 as libc::c_int || level > 9 as libc::c_int {
         return -(10 as libc::c_int);
     }
-    sshlog(
+    crate::log::sshlog(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"start_compression_out\0"))
             .as_ptr(),
@@ -1380,7 +1371,7 @@ pub unsafe extern "C" fn ssh_set_newkeys(mut ssh: *mut ssh, mut mode: libc::c_in
     } else {
         b"in\0" as *const u8 as *const libc::c_char
     };
-    sshlog(
+    crate::log::sshlog(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"ssh_set_newkeys\0")).as_ptr(),
         874 as libc::c_int,
@@ -1402,7 +1393,7 @@ pub unsafe extern "C" fn ssh_set_newkeys(mut ssh: *mut ssh, mut mode: libc::c_in
         max_blocks = &mut (*state).max_blocks_in;
     }
     if !((*state).newkeys[mode as usize]).is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"packet.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"ssh_set_newkeys\0"))
                 .as_ptr(),
@@ -1456,7 +1447,7 @@ pub unsafe extern "C" fn ssh_set_newkeys(mut ssh: *mut ssh, mut mode: libc::c_in
         wmsg = cipher_warning_message(*ccp);
         !wmsg.is_null()
     } {
-        sshlog(
+        crate::log::sshlog(
             b"packet.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"ssh_set_newkeys\0"))
                 .as_ptr(),
@@ -1506,7 +1497,7 @@ pub unsafe extern "C" fn ssh_set_newkeys(mut ssh: *mut ssh, mut mode: libc::c_in
             ((*state).rekey_limit).wrapping_div((*enc).block_size as libc::c_ulong)
         };
     }
-    sshlog(
+    crate::log::sshlog(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"ssh_set_newkeys\0")).as_ptr(),
         953 as libc::c_int,
@@ -1576,7 +1567,7 @@ pub unsafe extern "C" fn ssh_packet_check_rekey(mut ssh: *mut ssh) -> libc::c_in
     if ssh_packet_need_rekeying(ssh, 0 as libc::c_int as u_int) == 0 {
         return 0 as libc::c_int;
     }
-    sshlog(
+    crate::log::sshlog(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(b"ssh_packet_check_rekey\0"))
             .as_ptr(),
@@ -1678,7 +1669,7 @@ pub unsafe extern "C" fn ssh_packet_send2_wrapped(mut ssh: *mut ssh) -> libc::c_
     }) as u_int;
     type_0 = *(sshbuf_ptr((*state).outgoing_packet)).offset(5 as libc::c_int as isize);
     if ssh_packet_log_type(type_0) != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"packet.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                 b"ssh_packet_send2_wrapped\0",
@@ -1860,7 +1851,7 @@ pub unsafe extern "C" fn ssh_packet_send2_wrapped(mut ssh: *mut ssh) -> libc::c_
                                             if (*state).p_send.seqnr
                                                 == 0 as libc::c_int as libc::c_uint
                                             {
-                                                sshlog(
+                                                crate::log::sshlog(
                                                     b"packet.c\0" as *const u8
                                                         as *const libc::c_char,
                                                     (*::core::mem::transmute::<
@@ -1945,7 +1936,7 @@ pub unsafe extern "C" fn ssh_packet_send2(mut ssh: *mut ssh) -> libc::c_int {
         as libc::c_int;
     if (need_rekey != 0 || (*state).rekeying != 0) && ssh_packet_type_is_kex(type_0) == 0 {
         if need_rekey != 0 {
-            sshlog(
+            crate::log::sshlog(
                 b"packet.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"ssh_packet_send2\0"))
                     .as_ptr(),
@@ -1956,7 +1947,7 @@ pub unsafe extern "C" fn ssh_packet_send2(mut ssh: *mut ssh) -> libc::c_int {
                 b"rekex triggered\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshlog(
+        crate::log::sshlog(
             b"packet.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"ssh_packet_send2\0"))
                 .as_ptr(),
@@ -2006,7 +1997,7 @@ pub unsafe extern "C" fn ssh_packet_send2(mut ssh: *mut ssh) -> libc::c_int {
             }
             type_0 = (*p).type_0;
             if ssh_packet_need_rekeying(ssh, sshbuf_len((*p).payload) as u_int) != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"packet.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                         b"ssh_packet_send2\0",
@@ -2020,7 +2011,7 @@ pub unsafe extern "C" fn ssh_packet_send2(mut ssh: *mut ssh) -> libc::c_int {
                 );
                 return kex_start_rekex(ssh);
             }
-            sshlog(
+            crate::log::sshlog(
                 b"packet.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"ssh_packet_send2\0"))
                     .as_ptr(),
@@ -2250,7 +2241,7 @@ unsafe extern "C" fn ssh_packet_read_poll2_mux(
         return r;
     }
     if ssh_packet_log_type(*typep) != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"packet.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"ssh_packet_read_poll2_mux\0",
@@ -2339,7 +2330,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
         if (*state).packlen < (1 as libc::c_int + 4 as libc::c_int) as libc::c_uint
             || (*state).packlen > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_uint
         {
-            sshlog(
+            crate::log::sshlog(
                 b"packet.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"ssh_packet_read_poll2\0",
@@ -2396,7 +2387,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                 if (*state).packlen < (1 as libc::c_int + 4 as libc::c_int) as libc::c_uint
                     || (*state).packlen > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_uint
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"packet.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                             b"ssh_packet_read_poll2\0",
@@ -2438,7 +2429,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                     .wrapping_sub(block_size);
             }
             if need.wrapping_rem(block_size) != 0 as libc::c_int as libc::c_uint {
-                sshlog(
+                crate::log::sshlog(
                     b"packet.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                         b"ssh_packet_read_poll2\0",
@@ -2484,7 +2475,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                 );
                 if r != 0 as libc::c_int {
                     if r == -(30 as libc::c_int) {
-                        sshlog(
+                        crate::log::sshlog(
                             b"packet.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                                 b"ssh_packet_read_poll2\0",
@@ -2543,7 +2534,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                                         if r != -(30 as libc::c_int) {
                                             current_block = 11636842938881510489;
                                         } else {
-                                            sshlog(
+                                            crate::log::sshlog(
                                                 b"packet.c\0" as *const u8 as *const libc::c_char,
                                                 (*::core::mem::transmute::<
                                                     &[u8; 22],
@@ -2600,7 +2591,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                                             ((*state).p_read.seqnr).wrapping_add(1);
                                         if (*state).p_read.seqnr == 0 as libc::c_int as libc::c_uint
                                         {
-                                            sshlog(
+                                            crate::log::sshlog(
                                                 b"packet.c\0" as *const u8 as *const libc::c_char,
                                                 (*::core::mem::transmute::<
                                                     &[u8; 22],
@@ -2705,7 +2696,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                                                     );
                                                     if !(r != 0 as libc::c_int) {
                                                         if ssh_packet_log_type(*typep) != 0 {
-                                                            sshlog(
+                                                            crate::log::sshlog(
                                                                 b"packet.c\0" as *const u8
                                                                     as *const libc::c_char,
                                                                 (*::core::mem::transmute::<
@@ -2811,7 +2802,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll_seqnr(
         }
         match *typep as libc::c_int {
             2 => {
-                sshlog(
+                crate::log::sshlog(
                     b"packet.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                         b"ssh_packet_read_poll_seqnr\0",
@@ -2839,7 +2830,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll_seqnr(
                     free(msg as *mut libc::c_void);
                     return r;
                 }
-                sshlog(
+                crate::log::sshlog(
                     b"packet.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                         b"ssh_packet_read_poll_seqnr\0",
@@ -2862,7 +2853,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll_seqnr(
                 } {
                     return r;
                 }
-                sshlog(
+                crate::log::sshlog(
                     b"packet.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                         b"ssh_packet_read_poll_seqnr\0",
@@ -2893,7 +2884,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll_seqnr(
                 if r != 0 as libc::c_int {
                     return r;
                 }
-                sshlog(
+                crate::log::sshlog(
                     b"packet.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
                         b"ssh_packet_read_poll_seqnr\0",
@@ -2991,7 +2982,7 @@ pub unsafe extern "C" fn ssh_packet_send_debug(
         fmt,
         args_0.as_va_list(),
     );
-    sshlog(
+    crate::log::sshlog(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"ssh_packet_send_debug\0"))
             .as_ptr(),
@@ -3268,7 +3259,7 @@ pub unsafe extern "C" fn ssh_packet_disconnect(
         fmt,
         args_0.as_va_list(),
     );
-    sshlog(
+    crate::log::sshlog(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"ssh_packet_disconnect\0"))
             .as_ptr(),
@@ -3457,7 +3448,7 @@ pub unsafe extern "C" fn ssh_packet_is_interactive(mut ssh: *mut ssh) -> libc::c
 pub unsafe extern "C" fn ssh_packet_set_maxsize(mut ssh: *mut ssh, mut s: u_int) -> libc::c_int {
     let mut state: *mut session_state = (*ssh).state;
     if (*state).set_maxsize_called != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"packet.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"ssh_packet_set_maxsize\0",
@@ -3476,7 +3467,7 @@ pub unsafe extern "C" fn ssh_packet_set_maxsize(mut ssh: *mut ssh, mut s: u_int)
     if s < (4 as libc::c_int * 1024 as libc::c_int) as libc::c_uint
         || s > (1024 as libc::c_int * 1024 as libc::c_int) as libc::c_uint
     {
-        sshlog(
+        crate::log::sshlog(
             b"packet.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                 b"ssh_packet_set_maxsize\0",
@@ -3492,7 +3483,7 @@ pub unsafe extern "C" fn ssh_packet_set_maxsize(mut ssh: *mut ssh, mut s: u_int)
         return -(1 as libc::c_int);
     }
     (*state).set_maxsize_called = 1 as libc::c_int;
-    sshlog(
+    crate::log::sshlog(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(b"ssh_packet_set_maxsize\0"))
             .as_ptr(),
@@ -3521,7 +3512,7 @@ pub unsafe extern "C" fn ssh_packet_set_rekey_limits(
     mut bytes: u_int64_t,
     mut seconds: u_int32_t,
 ) {
-    sshlog(
+    crate::log::sshlog(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
             b"ssh_packet_set_rekey_limits\0",
@@ -3563,7 +3554,7 @@ pub unsafe extern "C" fn ssh_packet_get_output(mut ssh: *mut ssh) -> *mut libc::
 }
 unsafe extern "C" fn ssh_packet_set_postauth(mut ssh: *mut ssh) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(b"ssh_packet_set_postauth\0"))
             .as_ptr(),
@@ -4067,7 +4058,7 @@ pub unsafe extern "C" fn ssh_packet_set_state(
     if sshbuf_len(m) != 0 {
         return -(4 as libc::c_int);
     }
-    sshlog(
+    crate::log::sshlog(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"ssh_packet_set_state\0"))
             .as_ptr(),
@@ -4243,7 +4234,7 @@ unsafe extern "C" fn ssh_packet_send_mux(mut ssh: *mut ssh) -> libc::c_int {
     cp = sshbuf_mutable_ptr((*state).outgoing_packet);
     type_0 = *cp.offset(5 as libc::c_int as isize);
     if ssh_packet_log_type(type_0) != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"packet.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"ssh_packet_send_mux\0"))
                 .as_ptr(),

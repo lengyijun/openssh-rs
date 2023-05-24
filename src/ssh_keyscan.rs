@@ -105,16 +105,7 @@ extern "C" {
     fn ssh_dispatch_run(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t) -> libc::c_int;
     fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
     fn cleanup_exit(_: libc::c_int) -> !;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshlogv(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -1253,7 +1244,7 @@ unsafe extern "C" fn tcpconnect(mut host: *mut libc::c_char) -> libc::c_int {
     hints.ai_socktype = SOCK_STREAM as libc::c_int;
     gaierr = getaddrinfo(host, strport.as_mut_ptr(), &mut hints, &mut aitop);
     if gaierr != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"tcpconnect\0")).as_ptr(),
             368 as libc::c_int,
@@ -1270,7 +1261,7 @@ unsafe extern "C" fn tcpconnect(mut host: *mut libc::c_char) -> libc::c_int {
     while !ai.is_null() {
         s = socket((*ai).ai_family, (*ai).ai_socktype, (*ai).ai_protocol);
         if s == -(1 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"tcpconnect\0"))
                     .as_ptr(),
@@ -1306,7 +1297,7 @@ unsafe extern "C" fn tcpconnect(mut host: *mut libc::c_char) -> libc::c_int {
             {
                 break;
             }
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"tcpconnect\0"))
                     .as_ptr(),
@@ -1372,7 +1363,7 @@ unsafe extern "C" fn conalloc(
             s,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"conalloc\0")).as_ptr(),
         412 as libc::c_int,
@@ -1503,7 +1494,7 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
     if n < 0 as libc::c_int
         || n as size_t >= ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"congreet\0")).as_ptr(),
             488 as libc::c_int,
@@ -1527,7 +1518,7 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
         n as size_t,
     ) != n as size_t
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"congreet\0")).as_ptr(),
             493 as libc::c_int,
@@ -1591,7 +1582,7 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
     if n == 0 as libc::c_int {
         match *__errno_location() {
             32 => {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"congreet\0"))
                         .as_ptr(),
@@ -1605,7 +1596,7 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
             }
             111 => {}
             _ => {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"congreet\0"))
                         .as_ptr(),
@@ -1627,7 +1618,7 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
             .as_mut_ptr()
             .offset(::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong as isize)
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"congreet\0")).as_ptr(),
             535 as libc::c_int,
@@ -1641,7 +1632,7 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
         return;
     }
     if *cp as libc::c_int != '\n' as i32 && *cp as libc::c_int != '\r' as i32 {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"congreet\0")).as_ptr(),
             540 as libc::c_int,
@@ -1681,7 +1672,7 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
         compat_banner((*c).c_ssh, remote_version.as_mut_ptr());
     }
     if ssh2_capable(remote_major, remote_minor) == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"congreet\0")).as_ptr(),
             554 as libc::c_int,
@@ -1723,7 +1714,7 @@ unsafe extern "C" fn conread(mut s: libc::c_int) {
         ((*c).c_len - (*c).c_off) as size_t,
     );
     if n == 0 as libc::c_int as libc::c_ulong {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"conread\0")).as_ptr(),
             576 as libc::c_int,
@@ -1808,7 +1799,7 @@ unsafe extern "C" fn conloop() {
         {
             continue;
         }
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"conloop\0")).as_ptr(),
             617 as libc::c_int,
@@ -1899,7 +1890,7 @@ unsafe extern "C" fn do_host(mut host: *mut libc::c_char) {
         do_one_host(host);
     } else {
         let mut current_block_11: u64;
-        sshlog(
+        crate::log::sshlog(
             b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_host\0")).as_ptr(),
             667 as libc::c_int,
@@ -1918,7 +1909,7 @@ unsafe extern "C" fn do_host(mut host: *mut libc::c_char) {
         loop {
             match current_block_11 {
                 9291219946876342924 => {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_host\0"))
                             .as_ptr(),
@@ -1941,7 +1932,7 @@ unsafe extern "C" fn do_host(mut host: *mut libc::c_char) {
                         current_block_11 = 9291219946876342924;
                         continue;
                     }
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"do_host\0"))
                             .as_ptr(),

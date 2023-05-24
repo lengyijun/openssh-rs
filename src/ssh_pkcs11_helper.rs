@@ -64,16 +64,7 @@ extern "C" {
     ) -> libc::c_int;
     fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -318,7 +309,7 @@ unsafe extern "C" fn lookup_key(mut k: *mut sshkey) -> *mut sshkey {
     let mut ki: *mut pkcs11_keyinfo = 0 as *mut pkcs11_keyinfo;
     ki = pkcs11_keylist.tqh_first;
     while !ki.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"lookup_key\0")).as_ptr(),
             102 as libc::c_int,
@@ -412,7 +403,7 @@ unsafe extern "C" fn process_add() {
         while i < nkeys {
             r = sshkey_to_blob(*keys.offset(i as isize), &mut blob, &mut blen);
             if r != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"process_add\0"))
                         .as_ptr(),
@@ -606,7 +597,7 @@ unsafe extern "C" fn process_sign() {
                 if ret != 0 as libc::c_int {
                     ok = 0 as libc::c_int;
                 } else {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                             b"process_sign\0",
@@ -622,7 +613,7 @@ unsafe extern "C" fn process_sign() {
                 }
                 slen = xslen as size_t;
             } else {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"process_sign\0"))
                         .as_ptr(),
@@ -702,7 +693,7 @@ unsafe extern "C" fn process() {
     cp = sshbuf_ptr(iqueue);
     msg_len = get_u32(cp as *const libc::c_void);
     if msg_len > 10240 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"process\0")).as_ptr(),
             269 as libc::c_int,
@@ -736,7 +727,7 @@ unsafe extern "C" fn process() {
         (buf_len as libc::c_uint).wrapping_sub(4 as libc::c_int as libc::c_uint) as u_int as u_int;
     match type_0 as libc::c_int {
         20 => {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"process\0")).as_ptr(),
                 280 as libc::c_int,
@@ -748,7 +739,7 @@ unsafe extern "C" fn process() {
             process_add();
         }
         21 => {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"process\0")).as_ptr(),
                 284 as libc::c_int,
@@ -760,7 +751,7 @@ unsafe extern "C" fn process() {
             process_del();
         }
         13 => {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"process\0")).as_ptr(),
                 288 as libc::c_int,
@@ -772,7 +763,7 @@ unsafe extern "C" fn process() {
             process_sign();
         }
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"process\0")).as_ptr(),
                 292 as libc::c_int,
@@ -785,7 +776,7 @@ unsafe extern "C" fn process() {
         }
     }
     if (buf_len as libc::c_ulong) < sshbuf_len(iqueue) {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"process\0")).as_ptr(),
             297 as libc::c_int,
@@ -798,7 +789,7 @@ unsafe extern "C" fn process() {
     }
     consumed = (buf_len as libc::c_ulong).wrapping_sub(sshbuf_len(iqueue)) as u_int;
     if msg_len < consumed {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"process\0")).as_ptr(),
             302 as libc::c_int,
@@ -966,7 +957,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     ::core::mem::size_of::<[libc::c_char; 16384]>() as libc::c_ulong,
                 );
                 if len == 0 as libc::c_int as libc::c_long {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0"))
                             .as_ptr(),
@@ -978,7 +969,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     );
                     cleanup_exit(0 as libc::c_int);
                 } else if len < 0 as libc::c_int as libc::c_long {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0"))
                             .as_ptr(),
@@ -1020,7 +1011,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     sshbuf_len(oqueue),
                 );
                 if len < 0 as libc::c_int as libc::c_long {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0"))
                             .as_ptr(),

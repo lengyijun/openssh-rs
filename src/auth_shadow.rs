@@ -6,16 +6,7 @@ extern "C" {
     fn time(__timer: *mut time_t) -> time_t;
     fn sshbuf_putf(buf: *mut sshbuf, fmt: *const libc::c_char, _: ...) -> libc::c_int;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -105,7 +96,7 @@ pub unsafe extern "C" fn auth_shadow_acctexpired(mut spw: *mut spwd) -> libc::c_
             * 60 as libc::c_int as libc::c_long
             * 60 as libc::c_int as libc::c_long);
     daysleft = ((*spw).sp_expire - today) as libc::c_longlong;
-    sshlog(
+    crate::log::sshlog(
         b"auth-shadow.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(b"auth_shadow_acctexpired\0"))
             .as_ptr(),
@@ -121,7 +112,7 @@ pub unsafe extern "C" fn auth_shadow_acctexpired(mut spw: *mut spwd) -> libc::c_
         daysleft,
     );
     if (*spw).sp_expire == -(1 as libc::c_int) as libc::c_long {
-        sshlog(
+        crate::log::sshlog(
             b"auth-shadow.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                 b"auth_shadow_acctexpired\0",
@@ -134,7 +125,7 @@ pub unsafe extern "C" fn auth_shadow_acctexpired(mut spw: *mut spwd) -> libc::c_
             b"account expiration disabled\0" as *const u8 as *const libc::c_char,
         );
     } else if daysleft < 0 as libc::c_int as libc::c_longlong {
-        sshlog(
+        crate::log::sshlog(
             b"auth-shadow.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                 b"auth_shadow_acctexpired\0",
@@ -149,7 +140,7 @@ pub unsafe extern "C" fn auth_shadow_acctexpired(mut spw: *mut spwd) -> libc::c_
         );
         return 1 as libc::c_int;
     } else if daysleft <= (*spw).sp_warn as libc::c_longlong {
-        sshlog(
+        crate::log::sshlog(
             b"auth-shadow.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
                 b"auth_shadow_acctexpired\0",
@@ -203,7 +194,7 @@ pub unsafe extern "C" fn auth_shadow_pwexpired(mut ctxt: *mut Authctxt) -> libc:
     let mut disabled: libc::c_int = 0 as libc::c_int;
     spw = getspnam(user as *mut libc::c_char);
     if spw.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"auth-shadow.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"auth_shadow_pwexpired\0"))
                 .as_ptr(),
@@ -220,7 +211,7 @@ pub unsafe extern "C" fn auth_shadow_pwexpired(mut ctxt: *mut Authctxt) -> libc:
         / (24 as libc::c_long
             * 60 as libc::c_int as libc::c_long
             * 60 as libc::c_int as libc::c_long);
-    sshlog(
+    crate::log::sshlog(
         b"auth-shadow.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"auth_shadow_pwexpired\0"))
             .as_ptr(),
@@ -235,7 +226,7 @@ pub unsafe extern "C" fn auth_shadow_pwexpired(mut ctxt: *mut Authctxt) -> libc:
     );
     daysleft = ((*spw).sp_lstchg + (*spw).sp_max - today) as libc::c_int;
     if disabled != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"auth-shadow.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"auth_shadow_pwexpired\0"))
                 .as_ptr(),
@@ -246,7 +237,7 @@ pub unsafe extern "C" fn auth_shadow_pwexpired(mut ctxt: *mut Authctxt) -> libc:
             b"password expiration disabled\0" as *const u8 as *const libc::c_char,
         );
     } else if (*spw).sp_lstchg == 0 as libc::c_int as libc::c_long {
-        sshlog(
+        crate::log::sshlog(
             b"auth-shadow.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"auth_shadow_pwexpired\0"))
                 .as_ptr(),
@@ -259,7 +250,7 @@ pub unsafe extern "C" fn auth_shadow_pwexpired(mut ctxt: *mut Authctxt) -> libc:
         );
         return 1 as libc::c_int;
     } else if (*spw).sp_max == -(1 as libc::c_int) as libc::c_long {
-        sshlog(
+        crate::log::sshlog(
             b"auth-shadow.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"auth_shadow_pwexpired\0"))
                 .as_ptr(),
@@ -270,7 +261,7 @@ pub unsafe extern "C" fn auth_shadow_pwexpired(mut ctxt: *mut Authctxt) -> libc:
             b"password expiration disabled\0" as *const u8 as *const libc::c_char,
         );
     } else if daysleft < 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"auth-shadow.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"auth_shadow_pwexpired\0"))
                 .as_ptr(),
@@ -284,7 +275,7 @@ pub unsafe extern "C" fn auth_shadow_pwexpired(mut ctxt: *mut Authctxt) -> libc:
         );
         return 1 as libc::c_int;
     } else if daysleft as libc::c_long <= (*spw).sp_warn {
-        sshlog(
+        crate::log::sshlog(
             b"auth-shadow.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"auth_shadow_pwexpired\0"))
                 .as_ptr(),

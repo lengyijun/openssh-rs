@@ -113,16 +113,7 @@ extern "C" {
         _: *mut *mut sshkey_sig_details,
     ) -> libc::c_int;
     fn tohex(_: *const libc::c_void, _: size_t) -> *mut libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn bitmap_new() -> *mut bitmap;
     fn bitmap_free(b: *mut bitmap);
     fn bitmap_test_bit(b: *mut bitmap, n: u_int) -> libc::c_int;
@@ -2289,7 +2280,7 @@ pub unsafe extern "C" fn ssh_krl_revoke_key_explicit(
     let mut blob: *mut u_char = 0 as *mut u_char;
     let mut len: size_t = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"krl.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
             b"ssh_krl_revoke_key_explicit\0",
@@ -2332,7 +2323,7 @@ pub unsafe extern "C" fn ssh_krl_revoke_key_sha1(
     mut p: *const u_char,
     mut len: size_t,
 ) -> libc::c_int {
-    sshlog(
+    crate::log::sshlog(
         b"krl.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(b"ssh_krl_revoke_key_sha1\0"))
             .as_ptr(),
@@ -2352,7 +2343,7 @@ pub unsafe extern "C" fn ssh_krl_revoke_key_sha256(
     mut p: *const u_char,
     mut len: size_t,
 ) -> libc::c_int {
-    sshlog(
+    crate::log::sshlog(
         b"krl.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(b"ssh_krl_revoke_key_sha256\0"))
             .as_ptr(),
@@ -2672,7 +2663,7 @@ unsafe extern "C" fn revoked_certs_generate(
                             if ((*rs).lo).wrapping_sub(bitmap_start)
                                 > 2147483647 as libc::c_int as libc::c_ulong
                             {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"krl.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                                         b"revoked_certs_generate\0",
@@ -3206,7 +3197,7 @@ unsafe extern "C" fn parse_revoked_certs(
                                         && serial_lo.wrapping_add(serial)
                                             == 0 as libc::c_int as libc::c_ulong
                                     {
-                                        sshlog(
+                                        crate::log::sshlog(
                                             b"krl.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
                                                 &[u8; 20],
@@ -3263,7 +3254,7 @@ unsafe extern "C" fn parse_revoked_certs(
                         }
                     }
                     _ => {
-                        sshlog(
+                        crate::log::sshlog(
                             b"krl.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                 b"parse_revoked_certs\0",
@@ -3285,7 +3276,7 @@ unsafe extern "C" fn parse_revoked_certs(
                 if !(sshbuf_len(subsect) > 0 as libc::c_int as libc::c_ulong) {
                     continue;
                 }
-                sshlog(
+                crate::log::sshlog(
                     b"krl.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                         b"parse_revoked_certs\0",
@@ -3332,7 +3323,7 @@ unsafe extern "C" fn blob_section(
             return r;
         }
         if expected_len != 0 as libc::c_int as libc::c_ulong && rlen != expected_len {
-            sshlog(
+            crate::log::sshlog(
                 b"krl.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"blob_section\0"))
                     .as_ptr(),
@@ -3390,7 +3381,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                 .wrapping_sub(1 as libc::c_int as libc::c_ulong),
         ) != 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"krl.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"ssh_krl_from_blob\0"))
                 .as_ptr(),
@@ -3414,7 +3405,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
         if !(r != 0 as libc::c_int) {
             krl = ssh_krl_init();
             if krl.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"krl.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(
                         b"ssh_krl_from_blob\0",
@@ -3460,7 +3451,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                 timestamp.as_mut_ptr(),
                                 ::core::mem::size_of::<[libc::c_char; 64]>() as libc::c_ulong,
                             );
-                            sshlog(
+                            crate::log::sshlog(
                                 b"krl.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(
                                     b"ssh_krl_from_blob\0",
@@ -3503,7 +3494,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                         if !(sig_seen != 0) {
                                             continue;
                                         }
-                                        sshlog(
+                                        crate::log::sshlog(
                                             b"krl.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
                                                 &[u8; 18],
@@ -3566,7 +3557,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                                         key,
                                                     ) != 0
                                                     {
-                                                        sshlog(
+                                                        crate::log::sshlog(
                                                             b"krl.c\0" as *const u8 as *const libc::c_char,
                                                             (*::core::mem::transmute::<
                                                                 &[u8; 18],
@@ -3705,7 +3696,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                                                 }
                                                             }
                                                             _ => {
-                                                                sshlog(
+                                                                crate::log::sshlog(
                                                                     b"krl.c\0" as *const u8
                                                                         as *const libc::c_char,
                                                                     (*::core::mem::transmute::<
@@ -3735,7 +3726,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                                         {
                                                             continue;
                                                         }
-                                                        sshlog(
+                                                        crate::log::sshlog(
                                                             b"krl.c\0" as *const u8
                                                                 as *const libc::c_char,
                                                             (*::core::mem::transmute::<
@@ -3781,7 +3772,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                                                 i;
                                                             }
                                                             if nca_used != 0 && sig_seen == 0 {
-                                                                sshlog(
+                                                                crate::log::sshlog(
                                                                     b"krl.c\0" as *const u8 as *const libc::c_char,
                                                                     (*::core::mem::transmute::<
                                                                         &[u8; 18],
@@ -3837,7 +3828,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                                                     }
                                                                     if sig_seen == 0 {
                                                                         r = -(21 as libc::c_int);
-                                                                        sshlog(
+                                                                        crate::log::sshlog(
                                                                             b"krl.c\0" as *const u8 as *const libc::c_char,
                                                                             (*::core::mem::transmute::<
                                                                                 &[u8; 18],
@@ -4040,7 +4031,7 @@ pub unsafe extern "C" fn ssh_krl_check_key(
         return r;
     }
     if sshkey_is_cert(key) != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"krl.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"ssh_krl_check_key\0"))
                 .as_ptr(),
@@ -4079,7 +4070,7 @@ pub unsafe extern "C" fn ssh_krl_file_contains_key(
             0 as libc::c_int as size_t,
         );
         if !(r != 0 as libc::c_int) {
-            sshlog(
+            crate::log::sshlog(
                 b"krl.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"ssh_krl_file_contains_key\0",
@@ -4149,7 +4140,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut FILE) -> li
         r = sshkey_from_blob((*rb).blob, (*rb).len, &mut key);
         if r != 0 as libc::c_int {
             ret = -(4 as libc::c_int);
-            sshlog(
+            crate::log::sshlog(
                 b"krl.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"krl_dump\0")).as_ptr(),
                 1383 as libc::c_int,
@@ -4162,7 +4153,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut FILE) -> li
             fp = sshkey_fingerprint(key, 2 as libc::c_int, SSH_FP_DEFAULT);
             if fp.is_null() {
                 ret = -(4 as libc::c_int);
-                sshlog(
+                crate::log::sshlog(
                     b"krl.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"krl_dump\0"))
                         .as_ptr(),
@@ -4218,7 +4209,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut FILE) -> li
             fp = sshkey_fingerprint((*rc).ca_key, 2 as libc::c_int, SSH_FP_DEFAULT);
             if fp.is_null() {
                 ret = -(4 as libc::c_int);
-                sshlog(
+                crate::log::sshlog(
                     b"krl.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"krl_dump\0"))
                         .as_ptr(),

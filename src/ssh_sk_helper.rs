@@ -31,16 +31,7 @@ extern "C" {
     ) -> libc::c_int;
     fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
     fn log_level_name(_: LogLevel) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
@@ -261,7 +252,7 @@ unsafe extern "C" fn reply_error(
     let mut resp: *mut sshbuf = 0 as *mut sshbuf;
     ap = args.clone();
     xvasprintf(&mut msg, fmt, ap.as_va_list());
-    sshlog(
+    crate::log::sshlog(
         b"ssh-sk-helper.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"reply_error\0")).as_ptr(),
         65 as libc::c_int,
@@ -405,7 +396,7 @@ unsafe extern "C" fn process_sign(mut req: *mut sshbuf) -> *mut sshbuf {
             sshkey_ssh_name(key),
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-sk-helper.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"process_sign\0")).as_ptr(),
         121 as libc::c_int,
@@ -780,7 +771,7 @@ unsafe extern "C" fn process_load_resident(mut req: *mut sshbuf) -> *mut sshbuf 
         }
         i = 0 as libc::c_int as size_t;
         while i < nsrks {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-sk-helper.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
                     b"process_load_resident\0",
@@ -948,7 +939,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         );
     }
     close(in_0);
-    sshlog(
+    crate::log::sshlog(
         b"ssh-sk-helper.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
         318 as libc::c_int,
@@ -1039,7 +1030,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         }
     }
     sshbuf_free(req);
-    sshlog(
+    crate::log::sshlog(
         b"ssh-sk-helper.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
         349 as libc::c_int,

@@ -156,16 +156,7 @@ extern "C" {
         _: ::core::ffi::VaList,
     ) -> libc::c_int;
     fn cleanup_exit(_: libc::c_int) -> !;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
@@ -711,7 +702,7 @@ pub unsafe extern "C" fn set_nonblock(mut fd: libc::c_int) -> libc::c_int {
     let mut val: libc::c_int = 0;
     val = fcntl(fd, 3 as libc::c_int);
     if val == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"set_nonblock\0")).as_ptr(),
             111 as libc::c_int,
@@ -725,7 +716,7 @@ pub unsafe extern "C" fn set_nonblock(mut fd: libc::c_int) -> libc::c_int {
         return -(1 as libc::c_int);
     }
     if val & 0o4000 as libc::c_int != 0 {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"set_nonblock\0")).as_ptr(),
             115 as libc::c_int,
@@ -737,7 +728,7 @@ pub unsafe extern "C" fn set_nonblock(mut fd: libc::c_int) -> libc::c_int {
         );
         return 0 as libc::c_int;
     }
-    sshlog(
+    crate::log::sshlog(
         b"misc.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"set_nonblock\0")).as_ptr(),
         118 as libc::c_int,
@@ -749,7 +740,7 @@ pub unsafe extern "C" fn set_nonblock(mut fd: libc::c_int) -> libc::c_int {
     );
     val |= 0o4000 as libc::c_int;
     if fcntl(fd, 4 as libc::c_int, val) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"set_nonblock\0")).as_ptr(),
             122 as libc::c_int,
@@ -768,7 +759,7 @@ pub unsafe extern "C" fn unset_nonblock(mut fd: libc::c_int) -> libc::c_int {
     let mut val: libc::c_int = 0;
     val = fcntl(fd, 3 as libc::c_int);
     if val == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"unset_nonblock\0"))
                 .as_ptr(),
@@ -783,7 +774,7 @@ pub unsafe extern "C" fn unset_nonblock(mut fd: libc::c_int) -> libc::c_int {
         return -(1 as libc::c_int);
     }
     if val & 0o4000 as libc::c_int == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"unset_nonblock\0"))
                 .as_ptr(),
@@ -796,7 +787,7 @@ pub unsafe extern "C" fn unset_nonblock(mut fd: libc::c_int) -> libc::c_int {
         );
         return 0 as libc::c_int;
     }
-    sshlog(
+    crate::log::sshlog(
         b"misc.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"unset_nonblock\0")).as_ptr(),
         142 as libc::c_int,
@@ -808,7 +799,7 @@ pub unsafe extern "C" fn unset_nonblock(mut fd: libc::c_int) -> libc::c_int {
     );
     val &= !(0o4000 as libc::c_int);
     if fcntl(fd, 4 as libc::c_int, val) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"unset_nonblock\0"))
                 .as_ptr(),
@@ -842,7 +833,7 @@ pub unsafe extern "C" fn set_nodelay(mut fd: libc::c_int) {
         &mut optlen,
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"set_nodelay\0")).as_ptr(),
             169 as libc::c_int,
@@ -855,7 +846,7 @@ pub unsafe extern "C" fn set_nodelay(mut fd: libc::c_int) {
         return;
     }
     if opt == 1 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"set_nodelay\0")).as_ptr(),
             173 as libc::c_int,
@@ -868,7 +859,7 @@ pub unsafe extern "C" fn set_nodelay(mut fd: libc::c_int) {
         return;
     }
     opt = 1 as libc::c_int;
-    sshlog(
+    crate::log::sshlog(
         b"misc.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"set_nodelay\0")).as_ptr(),
         177 as libc::c_int,
@@ -886,7 +877,7 @@ pub unsafe extern "C" fn set_nodelay(mut fd: libc::c_int) {
         ::core::mem::size_of::<libc::c_int>() as libc::c_ulong as socklen_t,
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"set_nodelay\0")).as_ptr(),
             179 as libc::c_int,
@@ -908,7 +899,7 @@ pub unsafe extern "C" fn set_reuseaddr(mut fd: libc::c_int) -> libc::c_int {
         ::core::mem::size_of::<libc::c_int>() as libc::c_ulong as socklen_t,
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"set_reuseaddr\0"))
                 .as_ptr(),
@@ -979,7 +970,7 @@ pub unsafe extern "C" fn set_sock_tos(mut fd: libc::c_int, mut tos: libc::c_int)
     match af {
         -1 => {}
         2 => {
-            sshlog(
+            crate::log::sshlog(
                 b"misc.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"set_sock_tos\0"))
                     .as_ptr(),
@@ -999,7 +990,7 @@ pub unsafe extern "C" fn set_sock_tos(mut fd: libc::c_int, mut tos: libc::c_int)
                 ::core::mem::size_of::<libc::c_int>() as libc::c_ulong as socklen_t,
             ) == -(1 as libc::c_int)
             {
-                sshlog(
+                crate::log::sshlog(
                     b"misc.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"set_sock_tos\0"))
                         .as_ptr(),
@@ -1015,7 +1006,7 @@ pub unsafe extern "C" fn set_sock_tos(mut fd: libc::c_int, mut tos: libc::c_int)
             }
         }
         10 => {
-            sshlog(
+            crate::log::sshlog(
                 b"misc.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"set_sock_tos\0"))
                     .as_ptr(),
@@ -1035,7 +1026,7 @@ pub unsafe extern "C" fn set_sock_tos(mut fd: libc::c_int, mut tos: libc::c_int)
                 ::core::mem::size_of::<libc::c_int>() as libc::c_ulong as socklen_t,
             ) == -(1 as libc::c_int)
             {
-                sshlog(
+                crate::log::sshlog(
                     b"misc.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"set_sock_tos\0"))
                         .as_ptr(),
@@ -1052,7 +1043,7 @@ pub unsafe extern "C" fn set_sock_tos(mut fd: libc::c_int, mut tos: libc::c_int)
             }
         }
         _ => {
-            sshlog(
+            crate::log::sshlog(
                 b"misc.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"set_sock_tos\0"))
                     .as_ptr(),
@@ -1165,7 +1156,7 @@ pub unsafe extern "C" fn timeout_connect(
         &mut optlen,
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"timeout_connect\0"))
                 .as_ptr(),
@@ -1485,7 +1476,7 @@ pub unsafe extern "C" fn put_host_port(
             strerror(*__errno_location()),
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"misc.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"put_host_port\0")).as_ptr(),
         673 as libc::c_int,
@@ -2144,7 +2135,7 @@ pub unsafe extern "C" fn tilde_expand(
     if !user.is_null() {
         pw = getpwnam(user);
         if pw.is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"misc.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"tilde_expand\0"))
                     .as_ptr(),
@@ -2162,7 +2153,7 @@ pub unsafe extern "C" fn tilde_expand(
     } else {
         pw = getpwuid(uid);
         if pw.is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"misc.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"tilde_expand\0"))
                     .as_ptr(),
@@ -2202,7 +2193,7 @@ pub unsafe extern "C" fn tilde_expand(
                 },
             );
             if r <= 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"misc.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"tilde_expand\0"))
                         .as_ptr(),
@@ -2213,7 +2204,7 @@ pub unsafe extern "C" fn tilde_expand(
                     b"xasprintf failed\0" as *const u8 as *const libc::c_char,
                 );
             } else if r >= 4096 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"misc.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"tilde_expand\0"))
                         .as_ptr(),
@@ -2366,7 +2357,7 @@ unsafe extern "C" fn vdollar_percent_expand(
             string = string.offset(2 as libc::c_int as isize);
             varend = strchr(string, '}' as i32);
             if varend.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"misc.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                         b"vdollar_percent_expand\0",
@@ -2385,7 +2376,7 @@ unsafe extern "C" fn vdollar_percent_expand(
             } else {
                 len = varend.offset_from(string) as libc::c_long as size_t;
                 if len == 0 as libc::c_int as libc::c_ulong {
-                    sshlog(
+                    crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                             b"vdollar_percent_expand\0",
@@ -2409,7 +2400,7 @@ unsafe extern "C" fn vdollar_percent_expand(
                     );
                     val = getenv(var);
                     if val.is_null() {
-                        sshlog(
+                        crate::log::sshlog(
                             b"misc.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                                 b"vdollar_percent_expand\0",
@@ -2424,7 +2415,7 @@ unsafe extern "C" fn vdollar_percent_expand(
                         );
                         missingvar = 1 as libc::c_int;
                     } else {
-                        sshlog(
+                        crate::log::sshlog(
                             b"misc.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                                 b"vdollar_percent_expand\0",
@@ -2468,7 +2459,7 @@ unsafe extern "C" fn vdollar_percent_expand(
                     current_block = 16144055239010142754;
                 } else {
                     if *string as libc::c_int == '\0' as i32 {
-                        sshlog(
+                        crate::log::sshlog(
                             b"misc.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                                 b"vdollar_percent_expand\0",
@@ -2512,7 +2503,7 @@ unsafe extern "C" fn vdollar_percent_expand(
                             }
                         }
                         if i >= num_keys {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"misc.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
                                     b"vdollar_percent_expand\0",
@@ -2902,7 +2893,7 @@ pub unsafe extern "C" fn monotime_ts(mut ts: *mut timespec) {
         if clock_gettime(0 as libc::c_int, ts) == 0 as libc::c_int {
             return;
         }
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"monotime_ts\0")).as_ptr(),
             1680 as libc::c_int,
@@ -3350,7 +3341,7 @@ pub unsafe extern "C" fn unix_listener(
         ::core::mem::size_of::<[libc::c_char; 108]>() as libc::c_ulong,
     ) >= ::core::mem::size_of::<[libc::c_char; 108]>() as libc::c_ulong
     {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"unix_listener\0"))
                 .as_ptr(),
@@ -3371,7 +3362,7 @@ pub unsafe extern "C" fn unix_listener(
     );
     if sock == -(1 as libc::c_int) {
         saved_errno = *__errno_location();
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"unix_listener\0"))
                 .as_ptr(),
@@ -3387,7 +3378,7 @@ pub unsafe extern "C" fn unix_listener(
     }
     if unlink_first == 1 as libc::c_int {
         if unlink(path) != 0 as libc::c_int && *__errno_location() != 2 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"misc.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"unix_listener\0"))
                     .as_ptr(),
@@ -3410,7 +3401,7 @@ pub unsafe extern "C" fn unix_listener(
     ) == -(1 as libc::c_int)
     {
         saved_errno = *__errno_location();
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"unix_listener\0"))
                 .as_ptr(),
@@ -3428,7 +3419,7 @@ pub unsafe extern "C" fn unix_listener(
     }
     if listen(sock, backlog) == -(1 as libc::c_int) {
         saved_errno = *__errno_location();
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"unix_listener\0"))
                 .as_ptr(),
@@ -3449,7 +3440,7 @@ pub unsafe extern "C" fn unix_listener(
 }
 pub unsafe extern "C" fn sock_set_v6only(mut s: libc::c_int) {
     let mut on: libc::c_int = 1 as libc::c_int;
-    sshlog(
+    crate::log::sshlog(
         b"misc.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"sock_set_v6only\0")).as_ptr(),
         1921 as libc::c_int,
@@ -3468,7 +3459,7 @@ pub unsafe extern "C" fn sock_set_v6only(mut s: libc::c_int) {
         ::core::mem::size_of::<libc::c_int>() as libc::c_ulong as socklen_t,
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"sock_set_v6only\0"))
                 .as_ptr(),
@@ -3533,7 +3524,7 @@ pub unsafe extern "C" fn daemonized() -> libc::c_int {
     if getsid(0 as libc::c_int) != getpid() {
         return 0 as libc::c_int;
     }
-    sshlog(
+    crate::log::sshlog(
         b"misc.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"daemonized\0")).as_ptr(),
         1978 as libc::c_int,
@@ -3836,7 +3827,7 @@ pub unsafe extern "C" fn exited_cleanly(
     let mut status: libc::c_int = 0;
     while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
         if *__errno_location() != 4 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"misc.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"exited_cleanly\0"))
                     .as_ptr(),
@@ -3855,7 +3846,7 @@ pub unsafe extern "C" fn exited_cleanly(
         >> 1 as libc::c_int
         > 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"exited_cleanly\0"))
                 .as_ptr(),
@@ -3870,7 +3861,7 @@ pub unsafe extern "C" fn exited_cleanly(
         );
         return -(1 as libc::c_int);
     } else if (status & 0xff00 as libc::c_int) >> 8 as libc::c_int != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"exited_cleanly\0"))
                 .as_ptr(),
@@ -4059,7 +4050,7 @@ pub unsafe extern "C" fn child_set_env(
     let mut i: u_int = 0;
     let mut namelen: u_int = 0;
     if !(strchr(name, '=' as i32)).is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"child_set_env\0"))
                 .as_ptr(),
@@ -4643,7 +4634,7 @@ pub unsafe extern "C" fn ssh_signal(mut signum: libc::c_int, mut handler: sshsig
         sa.sa_flags = 0x10000000 as libc::c_int;
     }
     if sigaction(signum, &mut sa, &mut osa) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"ssh_signal\0")).as_ptr(),
             2595 as libc::c_int,
@@ -4672,7 +4663,7 @@ pub unsafe extern "C" fn stdfd_devnull(
         0o2 as libc::c_int,
     );
     if devnull == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"stdfd_devnull\0"))
                 .as_ptr(),
@@ -4690,7 +4681,7 @@ pub unsafe extern "C" fn stdfd_devnull(
         || do_stdout != 0 && dup2(devnull, 1 as libc::c_int) == -(1 as libc::c_int)
         || do_stderr != 0 && dup2(devnull, 2 as libc::c_int) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"stdfd_devnull\0"))
                 .as_ptr(),
@@ -4756,7 +4747,7 @@ pub unsafe extern "C" fn subprocess(
     let mut nenv: u_int = 0 as libc::c_int as u_int;
     let mut env: *mut *mut libc::c_char = 0 as *mut *mut libc::c_char;
     if drop_privs.is_some() && (pw.is_null() || restore_privs.is_none()) {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0")).as_ptr(),
             2646 as libc::c_int,
@@ -4772,7 +4763,7 @@ pub unsafe extern "C" fn subprocess(
         pw = getpwuid(getuid());
         pw.is_null()
     } {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0")).as_ptr(),
             2650 as libc::c_int,
@@ -4787,7 +4778,7 @@ pub unsafe extern "C" fn subprocess(
     if !child.is_null() {
         *child = 0 as *mut FILE;
     }
-    sshlog(
+    crate::log::sshlog(
         b"misc.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0")).as_ptr(),
         2657 as libc::c_int,
@@ -4804,7 +4795,7 @@ pub unsafe extern "C" fn subprocess(
         && flags & ((1 as libc::c_int) << 1 as libc::c_int) as libc::c_uint
             != 0 as libc::c_int as libc::c_uint
     {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0")).as_ptr(),
             2662 as libc::c_int,
@@ -4819,7 +4810,7 @@ pub unsafe extern "C" fn subprocess(
         == 0 as libc::c_int as libc::c_uint) as libc::c_int
         != (child == 0 as *mut libc::c_void as *mut *mut FILE) as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0")).as_ptr(),
             2666 as libc::c_int,
@@ -4831,7 +4822,7 @@ pub unsafe extern "C" fn subprocess(
         return 0 as libc::c_int;
     }
     if path_absolute(*av.offset(0 as libc::c_int as isize)) == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0")).as_ptr(),
             2675 as libc::c_int,
@@ -4847,7 +4838,7 @@ pub unsafe extern "C" fn subprocess(
         drop_privs.expect("non-null function pointer")(pw);
     }
     if stat(*av.offset(0 as libc::c_int as isize), &mut st) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0")).as_ptr(),
             2682 as libc::c_int,
@@ -4870,7 +4861,7 @@ pub unsafe extern "C" fn subprocess(
             ::core::mem::size_of::<[libc::c_char; 512]>() as libc::c_ulong,
         ) != 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0")).as_ptr(),
             2687 as libc::c_int,
@@ -4883,7 +4874,7 @@ pub unsafe extern "C" fn subprocess(
             errmsg.as_mut_ptr(),
         );
     } else if pipe(p.as_mut_ptr()) == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0")).as_ptr(),
             2692 as libc::c_int,
@@ -4901,7 +4892,7 @@ pub unsafe extern "C" fn subprocess(
         pid = fork();
         match pid {
             -1 => {
-                sshlog(
+                crate::log::sshlog(
                     b"misc.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0"))
                         .as_ptr(),
@@ -4972,7 +4963,7 @@ pub unsafe extern "C" fn subprocess(
                     0o2 as libc::c_int,
                 );
                 if devnull == -(1 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"subprocess\0",
@@ -4990,7 +4981,7 @@ pub unsafe extern "C" fn subprocess(
                     _exit(1 as libc::c_int);
                 }
                 if dup2(devnull, 0 as libc::c_int) == -(1 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"subprocess\0",
@@ -5017,7 +5008,7 @@ pub unsafe extern "C" fn subprocess(
                     fd = devnull;
                 }
                 if fd != -(1 as libc::c_int) && dup2(fd, 1 as libc::c_int) == -(1 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"subprocess\0",
@@ -5037,7 +5028,7 @@ pub unsafe extern "C" fn subprocess(
                 if geteuid() == 0 as libc::c_int as libc::c_uint
                     && initgroups((*pw).pw_name, (*pw).pw_gid) == -(1 as libc::c_int)
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"subprocess\0",
@@ -5056,7 +5047,7 @@ pub unsafe extern "C" fn subprocess(
                     _exit(1 as libc::c_int);
                 }
                 if setresgid((*pw).pw_gid, (*pw).pw_gid, (*pw).pw_gid) == -(1 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"subprocess\0",
@@ -5074,7 +5065,7 @@ pub unsafe extern "C" fn subprocess(
                     _exit(1 as libc::c_int);
                 }
                 if setresuid((*pw).pw_uid, (*pw).pw_uid, (*pw).pw_uid) == -(1 as libc::c_int) {
-                    sshlog(
+                    crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"subprocess\0",
@@ -5094,7 +5085,7 @@ pub unsafe extern "C" fn subprocess(
                 if flags & 1 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint
                     && dup2(0 as libc::c_int, 2 as libc::c_int) == -(1 as libc::c_int)
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"subprocess\0",
@@ -5122,7 +5113,7 @@ pub unsafe extern "C" fn subprocess(
                         av as *const *mut libc::c_char,
                     );
                 }
-                sshlog(
+                crate::log::sshlog(
                     b"misc.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0"))
                         .as_ptr(),
@@ -5155,7 +5146,7 @@ pub unsafe extern "C" fn subprocess(
                 b"r\0" as *const u8 as *const libc::c_char,
             );
             if f.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"misc.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0"))
                         .as_ptr(),
@@ -5175,7 +5166,7 @@ pub unsafe extern "C" fn subprocess(
                 return 0 as libc::c_int;
             }
         }
-        sshlog(
+        crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0")).as_ptr(),
             2791 as libc::c_int,

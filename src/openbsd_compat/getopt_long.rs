@@ -4,16 +4,7 @@ extern "C" {
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
 }
 pub type size_t = libc::c_ulong;
 #[derive(Copy, Clone)]
@@ -162,7 +153,7 @@ unsafe extern "C" fn parse_long_options(
                     match_0 = i;
                 } else {
                     if BSDopterr != 0 && *options as libc::c_int != ':' as i32 {
-                        sshlog(
+                        crate::log::sshlog(
                             b"getopt_long.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                                 b"parse_long_options\0",
@@ -190,7 +181,7 @@ unsafe extern "C" fn parse_long_options(
             && !has_equal.is_null()
         {
             if BSDopterr != 0 && *options as libc::c_int != ':' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"getopt_long.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"parse_long_options\0",
@@ -231,7 +222,7 @@ unsafe extern "C" fn parse_long_options(
             && BSDoptarg.is_null()
         {
             if BSDopterr != 0 && *options as libc::c_int != ':' as i32 {
-                sshlog(
+                crate::log::sshlog(
                     b"getopt_long.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"parse_long_options\0",
@@ -265,7 +256,7 @@ unsafe extern "C" fn parse_long_options(
             return -(1 as libc::c_int);
         }
         if BSDopterr != 0 && *options as libc::c_int != ':' as i32 {
-            sshlog(
+            crate::log::sshlog(
                 b"getopt_long.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"parse_long_options\0",
@@ -428,7 +419,7 @@ unsafe extern "C" fn getopt_internal(
             BSDoptind;
         }
         if BSDopterr != 0 && *options as libc::c_int != ':' as i32 {
-            sshlog(
+            crate::log::sshlog(
                 b"getopt_long.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"getopt_internal\0"))
                     .as_ptr(),
@@ -452,7 +443,7 @@ unsafe extern "C" fn getopt_internal(
             if BSDoptind >= nargc {
                 place = b"\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
                 if BSDopterr != 0 && *options as libc::c_int != ':' as i32 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"getopt_long.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(
                             b"getopt_internal\0",
@@ -495,7 +486,7 @@ unsafe extern "C" fn getopt_internal(
             if BSDoptind >= nargc {
                 place = b"\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
                 if BSDopterr != 0 && *options as libc::c_int != ':' as i32 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"getopt_long.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(
                             b"getopt_internal\0",

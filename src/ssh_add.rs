@@ -70,16 +70,7 @@ extern "C" {
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -538,7 +529,7 @@ unsafe extern "C" fn delete_stdin(
         }
         r = sshkey_read(key, &mut cp);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-add.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"delete_stdin\0"))
                     .as_ptr(),
@@ -602,7 +593,7 @@ unsafe extern "C" fn delete_file(
         r = sshkey_load_public(certpath, &mut cert, &mut comment);
         if r != 0 as libc::c_int {
             if r != -(24 as libc::c_int) || *__errno_location() != 2 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-add.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"delete_file\0"))
                         .as_ptr(),
@@ -978,7 +969,7 @@ unsafe extern "C" fn add_file(
                                                     if r != -(24 as libc::c_int)
                                                         || *__errno_location() != 2 as libc::c_int
                                                     {
-                                                        sshlog(
+                                                        crate::log::sshlog(
                                                             b"ssh-add.c\0" as *const u8
                                                                 as *const libc::c_char,
                                                             (*::core::mem::transmute::<
@@ -999,7 +990,7 @@ unsafe extern "C" fn add_file(
                                                         );
                                                     }
                                                 } else if sshkey_equal_public(cert, private) == 0 {
-                                                    sshlog(
+                                                    crate::log::sshlog(
                                                         b"ssh-add.c\0" as *const u8 as *const libc::c_char,
                                                         (*::core::mem::transmute::<
                                                             &[u8; 9],
@@ -1019,7 +1010,7 @@ unsafe extern "C" fn add_file(
                                                 } else {
                                                     r = sshkey_to_certified(private);
                                                     if r != 0 as libc::c_int {
-                                                        sshlog(
+                                                        crate::log::sshlog(
                                                             b"ssh-add.c\0" as *const u8
                                                                 as *const libc::c_char,
                                                             (*::core::mem::transmute::<
@@ -1040,7 +1031,7 @@ unsafe extern "C" fn add_file(
                                                     } else {
                                                         r = sshkey_cert_copy(cert, private);
                                                         if r != 0 as libc::c_int {
-                                                            sshlog(
+                                                            crate::log::sshlog(
                                                                 b"ssh-add.c\0" as *const u8
                                                                     as *const libc::c_char,
                                                                 (*::core::mem::transmute::<
@@ -1072,7 +1063,7 @@ unsafe extern "C" fn add_file(
                                                                 ndest_constraints,
                                                             );
                                                             if r != 0 as libc::c_int {
-                                                                sshlog(
+                                                                crate::log::sshlog(
                                                                     b"ssh-add.c\0" as *const u8 as *const libc::c_char,
                                                                     (*::core::mem::transmute::<
                                                                         &[u8; 9],
@@ -1212,7 +1203,7 @@ unsafe extern "C" fn test_key(
     let mut data: [libc::c_char; 1024] = [0; 1024];
     r = sshkey_load_public(filename, &mut key, 0 as *mut *mut libc::c_char);
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-add.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"test_key\0")).as_ptr(),
             486 as libc::c_int,
@@ -1242,7 +1233,7 @@ unsafe extern "C" fn test_key(
         0 as libc::c_int as u_int,
     );
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-add.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"test_key\0")).as_ptr(),
             494 as libc::c_int,
@@ -1264,7 +1255,7 @@ unsafe extern "C" fn test_key(
             0 as *mut *mut sshkey_sig_details,
         );
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-add.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"test_key\0")).as_ptr(),
                 499 as libc::c_int,
@@ -1440,7 +1431,7 @@ unsafe extern "C" fn load_resident_keys(
         &mut nsrks,
     );
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-add.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"load_resident_keys\0"))
                 .as_ptr(),
@@ -1482,7 +1473,7 @@ unsafe extern "C" fn load_resident_keys(
             ndest_constraints,
         );
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-add.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"load_resident_keys\0",
@@ -1662,7 +1653,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
     i = 0 as libc::c_int as size_t;
     while !(*hostkey_files.offset(i as isize)).is_null() {
         path = tilde_expand_filename(*hostkey_files.offset(i as isize), getuid());
-        sshlog(
+        crate::log::sshlog(
             b"ssh-add.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                 b"parse_dest_constraint_hop\0",
@@ -1695,7 +1686,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
         if !((*hke).marker as libc::c_uint != MRK_NONE as libc::c_int as libc::c_uint
             && want_ca == 0)
         {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-add.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
                     b"parse_dest_constraint_hop\0",
@@ -1823,7 +1814,7 @@ unsafe extern "C" fn parse_dest_constraint(
             );
         }
     }
-    sshlog(
+    crate::log::sshlog(
         b"ssh-add.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"parse_dest_constraint\0"))
             .as_ptr(),

@@ -150,16 +150,7 @@ extern "C" {
     fn sshbuf_put_string(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn log_level_get() -> LogLevel;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -359,7 +350,7 @@ unsafe extern "C" fn send_msg(mut m: *mut sshbuf) {
             sshbuf_len(m),
         ) != sshbuf_len(m)
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"send_msg\0")).as_ptr(),
             66 as libc::c_int,
@@ -395,7 +386,7 @@ unsafe extern "C" fn recv_msg(mut m: *mut sshbuf) -> libc::c_int {
         4 as libc::c_int as size_t,
     ) as u_int;
     if len != 4 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"recv_msg\0")).as_ptr(),
             79 as libc::c_int,
@@ -439,7 +430,7 @@ unsafe extern "C" fn recv_msg(mut m: *mut sshbuf) -> libc::c_int {
             l as size_t,
         ) != l as libc::c_ulong
         {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"recv_msg\0")).as_ptr(),
                 92 as libc::c_int,
@@ -504,7 +495,7 @@ unsafe extern "C" fn rsa_encrypt(
     if !(padding != 1 as libc::c_int) {
         key = sshkey_new(KEY_UNSPEC as libc::c_int);
         if key.is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"rsa_encrypt\0"))
                     .as_ptr(),
@@ -520,7 +511,7 @@ unsafe extern "C" fn rsa_encrypt(
             (*key).rsa = rsa;
             r = sshkey_to_blob(key, &mut blob, &mut blen);
             if r != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"rsa_encrypt\0"))
                         .as_ptr(),
@@ -629,7 +620,7 @@ unsafe extern "C" fn ecdsa_do_sign(
     let mut nid: libc::c_int = 0;
     nid = sshkey_ecdsa_key_to_nid(ec);
     if nid < 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"ecdsa_do_sign\0"))
                 .as_ptr(),
@@ -642,7 +633,7 @@ unsafe extern "C" fn ecdsa_do_sign(
     } else {
         key = sshkey_new(KEY_UNSPEC as libc::c_int);
         if key.is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"ecdsa_do_sign\0"))
                     .as_ptr(),
@@ -659,7 +650,7 @@ unsafe extern "C" fn ecdsa_do_sign(
             EC_KEY_up_ref(ec);
             r = sshkey_to_blob(key, &mut blob, &mut blen);
             if r != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"ecdsa_do_sign\0"))
                         .as_ptr(),
@@ -877,7 +868,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
         verbosity = b"-vvv\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
     }
     if pkcs11_start_helper_methods() == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"pkcs11_start_helper\0"))
                 .as_ptr(),
@@ -896,7 +887,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
         pair.as_mut_ptr(),
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"pkcs11_start_helper\0"))
                 .as_ptr(),
@@ -911,7 +902,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
     }
     pid = fork();
     if pid == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"pkcs11_start_helper\0"))
                 .as_ptr(),
@@ -941,7 +932,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             helper = b"/usr/local/libexec/ssh-pkcs11-helper\0" as *const u8 as *const libc::c_char
                 as *mut libc::c_char;
         }
-        sshlog(
+        crate::log::sshlog(
             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"pkcs11_start_helper\0"))
                 .as_ptr(),

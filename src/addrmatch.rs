@@ -1,4 +1,5 @@
 use ::libc;
+
 extern "C" {
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -10,16 +11,7 @@ extern "C" {
     fn addr_pton_cidr(p: *const libc::c_char, n: *mut xaddr, l: *mut u_int) -> libc::c_int;
     fn addr_netmatch(host: *const xaddr, net: *const xaddr, masklen: u_int) -> libc::c_int;
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
 }
 pub type __u_int = libc::c_uint;
 pub type __uint8_t = libc::c_uchar;
@@ -103,7 +95,7 @@ pub unsafe extern "C" fn addr_match_list(
     let mut ret: libc::c_int = 0 as libc::c_int;
     let mut r: libc::c_int = 0;
     if !addr.is_null() && addr_pton(addr, &mut try_addr) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"addrmatch.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"addr_match_list\0"))
                 .as_ptr(),
@@ -137,7 +129,7 @@ pub unsafe extern "C" fn addr_match_list(
         } else {
             r = addr_pton_cidr(cp, &mut match_addr, &mut masklen);
             if r == -(2 as libc::c_int) {
-                sshlog(
+                crate::log::sshlog(
                     b"addrmatch.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(
                         b"addr_match_list\0",
@@ -201,7 +193,7 @@ pub unsafe extern "C" fn addr_match_cidr_list(
     let mut ret: libc::c_int = 0 as libc::c_int;
     let mut r: libc::c_int = 0;
     if !addr.is_null() && addr_pton(addr, &mut try_addr) != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"addrmatch.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"addr_match_cidr_list\0"))
                 .as_ptr(),
@@ -225,7 +217,7 @@ pub unsafe extern "C" fn addr_match_cidr_list(
             break;
         }
         if *cp as libc::c_int == '\0' as i32 {
-            sshlog(
+            crate::log::sshlog(
                 b"addrmatch.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                     b"addr_match_cidr_list\0",
@@ -241,7 +233,7 @@ pub unsafe extern "C" fn addr_match_cidr_list(
             ret = -(1 as libc::c_int);
             break;
         } else if strlen(cp) > (46 as libc::c_int + 3 as libc::c_int) as libc::c_ulong {
-            sshlog(
+            crate::log::sshlog(
                 b"addrmatch.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                     b"addr_match_cidr_list\0",
@@ -262,7 +254,7 @@ pub unsafe extern "C" fn addr_match_cidr_list(
                 b"0123456789abcdefABCDEF.:/\0" as *const u8 as *const libc::c_char,
             ) != strlen(cp)
             {
-                sshlog(
+                crate::log::sshlog(
                     b"addrmatch.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                         b"addr_match_cidr_list\0",
@@ -280,7 +272,7 @@ pub unsafe extern "C" fn addr_match_cidr_list(
             }
             r = addr_pton_cidr(cp, &mut match_addr, &mut masklen);
             if r == -(1 as libc::c_int) {
-                sshlog(
+                crate::log::sshlog(
                     b"addrmatch.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                         b"addr_match_cidr_list\0",
@@ -296,7 +288,7 @@ pub unsafe extern "C" fn addr_match_cidr_list(
                 ret = -(1 as libc::c_int);
                 break;
             } else if r == -(2 as libc::c_int) {
-                sshlog(
+                crate::log::sshlog(
                     b"addrmatch.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                         b"addr_match_cidr_list\0",

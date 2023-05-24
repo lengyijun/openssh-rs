@@ -15,16 +15,7 @@ extern "C" {
         _: ...
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
@@ -436,7 +427,7 @@ unsafe extern "C" fn lookup_and_record(
         &mut groupnames,
     );
     if r != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"sftp-usergroup.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"lookup_and_record\0"))
                 .as_ptr(),
@@ -451,7 +442,7 @@ unsafe extern "C" fn lookup_and_record(
     i = 0 as libc::c_int as u_int;
     while i < nuids {
         if (*usernames.offset(i as isize)).is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-usergroup.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"lookup_and_record\0"))
                     .as_ptr(),
@@ -463,7 +454,7 @@ unsafe extern "C" fn lookup_and_record(
                 *uids.offset(i as isize),
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-usergroup.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"lookup_and_record\0"))
                     .as_ptr(),
@@ -487,7 +478,7 @@ unsafe extern "C" fn lookup_and_record(
     i = 0 as libc::c_int as u_int;
     while i < ngids {
         if (*groupnames.offset(i as isize)).is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-usergroup.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"lookup_and_record\0"))
                     .as_ptr(),
@@ -499,7 +490,7 @@ unsafe extern "C" fn lookup_and_record(
                 *gids.offset(i as isize),
             );
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"sftp-usergroup.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"lookup_and_record\0"))
                     .as_ptr(),

@@ -12,16 +12,7 @@ extern "C" {
     
     fn getgrnam(__name: *const libc::c_char) -> *mut group;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -150,7 +141,7 @@ pub unsafe extern "C" fn pty_allocate(
         0 as *const winsize,
     );
     if i == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sshpty.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"pty_allocate\0")).as_ptr(),
             73 as libc::c_int,
@@ -197,7 +188,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
         close(fd);
     }
     if setsid() == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sshpty.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                 b"pty_make_controlling_tty\0",
@@ -216,7 +207,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
         0o2 as libc::c_int | 0o400 as libc::c_int,
     );
     if fd >= 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"sshpty.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                 b"pty_make_controlling_tty\0",
@@ -230,7 +221,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
         );
         close(fd);
     }
-    sshlog(
+    crate::log::sshlog(
         b"sshpty.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"pty_make_controlling_tty\0"))
             .as_ptr(),
@@ -246,7 +237,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
         0 as *mut libc::c_void,
     ) < 0 as libc::c_int
     {
-        sshlog(
+        crate::log::sshlog(
             b"sshpty.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                 b"pty_make_controlling_tty\0",
@@ -262,7 +253,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
     }
     fd = libc::open(tty, 0o2 as libc::c_int);
     if fd == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sshpty.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                 b"pty_make_controlling_tty\0",
@@ -284,7 +275,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
         0o1 as libc::c_int,
     );
     if fd == -(1 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"sshpty.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
                 b"pty_make_controlling_tty\0",
@@ -357,7 +348,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
     };
     grp = getgrnam(b"tty\0" as *const u8 as *const libc::c_char);
     if grp.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"sshpty.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"pty_setowner\0")).as_ptr(),
             176 as libc::c_int,
@@ -396,7 +387,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
             if *__errno_location() == 30 as libc::c_int
                 && (st.st_uid == (*pw).pw_uid || st.st_uid == 0 as libc::c_int as libc::c_uint)
             {
-                sshlog(
+                crate::log::sshlog(
                     b"sshpty.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"pty_setowner\0"))
                         .as_ptr(),
@@ -447,7 +438,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
                         as libc::c_uint
                     == 0 as libc::c_int as libc::c_uint
             {
-                sshlog(
+                crate::log::sshlog(
                     b"sshpty.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"pty_setowner\0"))
                         .as_ptr(),

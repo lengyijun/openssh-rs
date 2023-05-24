@@ -4,16 +4,7 @@ extern "C" {
     pub type sshkey;
     pub type kex;
     pub type session_state;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn ssh_packet_read_seqnr(_: *mut ssh, _: *mut u_char, seqnr_p: *mut u_int32_t) -> libc::c_int;
     fn ssh_packet_read_poll_seqnr(
@@ -99,7 +90,7 @@ pub unsafe extern "C" fn dispatch_protocol_error(
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"dispatch.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(b"dispatch_protocol_error\0"))
             .as_ptr(),
@@ -143,7 +134,7 @@ pub unsafe extern "C" fn dispatch_protocol_ignore(
     mut seq: u_int32_t,
     mut _ssh: *mut ssh,
 ) -> libc::c_int {
-    sshlog(
+    crate::log::sshlog(
         b"dispatch.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"dispatch_protocol_ignore\0"))
             .as_ptr(),
@@ -218,7 +209,7 @@ pub unsafe extern "C" fn ssh_dispatch_run(
             && ((*ssh).dispatch[type_0 as usize]).is_some()
         {
             if (*ssh).dispatch_skip_packets != 0 {
-                sshlog(
+                crate::log::sshlog(
                     b"dispatch.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
                         b"ssh_dispatch_run\0",

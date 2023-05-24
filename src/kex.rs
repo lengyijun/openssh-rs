@@ -84,16 +84,7 @@ extern "C" {
     fn mac_setup(_: *mut sshmac, _: *mut libc::c_char) -> libc::c_int;
     fn mac_clear(_: *mut sshmac);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -624,7 +615,7 @@ pub unsafe extern "C" fn kex_names_valid(mut names: *const libc::c_char) -> libc
     p = strsep(&mut cp, b",\0" as *const u8 as *const libc::c_char);
     while !p.is_null() && *p as libc::c_int != '\0' as i32 {
         if (kex_alg_by_name(p)).is_null() {
-            sshlog(
+            crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"kex_names_valid\0"))
                     .as_ptr(),
@@ -640,7 +631,7 @@ pub unsafe extern "C" fn kex_names_valid(mut names: *const libc::c_char) -> libc
         }
         p = strsep(&mut cp, b",\0" as *const u8 as *const libc::c_char);
     }
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"kex_names_valid\0")).as_ptr(),
         175 as libc::c_int,
@@ -1008,7 +999,7 @@ pub unsafe extern "C" fn kex_buf2prop(
     } else {
         r = sshbuf_consume(b, 16 as libc::c_int as size_t);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"kex_buf2prop\0"))
                     .as_ptr(),
@@ -1027,7 +1018,7 @@ pub unsafe extern "C" fn kex_buf2prop(
                 }
                 r = sshbuf_get_cstring(b, &mut *proposal.offset(i as isize), 0 as *mut size_t);
                 if r != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"kex.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                             b"kex_buf2prop\0",
@@ -1043,7 +1034,7 @@ pub unsafe extern "C" fn kex_buf2prop(
                     current_block = 14439343106787185477;
                     break;
                 } else {
-                    sshlog(
+                    crate::log::sshlog(
                         b"kex.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                             b"kex_buf2prop\0",
@@ -1069,7 +1060,7 @@ pub unsafe extern "C" fn kex_buf2prop(
                         r = sshbuf_get_u32(b, &mut i);
                         r != 0 as libc::c_int
                     } {
-                        sshlog(
+                        crate::log::sshlog(
                             b"kex.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                                 b"kex_buf2prop\0",
@@ -1085,7 +1076,7 @@ pub unsafe extern "C" fn kex_buf2prop(
                         if !first_kex_follows.is_null() {
                             *first_kex_follows = v as libc::c_int;
                         }
-                        sshlog(
+                        crate::log::sshlog(
                             b"kex.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                                 b"kex_buf2prop\0",
@@ -1098,7 +1089,7 @@ pub unsafe extern "C" fn kex_buf2prop(
                             b"first_kex_follows %d \0" as *const u8 as *const libc::c_char,
                             v as libc::c_int,
                         );
-                        sshlog(
+                        crate::log::sshlog(
                             b"kex.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                                 b"kex_buf2prop\0",
@@ -1143,7 +1134,7 @@ pub unsafe extern "C" fn kex_protocol_error(
     mut ssh: *mut ssh,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"kex_protocol_error\0"))
             .as_ptr(),
@@ -1184,7 +1175,7 @@ unsafe extern "C" fn kex_reset_dispatch(mut ssh: *mut ssh) {
 unsafe extern "C" fn kex_send_ext_info(mut ssh: *mut ssh) -> libc::c_int {
     let mut r: libc::c_int = 0;
     let mut algs: *mut libc::c_char = 0 as *mut libc::c_char;
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"kex_send_ext_info\0"))
             .as_ptr(),
@@ -1240,7 +1231,7 @@ unsafe extern "C" fn kex_send_ext_info(mut ssh: *mut ssh) -> libc::c_int {
             r != 0 as libc::c_int
         }
     {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"kex_send_ext_info\0"))
                 .as_ptr(),
@@ -1266,7 +1257,7 @@ pub unsafe extern "C" fn kex_send_newkeys(mut ssh: *mut ssh) -> libc::c_int {
     } {
         return r;
     }
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"kex_send_newkeys\0")).as_ptr(),
         521 as libc::c_int,
@@ -1292,7 +1283,7 @@ pub unsafe extern "C" fn kex_send_newkeys(mut ssh: *mut ssh) -> libc::c_int {
             return r;
         }
     }
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"kex_send_newkeys\0")).as_ptr(),
         526 as libc::c_int,
@@ -1315,7 +1306,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
     let mut val: *mut u_char = 0 as *mut u_char;
     let mut vlen: size_t = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"kex_input_ext_info\0"))
             .as_ptr(),
@@ -1338,7 +1329,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
         return r;
     }
     if ninfo >= 1024 as libc::c_int as libc::c_uint {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"kex_input_ext_info\0"))
                 .as_ptr(),
@@ -1369,7 +1360,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
         ) == 0 as libc::c_int
         {
             if !(memchr(val as *const libc::c_void, '\0' as i32, vlen)).is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"kex.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"kex_input_ext_info\0",
@@ -1384,7 +1375,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
                 );
                 return -(4 as libc::c_int);
             }
-            sshlog(
+            crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"kex_input_ext_info\0",
@@ -1406,7 +1397,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
         ) == 0 as libc::c_int
         {
             if !(memchr(val as *const libc::c_void, '\0' as i32, vlen)).is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"kex.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"kex_input_ext_info\0",
@@ -1421,7 +1412,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
                 );
                 return -(4 as libc::c_int);
             }
-            sshlog(
+            crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"kex_input_ext_info\0",
@@ -1442,7 +1433,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
             {
                 (*kex).flags |= 0x4 as libc::c_int as libc::c_uint;
             } else {
-                sshlog(
+                crate::log::sshlog(
                     b"kex.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                         b"kex_input_ext_info\0",
@@ -1457,7 +1448,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
                 );
             }
         } else {
-            sshlog(
+            crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
                     b"kex_input_ext_info\0",
@@ -1485,7 +1476,7 @@ unsafe extern "C" fn kex_input_newkeys(
 ) -> libc::c_int {
     let mut kex: *mut kex = (*ssh).kex;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"kex_input_newkeys\0"))
             .as_ptr(),
@@ -1532,7 +1523,7 @@ pub unsafe extern "C" fn kex_send_kexinit(mut ssh: *mut ssh) -> libc::c_int {
     let mut kex: *mut kex = (*ssh).kex;
     let mut r: libc::c_int = 0;
     if kex.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"kex_send_kexinit\0"))
                 .as_ptr(),
@@ -1549,7 +1540,7 @@ pub unsafe extern "C" fn kex_send_kexinit(mut ssh: *mut ssh) -> libc::c_int {
     }
     (*kex).done = 0 as libc::c_int;
     if sshbuf_len((*kex).my) < 16 as libc::c_int as libc::c_ulong {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"kex_send_kexinit\0"))
                 .as_ptr(),
@@ -1565,7 +1556,7 @@ pub unsafe extern "C" fn kex_send_kexinit(mut ssh: *mut ssh) -> libc::c_int {
     }
     cookie = sshbuf_mutable_ptr((*kex).my);
     if cookie.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"kex_send_kexinit\0"))
                 .as_ptr(),
@@ -1589,7 +1580,7 @@ pub unsafe extern "C" fn kex_send_kexinit(mut ssh: *mut ssh) -> libc::c_int {
             r != 0 as libc::c_int
         }
     {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"kex_send_kexinit\0"))
                 .as_ptr(),
@@ -1601,7 +1592,7 @@ pub unsafe extern "C" fn kex_send_kexinit(mut ssh: *mut ssh) -> libc::c_int {
         );
         return r;
     }
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"kex_send_kexinit\0")).as_ptr(),
         644 as libc::c_int,
@@ -1623,7 +1614,7 @@ pub unsafe extern "C" fn kex_input_kexinit(
     let mut i: u_int = 0;
     let mut dlen: size_t = 0;
     let mut r: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"kex_input_kexinit\0"))
             .as_ptr(),
@@ -1634,7 +1625,7 @@ pub unsafe extern "C" fn kex_input_kexinit(
         b"SSH2_MSG_KEXINIT received\0" as *const u8 as *const libc::c_char,
     );
     if kex.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"kex_input_kexinit\0"))
                 .as_ptr(),
@@ -1656,7 +1647,7 @@ pub unsafe extern "C" fn kex_input_kexinit(
     while i < 16 as libc::c_int as libc::c_uint {
         r = sshpkt_get_u8(ssh, 0 as *mut u_char);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"kex_input_kexinit\0"))
                     .as_ptr(),
@@ -1675,7 +1666,7 @@ pub unsafe extern "C" fn kex_input_kexinit(
     while i < PROPOSAL_MAX as libc::c_int as libc::c_uint {
         r = sshpkt_get_string(ssh, 0 as *mut *mut u_char, 0 as *mut size_t);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"kex_input_kexinit\0"))
                     .as_ptr(),
@@ -1718,7 +1709,7 @@ pub unsafe extern "C" fn kex_input_kexinit(
     {
         return ((*kex).kex[(*kex).kex_type as usize]).expect("non-null function pointer")(ssh);
     }
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"kex_input_kexinit\0"))
             .as_ptr(),
@@ -1880,7 +1871,7 @@ pub unsafe extern "C" fn kex_setup(
 }
 pub unsafe extern "C" fn kex_start_rekex(mut ssh: *mut ssh) -> libc::c_int {
     if ((*ssh).kex).is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"kex_start_rekex\0"))
                 .as_ptr(),
@@ -1893,7 +1884,7 @@ pub unsafe extern "C" fn kex_start_rekex(mut ssh: *mut ssh) -> libc::c_int {
         return -(1 as libc::c_int);
     }
     if (*(*ssh).kex).done == 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"kex_start_rekex\0"))
                 .as_ptr(),
@@ -1919,7 +1910,7 @@ unsafe extern "C" fn choose_enc(
     }
     (*enc).cipher = cipher_by_name(name);
     if ((*enc).cipher).is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"choose_enc\0")).as_ptr(),
             843 as libc::c_int,
@@ -1952,7 +1943,7 @@ unsafe extern "C" fn choose_mac(
         return -(32 as libc::c_int);
     }
     if mac_setup(mac, name) < 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"choose_mac\0")).as_ptr(),
             865 as libc::c_int,
@@ -1990,7 +1981,7 @@ unsafe extern "C" fn choose_comp(
     } else if strcmp(name, b"none\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         (*comp).type_0 = 0 as libc::c_int as u_int;
     } else {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"choose_comp\0")).as_ptr(),
             892 as libc::c_int,
@@ -2013,7 +2004,7 @@ unsafe extern "C" fn choose_kex(
 ) -> libc::c_int {
     let mut kexalg: *const kexalg = 0 as *const kexalg;
     (*k).name = match_list(client, server, 0 as *mut u_int);
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"choose_kex\0")).as_ptr(),
         907 as libc::c_int,
@@ -2032,7 +2023,7 @@ unsafe extern "C" fn choose_kex(
     }
     kexalg = kex_alg_by_name((*k).name);
     if kexalg.is_null() {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"choose_kex\0")).as_ptr(),
             911 as libc::c_int,
@@ -2056,7 +2047,7 @@ unsafe extern "C" fn choose_hostkeyalg(
 ) -> libc::c_int {
     free((*k).hostkey_alg as *mut libc::c_void);
     (*k).hostkey_alg = match_list(client, server, 0 as *mut u_int);
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"choose_hostkeyalg\0"))
             .as_ptr(),
@@ -2076,7 +2067,7 @@ unsafe extern "C" fn choose_hostkeyalg(
     }
     (*k).hostkey_type = sshkey_type_from_name((*k).hostkey_alg);
     if (*k).hostkey_type == KEY_UNSPEC as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"choose_hostkeyalg\0"))
                 .as_ptr(),
@@ -2114,7 +2105,7 @@ unsafe extern "C" fn proposals_match(
             *p = '\0' as i32 as libc::c_char;
         }
         if strcmp(*my.offset(*idx as isize), *peer.offset(*idx as isize)) != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"proposals_match\0"))
                     .as_ptr(),
@@ -2131,7 +2122,7 @@ unsafe extern "C" fn proposals_match(
         idx = idx.offset(1);
         idx;
     }
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"proposals_match\0")).as_ptr(),
         959 as libc::c_int,
@@ -2172,7 +2163,7 @@ unsafe extern "C" fn kex_choose_conf(mut ssh: *mut ssh) -> libc::c_int {
     let mut authlen: u_int = 0;
     let mut r: libc::c_int = 0;
     let mut first_kex_follows: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"kex_choose_conf\0")).as_ptr(),
         986 as libc::c_int,
@@ -2188,7 +2179,7 @@ unsafe extern "C" fn kex_choose_conf(mut ssh: *mut ssh) -> libc::c_int {
     );
     r = kex_buf2prop((*kex).my, 0 as *mut libc::c_int, &mut my);
     if !(r != 0 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"kex_choose_conf\0"))
                 .as_ptr(),
@@ -2339,7 +2330,7 @@ unsafe extern "C" fn kex_choose_conf(mut ssh: *mut ssh) -> libc::c_int {
                                         current_block = 11763037568314306996;
                                         break;
                                     } else {
-                                        sshlog(
+                                        crate::log::sshlog(
                                             b"kex.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
                                                 &[u8; 16],
@@ -2489,7 +2480,7 @@ unsafe extern "C" fn derive_key(
             || ssh_digest_final(hashctx, digest, mdsz) != 0 as libc::c_int
         {
             r = -(22 as libc::c_int);
-            sshlog(
+            crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"derive_key\0"))
                     .as_ptr(),
@@ -2518,7 +2509,7 @@ unsafe extern "C" fn derive_key(
                     || ssh_digest_final(hashctx, digest.offset(have as isize), mdsz)
                         != 0 as libc::c_int
                 {
-                    sshlog(
+                    crate::log::sshlog(
                         b"kex.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                             b"derive_key\0",
@@ -2568,7 +2559,7 @@ pub unsafe extern "C" fn kex_derive_keys(
     let mut r: libc::c_int = 0;
     if (*kex).flags & 0x2 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint {
         if sshbuf_len((*kex).session_id) != 0 as libc::c_int as libc::c_ulong {
-            sshlog(
+            crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"kex_derive_keys\0"))
                     .as_ptr(),
@@ -2589,7 +2580,7 @@ pub unsafe extern "C" fn kex_derive_keys(
             return r;
         }
     } else if sshbuf_len((*kex).session_id) == 0 as libc::c_int as libc::c_ulong {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"kex_derive_keys\0"))
                 .as_ptr(),
@@ -2658,7 +2649,7 @@ pub unsafe extern "C" fn kex_load_hostkey(
     *pubp = 0 as *mut sshkey;
     *prvp = 0 as *mut sshkey;
     if ((*kex).load_host_public_key).is_none() || ((*kex).load_host_private_key).is_none() {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"kex_load_hostkey\0"))
                 .as_ptr(),
@@ -2691,7 +2682,7 @@ pub unsafe extern "C" fn kex_verify_host_key(
 ) -> libc::c_int {
     let mut kex: *mut kex = (*ssh).kex;
     if ((*kex).verify_host_key).is_none() {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"kex_verify_host_key\0"))
                 .as_ptr(),
@@ -2745,7 +2736,7 @@ unsafe extern "C" fn send_error(mut ssh: *mut ssh, mut msg: *mut libc::c_char) {
             strlen(crnl),
         ) != strlen(crnl)
     {
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"send_error\0")).as_ptr(),
             1265 as libc::c_int,
@@ -2809,7 +2800,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
     );
     if r != 0 as libc::c_int {
         oerrno = *__errno_location();
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"kex_exchange_identification\0",
@@ -2834,7 +2825,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
     ) != sshbuf_len(our_version)
     {
         oerrno = *__errno_location();
-        sshlog(
+        crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                 b"kex_exchange_identification\0",
@@ -2852,7 +2843,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
         r = sshbuf_consume_end(our_version, 2 as libc::c_int as size_t);
         if r != 0 as libc::c_int {
             oerrno = *__errno_location();
-            sshlog(
+            crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                     b"kex_exchange_identification\0",
@@ -2867,7 +2858,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
         } else {
             our_version_string = sshbuf_dup_string(our_version);
             if our_version_string.is_null() {
-                sshlog(
+                crate::log::sshlog(
                     b"kex.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                         b"kex_exchange_identification\0",
@@ -2881,7 +2872,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                 );
                 r = -(2 as libc::c_int);
             } else {
-                sshlog(
+                crate::log::sshlog(
                     b"kex.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                         b"kex_exchange_identification\0",
@@ -2903,7 +2894,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                 as *const libc::c_char
                                 as *mut libc::c_char,
                         );
-                        sshlog(
+                        crate::log::sshlog(
                             b"kex.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                 b"kex_exchange_identification\0",
@@ -2936,7 +2927,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                             as *const libc::c_char
                                             as *mut libc::c_char,
                                     );
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"kex.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                             b"kex_exchange_identification\0",
@@ -2955,7 +2946,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                     break 's_97;
                                 } else if r == -(1 as libc::c_int) {
                                     oerrno = *__errno_location();
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"kex.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                             b"kex_exchange_identification\0",
@@ -2989,7 +2980,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                             if len != 1 as libc::c_int as libc::c_ulong
                                 && *__errno_location() == 32 as libc::c_int
                             {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"kex.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                         b"kex_exchange_identification\0",
@@ -3007,7 +2998,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                 break 's_97;
                             } else if len != 1 as libc::c_int as libc::c_ulong {
                                 oerrno = *__errno_location();
-                                sshlog(
+                                crate::log::sshlog(
                                     b"kex.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                         b"kex_exchange_identification\0",
@@ -3030,7 +3021,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                     break;
                                 }
                                 if c as libc::c_int == '\0' as i32 || expect_nl != 0 {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"kex.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                             b"kex_exchange_identification\0",
@@ -3049,7 +3040,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                     r = sshbuf_put_u8(peer_version, c);
                                     if r != 0 as libc::c_int {
                                         oerrno = *__errno_location();
-                                        sshlog(
+                                        crate::log::sshlog(
                                             b"kex.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
                                                 &[u8; 28],
@@ -3072,7 +3063,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                         {
                                             continue;
                                         }
-                                        sshlog(
+                                        crate::log::sshlog(
                                             b"kex.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
                                                 &[u8; 28],
@@ -3107,7 +3098,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                         }
                         cp = sshbuf_dup_string(peer_version);
                         if cp.is_null() {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"kex.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                     b"kex_exchange_identification\0",
@@ -3123,7 +3114,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                             current_block = 4276536258050058664;
                             break;
                         } else if (*(*ssh).kex).server != 0 {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"kex.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                     b"kex_exchange_identification\0",
@@ -3141,7 +3132,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                             current_block = 14036831669631104504;
                             break;
                         } else {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"kex.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                     b"kex_exchange_identification\0",
@@ -3188,7 +3179,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                 )
                                     as *mut libc::c_char;
                                 if remote_version.is_null() {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"kex.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                             b"kex_exchange_identification\0",
@@ -3210,7 +3201,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                     remote_version,
                                 ) != 3 as libc::c_int
                                 {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"kex.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
                                             b"kex_exchange_identification\0",
@@ -3227,7 +3218,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                     );
                                     current_block = 14036831669631104504;
                                 } else {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"kex.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<
                                             &[u8; 28],
@@ -3258,7 +3249,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                         }
                                     }
                                     if mismatch != 0 {
-                                        sshlog(
+                                        crate::log::sshlog(
                                             b"kex.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
                                                 &[u8; 28],
@@ -3288,7 +3279,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                         && (*ssh).compat & 0x400000 as libc::c_int
                                             != 0 as libc::c_int
                                     {
-                                        sshlog(
+                                        crate::log::sshlog(
                                             b"kex.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
                                                 &[u8; 28],
@@ -3312,7 +3303,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                     } else if (*(*ssh).kex).server != 0
                                         && (*ssh).compat & 0x800 as libc::c_int != 0 as libc::c_int
                                     {
-                                        sshlog(
+                                        crate::log::sshlog(
                                             b"kex.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
                                                 &[u8; 28],

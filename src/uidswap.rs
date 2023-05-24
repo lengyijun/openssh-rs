@@ -16,16 +16,7 @@ extern "C" {
     fn free(_: *mut libc::c_void);
     fn setgroups(__n: size_t, __groups: *const __gid_t) -> libc::c_int;
     fn initgroups(__user: *const libc::c_char, __group: __gid_t) -> libc::c_int;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -78,7 +69,7 @@ static mut user_groupslen: libc::c_int = -(1 as libc::c_int);
 pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut passwd) {
     saved_euid = geteuid();
     saved_egid = getegid();
-    sshlog(
+    crate::log::sshlog(
         b"uidswap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"temporarily_use_uid\0"))
             .as_ptr(),
@@ -241,7 +232,7 @@ pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut passwd) {
 }
 pub unsafe extern "C" fn restore_uid() {
     if privileged == 0 {
-        sshlog(
+        crate::log::sshlog(
             b"uidswap.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"restore_uid\0")).as_ptr(),
             146 as libc::c_int,
@@ -263,7 +254,7 @@ pub unsafe extern "C" fn restore_uid() {
             b"restore_uid: temporarily_use_uid not effective\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"uidswap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"restore_uid\0")).as_ptr(),
         153 as libc::c_int,
@@ -342,7 +333,7 @@ pub unsafe extern "C" fn permanently_set_uid(mut pw: *mut passwd) {
                 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"uidswap.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"permanently_set_uid\0"))
             .as_ptr(),

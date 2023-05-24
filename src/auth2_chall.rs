@@ -1,4 +1,5 @@
 use ::libc;
+
 extern "C" {
     pub type ssh_channels;
     pub type sshbuf;
@@ -42,16 +43,7 @@ extern "C" {
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
     fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -312,7 +304,7 @@ unsafe extern "C" fn kbdint_alloc(mut devs: *const libc::c_char) -> *mut KbdintA
     } else {
         (*kbdintctxt).devices = xstrdup(devs);
     }
-    sshlog(
+    crate::log::sshlog(
         b"auth2-chall.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"kbdint_alloc\0")).as_ptr(),
         127 as libc::c_int,
@@ -393,7 +385,7 @@ unsafe extern "C" fn kbdint_next_device(
             0 as *mut libc::c_char
         };
         free(t as *mut libc::c_void);
-        sshlog(
+        crate::log::sshlog(
             b"auth2-chall.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"kbdint_next_device\0"))
                 .as_ptr(),
@@ -423,7 +415,7 @@ pub unsafe extern "C" fn auth2_challenge(
     mut devs: *mut libc::c_char,
 ) -> libc::c_int {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
-    sshlog(
+    crate::log::sshlog(
         b"auth2-chall.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"auth2_challenge\0")).as_ptr(),
         198 as libc::c_int,
@@ -461,7 +453,7 @@ pub unsafe extern "C" fn auth2_challenge_stop(mut ssh: *mut ssh) {
 unsafe extern "C" fn auth2_challenge_start(mut ssh: *mut ssh) -> libc::c_int {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
     let mut kbdintctxt: *mut KbdintAuthctxt = (*authctxt).kbdintctxt as *mut KbdintAuthctxt;
-    sshlog(
+    crate::log::sshlog(
         b"auth2-chall.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"auth2_challenge_start\0"))
             .as_ptr(),
@@ -480,7 +472,7 @@ unsafe extern "C" fn auth2_challenge_start(mut ssh: *mut ssh) -> libc::c_int {
         auth2_challenge_stop(ssh);
         return 0 as libc::c_int;
     }
-    sshlog(
+    crate::log::sshlog(
         b"auth2-chall.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"auth2_challenge_start\0"))
             .as_ptr(),

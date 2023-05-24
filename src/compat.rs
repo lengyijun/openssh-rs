@@ -6,16 +6,7 @@ extern "C" {
     pub type session_state;
     fn free(_: *mut libc::c_void);
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -288,7 +279,7 @@ pub unsafe extern "C" fn compat_banner(mut ssh: *mut ssh, mut version: *const li
     while !(check[i as usize].pat).is_null() {
         if match_pattern_list(version, check[i as usize].pat, 0 as libc::c_int) == 1 as libc::c_int
         {
-            sshlog(
+            crate::log::sshlog(
                 b"compat.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"compat_banner\0"))
                     .as_ptr(),
@@ -307,7 +298,7 @@ pub unsafe extern "C" fn compat_banner(mut ssh: *mut ssh, mut version: *const li
         i += 1;
         i;
     }
-    sshlog(
+    crate::log::sshlog(
         b"compat.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"compat_banner\0")).as_ptr(),
         137 as libc::c_int,
@@ -327,7 +318,7 @@ pub unsafe extern "C" fn compat_kex_proposal(
     if (*ssh).compat & (0x10000000 as libc::c_int | 0x4000 as libc::c_int) == 0 as libc::c_int {
         return xstrdup(p);
     }
-    sshlog(
+    crate::log::sshlog(
         b"compat.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"compat_kex_proposal\0"))
             .as_ptr(),
@@ -397,7 +388,7 @@ pub unsafe extern "C" fn compat_kex_proposal(
             b"No supported key exchange algorithms found\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshlog(
+    crate::log::sshlog(
         b"compat.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"compat_kex_proposal\0"))
             .as_ptr(),

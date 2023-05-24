@@ -29,16 +29,7 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn log_level_get() -> LogLevel;
     fn log_is_on_stderr() -> libc::c_int;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
@@ -179,7 +170,7 @@ unsafe extern "C" fn start_helper(
     }
     if access(helper, 1 as libc::c_int) != 0 as libc::c_int {
         oerrno = *__errno_location();
-        sshlog(
+        crate::log::sshlog(
             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"start_helper\0")).as_ptr(),
             63 as libc::c_int,
@@ -200,7 +191,7 @@ unsafe extern "C" fn start_helper(
         pair.as_mut_ptr(),
     ) == -(1 as libc::c_int)
     {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"start_helper\0")).as_ptr(),
             73 as libc::c_int,
@@ -216,7 +207,7 @@ unsafe extern "C" fn start_helper(
     pid = fork();
     if pid == -(1 as libc::c_int) {
         oerrno = *__errno_location();
-        sshlog(
+        crate::log::sshlog(
             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"start_helper\0")).as_ptr(),
             79 as libc::c_int,
@@ -236,7 +227,7 @@ unsafe extern "C" fn start_helper(
         if dup2(pair[1 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int)
             || dup2(pair[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int)
         {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"start_helper\0"))
                     .as_ptr(),
@@ -252,7 +243,7 @@ unsafe extern "C" fn start_helper(
         close(pair[0 as libc::c_int as usize]);
         close(pair[1 as libc::c_int as usize]);
         closefrom(2 as libc::c_int + 1 as libc::c_int);
-        sshlog(
+        crate::log::sshlog(
             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"start_helper\0")).as_ptr(),
             96 as libc::c_int,
@@ -273,7 +264,7 @@ unsafe extern "C" fn start_helper(
             verbosity,
             0 as *mut libc::c_void as *mut libc::c_char,
         );
-        sshlog(
+        crate::log::sshlog(
             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"start_helper\0")).as_ptr(),
             98 as libc::c_int,
@@ -286,7 +277,7 @@ unsafe extern "C" fn start_helper(
         _exit(1 as libc::c_int);
     }
     close(pair[1 as libc::c_int as usize]);
-    sshlog(
+    crate::log::sshlog(
         b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"start_helper\0")).as_ptr(),
         104 as libc::c_int,
@@ -304,7 +295,7 @@ unsafe extern "C" fn start_helper(
 unsafe extern "C" fn reap_helper(mut pid: pid_t) -> libc::c_int {
     let mut status: libc::c_int = 0;
     let mut oerrno: libc::c_int = 0;
-    sshlog(
+    crate::log::sshlog(
         b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"reap_helper\0")).as_ptr(),
         116 as libc::c_int,
@@ -320,7 +311,7 @@ unsafe extern "C" fn reap_helper(mut pid: pid_t) -> libc::c_int {
             *__errno_location() = 0 as libc::c_int;
         } else {
             oerrno = *__errno_location();
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"reap_helper\0"))
                     .as_ptr(),
@@ -336,7 +327,7 @@ unsafe extern "C" fn reap_helper(mut pid: pid_t) -> libc::c_int {
         }
     }
     if !(status & 0x7f as libc::c_int == 0 as libc::c_int) {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"reap_helper\0")).as_ptr(),
             130 as libc::c_int,
@@ -347,7 +338,7 @@ unsafe extern "C" fn reap_helper(mut pid: pid_t) -> libc::c_int {
         );
         return -(27 as libc::c_int);
     } else if (status & 0xff00 as libc::c_int) >> 8 as libc::c_int != 0 as libc::c_int {
-        sshlog(
+        crate::log::sshlog(
             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"reap_helper\0")).as_ptr(),
             133 as libc::c_int,
@@ -415,7 +406,7 @@ unsafe extern "C" fn client_converse(
                 r != 0 as libc::c_int
             }
         {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"client_converse\0"))
                     .as_ptr(),
@@ -428,7 +419,7 @@ unsafe extern "C" fn client_converse(
         } else {
             r = ssh_msg_send(fd, 5 as libc::c_int as u_char, req);
             if r != 0 as libc::c_int {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(
                         b"client_converse\0",
@@ -443,7 +434,7 @@ unsafe extern "C" fn client_converse(
             } else {
                 r = ssh_msg_recv(fd, resp);
                 if r != 0 as libc::c_int {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(
                             b"client_converse\0",
@@ -458,7 +449,7 @@ unsafe extern "C" fn client_converse(
                 } else {
                     r = sshbuf_get_u8(resp, &mut version);
                     if r != 0 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(
                                 b"client_converse\0",
@@ -471,7 +462,7 @@ unsafe extern "C" fn client_converse(
                             b"parse version\0" as *const u8 as *const libc::c_char,
                         );
                     } else if version as libc::c_int != 5 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(
                                 b"client_converse\0",
@@ -490,7 +481,7 @@ unsafe extern "C" fn client_converse(
                     } else {
                         r = sshbuf_get_u32(resp, &mut rtype);
                         if r != 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(
                                     b"client_converse\0",
@@ -505,7 +496,7 @@ unsafe extern "C" fn client_converse(
                         } else if rtype == 0 as libc::c_int as libc::c_uint {
                             r = sshbuf_get_u32(resp, &mut rerr);
                             if r != 0 as libc::c_int {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(
                                         b"client_converse\0",
@@ -518,7 +509,7 @@ unsafe extern "C" fn client_converse(
                                     b"parse\0" as *const u8 as *const libc::c_char,
                                 );
                             } else {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(
                                         b"client_converse\0",
@@ -541,7 +532,7 @@ unsafe extern "C" fn client_converse(
                                 }
                             }
                         } else if rtype != type_0 {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(
                                     b"client_converse\0",
@@ -611,7 +602,7 @@ pub unsafe extern "C" fn sshsk_sign(
     } else {
         r = sshkey_private_serialize(key, kbuf);
         if r != 0 as libc::c_int {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"sshsk_sign\0"))
                     .as_ptr(),
@@ -645,7 +636,7 @@ pub unsafe extern "C" fn sshsk_sign(
                     r != 0 as libc::c_int
                 }
             {
-                sshlog(
+                crate::log::sshlog(
                     b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"sshsk_sign\0"))
                         .as_ptr(),
@@ -660,7 +651,7 @@ pub unsafe extern "C" fn sshsk_sign(
                 if !(r != 0 as libc::c_int) {
                     r = sshbuf_get_string(resp, sigp, lenp);
                     if r != 0 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                 b"sshsk_sign\0",
@@ -674,7 +665,7 @@ pub unsafe extern "C" fn sshsk_sign(
                         );
                         r = -(4 as libc::c_int);
                     } else if sshbuf_len(resp) != 0 as libc::c_int as libc::c_ulong {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
                                 b"sshsk_sign\0",
@@ -776,7 +767,7 @@ pub unsafe extern "C" fn sshsk_enroll(
                 r != 0 as libc::c_int
             }
         {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"sshsk_enroll\0"))
                     .as_ptr(),
@@ -794,7 +785,7 @@ pub unsafe extern "C" fn sshsk_enroll(
                     r = sshbuf_get_stringb(resp, abuf);
                     r != 0 as libc::c_int
                 } {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                             b"sshsk_enroll\0",
@@ -808,7 +799,7 @@ pub unsafe extern "C" fn sshsk_enroll(
                     );
                     r = -(4 as libc::c_int);
                 } else if sshbuf_len(resp) != 0 as libc::c_int as libc::c_ulong {
-                    sshlog(
+                    crate::log::sshlog(
                         b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                             b"sshsk_enroll\0",
@@ -824,7 +815,7 @@ pub unsafe extern "C" fn sshsk_enroll(
                 } else {
                     r = sshkey_private_deserialize(kbuf, &mut key);
                     if r != 0 as libc::c_int {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                                 b"sshsk_enroll\0",
@@ -840,7 +831,7 @@ pub unsafe extern "C" fn sshsk_enroll(
                         r = sshbuf_putb(attest, abuf);
                         r != 0 as libc::c_int
                     } {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
                                 b"sshsk_enroll\0",
@@ -939,7 +930,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
                 r != 0 as libc::c_int
             }
         {
-            sshlog(
+            crate::log::sshlog(
                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                     b"sshsk_load_resident\0",
@@ -974,7 +965,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
                             r != 0 as libc::c_int
                         }
                     {
-                        sshlog(
+                        crate::log::sshlog(
                             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                 b"sshsk_load_resident\0",
@@ -992,7 +983,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
                     } else {
                         r = sshkey_private_deserialize(kbuf, &mut key);
                         if r != 0 as libc::c_int {
-                            sshlog(
+                            crate::log::sshlog(
                                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                     b"sshsk_load_resident\0",
@@ -1012,7 +1003,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
                                 ::core::mem::size_of::<sshsk_resident_key>() as libc::c_ulong,
                             ) as *mut sshsk_resident_key;
                             if srk.is_null() {
-                                sshlog(
+                                crate::log::sshlog(
                                     b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                         b"sshsk_load_resident\0",
@@ -1042,7 +1033,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
                                 )
                                     as *mut *mut sshsk_resident_key;
                                 if tmp.is_null() {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                             b"sshsk_load_resident\0",
@@ -1058,7 +1049,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
                                     current_block = 18195178125133313560;
                                     break;
                                 } else {
-                                    sshlog(
+                                    crate::log::sshlog(
                                         b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
                                             b"sshsk_load_resident\0",

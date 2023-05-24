@@ -70,16 +70,7 @@ extern "C" {
         maxsign: u_int32_t,
         _: libc::c_int,
     ) -> libc::c_int;
-    fn sshlog(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    );
+
     fn atomicio(
         _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
         _: libc::c_int,
@@ -297,7 +288,7 @@ pub unsafe extern "C" fn ssh_get_authentication_socket_path(
         sun_family: 0,
         sun_path: [0; 108],
     };
-    sshlog(
+    crate::log::sshlog(
         b"authfd.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 35], &[libc::c_char; 35]>(
             b"ssh_get_authentication_socket_path\0",
