@@ -1,4 +1,5 @@
 use ::libc;
+use libc::kill;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -18,7 +19,7 @@ extern "C" {
         _: libc::c_int,
         _: libc::c_int,
     ) -> *mut libc::c_char;
-    fn kill(__pid: __pid_t, __sig: libc::c_int) -> libc::c_int;
+    
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
     fn closefrom(__lowfd: libc::c_int);
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;

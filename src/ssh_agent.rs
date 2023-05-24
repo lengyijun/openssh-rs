@@ -1,4 +1,5 @@
 use ::libc;
+use libc::kill;
 use libc::close;
 extern "C" {
     pub type sockaddr_x25;
@@ -38,7 +39,7 @@ extern "C" {
     fn __errno_location() -> *mut libc::c_int;
     fn platform_disable_tracing(_: libc::c_int);
     fn platform_pledge_agent();
-    fn kill(__pid: __pid_t, __sig: libc::c_int) -> libc::c_int;
+    
     fn setegid(__gid: __gid_t) -> libc::c_int;
     fn fork() -> __pid_t;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;

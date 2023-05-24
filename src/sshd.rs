@@ -1,4 +1,5 @@
 use ::libc;
+use libc::kill;
 use libc::close;
 extern "C" {
     pub type sockaddr_x25;
@@ -75,7 +76,7 @@ extern "C" {
     fn platform_pre_restart();
     fn platform_post_fork_parent(child_pid: pid_t);
     fn platform_post_fork_child();
-    fn kill(__pid: __pid_t, __sig: libc::c_int) -> libc::c_int;
+    
     fn sigemptyset(__set: *mut sigset_t) -> libc::c_int;
     fn sigaddset(__set: *mut sigset_t, __signo: libc::c_int) -> libc::c_int;
     fn sigprocmask(

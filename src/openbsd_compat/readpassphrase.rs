@@ -1,4 +1,5 @@
 use ::libc;
+use libc::kill;
 use libc::close;
 extern "C" {
     
@@ -12,7 +13,7 @@ extern "C" {
     ) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn getpid() -> __pid_t;
-    fn kill(__pid: __pid_t, __sig: libc::c_int) -> libc::c_int;
+    
     fn sigaction(
         __sig: libc::c_int,
         __act: *const sigaction,

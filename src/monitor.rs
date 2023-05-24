@@ -1,4 +1,5 @@
 use ::libc;
+use libc::kill;
 use libc::close;
 
 extern "C" {
@@ -33,7 +34,7 @@ extern "C" {
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
-    fn kill(__pid: __pid_t, __sig: libc::c_int) -> libc::c_int;
+    
     
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;

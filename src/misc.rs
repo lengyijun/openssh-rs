@@ -1,4 +1,5 @@
 use ::libc;
+use libc::kill;
 use libc::close;
 extern "C" {
     pub type sockaddr_x25;
@@ -45,7 +46,7 @@ extern "C" {
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
     fn platform_sys_dir_uid(_: uid_t) -> libc::c_int;
-    fn kill(__pid: __pid_t, __sig: libc::c_int) -> libc::c_int;
+    
     fn sigfillset(__set: *mut sigset_t) -> libc::c_int;
     fn sigaction(
         __sig: libc::c_int,

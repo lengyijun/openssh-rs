@@ -1,4 +1,5 @@
 use ::libc;
+use libc::kill;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -17,7 +18,7 @@ extern "C" {
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
-    fn kill(__pid: __pid_t, __sig: libc::c_int) -> libc::c_int;
+    
     fn sys_tun_outfilter(
         _: *mut ssh,
         _: *mut Channel,
