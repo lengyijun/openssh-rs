@@ -11,7 +11,6 @@ extern "C" {
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
     fn lstat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn fchmod(__fd: libc::c_int, __mode: __mode_t) -> libc::c_int;
     fn fchmodat(
         __fd: libc::c_int,
         __file: *const libc::c_char,
@@ -2632,7 +2631,7 @@ unsafe extern "C" fn process_fsetstat(mut id: u_int32_t) {
                 name,
                 a.perm,
             );
-            r = fchmod(fd, a.perm & 0o7777 as libc::c_int as libc::c_uint);
+            r = libc::fchmod(fd, a.perm & 0o7777 as libc::c_int as libc::c_uint);
             if r == -(1 as libc::c_int) {
                 status = errno_to_portable(*__errno_location());
             }

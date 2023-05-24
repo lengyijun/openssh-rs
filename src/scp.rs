@@ -25,7 +25,6 @@ extern "C" {
     fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn fchmod(__fd: libc::c_int, __mode: __mode_t) -> libc::c_int;
     fn umask(__mask: __mode_t) -> __mode_t;
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
@@ -4451,7 +4450,7 @@ pub unsafe extern "C" fn sink(
                                             }
                                             if pflag != 0 {
                                                 if exists != 0 || omode != mode {
-                                                    if fchmod(ofd, omode) != 0 {
+                                                    if libc::fchmod(ofd, omode) != 0 {
                                                         note_err(
                                                             b"%s: set mode: %s\0" as *const u8
                                                                 as *const libc::c_char,
@@ -4461,7 +4460,7 @@ pub unsafe extern "C" fn sink(
                                                     }
                                                 }
                                             } else if exists == 0 && omode != mode {
-                                                if fchmod(ofd, omode & !mask) != 0 {
+                                                if libc::fchmod(ofd, omode & !mask) != 0 {
                                                     note_err(
                                                         b"%s: set mode: %s\0" as *const u8
                                                             as *const libc::c_char,

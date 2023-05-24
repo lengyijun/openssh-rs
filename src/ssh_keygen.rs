@@ -17,7 +17,6 @@ extern "C" {
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn fchmod(__fd: libc::c_int, __mode: __mode_t) -> libc::c_int;
     fn umask(__mask: __mode_t) -> __mode_t;
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
@@ -3273,7 +3272,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                                 );
                                 current_block = 10340423718687530949;
                             } else {
-                                fchmod(fd, 0o644 as libc::c_int as __mode_t);
+                                libc::fchmod(fd, 0o644 as libc::c_int as __mode_t);
                                 close(fd);
                                 r = sshkey_save_public(public, pub_tmp, comment.as_mut_ptr());
                                 if r != 0 as libc::c_int {
@@ -3746,7 +3745,7 @@ unsafe extern "C" fn do_known_hosts(
                 strerror(oerrno),
             );
         }
-        fchmod(fd, sb.st_mode & 0o644 as libc::c_int as libc::c_uint);
+        libc::fchmod(fd, sb.st_mode & 0o644 as libc::c_int as libc::c_uint);
         inplace = 1 as libc::c_int;
     }
     foreach_options = (if find_host != 0 {
