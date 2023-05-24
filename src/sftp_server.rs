@@ -20,7 +20,6 @@ extern "C" {
         __flag: libc::c_int,
     ) -> libc::c_int;
     fn umask(__mask: __mode_t) -> __mode_t;
-    fn mkdir(__path: *const libc::c_char, __mode: __mode_t) -> libc::c_int;
     fn utimensat(
         __fd: libc::c_int,
         __path: *const libc::c_char,
@@ -2983,7 +2982,7 @@ unsafe extern "C" fn process_mkdir(mut id: u_int32_t) {
         name,
         mode,
     );
-    r = mkdir(name, mode as __mode_t);
+    r = libc::mkdir(name, mode as __mode_t);
     status = if r == -(1 as libc::c_int) {
         errno_to_portable(*__errno_location())
     } else {

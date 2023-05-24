@@ -28,7 +28,6 @@ extern "C" {
     fn chmod(__file: *const libc::c_char, __mode: __mode_t) -> libc::c_int;
     fn fchmod(__fd: libc::c_int, __mode: __mode_t) -> libc::c_int;
     fn umask(__mask: __mode_t) -> __mode_t;
-    fn mkdir(__path: *const libc::c_char, __mode: __mode_t) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn strnvis(
@@ -3467,7 +3466,7 @@ pub unsafe extern "C" fn sink_sftp(
                                     as *const libc::c_char,
                                 dst,
                             );
-                            if mkdir(dst, 0o777 as libc::c_int as __mode_t) != 0 as libc::c_int {
+                            if libc::mkdir(dst, 0o777 as libc::c_int as __mode_t) != 0 as libc::c_int {
                                 sshlog(
                                     b"scp.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(
@@ -4202,7 +4201,7 @@ pub unsafe extern "C" fn sink(
                                             }
                                         } else {
                                             mod_flag = 1 as libc::c_int;
-                                            if mkdir(
+                                            if libc::mkdir(
                                                 np,
                                                 mode | (0o400 as libc::c_int
                                                     | 0o200 as libc::c_int

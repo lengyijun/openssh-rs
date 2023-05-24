@@ -21,7 +21,6 @@ extern "C" {
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn mkdir(__path: *const libc::c_char, __mode: __mode_t) -> libc::c_int;
     fn lstat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn chmod(__file: *const libc::c_char, __mode: __mode_t) -> libc::c_int;
     fn fchmod(__fd: libc::c_int, __mode: __mode_t) -> libc::c_int;
@@ -4904,7 +4903,7 @@ unsafe extern "C" fn download_dir_internal(
             dst,
         );
     }
-    if mkdir(dst, tmpmode) == -(1 as libc::c_int) && *__errno_location() != 17 as libc::c_int {
+    if libc::mkdir(dst, tmpmode) == -(1 as libc::c_int) && *__errno_location() != 17 as libc::c_int {
         sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"download_dir_internal\0"))
