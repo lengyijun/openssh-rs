@@ -25,7 +25,6 @@ extern "C" {
     fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn chmod(__file: *const libc::c_char, __mode: __mode_t) -> libc::c_int;
     fn fchmod(__fd: libc::c_int, __mode: __mode_t) -> libc::c_int;
     fn umask(__mask: __mode_t) -> __mode_t;
     fn __errno_location() -> *mut libc::c_int;
@@ -4195,7 +4194,7 @@ pub unsafe extern "C" fn sink(
                                                 current_block = 11551238854158739040;
                                             } else {
                                                 if pflag != 0 {
-                                                    chmod(np, mode);
+                                                    libc::chmod(np, mode);
                                                 }
                                                 current_block = 7079180960716815705;
                                             }
@@ -4227,7 +4226,7 @@ pub unsafe extern "C" fn sink(
                                                     );
                                                 }
                                                 if mod_flag != 0 {
-                                                    chmod(vect[0 as libc::c_int as usize], mode);
+                                                    libc::chmod(vect[0 as libc::c_int as usize], mode);
                                                 }
                                                 free(
                                                     vect[0 as libc::c_int as usize]

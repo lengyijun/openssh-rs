@@ -1,7 +1,6 @@
 use ::libc;
 extern "C" {
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn chmod(__file: *const libc::c_char, __mode: __mode_t) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn close(__fd: libc::c_int) -> libc::c_int;
     fn chown(__file: *const libc::c_char, __owner: __uid_t, __group: __gid_t) -> libc::c_int;
@@ -439,7 +438,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
                 >> 3 as libc::c_int) as libc::c_uint
         != mode
     {
-        if chmod(tty, mode) == -(1 as libc::c_int) {
+        if libc::chmod(tty, mode) == -(1 as libc::c_int) {
             if *__errno_location() == 30 as libc::c_int
                 && st.st_mode
                     & (0o400 as libc::c_int >> 3 as libc::c_int

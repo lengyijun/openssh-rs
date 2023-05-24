@@ -22,7 +22,6 @@ extern "C" {
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
     fn lstat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn chmod(__file: *const libc::c_char, __mode: __mode_t) -> libc::c_int;
     fn fchmod(__fd: libc::c_int, __mode: __mode_t) -> libc::c_int;
     fn writev(__fd: libc::c_int, __iovec: *const iovec, __count: libc::c_int) -> ssize_t;
     fn opendir(__name: *const libc::c_char) -> *mut DIR;
@@ -5068,7 +5067,7 @@ unsafe extern "C" fn download_dir_internal(
             );
         }
     }
-    if mode != tmpmode && chmod(dst, mode) == -(1 as libc::c_int) {
+    if mode != tmpmode && libc::chmod(dst, mode) == -(1 as libc::c_int) {
         sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"download_dir_internal\0"))
