@@ -150,7 +150,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sanitise_stdfd();
     
-    fn replacearg(_: *mut arglist, _: u_int, _: *mut libc::c_char, _: ...);
     fn freeargs(_: *mut arglist);
     fn bandwidth_limit_init(_: *mut bwlimit, _: u_int64_t, _: size_t);
     fn bandwidth_limit(_: *mut bwlimit, _: size_t);
@@ -728,7 +727,7 @@ pub unsafe extern "C" fn do_cmd(
             }
             close(sv[0 as libc::c_int as usize]);
             close(sv[1 as libc::c_int as usize]);
-            replacearg(
+            crate::misc::replacearg(
                 &mut args as *mut arglist,
                 0 as libc::c_int as u_int,
                 b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
@@ -836,7 +835,7 @@ pub unsafe extern "C" fn do_cmd2(
         if dup2(fdout, 1 as libc::c_int) == -(1 as libc::c_int) {
             perror(b"dup2\0" as *const u8 as *const libc::c_char);
         }
-        replacearg(
+        crate::misc::replacearg(
             &mut args as *mut arglist,
             0 as libc::c_int as u_int,
             b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,

@@ -144,7 +144,7 @@ extern "C" {
     fn sanitise_stdfd();
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
     
-    fn replacearg(_: *mut arglist, _: u_int, _: *mut libc::c_char, _: ...);
+    
     fn freeargs(_: *mut arglist);
     fn argv_split(
         _: *const libc::c_char,
@@ -4582,7 +4582,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             }
             83 => {
                 ssh_program = BSDoptarg;
-                replacearg(
+                crate::misc::replacearg(
                     &mut args as *mut arglist,
                     0 as libc::c_int as u_int,
                     b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
