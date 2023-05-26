@@ -1,16 +1,7 @@
 use ::libc;
 extern "C" {
     fn cleanup_exit(_: libc::c_int) -> !;
-    fn sshlogv(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ::core::ffi::VaList,
-    );
+
 }
 pub type __builtin_va_list = [__va_list_tag; 1];
 #[derive(Copy, Clone)]
@@ -44,7 +35,7 @@ pub unsafe extern "C" fn sshfatal(
 ) -> ! {
     let mut args_0: ::core::ffi::VaListImpl;
     args_0 = args.clone();
-    sshlogv(
+    crate::log::sshlogv(
         file,
         func,
         line,

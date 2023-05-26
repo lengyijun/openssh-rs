@@ -106,16 +106,7 @@ extern "C" {
     fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
     fn cleanup_exit(_: libc::c_int) -> !;
 
-    fn sshlogv(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ::core::ffi::VaList,
-    );
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn atomicio(
         _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
@@ -1966,7 +1957,7 @@ pub unsafe extern "C" fn sshfatal(
 ) -> ! {
     let mut args_0: ::core::ffi::VaListImpl;
     args_0 = args.clone();
-    sshlogv(
+    crate::log::sshlogv(
         file,
         func,
         line,
