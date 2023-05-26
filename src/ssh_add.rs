@@ -1,5 +1,7 @@
+use crate::log::log_init;
 use ::libc;
 use libc::close;
+
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -69,7 +71,6 @@ extern "C" {
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -166,7 +167,7 @@ extern "C" {
     fn cleanhostname(_: *mut libc::c_char) -> *mut libc::c_char;
     fn convtime(_: *const libc::c_char) -> libc::c_int;
     fn tilde_expand_filename(_: *const libc::c_char, _: uid_t) -> *mut libc::c_char;
-    fn sanitise_stdfd();
+
     fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn ssh_digest_alg_by_name(name: *const libc::c_char) -> libc::c_int;
     fn sshsk_load_resident(
@@ -1908,7 +1909,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     let mut log_level: LogLevel = SYSLOG_LEVEL_INFO;
     let mut dest_constraints: *mut *mut dest_constraint = 0 as *mut *mut dest_constraint;
     let mut ndest_constraints: size_t = 0 as libc::c_int as size_t;
-    sanitise_stdfd();
+    crate::misc::sanitise_stdfd();
     __progname = ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
     seed_rng();
     log_init(__progname, log_level, log_facility, 1 as libc::c_int);

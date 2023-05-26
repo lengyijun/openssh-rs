@@ -1,5 +1,7 @@
+use crate::log::log_init;
 use ::libc;
 use libc::close;
+
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -29,7 +31,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ::core::ffi::VaList,
     ) -> libc::c_int;
-    fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
+
     fn log_level_name(_: LogLevel) -> *const libc::c_char;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
@@ -49,7 +51,7 @@ extern "C" {
     fn sshkey_is_sk(_: *const sshkey) -> libc::c_int;
     fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
     fn sshkey_free(_: *mut sshkey);
-    fn sanitise_stdfd();
+
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_froms(buf: *mut sshbuf, bufp: *mut *mut sshbuf) -> libc::c_int;
     fn sshbuf_free(buf: *mut sshbuf);
@@ -860,7 +862,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     let mut ll: u_int = 0 as libc::c_int as u_int;
     let mut version: uint8_t = 0;
     let mut log_stderr: uint8_t = 0 as libc::c_int as uint8_t;
-    sanitise_stdfd();
+    crate::misc::sanitise_stdfd();
     log_init(
         __progname,
         log_level,
@@ -913,7 +915,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     }
     close(0 as libc::c_int);
     close(1 as libc::c_int);
-    sanitise_stdfd();
+    crate::misc::sanitise_stdfd();
     req = sshbuf_new();
     if req.is_null() {
         sshfatal(

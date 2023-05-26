@@ -1,3 +1,4 @@
+use crate::atomicio::atomicio;
 use ::libc;
 use libc::close;
 use libc::kill;
@@ -62,12 +63,7 @@ extern "C" {
         g: *mut *const BIGNUM,
     );
     fn DH_free(dh: *mut DH);
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;

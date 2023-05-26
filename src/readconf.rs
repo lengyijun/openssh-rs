@@ -1,5 +1,7 @@
+use crate::misc::parse_uri;
 use ::libc;
 use libc::kill;
+
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -103,7 +105,7 @@ extern "C" {
     fn forward_equals(_: *const Forward, _: *const Forward) -> libc::c_int;
     fn rtrim(_: *mut libc::c_char);
     fn strdelim(_: *mut *mut libc::c_char) -> *mut libc::c_char;
-    fn a2port(_: *const libc::c_char) -> libc::c_int;
+
     fn a2tun(_: *const libc::c_char, _: *mut libc::c_int) -> libc::c_int;
     fn hpdelim(_: *mut *mut libc::c_char) -> *mut libc::c_char;
     fn cleanhostname(_: *mut libc::c_char) -> *mut libc::c_char;
@@ -113,14 +115,7 @@ extern "C" {
         _: *mut *mut libc::c_char,
         _: *mut libc::c_int,
     ) -> libc::c_int;
-    fn parse_uri(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *mut *mut libc::c_char,
-        _: *mut *mut libc::c_char,
-        _: *mut libc::c_int,
-        _: *mut *mut libc::c_char,
-    ) -> libc::c_int;
+
     fn convtime(_: *const libc::c_char) -> libc::c_int;
     fn dollar_expand(_: *mut libc::c_int, string: *const libc::c_char, _: ...)
         -> *mut libc::c_char;
@@ -3736,7 +3731,7 @@ unsafe extern "C" fn process_config_line_depth(
                 );
                 current_block = 7482270440933722938;
             } else {
-                value = a2port(arg);
+                value = crate::misc::a2port(arg);
                 if value <= 0 as libc::c_int {
                     crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
@@ -4242,7 +4237,7 @@ unsafe extern "C" fn process_config_line_depth(
                     if arg.is_null()
                         || strcmp(arg, b"*\0" as *const u8 as *const libc::c_char)
                             != 0 as libc::c_int
-                            && a2port(arg) <= 0 as libc::c_int
+                            && crate::misc::a2port(arg) <= 0 as libc::c_int
                     {
                         sshfatal(
                             b"readconf.c\0" as *const u8 as *const libc::c_char,
@@ -7091,7 +7086,7 @@ pub unsafe extern "C" fn parse_forward(
                 (*fwd).listen_port = -(2 as libc::c_int);
             } else {
                 (*fwd).listen_host = 0 as *mut libc::c_char;
-                (*fwd).listen_port = a2port(fwdargs[0 as libc::c_int as usize].arg);
+                (*fwd).listen_port = crate::misc::a2port(fwdargs[0 as libc::c_int as usize].arg);
             }
             (*fwd).connect_host = xstrdup(b"socks\0" as *const u8 as *const libc::c_char);
         }
@@ -7105,12 +7100,12 @@ pub unsafe extern "C" fn parse_forward(
                 (*fwd).connect_port = -(2 as libc::c_int);
             } else if fwdargs[1 as libc::c_int as usize].ispath != 0 {
                 (*fwd).listen_host = 0 as *mut libc::c_char;
-                (*fwd).listen_port = a2port(fwdargs[0 as libc::c_int as usize].arg);
+                (*fwd).listen_port = crate::misc::a2port(fwdargs[0 as libc::c_int as usize].arg);
                 (*fwd).connect_path = xstrdup(fwdargs[1 as libc::c_int as usize].arg);
                 (*fwd).connect_port = -(2 as libc::c_int);
             } else {
                 (*fwd).listen_host = xstrdup(fwdargs[0 as libc::c_int as usize].arg);
-                (*fwd).listen_port = a2port(fwdargs[1 as libc::c_int as usize].arg);
+                (*fwd).listen_port = crate::misc::a2port(fwdargs[1 as libc::c_int as usize].arg);
                 (*fwd).connect_host = xstrdup(b"socks\0" as *const u8 as *const libc::c_char);
             }
         }
@@ -7119,24 +7114,24 @@ pub unsafe extern "C" fn parse_forward(
                 (*fwd).listen_path = xstrdup(fwdargs[0 as libc::c_int as usize].arg);
                 (*fwd).listen_port = -(2 as libc::c_int);
                 (*fwd).connect_host = xstrdup(fwdargs[1 as libc::c_int as usize].arg);
-                (*fwd).connect_port = a2port(fwdargs[2 as libc::c_int as usize].arg);
+                (*fwd).connect_port = crate::misc::a2port(fwdargs[2 as libc::c_int as usize].arg);
             } else if fwdargs[2 as libc::c_int as usize].ispath != 0 {
                 (*fwd).listen_host = xstrdup(fwdargs[0 as libc::c_int as usize].arg);
-                (*fwd).listen_port = a2port(fwdargs[1 as libc::c_int as usize].arg);
+                (*fwd).listen_port = crate::misc::a2port(fwdargs[1 as libc::c_int as usize].arg);
                 (*fwd).connect_path = xstrdup(fwdargs[2 as libc::c_int as usize].arg);
                 (*fwd).connect_port = -(2 as libc::c_int);
             } else {
                 (*fwd).listen_host = 0 as *mut libc::c_char;
-                (*fwd).listen_port = a2port(fwdargs[0 as libc::c_int as usize].arg);
+                (*fwd).listen_port = crate::misc::a2port(fwdargs[0 as libc::c_int as usize].arg);
                 (*fwd).connect_host = xstrdup(fwdargs[1 as libc::c_int as usize].arg);
-                (*fwd).connect_port = a2port(fwdargs[2 as libc::c_int as usize].arg);
+                (*fwd).connect_port = crate::misc::a2port(fwdargs[2 as libc::c_int as usize].arg);
             }
         }
         4 => {
             (*fwd).listen_host = xstrdup(fwdargs[0 as libc::c_int as usize].arg);
-            (*fwd).listen_port = a2port(fwdargs[1 as libc::c_int as usize].arg);
+            (*fwd).listen_port = crate::misc::a2port(fwdargs[1 as libc::c_int as usize].arg);
             (*fwd).connect_host = xstrdup(fwdargs[2 as libc::c_int as usize].arg);
-            (*fwd).connect_port = a2port(fwdargs[3 as libc::c_int as usize].arg);
+            (*fwd).connect_port = crate::misc::a2port(fwdargs[3 as libc::c_int as usize].arg);
         }
         _ => {
             i = 0 as libc::c_int;

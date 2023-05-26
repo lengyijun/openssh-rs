@@ -1,6 +1,8 @@
+use crate::log::log_init;
 use ::libc;
 use libc::close;
 use libc::kill;
+
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_ns;
@@ -186,7 +188,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_private_deserialize(buf: *mut sshbuf, keyp: *mut *mut sshkey) -> libc::c_int;
     fn sshkey_enable_maxsign(_: *mut sshkey, _: u_int32_t) -> libc::c_int;
-    fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
@@ -201,7 +202,7 @@ extern "C" {
     ) -> !;
     fn set_nonblock(_: libc::c_int) -> libc::c_int;
     fn convtime(_: *const libc::c_char) -> libc::c_int;
-    fn sanitise_stdfd();
+
     fn monotime() -> time_t;
     fn unix_listener(_: *const libc::c_char, _: libc::c_int, _: libc::c_int) -> libc::c_int;
     fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
@@ -4755,7 +4756,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     let mut pfd: *mut pollfd = 0 as *mut pollfd;
     let mut npfd: size_t = 0 as libc::c_int as size_t;
     let mut maxfds: u_int = 0;
-    sanitise_stdfd();
+    crate::misc::sanitise_stdfd();
     setegid(getgid());
     setgid(getgid());
     platform_disable_tracing(0 as libc::c_int);

@@ -1,5 +1,8 @@
+use crate::log::log_init;
+use crate::utf8::msetlocale;
 use ::libc;
 use libc::close;
+
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -232,7 +235,7 @@ extern "C" {
     );
     fn muxserver_listen(_: *mut ssh);
     fn muxclient(_: *const libc::c_char) -> libc::c_int;
-    fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
+
     fn log_is_on_stderr() -> libc::c_int;
     fn log_redirect_stderr_to(_: *const libc::c_char);
     fn log_verbose_add(_: *const libc::c_char);
@@ -249,14 +252,14 @@ extern "C" {
         _: ...
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn a2port(_: *const libc::c_char) -> libc::c_int;
+
     fn a2tun(_: *const libc::c_char, _: *mut libc::c_int) -> libc::c_int;
     fn hpdelim(_: *mut *mut libc::c_char) -> *mut libc::c_char;
     fn cleanhostname(_: *mut libc::c_char) -> *mut libc::c_char;
     fn tilde_expand_filename(_: *const libc::c_char, _: uid_t) -> *mut libc::c_char;
     fn percent_expand(_: *const libc::c_char, _: ...) -> *mut libc::c_char;
     fn percent_dollar_expand(_: *const libc::c_char, _: ...) -> *mut libc::c_char;
-    fn sanitise_stdfd();
+
     fn lowercase(s: *mut libc::c_char);
     fn valid_domain(
         _: *mut libc::c_char,
@@ -358,7 +361,7 @@ extern "C" {
         _: *const libc::c_char,
         _: libc::c_int,
     ) -> libc::c_int;
-    fn msetlocale();
+
     fn pkcs11_init(_: libc::c_int) -> libc::c_int;
     fn pkcs11_add_provider(
         _: *mut libc::c_char,
@@ -2180,7 +2183,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     let mut len: size_t = 0;
     let mut j: u_int = 0;
     let mut cinfo: *mut ssh_conn_info = 0 as *mut ssh_conn_info;
-    sanitise_stdfd();
+    crate::misc::sanitise_stdfd();
     closefrom(2 as libc::c_int + 1 as libc::c_int);
     __progname = ssh_get_progname(*av.offset(0 as libc::c_int as isize));
     saved_av = xcalloc(
@@ -2750,7 +2753,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 }
                 112 => {
                     if options.port == -(1 as libc::c_int) {
-                        options.port = a2port(BSDoptarg);
+                        options.port = crate::misc::a2port(BSDoptarg);
                         if options.port <= 0 as libc::c_int {
                             fprintf(
                                 stderr,

@@ -1,3 +1,4 @@
+use crate::atomicio::atomicio;
 use ::libc;
 extern "C" {
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
@@ -13,12 +14,7 @@ extern "C" {
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
     fn free(_: *mut libc::c_void);
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn xextendf(
         s: *mut *mut libc::c_char,
         sep: *const libc::c_char,

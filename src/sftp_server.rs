@@ -1,4 +1,6 @@
+use crate::atomicio::atomicio;
 use crate::sftp_common::Attrib;
+
 use ::libc;
 use libc::close;
 
@@ -100,12 +102,7 @@ extern "C" {
         __tp: *const tm,
     ) -> size_t;
     fn localtime(__timer: *const time_t) -> *mut tm;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
@@ -140,7 +137,7 @@ extern "C" {
     fn sshbuf_froms(buf: *mut sshbuf, bufp: *mut *mut sshbuf) -> libc::c_int;
     fn sshbuf_new() -> *mut sshbuf;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
+
     fn log_facility_number(_: *mut libc::c_char) -> SyslogFacility;
     fn log_level_number(_: *mut libc::c_char) -> LogLevel;
 

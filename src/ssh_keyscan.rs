@@ -1,5 +1,8 @@
+use crate::atomicio::atomicio;
+use crate::log::log_init;
 use ::libc;
 use libc::close;
+
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_un;
@@ -103,22 +106,17 @@ extern "C" {
     fn ssh_packet_set_timeout(_: *mut ssh, _: libc::c_int, _: libc::c_int);
     fn ssh_packet_close(_: *mut ssh);
     fn ssh_dispatch_run(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t) -> libc::c_int;
-    fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
+
     fn cleanup_exit(_: libc::c_int) -> !;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn chop(_: *mut libc::c_char) -> *mut libc::c_char;
     fn set_nonblock(_: libc::c_int) -> libc::c_int;
-    fn a2port(_: *const libc::c_char) -> libc::c_int;
+
     fn put_host_port(_: *const libc::c_char, _: u_short) -> *mut libc::c_char;
     fn convtime(_: *const libc::c_char) -> libc::c_int;
-    fn sanitise_stdfd();
+
     fn monotime_ts(_: *mut timespec);
     fn lowercase(s: *mut libc::c_char);
     fn ssh_gai_strerror(_: libc::c_int) -> *const libc::c_char;
@@ -1999,7 +1997,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     seed_rng();
     tq.tqh_first = 0 as *mut Connection;
     tq.tqh_last = &mut tq.tqh_first;
-    sanitise_stdfd();
+    crate::misc::sanitise_stdfd();
     if argc <= 1 as libc::c_int {
         usage();
     }
@@ -2023,7 +2021,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 print_sshfp = 1 as libc::c_int;
             }
             112 => {
-                ssh_port = a2port(BSDoptarg);
+                ssh_port = crate::misc::a2port(BSDoptarg);
                 if ssh_port <= 0 as libc::c_int {
                     fprintf(
                         stderr,

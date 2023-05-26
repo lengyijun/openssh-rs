@@ -1,3 +1,4 @@
+use crate::sftp_client::do_stat;
 use crate::sftp_client::sftp_conn;
 use crate::sftp_common::Attrib;
 use ::libc;
@@ -17,7 +18,7 @@ extern "C" {
         _: *mut *mut *mut SFTP_DIRENT,
     ) -> libc::c_int;
     fn free_sftp_dirents(_: *mut *mut SFTP_DIRENT);
-    fn do_stat(_: *mut sftp_conn, _: *const libc::c_char, _: libc::c_int) -> *mut Attrib;
+
     fn do_lstat(_: *mut sftp_conn, _: *const libc::c_char, _: libc::c_int) -> *mut Attrib;
     fn _ssh__compat_glob(
         _: *const libc::c_char,

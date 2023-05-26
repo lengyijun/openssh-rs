@@ -1,5 +1,9 @@
+use crate::atomicio::atomicio;
+use crate::log::log_init;
+use crate::utf8::msetlocale;
 use ::libc;
 use libc::close;
+
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -299,7 +303,6 @@ extern "C" {
     fn sshbuf_write_file(path: *const libc::c_char, buf: *mut sshbuf) -> libc::c_int;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn log_level_get() -> LogLevel;
-    fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -320,7 +323,7 @@ extern "C" {
         fmt: *const libc::c_char,
         _: ...
     );
-    fn sanitise_stdfd();
+
     fn lowercase(s: *mut libc::c_char);
     fn parse_absolute_time(_: *const libc::c_char, _: *mut uint64_t) -> libc::c_int;
     fn pwcopy(_: *mut passwd) -> *mut passwd;
@@ -354,12 +357,7 @@ extern "C" {
         _: *mut *mut *mut sshkey,
         _: *mut *mut *mut libc::c_char,
     ) -> libc::c_int;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn ssh_krl_init() -> *mut ssh_krl;
     fn ssh_krl_free(krl: *mut ssh_krl);
     fn ssh_krl_set_version(krl: *mut ssh_krl, version: u_int64_t);
@@ -402,7 +400,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> libc::c_int;
-    fn msetlocale();
+
     fn ssh_get_authentication_socket(fdp: *mut libc::c_int) -> libc::c_int;
     fn ssh_fetch_identitylist(sock: libc::c_int, idlp: *mut *mut ssh_identitylist) -> libc::c_int;
     fn ssh_free_identitylist(idl: *mut ssh_identitylist);
@@ -8771,7 +8769,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         #[link_name = "BSDoptarg"]
         static mut BSDoptarg_0: *mut libc::c_char;
     }
-    sanitise_stdfd();
+    crate::misc::sanitise_stdfd();
     __progname = ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
     seed_rng();
     log_init(

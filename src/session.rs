@@ -1,3 +1,4 @@
+use crate::atomicio::atomicio;
 use ::libc;
 use libc::close;
 extern "C" {
@@ -270,12 +271,7 @@ extern "C" {
     ) -> libc::c_int;
     fn mm_session_pty_cleanup2(_: *mut Session);
     fn sftp_server_main(_: libc::c_int, _: *mut *mut libc::c_char, _: *mut passwd) -> libc::c_int;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     static mut options: ServerOptions;
     static mut __progname: *mut libc::c_char;
     static mut debug_flag: libc::c_int;

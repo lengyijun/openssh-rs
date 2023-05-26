@@ -1,3 +1,4 @@
+use crate::atomicio::atomicio;
 use ::libc;
 use libc::close;
 
@@ -35,12 +36,7 @@ extern "C" {
         -> *mut libc::c_char;
     fn nanosleep(__requested_time: *const timespec, __remaining: *mut timespec) -> libc::c_int;
     fn free(_: *mut libc::c_void);
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;

@@ -1,3 +1,4 @@
+use crate::atomicio::atomicio;
 use ::libc;
 use libc::close;
 extern "C" {
@@ -167,12 +168,7 @@ extern "C" {
     fn sshkey_ecdsa_key_to_nid(_: *mut EC_KEY) -> libc::c_int;
     fn sshkey_from_blob(_: *const u_char, _: size_t, _: *mut *mut sshkey) -> libc::c_int;
     fn sshkey_to_blob(_: *const sshkey, _: *mut *mut u_char, _: *mut size_t) -> libc::c_int;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;

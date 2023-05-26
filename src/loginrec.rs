@@ -1,5 +1,7 @@
+use crate::atomicio::atomicio;
 use ::libc;
 use libc::close;
+
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_un;
@@ -69,12 +71,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_connection_is_on_socket(_: *mut ssh) -> libc::c_int;
     fn ipv64_normalise_mapped(_: *mut sockaddr_storage, _: *mut socklen_t);

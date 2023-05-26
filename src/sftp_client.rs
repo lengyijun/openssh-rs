@@ -1,3 +1,4 @@
+use crate::atomicio::atomicio;
 use crate::sftp_common::Attrib;
 use ::libc;
 use libc::close;
@@ -88,12 +89,7 @@ extern "C" {
         cb: Option<unsafe extern "C" fn(*mut libc::c_void, size_t) -> libc::c_int>,
         _: *mut libc::c_void,
     ) -> size_t;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn atomiciov6(
         f: Option<unsafe extern "C" fn(libc::c_int, *const iovec, libc::c_int) -> ssize_t>,
         fd: libc::c_int,

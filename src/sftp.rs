@@ -1,7 +1,19 @@
+use crate::log::log_init;
 use crate::misc::arglist;
-use crate::sftp_client::sftp_conn;
+use crate::misc::parse_uri;
+use crate::misc::parse_user_host_path;
+use crate::sftp_client::do_init;
 use crate::sftp_client::do_mkdir;
+use crate::sftp_client::do_stat;
+use crate::sftp_client::do_upload;
+use crate::sftp_client::download_dir;
+use crate::sftp_client::globpath_is_dir;
+use crate::sftp_client::path_append;
+use crate::sftp_client::remote_is_dir;
+use crate::sftp_client::sftp_conn;
+use crate::sftp_client::upload_dir;
 use crate::sftp_common::Attrib;
+use crate::utf8::msetlocale;
 use ::libc;
 use libc::close;
 use libc::kill;
@@ -107,7 +119,6 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -120,30 +131,18 @@ extern "C" {
         _: ...
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn a2port(_: *const libc::c_char) -> libc::c_int;
+
     fn cleanhostname(_: *mut libc::c_char) -> *mut libc::c_char;
-    fn parse_user_host_path(
-        _: *const libc::c_char,
-        _: *mut *mut libc::c_char,
-        _: *mut *mut libc::c_char,
-        _: *mut *mut libc::c_char,
-    ) -> libc::c_int;
+
     fn parse_user_host_port(
         _: *const libc::c_char,
         _: *mut *mut libc::c_char,
         _: *mut *mut libc::c_char,
         _: *mut libc::c_int,
     ) -> libc::c_int;
-    fn parse_uri(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *mut *mut libc::c_char,
-        _: *mut *mut libc::c_char,
-        _: *mut libc::c_int,
-        _: *mut *mut libc::c_char,
-    ) -> libc::c_int;
+
     fn tilde_expand_filename(_: *const libc::c_char, _: uid_t) -> *mut libc::c_char;
-    fn sanitise_stdfd();
+
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
 
     fn argv_split(
@@ -155,7 +154,7 @@ extern "C" {
     fn argv_free(_: *mut *mut libc::c_char, _: libc::c_int);
     fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
     fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn msetlocale();
+
     fn attrib_clear(_: *mut Attrib);
     fn attrib_to_stat(_: *const Attrib, _: *mut stat);
     fn ls_file(
@@ -166,7 +165,7 @@ extern "C" {
         _: *const libc::c_char,
         _: *const libc::c_char,
     ) -> *mut libc::c_char;
-    fn do_init(_: libc::c_int, _: libc::c_int, _: u_int, _: u_int, _: u_int64_t) -> *mut sftp_conn;
+
     fn sftp_proto_version(_: *mut sftp_conn) -> u_int;
     fn do_readdir(
         _: *mut sftp_conn,
@@ -175,9 +174,9 @@ extern "C" {
     ) -> libc::c_int;
     fn free_sftp_dirents(_: *mut *mut SFTP_DIRENT);
     fn do_rm(_: *mut sftp_conn, _: *const libc::c_char) -> libc::c_int;
-    
+
     fn do_rmdir(_: *mut sftp_conn, _: *const libc::c_char) -> libc::c_int;
-    fn do_stat(_: *mut sftp_conn, _: *const libc::c_char, _: libc::c_int) -> *mut Attrib;
+
     fn do_lstat(_: *mut sftp_conn, _: *const libc::c_char, _: libc::c_int) -> *mut Attrib;
     fn do_setstat(_: *mut sftp_conn, _: *const libc::c_char, _: *mut Attrib) -> libc::c_int;
     fn do_lsetstat(conn: *mut sftp_conn, path: *const libc::c_char, a: *mut Attrib) -> libc::c_int;
@@ -195,29 +194,7 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_int;
     fn do_copy(_: *mut sftp_conn, _: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn do_upload(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn download_dir(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *mut Attrib,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-    ) -> libc::c_int;
 
-    fn remote_is_dir(conn: *mut sftp_conn, path: *const libc::c_char) -> libc::c_int;
     fn do_symlink(_: *mut sftp_conn, _: *const libc::c_char, _: *const libc::c_char)
         -> libc::c_int;
     fn make_absolute(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
@@ -226,21 +203,11 @@ extern "C" {
         _: *const libc::c_char,
         _: *const libc::c_char,
     ) -> libc::c_int;
-    fn path_append(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
+
     fn can_get_users_groups_by_id(conn: *mut sftp_conn) -> libc::c_int;
-    fn upload_dir(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-    ) -> libc::c_int;
+
     fn local_is_dir(path: *const libc::c_char) -> libc::c_int;
-    fn globpath_is_dir(pathname: *const libc::c_char) -> libc::c_int;
+
     fn _ssh__compat_glob(
         _: *const libc::c_char,
         _: libc::c_int,
@@ -4339,7 +4306,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     let mut num_requests: size_t = 0 as libc::c_int as size_t;
     let mut llv: libc::c_longlong = 0;
     let mut limit_kbps: libc::c_longlong = 0 as libc::c_int as libc::c_longlong;
-    sanitise_stdfd();
+    crate::misc::sanitise_stdfd();
     msetlocale();
     __progname = ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
     memset(
@@ -4407,7 +4374,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 );
             }
             80 => {
-                port = a2port(BSDoptarg);
+                port = crate::misc::a2port(BSDoptarg);
                 if port <= 0 as libc::c_int {
                     sshfatal(
                         b"sftp.c\0" as *const u8 as *const libc::c_char,

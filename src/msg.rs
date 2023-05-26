@@ -1,4 +1,6 @@
+use crate::atomicio::atomicio;
 use ::libc;
+
 extern "C" {
     pub type sshbuf;
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
@@ -12,12 +14,6 @@ extern "C" {
     fn sshbuf_reset(buf: *mut sshbuf);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
     fn get_u32(_: *const libc::c_void) -> u_int32_t;
     fn put_u32(_: *mut libc::c_void, _: u_int32_t);
 }

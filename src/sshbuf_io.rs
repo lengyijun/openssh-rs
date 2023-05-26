@@ -1,3 +1,4 @@
+use crate::atomicio::atomicio;
 use ::libc;
 use libc::close;
 extern "C" {
@@ -15,12 +16,7 @@ extern "C" {
     fn sshbuf_len(buf: *const sshbuf) -> size_t;
     fn sshbuf_mutable_ptr(buf: *const sshbuf) -> *mut u_char;
     fn sshbuf_put(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __dev_t = libc::c_ulong;

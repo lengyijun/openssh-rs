@@ -1,4 +1,6 @@
+use crate::log::log_init;
 use ::libc;
+
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -62,7 +64,7 @@ extern "C" {
         siglen: *mut libc::c_uint,
         eckey: *mut EC_KEY,
     ) -> libc::c_int;
-    fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn sshfatal(

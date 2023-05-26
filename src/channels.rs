@@ -186,7 +186,7 @@ extern "C" {
     fn set_nonblock(_: libc::c_int) -> libc::c_int;
     fn set_nodelay(_: libc::c_int);
     fn set_reuseaddr(_: libc::c_int) -> libc::c_int;
-    fn a2port(_: *const libc::c_char) -> libc::c_int;
+
     fn tohex(_: *const libc::c_void, _: size_t) -> *mut libc::c_char;
     fn monotime() -> time_t;
     fn lowercase(s: *mut libc::c_char);
@@ -9327,7 +9327,7 @@ pub unsafe extern "C" fn permitopen_port(mut p: *const libc::c_char) -> libc::c_
     if strcmp(p, b"*\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 0 as libc::c_int;
     }
-    port = a2port(p);
+    port = crate::misc::a2port(p);
     if port > 0 as libc::c_int {
         return port;
     }

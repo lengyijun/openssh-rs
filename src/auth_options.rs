@@ -35,7 +35,7 @@ extern "C" {
     fn sshbuf_froms(buf: *mut sshbuf, bufp: *mut *mut sshbuf) -> libc::c_int;
     fn sshbuf_fromb(buf: *mut sshbuf) -> *mut sshbuf;
     fn sshbuf_new() -> *mut sshbuf;
-    fn a2port(_: *const libc::c_char) -> libc::c_int;
+
     fn a2tun(_: *const libc::c_char, _: *mut libc::c_int) -> libc::c_int;
     fn hpdelim2(_: *mut *mut libc::c_char, _: *mut libc::c_char) -> *mut libc::c_char;
     fn valid_env_name(_: *const libc::c_char) -> libc::c_int;
@@ -597,7 +597,7 @@ unsafe extern "C" fn handle_permit(
     }
     if cp.is_null()
         || strcmp(cp, b"*\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
-            && a2port(cp) <= 0 as libc::c_int
+            && crate::misc::a2port(cp) <= 0 as libc::c_int
     {
         free(tmp as *mut libc::c_void);
         free(opt as *mut libc::c_void);

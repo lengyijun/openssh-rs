@@ -1,6 +1,9 @@
+use crate::atomicio::atomicio;
+use crate::log::log_init;
 use ::libc;
 use libc::close;
 use libc::kill;
+
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_un;
@@ -188,7 +191,7 @@ extern "C" {
     fn sshpkt_put_cstring(ssh: *mut ssh, v: *const libc::c_void) -> libc::c_int;
     fn sshpkt_put_stringb(ssh: *mut ssh, v: *const sshbuf) -> libc::c_int;
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
-    fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
+
     fn log_verbose_add(_: *const libc::c_char);
     fn set_log_handler(_: Option<log_handler_fn>, _: *mut libc::c_void);
 
@@ -241,7 +244,7 @@ extern "C" {
     fn unset_nonblock(_: libc::c_int) -> libc::c_int;
     fn set_reuseaddr(_: libc::c_int) -> libc::c_int;
     fn set_rdomain(_: libc::c_int, _: *const libc::c_char) -> libc::c_int;
-    fn a2port(_: *const libc::c_char) -> libc::c_int;
+
     fn convtime(_: *const libc::c_char) -> libc::c_int;
     fn fmt_timeframe(t: time_t) -> *const libc::c_char;
     fn xextendf(
@@ -250,7 +253,7 @@ extern "C" {
         fmt: *const libc::c_char,
         _: ...
     );
-    fn sanitise_stdfd();
+
     fn monotime() -> time_t;
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
     fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
@@ -369,12 +372,7 @@ extern "C" {
         _: *mut *mut sshkey,
         _: *mut *mut libc::c_char,
     ) -> libc::c_int;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn get_peer_ipaddr(_: libc::c_int) -> *mut libc::c_char;
     fn get_peer_port(_: libc::c_int) -> libc::c_int;
     fn get_local_ipaddr(_: libc::c_int) -> *mut libc::c_char;
@@ -3804,7 +3802,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             strerror(*__errno_location()),
         );
     }
-    sanitise_stdfd();
+    crate::misc::sanitise_stdfd();
     initialize_server_options(&mut options);
     loop {
         opt = BSDgetopt(
@@ -3897,7 +3895,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 }
                 let fresh6 = options.num_ports;
                 options.num_ports = (options.num_ports).wrapping_add(1);
-                options.ports[fresh6 as usize] = a2port(BSDoptarg);
+                options.ports[fresh6 as usize] = crate::misc::a2port(BSDoptarg);
                 if options.ports
                     [(options.num_ports).wrapping_sub(1 as libc::c_int as libc::c_uint) as usize]
                     <= 0 as libc::c_int

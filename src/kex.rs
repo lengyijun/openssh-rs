@@ -1,4 +1,6 @@
+use crate::atomicio::atomicio;
 use ::libc;
+
 extern "C" {
     pub type ssh_channels;
     pub type sshbuf;
@@ -35,12 +37,7 @@ extern "C" {
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
     fn DH_free(dh: *mut DH);
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn EC_KEY_free(key: *mut EC_KEY);
     fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_range(_: *mut ssh, _: u_int, _: u_int, _: Option<dispatch_fn>);

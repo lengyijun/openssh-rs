@@ -1,5 +1,7 @@
+use crate::atomicio::atomicio;
 use ::libc;
 use libc::close;
+
 extern "C" {
     pub type ssh_channels;
     pub type sshbuf;
@@ -74,12 +76,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn mm_receive_fd(_: libc::c_int) -> libc::c_int;
     fn process_permitopen(ssh: *mut ssh, options_0: *mut ServerOptions);
     fn process_channel_timeouts(ssh: *mut ssh, _: *mut ServerOptions);

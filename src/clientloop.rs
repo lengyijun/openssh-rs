@@ -1,5 +1,7 @@
+use crate::atomicio::atomicio;
 use ::libc;
 use libc::kill;
+
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -315,12 +317,7 @@ extern "C" {
         signature: *const sshbuf,
         forwarding: libc::c_int,
     ) -> libc::c_int;
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
+
     fn get_saved_tio() -> *mut termios;
     fn leave_raw_mode(_: libc::c_int);
     fn enter_raw_mode(_: libc::c_int);

@@ -1,3 +1,4 @@
+use crate::atomicio::atomicio;
 use ::libc;
 use libc::close;
 
@@ -71,12 +72,6 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_int;
 
-    fn atomicio(
-        _: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        _: libc::c_int,
-        _: *mut libc::c_void,
-        _: size_t,
-    ) -> size_t;
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
