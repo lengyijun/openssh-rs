@@ -17,11 +17,11 @@ extern "C" {
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    
+
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
-    
+
     fn closefrom(__lowfd: libc::c_int);
     fn dup(__fd: libc::c_int) -> libc::c_int;
     static mut environ: *mut *mut libc::c_char;
@@ -72,7 +72,7 @@ extern "C" {
     fn daemon(__nochdir: libc::c_int, __noclose: libc::c_int) -> libc::c_int;
     fn gethostname(__name: *mut libc::c_char, __len: size_t) -> libc::c_int;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
-    
+
     fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;

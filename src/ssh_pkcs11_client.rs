@@ -20,7 +20,7 @@ extern "C" {
         __fds: *mut libc::c_int,
     ) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
-    
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;

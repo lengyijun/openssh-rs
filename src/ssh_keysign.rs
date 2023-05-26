@@ -10,10 +10,10 @@ extern "C" {
         -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
-    
+
     fn getuid() -> __uid_t;
     fn pledge(promises: *const libc::c_char, paths: *mut *const libc::c_char) -> libc::c_int;
-    
+
     fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;

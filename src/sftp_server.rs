@@ -1,5 +1,7 @@
+use crate::sftp_common::Attrib;
 use ::libc;
 use libc::close;
+
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -18,7 +20,7 @@ extern "C" {
         __mode: __mode_t,
         __flag: libc::c_int,
     ) -> libc::c_int;
-    
+
     fn utimensat(
         __fd: libc::c_int,
         __path: *const libc::c_char,
@@ -31,7 +33,7 @@ extern "C" {
     fn platform_disable_tracing(_: libc::c_int);
     fn platform_pledge_sftp_server();
     fn lseek(__fd: libc::c_int, __offset: __off_t, __whence: libc::c_int) -> __off_t;
-    
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn chown(__file: *const libc::c_char, __owner: __uid_t, __group: __gid_t) -> libc::c_int;
@@ -79,7 +81,7 @@ extern "C" {
     fn opendir(__name: *const libc::c_char) -> *mut DIR;
     fn closedir(__dirp: *mut DIR) -> libc::c_int;
     fn readdir(__dirp: *mut DIR) -> *mut dirent;
-    
+
     fn getgrgid(__gid: __gid_t) -> *mut group;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
@@ -442,17 +444,7 @@ pub struct Stat {
     pub long_name: *mut libc::c_char,
     pub attrib: Attrib,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Attrib {
-    pub flags: u_int32_t,
-    pub size: u_int64_t,
-    pub uid: u_int32_t,
-    pub gid: u_int32_t,
-    pub perm: u_int32_t,
-    pub atime: u_int32_t,
-    pub mtime: u_int32_t,
-}
+
 pub type C2RustUnnamed_0 = libc::c_uint;
 static mut log_level: LogLevel = SYSLOG_LEVEL_ERROR;
 static mut pw: *mut passwd = 0 as *const passwd as *mut passwd;

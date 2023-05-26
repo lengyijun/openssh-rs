@@ -1,6 +1,6 @@
 use ::libc;
-use libc::kill;
 use libc::close;
+use libc::kill;
 
 extern "C" {
     pub type sockaddr_x25;
@@ -47,14 +47,14 @@ extern "C" {
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
     fn platform_sys_dir_uid(_: uid_t) -> libc::c_int;
-    
+
     fn sigfillset(__set: *mut sigset_t) -> libc::c_int;
     fn sigaction(
         __sig: libc::c_int,
         __act: *const sigaction,
         __oact: *mut sigaction,
     ) -> libc::c_int;
-    
+
     fn closefrom(__lowfd: libc::c_int);
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn getservbyname(__name: *const libc::c_char, __proto: *const libc::c_char) -> *mut servent;
@@ -143,7 +143,7 @@ extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __ctype_tolower_loc() -> *mut *const __int32_t;
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
-    
+
     fn initgroups(__user: *const libc::c_char, __group: __gid_t) -> libc::c_int;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;

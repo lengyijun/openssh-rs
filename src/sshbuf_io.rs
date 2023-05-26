@@ -2,13 +2,13 @@ use ::libc;
 use libc::close;
 extern "C" {
     pub type sshbuf;
-    
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
-    
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_free(buf: *mut sshbuf);

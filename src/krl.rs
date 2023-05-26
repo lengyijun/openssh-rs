@@ -2447,20 +2447,8 @@ unsafe extern "C" fn choose_next_state(
                 8 as libc::c_int + 64 as libc::c_int
             })) as libc::c_ulong,
     ) as u_int64_t as u_int64_t;
-    cost_bitmap =
-        (cost_bitmap as libc::c_ulong).wrapping_add(last_gap.wrapping_add(contig).wrapping_add(
-            if final_0 != 0 {
-                0 as libc::c_int as libc::c_ulong
-            } else {
-                if next_gap < (8 as libc::c_int + 64 as libc::c_int) as libc::c_ulong {
-                    next_gap
-                } else {
-                    (8 as libc::c_int + 64 as libc::c_int) as libc::c_ulong
-                }
-            },
-        )) as u_int64_t as u_int64_t;
-    cost_bitmap_restart = (cost_bitmap_restart as libc::c_ulong).wrapping_add(contig.wrapping_add(
-        if final_0 != 0 {
+    cost_bitmap = (cost_bitmap as libc::c_ulong).wrapping_add(
+        last_gap.wrapping_add(contig).wrapping_add(if final_0 != 0 {
             0 as libc::c_int as libc::c_ulong
         } else {
             if next_gap < (8 as libc::c_int + 64 as libc::c_int) as libc::c_ulong {
@@ -2468,8 +2456,18 @@ unsafe extern "C" fn choose_next_state(
             } else {
                 (8 as libc::c_int + 64 as libc::c_int) as libc::c_ulong
             }
-        },
-    )) as u_int64_t as u_int64_t;
+        }),
+    ) as u_int64_t as u_int64_t;
+    cost_bitmap_restart =
+        (cost_bitmap_restart as libc::c_ulong).wrapping_add(contig.wrapping_add(if final_0 != 0 {
+            0 as libc::c_int as libc::c_ulong
+        } else {
+            if next_gap < (8 as libc::c_int + 64 as libc::c_int) as libc::c_ulong {
+                next_gap
+            } else {
+                (8 as libc::c_int + 64 as libc::c_int) as libc::c_ulong
+            }
+        })) as u_int64_t as u_int64_t;
     cost_list = cost_list
         .wrapping_add(7 as libc::c_int as libc::c_ulong)
         .wrapping_div(8 as libc::c_int as libc::c_ulong);

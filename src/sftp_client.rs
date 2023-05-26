@@ -1,12 +1,14 @@
+use crate::sftp_common::Attrib;
 use ::libc;
 use libc::close;
+
 extern "C" {
     pub type sshbuf;
     pub type __dirstream;
     fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn lseek(__fd: libc::c_int, __offset: __off_t, __whence: libc::c_int) -> __off_t;
-    
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn fsync(__fd: libc::c_int) -> libc::c_int;
@@ -27,7 +29,7 @@ extern "C" {
     fn opendir(__name: *const libc::c_char) -> *mut DIR;
     fn closedir(__dirp: *mut DIR) -> libc::c_int;
     fn readdir(__dirp: *mut DIR) -> *mut dirent;
-    
+
     fn free(_: *mut libc::c_void);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -241,17 +243,6 @@ pub struct bwlimit {
     pub lamt: u_int64_t,
     pub bwstart: timeval,
     pub bwend: timeval,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Attrib {
-    pub flags: u_int32_t,
-    pub size: u_int64_t,
-    pub uid: u_int32_t,
-    pub gid: u_int32_t,
-    pub perm: u_int32_t,
-    pub atime: u_int32_t,
-    pub mtime: u_int32_t,
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -4893,7 +4884,8 @@ unsafe extern "C" fn download_dir_internal(
             dst,
         );
     }
-    if libc::mkdir(dst, tmpmode) == -(1 as libc::c_int) && *__errno_location() != 17 as libc::c_int {
+    if libc::mkdir(dst, tmpmode) == -(1 as libc::c_int) && *__errno_location() != 17 as libc::c_int
+    {
         crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"download_dir_internal\0"))

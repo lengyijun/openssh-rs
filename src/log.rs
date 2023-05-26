@@ -12,7 +12,7 @@ extern "C" {
         _: size_t,
         _: libc::c_int,
     ) -> libc::c_int;
-    
+
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn _exit(_: libc::c_int) -> !;
     fn getpid() -> __pid_t;
@@ -32,7 +32,7 @@ extern "C" {
     ) -> libc::c_int;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    
+
     fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;

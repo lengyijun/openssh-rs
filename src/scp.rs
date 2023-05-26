@@ -1,14 +1,15 @@
+use crate::misc::arglist;
+use crate::sftp_client::sftp_conn;
+use crate::sftp_common::Attrib;
 use ::libc;
 use libc::close;
 use libc::kill;
-use crate::misc::arglist;
 
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
     pub type __dirstream;
-    pub type sftp_conn;
     static mut stderr: *mut FILE;
     fn fflush(__stream: *mut FILE) -> libc::c_int;
     fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut FILE;
@@ -29,7 +30,7 @@ extern "C" {
     fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    
+
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn strnvis(
@@ -38,7 +39,7 @@ extern "C" {
         _: size_t,
         _: libc::c_int,
     ) -> libc::c_int;
-    
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
@@ -149,7 +150,7 @@ extern "C" {
         _: *mut *mut libc::c_char,
     ) -> libc::c_int;
     fn sanitise_stdfd();
-    
+
     fn bandwidth_limit_init(_: *mut bwlimit, _: u_int64_t, _: size_t);
     fn bandwidth_limit(_: *mut bwlimit, _: size_t);
     fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
@@ -183,16 +184,7 @@ extern "C" {
     fn do_stat(_: *mut sftp_conn, _: *const libc::c_char, _: libc::c_int) -> *mut Attrib;
     fn do_expand_path(_: *mut sftp_conn, _: *const libc::c_char) -> *mut libc::c_char;
     fn can_expand_path(_: *mut sftp_conn) -> libc::c_int;
-    fn do_download(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *mut Attrib,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-    ) -> libc::c_int;
+
     fn download_dir(
         _: *mut sftp_conn,
         _: *const libc::c_char,
@@ -456,17 +448,7 @@ pub struct bwlimit {
     pub bwend: timeval,
 }
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Attrib {
-    pub flags: u_int32_t,
-    pub size: u_int64_t,
-    pub uid: u_int32_t,
-    pub gid: u_int32_t,
-    pub perm: u_int32_t,
-    pub atime: u_int32_t,
-    pub mtime: u_int32_t,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct BUF {
@@ -3449,7 +3431,9 @@ pub unsafe extern "C" fn sink_sftp(
                                     as *const libc::c_char,
                                 dst,
                             );
-                            if libc::mkdir(dst, 0o777 as libc::c_int as __mode_t) != 0 as libc::c_int {
+                            if libc::mkdir(dst, 0o777 as libc::c_int as __mode_t)
+                                != 0 as libc::c_int
+                            {
                                 crate::log::sshlog(
                                     b"scp.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(
@@ -3538,7 +3522,7 @@ pub unsafe extern "C" fn sink_sftp(
                                         {
                                             err = -(1 as libc::c_int);
                                         }
-                                    } else if do_download(
+                                    } else if crate::sftp_client::do_download(
                                         conn,
                                         *(g.gl_pathv).offset(i as isize),
                                         abs_dst,
@@ -4210,7 +4194,10 @@ pub unsafe extern "C" fn sink(
                                                     );
                                                 }
                                                 if mod_flag != 0 {
-                                                    libc::chmod(vect[0 as libc::c_int as usize], mode);
+                                                    libc::chmod(
+                                                        vect[0 as libc::c_int as usize],
+                                                        mode,
+                                                    );
                                                 }
                                                 free(
                                                     vect[0 as libc::c_int as usize]
@@ -4223,7 +4210,11 @@ pub unsafe extern "C" fn sink(
                                 } else {
                                     omode = mode;
                                     mode |= 0o200 as libc::c_int as libc::c_uint;
-                                    ofd = libc::open(np, 0o1 as libc::c_int | 0o100 as libc::c_int, mode);
+                                    ofd = libc::open(
+                                        np,
+                                        0o1 as libc::c_int | 0o100 as libc::c_int,
+                                        mode,
+                                    );
                                     if ofd == -(1 as libc::c_int) {
                                         current_block = 11551238854158739040;
                                     } else {

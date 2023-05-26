@@ -31,9 +31,9 @@ extern "C" {
     fn accept(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __addr_len: *mut socklen_t)
         -> libc::c_int;
     fn tcgetattr(__fd: libc::c_int, __termios_p: *mut termios) -> libc::c_int;
-    
+
     fn __errno_location() -> *mut libc::c_int;
-    
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn getuid() -> __uid_t;

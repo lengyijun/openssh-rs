@@ -1,8 +1,8 @@
 use ::libc;
-use libc::kill;
 use libc::close;
+use libc::kill;
 extern "C" {
-    
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn tcgetattr(__fd: libc::c_int, __termios_p: *mut termios) -> libc::c_int;
@@ -13,7 +13,7 @@ extern "C" {
     ) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     fn getpid() -> __pid_t;
-    
+
     fn sigaction(
         __sig: libc::c_int,
         __act: *const sigaction,
@@ -23,7 +23,7 @@ extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __ctype_tolower_loc() -> *mut *const __int32_t;
     fn __ctype_toupper_loc() -> *mut *const __int32_t;
-    
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;

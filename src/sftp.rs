@@ -1,14 +1,15 @@
-use ::libc;
-use libc::kill;
-use libc::close;
 use crate::misc::arglist;
+use crate::sftp_client::sftp_conn;
+use crate::sftp_common::Attrib;
+use ::libc;
+use libc::close;
+use libc::kill;
 
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
     pub type dirent;
-    pub type sftp_conn;
     fn socketpair(
         __domain: libc::c_int,
         __type: libc::c_int,
@@ -18,15 +19,15 @@ extern "C" {
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    
+
     fn __errno_location() -> *mut libc::c_int;
-    
+
     fn sigaction(
         __sig: libc::c_int,
         __act: *const sigaction,
         __oact: *mut sigaction,
     ) -> libc::c_int;
-    
+
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn getcwd(__buf: *mut libc::c_char, __size: size_t) -> *mut libc::c_char;
@@ -143,8 +144,7 @@ extern "C" {
     fn tilde_expand_filename(_: *const libc::c_char, _: uid_t) -> *mut libc::c_char;
     fn sanitise_stdfd();
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
-    
-    
+
     fn argv_split(
         _: *const libc::c_char,
         _: *mut libc::c_int,
@@ -220,16 +220,7 @@ extern "C" {
         _: libc::c_int,
         _: libc::c_int,
     ) -> libc::c_int;
-    fn do_download(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *mut Attrib,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-    ) -> libc::c_int;
+
     fn remote_is_dir(conn: *mut sftp_conn, path: *const libc::c_char) -> libc::c_int;
     fn do_symlink(_: *mut sftp_conn, _: *const libc::c_char, _: *const libc::c_char)
         -> libc::c_int;
@@ -534,17 +525,7 @@ pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Attrib {
-    pub flags: u_int32_t,
-    pub size: u_int64_t,
-    pub uid: u_int32_t,
-    pub gid: u_int32_t,
-    pub perm: u_int32_t,
-    pub atime: u_int32_t,
-    pub mtime: u_int32_t,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct _ssh_compat_glob_t {
@@ -1842,7 +1823,7 @@ unsafe extern "C" fn process_get(
                     {
                         err = -(1 as libc::c_int);
                     }
-                } else if do_download(
+                } else if crate::sftp_client::do_download(
                     conn,
                     *(g.gl_pathv).offset(i as isize),
                     abs_dst,

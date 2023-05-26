@@ -11,9 +11,9 @@ extern "C" {
     pub type ec_key_st;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    
+
     fn __errno_location() -> *mut libc::c_int;
-    
+
     fn getuid() -> __uid_t;
     fn fclose(__stream: *mut FILE) -> libc::c_int;
     fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut FILE;
@@ -26,7 +26,7 @@ extern "C" {
         __stream: *mut FILE,
     ) -> __ssize_t;
     fn ferror(__stream: *mut FILE) -> libc::c_int;
-    
+
     fn free(_: *mut libc::c_void);
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;

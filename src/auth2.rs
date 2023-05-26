@@ -10,7 +10,7 @@ extern "C" {
     pub type kex;
     pub type session_state;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn setproctitle(fmt: *const libc::c_char, _: ...);
@@ -26,7 +26,7 @@ extern "C" {
         __f: *const libc::c_char,
         __arg: ::core::ffi::VaList,
     ) -> libc::c_int;
-    
+
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;

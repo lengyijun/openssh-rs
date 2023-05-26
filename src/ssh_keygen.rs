@@ -18,10 +18,10 @@ extern "C" {
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    
+
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
-    
+
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn getuid() -> __uid_t;
     fn seed_rng();
@@ -163,7 +163,7 @@ extern "C" {
         cb: Option<pem_password_cb>,
         u: *mut libc::c_void,
     ) -> libc::c_int;
-    
+
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
@@ -2199,7 +2199,10 @@ unsafe extern "C" fn do_convert_from_ssh2(
     sshbuf_free(buf);
     fclose(fp);
 }
-unsafe extern "C" fn do_convert_from_pkcs8(mut k: *mut *mut sshkey, mut _private: *mut libc::c_int) {
+unsafe extern "C" fn do_convert_from_pkcs8(
+    mut k: *mut *mut sshkey,
+    mut _private: *mut libc::c_int,
+) {
     let mut pubkey: *mut EVP_PKEY = 0 as *mut EVP_PKEY;
     let mut fp: *mut FILE = 0 as *mut FILE;
     fp = fopen(

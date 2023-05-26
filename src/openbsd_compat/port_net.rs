@@ -21,7 +21,7 @@ extern "C" {
     ) -> libc::c_int;
     fn bzero(_: *mut libc::c_void, _: libc::c_ulong);
     fn __errno_location() -> *mut libc::c_int;
-    
+
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -29,7 +29,7 @@ extern "C" {
         _: ...
     ) -> libc::c_int;
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
-    
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;

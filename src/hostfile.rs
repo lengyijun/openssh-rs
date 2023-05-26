@@ -11,9 +11,9 @@ extern "C" {
     pub type ec_key_st;
     pub type ssh_hmac_ctx;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    
+
     fn __errno_location() -> *mut libc::c_int;
-    
+
     fn getuid() -> __uid_t;
     fn link(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
@@ -1065,7 +1065,9 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
                     dotsshdir,
                     strerror(*__errno_location()),
                 );
-            } else if libc::mkdir(dotsshdir, 0o700 as libc::c_int as __mode_t) == -(1 as libc::c_int) {
+            } else if libc::mkdir(dotsshdir, 0o700 as libc::c_int as __mode_t)
+                == -(1 as libc::c_int)
+            {
                 crate::log::sshlog(
                     b"hostfile.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(

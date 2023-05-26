@@ -1,6 +1,6 @@
 use ::libc;
-use libc::kill;
 use libc::close;
+use libc::kill;
 
 extern "C" {
     pub type sockaddr_x25;
@@ -34,8 +34,7 @@ extern "C" {
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
-    
-    
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
@@ -45,7 +44,7 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
-    
+
     fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;

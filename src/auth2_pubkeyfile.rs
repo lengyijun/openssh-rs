@@ -13,7 +13,7 @@ extern "C" {
     fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut FILE;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
-    
+
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -28,7 +28,7 @@ extern "C" {
     ) -> __ssize_t;
     fn fileno(__stream: *mut FILE) -> libc::c_int;
     fn free(_: *mut libc::c_void);
-    
+
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;

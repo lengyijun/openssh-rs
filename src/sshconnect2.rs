@@ -18,7 +18,7 @@ extern "C" {
     pub type notifier_ctx;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
-    
+
     fn closefrom(__lowfd: libc::c_int);
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;

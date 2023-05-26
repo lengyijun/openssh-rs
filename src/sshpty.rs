@@ -3,13 +3,13 @@ use libc::close;
 extern "C" {
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
-    
+
     fn chown(__file: *const libc::c_char, __owner: __uid_t, __group: __gid_t) -> libc::c_int;
     fn setsid() -> __pid_t;
     fn ttyname(__fd: libc::c_int) -> *mut libc::c_char;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
-    
+
     fn getgrnam(__name: *const libc::c_char) -> *mut group;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
 

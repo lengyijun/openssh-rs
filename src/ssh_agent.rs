@@ -1,6 +1,6 @@
 use ::libc;
-use libc::kill;
 use libc::close;
+use libc::kill;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_ns;
@@ -19,7 +19,7 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
     pub type notifier_ctx;
-    
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn usleep(__useconds: __useconds_t) -> libc::c_int;
@@ -35,11 +35,11 @@ extern "C" {
     fn accept(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __addr_len: *mut socklen_t)
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    
+
     fn __errno_location() -> *mut libc::c_int;
     fn platform_disable_tracing(_: libc::c_int);
     fn platform_pledge_agent();
-    
+
     fn setegid(__gid: __gid_t) -> libc::c_int;
     fn fork() -> __pid_t;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;

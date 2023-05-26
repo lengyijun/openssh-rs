@@ -1,6 +1,8 @@
+use crate::sftp_client::sftp_conn;
+use crate::sftp_common::Attrib;
 use ::libc;
+
 extern "C" {
-    pub type sftp_conn;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
@@ -74,17 +76,7 @@ pub struct dirent {
     pub d_type: libc::c_uchar,
     pub d_name: [libc::c_char; 256],
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Attrib {
-    pub flags: u_int32_t,
-    pub size: u_int64_t,
-    pub uid: u_int32_t,
-    pub gid: u_int32_t,
-    pub perm: u_int32_t,
-    pub atime: u_int32_t,
-    pub mtime: u_int32_t,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct _ssh_compat_glob_t {

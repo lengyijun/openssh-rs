@@ -1,7 +1,9 @@
+use crate::sftp_client::sftp_conn;
+use crate::sftp_common::Attrib;
 use ::libc;
+
 extern "C" {
     pub type dirent;
-    pub type sftp_conn;
     fn free(_: *mut libc::c_void);
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn sshfatal(
@@ -85,17 +87,7 @@ pub const SYSLOG_LEVEL_INFO: LogLevel = 3;
 pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Attrib {
-    pub flags: u_int32_t,
-    pub size: u_int64_t,
-    pub uid: u_int32_t,
-    pub gid: u_int32_t,
-    pub perm: u_int32_t,
-    pub atime: u_int32_t,
-    pub mtime: u_int32_t,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct _ssh_compat_glob_t {

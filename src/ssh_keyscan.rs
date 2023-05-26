@@ -25,7 +25,7 @@ extern "C" {
     pub type ssh_hmac_ctx;
     pub type sshcipher;
     pub type session_state;
-    
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
@@ -105,7 +105,6 @@ extern "C" {
     fn ssh_dispatch_run(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t) -> libc::c_int;
     fn log_init(_: *const libc::c_char, _: LogLevel, _: SyslogFacility, _: libc::c_int);
     fn cleanup_exit(_: libc::c_int) -> !;
-
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn atomicio(

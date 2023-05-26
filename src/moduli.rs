@@ -8,7 +8,7 @@ extern "C" {
     pub type bignum_ctx;
     pub type bn_gencb_st;
     fn __errno_location() -> *mut libc::c_int;
-    
+
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
     fn fclose(__stream: *mut FILE) -> libc::c_int;

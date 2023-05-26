@@ -1,6 +1,6 @@
 use ::libc;
-use libc::kill;
 use libc::close;
+use libc::kill;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_un;
@@ -67,7 +67,7 @@ extern "C" {
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    
+
     fn __errno_location() -> *mut libc::c_int;
     fn endpwent();
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
@@ -76,7 +76,7 @@ extern "C" {
     fn platform_pre_restart();
     fn platform_post_fork_parent(child_pid: pid_t);
     fn platform_post_fork_child();
-    
+
     fn sigemptyset(__set: *mut sigset_t) -> libc::c_int;
     fn sigaddset(__set: *mut sigset_t, __signo: libc::c_int) -> libc::c_int;
     fn sigprocmask(
@@ -84,7 +84,7 @@ extern "C" {
         __set: *const sigset_t,
         __oset: *mut sigset_t,
     ) -> libc::c_int;
-    
+
     fn closefrom(__lowfd: libc::c_int);
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;

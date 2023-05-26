@@ -1,6 +1,6 @@
 use ::libc;
-use libc::kill;
 use libc::close;
+use libc::kill;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_un;
@@ -43,8 +43,7 @@ extern "C" {
     ) -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
-    
-    
+
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn sleep(__seconds: libc::c_uint) -> libc::c_uint;
     fn dup(__fd: libc::c_int) -> libc::c_int;

@@ -1,6 +1,6 @@
 use ::libc;
-use libc::kill;
 use libc::close;
+use libc::kill;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -13,8 +13,7 @@ extern "C" {
         _: size_t,
         _: libc::c_int,
     ) -> *mut libc::c_char;
-    
-    
+
     fn closefrom(__lowfd: libc::c_int);
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
@@ -33,7 +32,7 @@ extern "C" {
         _: ::core::ffi::VaList,
     ) -> libc::c_int;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
-    
+
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
