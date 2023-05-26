@@ -1,6 +1,7 @@
 use ::libc;
 use libc::close;
 use libc::kill;
+use crate::misc::arglist;
 
 extern "C" {
     pub type _IO_wide_data;
@@ -148,7 +149,7 @@ extern "C" {
         _: *mut *mut libc::c_char,
     ) -> libc::c_int;
     fn sanitise_stdfd();
-    fn addargs(_: *mut arglist, _: *mut libc::c_char, _: ...);
+    
     fn replacearg(_: *mut arglist, _: u_int, _: *mut libc::c_char, _: ...);
     fn freeargs(_: *mut arglist);
     fn bandwidth_limit_init(_: *mut bwlimit, _: u_int64_t, _: size_t);
@@ -445,13 +446,7 @@ pub const SYSLOG_LEVEL_INFO: LogLevel = 3;
 pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct arglist {
-    pub list: *mut *mut libc::c_char,
-    pub num: u_int,
-    pub nalloc: u_int,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct bwlimit {
@@ -740,43 +735,43 @@ pub unsafe extern "C" fn do_cmd(
                 program,
             );
             if port != -(1 as libc::c_int) {
-                addargs(
+                crate::misc::addargs(
                     &mut args as *mut arglist,
                     b"-p\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
-                addargs(
+                crate::misc::addargs(
                     &mut args as *mut arglist,
                     b"%d\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     port,
                 );
             }
             if !remuser.is_null() {
-                addargs(
+                crate::misc::addargs(
                     &mut args as *mut arglist,
                     b"-l\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
-                addargs(
+                crate::misc::addargs(
                     &mut args as *mut arglist,
                     b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     remuser,
                 );
             }
             if subsystem != 0 {
-                addargs(
+                crate::misc::addargs(
                     &mut args as *mut arglist,
                     b"-s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
             }
-            addargs(
+            crate::misc::addargs(
                 &mut args as *mut arglist,
                 b"--\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
-            addargs(
+            crate::misc::addargs(
                 &mut args as *mut arglist,
                 b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 host,
             );
-            addargs(
+            crate::misc::addargs(
                 &mut args as *mut arglist,
                 b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 cmd_0,
@@ -848,41 +843,41 @@ pub unsafe extern "C" fn do_cmd2(
             ssh_program,
         );
         if port != -(1 as libc::c_int) {
-            addargs(
+            crate::misc::addargs(
                 &mut args as *mut arglist,
                 b"-p\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
-            addargs(
+            crate::misc::addargs(
                 &mut args as *mut arglist,
                 b"%d\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 port,
             );
         }
         if !remuser.is_null() {
-            addargs(
+            crate::misc::addargs(
                 &mut args as *mut arglist,
                 b"-l\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
-            addargs(
+            crate::misc::addargs(
                 &mut args as *mut arglist,
                 b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 remuser,
             );
         }
-        addargs(
+        crate::misc::addargs(
             &mut args as *mut arglist,
             b"-oBatchMode=yes\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
-        addargs(
+        crate::misc::addargs(
             &mut args as *mut arglist,
             b"--\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
-        addargs(
+        crate::misc::addargs(
             &mut args as *mut arglist,
             b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             host,
         );
-        addargs(
+        crate::misc::addargs(
             &mut args as *mut arglist,
             b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             cmd_0,
@@ -985,28 +980,28 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
     );
     remote_remote_args.list = 0 as *mut *mut libc::c_char;
     args.list = remote_remote_args.list;
-    addargs(
+    crate::misc::addargs(
         &mut args as *mut arglist,
         b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         ssh_program,
     );
-    addargs(
+    crate::misc::addargs(
         &mut args as *mut arglist,
         b"-x\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
-    addargs(
+    crate::misc::addargs(
         &mut args as *mut arglist,
         b"-oPermitLocalCommand=no\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
-    addargs(
+    crate::misc::addargs(
         &mut args as *mut arglist,
         b"-oClearAllForwardings=yes\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
-    addargs(
+    crate::misc::addargs(
         &mut args as *mut arglist,
         b"-oRemoteCommand=none\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
-    addargs(
+    crate::misc::addargs(
         &mut args as *mut arglist,
         b"-oRequestTTY=no\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
@@ -1037,12 +1032,12 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
             }
             50 => {}
             65 | 52 | 54 | 67 => {
-                addargs(
+                crate::misc::addargs(
                     &mut args as *mut arglist,
                     b"-%c\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     ch,
                 );
-                addargs(
+                crate::misc::addargs(
                     &mut remote_remote_args as *mut arglist,
                     b"-%c\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     ch,
@@ -1058,22 +1053,22 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
                 throughlocal = 0 as libc::c_int;
             }
             111 | 99 | 105 | 70 | 74 => {
-                addargs(
+                crate::misc::addargs(
                     &mut remote_remote_args as *mut arglist,
                     b"-%c\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     ch,
                 );
-                addargs(
+                crate::misc::addargs(
                     &mut remote_remote_args as *mut arglist,
                     b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     BSDoptarg,
                 );
-                addargs(
+                crate::misc::addargs(
                     &mut args as *mut arglist,
                     b"-%c\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     ch,
                 );
-                addargs(
+                crate::misc::addargs(
                     &mut args as *mut arglist,
                     b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     BSDoptarg,
@@ -1102,11 +1097,11 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
                 }
             }
             66 => {
-                addargs(
+                crate::misc::addargs(
                     &mut remote_remote_args as *mut arglist,
                     b"-oBatchmode=yes\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
-                addargs(
+                crate::misc::addargs(
                     &mut args as *mut arglist,
                     b"-oBatchmode=yes\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -1139,11 +1134,11 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
                 ssh_program = xstrdup(BSDoptarg);
             }
             118 => {
-                addargs(
+                crate::misc::addargs(
                     &mut args as *mut arglist,
                     b"-v\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
-                addargs(
+                crate::misc::addargs(
                     &mut remote_remote_args as *mut arglist,
                     b"-v\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -1156,11 +1151,11 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
                 verbose_mode = 1 as libc::c_int;
             }
             113 => {
-                addargs(
+                crate::misc::addargs(
                     &mut args as *mut arglist,
                     b"-q\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
-                addargs(
+                crate::misc::addargs(
                     &mut remote_remote_args as *mut arglist,
                     b"-q\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -1259,7 +1254,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
     argc -= BSDoptind;
     argv = argv.offset(BSDoptind as isize);
     log_init(argv0, log_level, SYSLOG_FACILITY_USER, 2 as libc::c_int);
-    addargs(
+    crate::misc::addargs(
         &mut args as *mut arglist,
         b"-oForwardAgent=no\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
@@ -1804,7 +1799,7 @@ unsafe extern "C" fn do_sftp_connect(
         }
     } else {
         freeargs(&mut args);
-        addargs(
+        crate::misc::addargs(
             &mut args as *mut arglist,
             b"sftp-server\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -2137,31 +2132,31 @@ pub unsafe extern "C" fn toremote(
                                     );
                                 }
                                 freeargs(&mut alist);
-                                addargs(
+                                crate::misc::addargs(
                                     &mut alist as *mut arglist,
                                     b"%s\0" as *const u8 as *const libc::c_char
                                         as *mut libc::c_char,
                                     ssh_program,
                                 );
-                                addargs(
+                                crate::misc::addargs(
                                     &mut alist as *mut arglist,
                                     b"-x\0" as *const u8 as *const libc::c_char
                                         as *mut libc::c_char,
                                 );
-                                addargs(
+                                crate::misc::addargs(
                                     &mut alist as *mut arglist,
                                     b"-oClearAllForwardings=yes\0" as *const u8
                                         as *const libc::c_char
                                         as *mut libc::c_char,
                                 );
-                                addargs(
+                                crate::misc::addargs(
                                     &mut alist as *mut arglist,
                                     b"-n\0" as *const u8 as *const libc::c_char
                                         as *mut libc::c_char,
                                 );
                                 j = 0 as libc::c_int as u_int;
                                 while j < remote_remote_args.num {
-                                    addargs(
+                                    crate::misc::addargs(
                                         &mut alist as *mut arglist,
                                         b"%s\0" as *const u8 as *const libc::c_char
                                             as *mut libc::c_char,
@@ -2171,12 +2166,12 @@ pub unsafe extern "C" fn toremote(
                                     j;
                                 }
                                 if sport != -(1 as libc::c_int) {
-                                    addargs(
+                                    crate::misc::addargs(
                                         &mut alist as *mut arglist,
                                         b"-p\0" as *const u8 as *const libc::c_char
                                             as *mut libc::c_char,
                                     );
-                                    addargs(
+                                    crate::misc::addargs(
                                         &mut alist as *mut arglist,
                                         b"%d\0" as *const u8 as *const libc::c_char
                                             as *mut libc::c_char,
@@ -2184,42 +2179,42 @@ pub unsafe extern "C" fn toremote(
                                     );
                                 }
                                 if !suser.is_null() {
-                                    addargs(
+                                    crate::misc::addargs(
                                         &mut alist as *mut arglist,
                                         b"-l\0" as *const u8 as *const libc::c_char
                                             as *mut libc::c_char,
                                     );
-                                    addargs(
+                                    crate::misc::addargs(
                                         &mut alist as *mut arglist,
                                         b"%s\0" as *const u8 as *const libc::c_char
                                             as *mut libc::c_char,
                                         suser,
                                     );
                                 }
-                                addargs(
+                                crate::misc::addargs(
                                     &mut alist as *mut arglist,
                                     b"--\0" as *const u8 as *const libc::c_char
                                         as *mut libc::c_char,
                                 );
-                                addargs(
+                                crate::misc::addargs(
                                     &mut alist as *mut arglist,
                                     b"%s\0" as *const u8 as *const libc::c_char
                                         as *mut libc::c_char,
                                     host,
                                 );
-                                addargs(
+                                crate::misc::addargs(
                                     &mut alist as *mut arglist,
                                     b"%s\0" as *const u8 as *const libc::c_char
                                         as *mut libc::c_char,
                                     cmd.as_mut_ptr(),
                                 );
-                                addargs(
+                                crate::misc::addargs(
                                     &mut alist as *mut arglist,
                                     b"%s\0" as *const u8 as *const libc::c_char
                                         as *mut libc::c_char,
                                     src,
                                 );
-                                addargs(
+                                crate::misc::addargs(
                                     &mut alist as *mut arglist,
                                     b"%s%s%s:%s\0" as *const u8 as *const libc::c_char
                                         as *mut libc::c_char,
@@ -2389,33 +2384,33 @@ pub unsafe extern "C" fn tolocal(
                 errs;
             } else if host.is_null() {
                 freeargs(&mut alist);
-                addargs(
+                crate::misc::addargs(
                     &mut alist as *mut arglist,
                     b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     b"cp\0" as *const u8 as *const libc::c_char,
                 );
                 if iamrecursive != 0 {
-                    addargs(
+                    crate::misc::addargs(
                         &mut alist as *mut arglist,
                         b"-r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     );
                 }
                 if pflag != 0 {
-                    addargs(
+                    crate::misc::addargs(
                         &mut alist as *mut arglist,
                         b"-p\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     );
                 }
-                addargs(
+                crate::misc::addargs(
                     &mut alist as *mut arglist,
                     b"--\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
-                addargs(
+                crate::misc::addargs(
                     &mut alist as *mut arglist,
                     b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     *argv.offset(i as isize),
                 );
-                addargs(
+                crate::misc::addargs(
                     &mut alist as *mut arglist,
                     b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     *argv.offset((argc - 1 as libc::c_int) as isize),
