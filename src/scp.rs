@@ -150,7 +150,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sanitise_stdfd();
     
-    fn freeargs(_: *mut arglist);
     fn bandwidth_limit_init(_: *mut bwlimit, _: u_int64_t, _: size_t);
     fn bandwidth_limit(_: *mut bwlimit, _: size_t);
     fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
@@ -1797,7 +1796,7 @@ unsafe extern "C" fn do_sftp_connect(
             return 0 as *mut sftp_conn;
         }
     } else {
-        freeargs(&mut args);
+        crate::misc::freeargs(&mut args);
         crate::misc::addargs(
             &mut args as *mut arglist,
             b"sftp-server\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
@@ -2130,7 +2129,7 @@ pub unsafe extern "C" fn toremote(
                                             as *const u8 as *const libc::c_char,
                                     );
                                 }
-                                freeargs(&mut alist);
+                                crate::misc::freeargs(&mut alist);
                                 crate::misc::addargs(
                                     &mut alist as *mut arglist,
                                     b"%s\0" as *const u8 as *const libc::c_char
@@ -2382,7 +2381,7 @@ pub unsafe extern "C" fn tolocal(
                 errs += 1;
                 errs;
             } else if host.is_null() {
-                freeargs(&mut alist);
+                crate::misc::freeargs(&mut alist);
                 crate::misc::addargs(
                     &mut alist as *mut arglist,
                     b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,

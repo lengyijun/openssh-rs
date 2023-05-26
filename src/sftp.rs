@@ -145,7 +145,6 @@ extern "C" {
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
     
     
-    fn freeargs(_: *mut arglist);
     fn argv_split(
         _: *const libc::c_char,
         _: *mut libc::c_int,
@@ -4798,7 +4797,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         );
         argv_free(cpp, tmp);
     }
-    freeargs(&mut args);
+    crate::misc::freeargs(&mut args);
     conn = do_init(
         in_0,
         out,
