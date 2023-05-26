@@ -1,6 +1,7 @@
 use crate::misc::arglist;
 use crate::sftp_client::sftp_conn;
 use crate::sftp_common::Attrib;
+use crate::sftp_client::do_mkdir;
 use ::libc;
 use libc::close;
 use libc::kill;
@@ -175,12 +176,7 @@ extern "C" {
     ) -> libc::c_int;
     fn msetlocale();
     fn do_init(_: libc::c_int, _: libc::c_int, _: u_int, _: u_int, _: u_int64_t) -> *mut sftp_conn;
-    fn do_mkdir(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: *mut Attrib,
-        _: libc::c_int,
-    ) -> libc::c_int;
+    
     fn do_stat(_: *mut sftp_conn, _: *const libc::c_char, _: libc::c_int) -> *mut Attrib;
     fn do_expand_path(_: *mut sftp_conn, _: *const libc::c_char) -> *mut libc::c_char;
     fn can_expand_path(_: *mut sftp_conn) -> libc::c_int;
