@@ -32,7 +32,7 @@ extern "C" {
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
-    fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
+    
     fn setproctitle(fmt: *const libc::c_char, _: ...);
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn timingsafe_bcmp(_: *const libc::c_void, _: *const libc::c_void, _: size_t) -> libc::c_int;
@@ -3975,7 +3975,7 @@ pub unsafe extern "C" fn mm_answer_pty(
                     b"assemble\0" as *const u8 as *const libc::c_char,
                 );
             }
-            if dup2((*s).ttyfd, 0 as libc::c_int) == -(1 as libc::c_int) {
+            if libc::dup2((*s).ttyfd, 0 as libc::c_int) == -(1 as libc::c_int) {
                 sshfatal(
                     b"monitor.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"mm_answer_pty\0"))
@@ -3984,7 +3984,7 @@ pub unsafe extern "C" fn mm_answer_pty(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     0 as *const libc::c_char,
-                    b"dup2\0" as *const u8 as *const libc::c_char,
+                    b"libc::dup2\0" as *const u8 as *const libc::c_char,
                 );
             }
             mm_record_login(ssh, s, (*authctxt).pw);

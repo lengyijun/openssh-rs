@@ -84,7 +84,7 @@ extern "C" {
     fn usleep(__useconds: __useconds_t) -> libc::c_int;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn dup(__fd: libc::c_int) -> libc::c_int;
-    fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
+    
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
     
     fn getpid() -> __pid_t;
@@ -4809,7 +4809,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             startup_pipe,
             config_s[0 as libc::c_int as usize],
         );
-        if dup2(newsock, 0 as libc::c_int) == -(1 as libc::c_int) {
+        if libc::dup2(newsock, 0 as libc::c_int) == -(1 as libc::c_int) {
             crate::log::sshlog(
                 b"sshd.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
@@ -4817,11 +4817,11 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 1 as libc::c_int,
                 SYSLOG_LEVEL_DEBUG3,
                 0 as *const libc::c_char,
-                b"dup2 stdin: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::dup2 stdin: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
-        if dup2(0 as libc::c_int, 1 as libc::c_int) == -(1 as libc::c_int) {
+        if libc::dup2(0 as libc::c_int, 1 as libc::c_int) == -(1 as libc::c_int) {
             crate::log::sshlog(
                 b"sshd.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
@@ -4829,14 +4829,14 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 1 as libc::c_int,
                 SYSLOG_LEVEL_DEBUG3,
                 0 as *const libc::c_char,
-                b"dup2 stdout: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::dup2 stdout: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
         if startup_pipe == -(1 as libc::c_int) {
             close(2 as libc::c_int + 2 as libc::c_int);
         } else if startup_pipe != 2 as libc::c_int + 2 as libc::c_int {
-            if dup2(startup_pipe, 2 as libc::c_int + 2 as libc::c_int) == -(1 as libc::c_int) {
+            if libc::dup2(startup_pipe, 2 as libc::c_int + 2 as libc::c_int) == -(1 as libc::c_int) {
                 crate::log::sshlog(
                     b"sshd.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
@@ -4844,14 +4844,14 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     1 as libc::c_int,
                     SYSLOG_LEVEL_DEBUG3,
                     0 as *const libc::c_char,
-                    b"dup2 startup_p: %s\0" as *const u8 as *const libc::c_char,
+                    b"libc::dup2 startup_p: %s\0" as *const u8 as *const libc::c_char,
                     strerror(*libc::__errno_location()),
                 );
             }
             close(startup_pipe);
             startup_pipe = 2 as libc::c_int + 2 as libc::c_int;
         }
-        if dup2(
+        if libc::dup2(
             config_s[1 as libc::c_int as usize],
             2 as libc::c_int + 3 as libc::c_int,
         ) == -(1 as libc::c_int)
@@ -4863,7 +4863,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 1 as libc::c_int,
                 SYSLOG_LEVEL_DEBUG3,
                 0 as *const libc::c_char,
-                b"dup2 config_s: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::dup2 config_s: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }

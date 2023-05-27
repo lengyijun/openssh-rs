@@ -11,7 +11,7 @@ extern "C" {
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
 
     fn closefrom(__lowfd: libc::c_int);
-    fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
+    
     fn execlp(__file: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     
     fn fork() -> __pid_t;
@@ -219,8 +219,8 @@ unsafe extern "C" fn start_helper(
         return -(24 as libc::c_int);
     }
     if pid == 0 as libc::c_int {
-        if dup2(pair[1 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int)
-            || dup2(pair[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int)
+        if libc::dup2(pair[1 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int)
+            || libc::dup2(pair[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int)
         {
             crate::log::sshlog(
                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
@@ -230,7 +230,7 @@ unsafe extern "C" fn start_helper(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"dup2: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
             libc::_exit(1 as libc::c_int);

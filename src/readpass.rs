@@ -18,7 +18,7 @@ extern "C" {
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
-    fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
+    
     fn execlp(__file: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     
     fn fork() -> __pid_t;
@@ -171,7 +171,7 @@ unsafe extern "C" fn ssh_askpass(
     }
     if pid == 0 as libc::c_int {
         close(p[0 as libc::c_int as usize]);
-        if dup2(p[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
+        if libc::dup2(p[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
             sshfatal(
                 b"readpass.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"ssh_askpass\0"))
@@ -180,7 +180,7 @@ unsafe extern "C" fn ssh_askpass(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"dup2: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }

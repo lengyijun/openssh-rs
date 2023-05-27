@@ -16,7 +16,7 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
     pub type sshbuf;
-    fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
+    
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
     fn bind(__fd: libc::c_int, __addr: __CONST_SOCKADDR_ARG, __len: socklen_t) -> libc::c_int;
     fn getsockname(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
@@ -2647,10 +2647,10 @@ pub unsafe extern "C" fn sanitise_stdfd() {
         if fcntl(dupfd, 3 as libc::c_int) == -(1 as libc::c_int)
             && *libc::__errno_location() == 9 as libc::c_int
         {
-            if dup2(nullfd, dupfd) == -(1 as libc::c_int) {
+            if libc::dup2(nullfd, dupfd) == -(1 as libc::c_int) {
                 libc::fprintf(
                     stderr,
-                    b"dup2: %s\n\0" as *const u8 as *const libc::c_char,
+                    b"libc::dup2: %s\n\0" as *const u8 as *const libc::c_char,
                     strerror(*libc::__errno_location()),
                 );
                 libc::exit(1 as libc::c_int);
@@ -4638,9 +4638,9 @@ pub unsafe extern "C" fn stdfd_devnull(
         );
         return -(1 as libc::c_int);
     }
-    if do_stdin != 0 && dup2(devnull, 0 as libc::c_int) == -(1 as libc::c_int)
-        || do_stdout != 0 && dup2(devnull, 1 as libc::c_int) == -(1 as libc::c_int)
-        || do_stderr != 0 && dup2(devnull, 2 as libc::c_int) == -(1 as libc::c_int)
+    if do_stdin != 0 && libc::dup2(devnull, 0 as libc::c_int) == -(1 as libc::c_int)
+        || do_stdout != 0 && libc::dup2(devnull, 1 as libc::c_int) == -(1 as libc::c_int)
+        || do_stderr != 0 && libc::dup2(devnull, 2 as libc::c_int) == -(1 as libc::c_int)
     {
         crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
@@ -4650,7 +4650,7 @@ pub unsafe extern "C" fn stdfd_devnull(
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"dup2: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
         ret = -(1 as libc::c_int);
@@ -4941,7 +4941,7 @@ pub unsafe extern "C" fn subprocess(
                     );
                     libc::_exit(1 as libc::c_int);
                 }
-                if dup2(devnull, 0 as libc::c_int) == -(1 as libc::c_int) {
+                if libc::dup2(devnull, 0 as libc::c_int) == -(1 as libc::c_int) {
                     crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
@@ -4952,7 +4952,7 @@ pub unsafe extern "C" fn subprocess(
                         0 as libc::c_int,
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
-                        b"%s: dup2: %s\0" as *const u8 as *const libc::c_char,
+                        b"%s: libc::dup2: %s\0" as *const u8 as *const libc::c_char,
                         tag,
                         strerror(*libc::__errno_location()),
                     );
@@ -4968,7 +4968,7 @@ pub unsafe extern "C" fn subprocess(
                 {
                     fd = devnull;
                 }
-                if fd != -(1 as libc::c_int) && dup2(fd, 1 as libc::c_int) == -(1 as libc::c_int) {
+                if fd != -(1 as libc::c_int) && libc::dup2(fd, 1 as libc::c_int) == -(1 as libc::c_int) {
                     crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
@@ -4979,7 +4979,7 @@ pub unsafe extern "C" fn subprocess(
                         0 as libc::c_int,
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
-                        b"%s: dup2: %s\0" as *const u8 as *const libc::c_char,
+                        b"%s: libc::dup2: %s\0" as *const u8 as *const libc::c_char,
                         tag,
                         strerror(*libc::__errno_location()),
                     );
@@ -5044,7 +5044,7 @@ pub unsafe extern "C" fn subprocess(
                     libc::_exit(1 as libc::c_int);
                 }
                 if flags & 1 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint
-                    && dup2(0 as libc::c_int, 2 as libc::c_int) == -(1 as libc::c_int)
+                    && libc::dup2(0 as libc::c_int, 2 as libc::c_int) == -(1 as libc::c_int)
                 {
                     crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
@@ -5056,7 +5056,7 @@ pub unsafe extern "C" fn subprocess(
                         0 as libc::c_int,
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
-                        b"%s: dup2: %s\0" as *const u8 as *const libc::c_char,
+                        b"%s: libc::dup2: %s\0" as *const u8 as *const libc::c_char,
                         tag,
                         strerror(*libc::__errno_location()),
                     );

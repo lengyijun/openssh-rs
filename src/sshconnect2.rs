@@ -22,7 +22,7 @@ extern "C" {
 
     fn closefrom(__lowfd: libc::c_int);
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
-    fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
+    
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     fn getpid() -> __pid_t;
     fn fork() -> __pid_t;
@@ -4190,7 +4190,7 @@ unsafe extern "C" fn ssh_keysign(
     osigchld = ssh_signal(17 as libc::c_int, None);
     if pid == 0 as libc::c_int {
         close(from[0 as libc::c_int as usize]);
-        if dup2(from[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
+        if libc::dup2(from[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
             sshfatal(
                 b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"ssh_keysign\0"))
@@ -4199,12 +4199,12 @@ unsafe extern "C" fn ssh_keysign(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"dup2: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
         close(to[1 as libc::c_int as usize]);
-        if dup2(to[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int) {
+        if libc::dup2(to[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int) {
             sshfatal(
                 b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"ssh_keysign\0"))
@@ -4213,13 +4213,13 @@ unsafe extern "C" fn ssh_keysign(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"dup2: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
         close(from[1 as libc::c_int as usize]);
         close(to[0 as libc::c_int as usize]);
-        if dup2(sock, 2 as libc::c_int + 1 as libc::c_int) == -(1 as libc::c_int) {
+        if libc::dup2(sock, 2 as libc::c_int + 1 as libc::c_int) == -(1 as libc::c_int) {
             sshfatal(
                 b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"ssh_keysign\0"))
@@ -4228,7 +4228,7 @@ unsafe extern "C" fn ssh_keysign(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"dup2: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }

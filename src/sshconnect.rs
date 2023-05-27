@@ -41,7 +41,7 @@ extern "C" {
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn sleep(__seconds: libc::c_uint) -> libc::c_uint;
     fn dup(__fd: libc::c_int) -> libc::c_int;
-    fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
+    
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     
@@ -1007,13 +1007,13 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
         let mut argv: [*mut libc::c_char; 10] = [0 as *mut libc::c_char; 10];
         close(sp[1 as libc::c_int as usize]);
         if sp[0 as libc::c_int as usize] != 0 as libc::c_int {
-            if dup2(sp[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int) {
-                perror(b"dup2 stdin\0" as *const u8 as *const libc::c_char);
+            if libc::dup2(sp[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int) {
+                perror(b"libc::dup2 stdin\0" as *const u8 as *const libc::c_char);
             }
         }
         if sp[0 as libc::c_int as usize] != 1 as libc::c_int {
-            if dup2(sp[0 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
-                perror(b"dup2 stdout\0" as *const u8 as *const libc::c_char);
+            if libc::dup2(sp[0 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
+                perror(b"libc::dup2 stdout\0" as *const u8 as *const libc::c_char);
             }
         }
         if sp[0 as libc::c_int as usize] >= 2 as libc::c_int {
@@ -1160,14 +1160,14 @@ unsafe extern "C" fn ssh_proxy_connect(
         let mut argv: [*mut libc::c_char; 10] = [0 as *mut libc::c_char; 10];
         close(pin[1 as libc::c_int as usize]);
         if pin[0 as libc::c_int as usize] != 0 as libc::c_int {
-            if dup2(pin[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int) {
-                perror(b"dup2 stdin\0" as *const u8 as *const libc::c_char);
+            if libc::dup2(pin[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int) {
+                perror(b"libc::dup2 stdin\0" as *const u8 as *const libc::c_char);
             }
             close(pin[0 as libc::c_int as usize]);
         }
         close(pout[0 as libc::c_int as usize]);
-        if dup2(pout[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
-            perror(b"dup2 stdout\0" as *const u8 as *const libc::c_char);
+        if libc::dup2(pout[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
+            perror(b"libc::dup2 stdout\0" as *const u8 as *const libc::c_char);
         }
         close(pout[1 as libc::c_int as usize]);
         if debug_flag == 0

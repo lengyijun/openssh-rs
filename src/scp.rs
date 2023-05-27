@@ -46,7 +46,7 @@ extern "C" {
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
-    fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
+    
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
     
     fn getpid() -> __pid_t;
@@ -558,8 +558,8 @@ pub unsafe extern "C" fn do_cmd(
             );
         }
         0 => {
-            if dup2(sv[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int)
-                || dup2(sv[0 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int)
+            if libc::dup2(sv[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int)
+                || libc::dup2(sv[0 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int)
             {
                 crate::log::sshlog(
                     b"scp.c\0" as *const u8 as *const libc::c_char,
@@ -568,7 +568,7 @@ pub unsafe extern "C" fn do_cmd(
                     0 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"dup2: %s\0" as *const u8 as *const libc::c_char,
+                    b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
                     strerror(*libc::__errno_location()),
                 );
                 libc::_exit(1 as libc::c_int);
@@ -677,11 +677,11 @@ pub unsafe extern "C" fn do_cmd2(
     }
     pid = fork();
     if pid == 0 as libc::c_int {
-        if dup2(fdin, 0 as libc::c_int) == -(1 as libc::c_int) {
-            perror(b"dup2\0" as *const u8 as *const libc::c_char);
+        if libc::dup2(fdin, 0 as libc::c_int) == -(1 as libc::c_int) {
+            perror(b"libc::dup2\0" as *const u8 as *const libc::c_char);
         }
-        if dup2(fdout, 1 as libc::c_int) == -(1 as libc::c_int) {
-            perror(b"dup2\0" as *const u8 as *const libc::c_char);
+        if libc::dup2(fdout, 1 as libc::c_int) == -(1 as libc::c_int) {
+            perror(b"libc::dup2\0" as *const u8 as *const libc::c_char);
         }
         crate::misc::replacearg(
             &mut args as *mut arglist,

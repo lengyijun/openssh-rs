@@ -65,7 +65,7 @@ extern "C" {
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn dup(__fd: libc::c_int) -> libc::c_int;
-    fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
+    
     static mut environ: *mut *mut libc::c_char;
     fn execve(
         __path: *const libc::c_char,
@@ -1479,18 +1479,18 @@ pub unsafe extern "C" fn do_exec_no_pty(
                 );
             }
             close(pin[1 as libc::c_int as usize]);
-            if dup2(pin[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int) {
-                perror(b"dup2 stdin\0" as *const u8 as *const libc::c_char);
+            if libc::dup2(pin[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int) {
+                perror(b"libc::dup2 stdin\0" as *const u8 as *const libc::c_char);
             }
             close(pin[0 as libc::c_int as usize]);
             close(pout[0 as libc::c_int as usize]);
-            if dup2(pout[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
-                perror(b"dup2 stdout\0" as *const u8 as *const libc::c_char);
+            if libc::dup2(pout[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
+                perror(b"libc::dup2 stdout\0" as *const u8 as *const libc::c_char);
             }
             close(pout[1 as libc::c_int as usize]);
             close(perr[0 as libc::c_int as usize]);
-            if dup2(perr[1 as libc::c_int as usize], 2 as libc::c_int) == -(1 as libc::c_int) {
-                perror(b"dup2 stderr\0" as *const u8 as *const libc::c_char);
+            if libc::dup2(perr[1 as libc::c_int as usize], 2 as libc::c_int) == -(1 as libc::c_int) {
+                perror(b"libc::dup2 stderr\0" as *const u8 as *const libc::c_char);
             }
             close(perr[1 as libc::c_int as usize]);
             do_child(ssh, s, command);
@@ -1601,7 +1601,7 @@ pub unsafe extern "C" fn do_exec_pty(
             close(ptymaster);
             close(ptyfd);
             pty_make_controlling_tty(&mut ttyfd, ((*s).tty).as_mut_ptr());
-            if dup2(ttyfd, 0 as libc::c_int) == -(1 as libc::c_int) {
+            if libc::dup2(ttyfd, 0 as libc::c_int) == -(1 as libc::c_int) {
                 crate::log::sshlog(
                     b"session.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_exec_pty\0"))
@@ -1610,11 +1610,11 @@ pub unsafe extern "C" fn do_exec_pty(
                     0 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"dup2 stdin: %s\0" as *const u8 as *const libc::c_char,
+                    b"libc::dup2 stdin: %s\0" as *const u8 as *const libc::c_char,
                     strerror(*libc::__errno_location()),
                 );
             }
-            if dup2(ttyfd, 1 as libc::c_int) == -(1 as libc::c_int) {
+            if libc::dup2(ttyfd, 1 as libc::c_int) == -(1 as libc::c_int) {
                 crate::log::sshlog(
                     b"session.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_exec_pty\0"))
@@ -1623,11 +1623,11 @@ pub unsafe extern "C" fn do_exec_pty(
                     0 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"dup2 stdout: %s\0" as *const u8 as *const libc::c_char,
+                    b"libc::dup2 stdout: %s\0" as *const u8 as *const libc::c_char,
                     strerror(*libc::__errno_location()),
                 );
             }
-            if dup2(ttyfd, 2 as libc::c_int) == -(1 as libc::c_int) {
+            if libc::dup2(ttyfd, 2 as libc::c_int) == -(1 as libc::c_int) {
                 crate::log::sshlog(
                     b"session.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_exec_pty\0"))
@@ -1636,7 +1636,7 @@ pub unsafe extern "C" fn do_exec_pty(
                     0 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"dup2 stderr: %s\0" as *const u8 as *const libc::c_char,
+                    b"libc::dup2 stderr: %s\0" as *const u8 as *const libc::c_char,
                     strerror(*libc::__errno_location()),
                 );
             }

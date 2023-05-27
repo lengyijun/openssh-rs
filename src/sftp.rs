@@ -37,7 +37,7 @@ extern "C" {
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn getcwd(__buf: *mut libc::c_char, __size: size_t) -> *mut libc::c_char;
-    fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
+    
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
     
@@ -4151,12 +4151,12 @@ unsafe extern "C" fn connect_to_server(
             strerror(*libc::__errno_location()),
         );
     } else if sshpid == 0 as libc::c_int {
-        if dup2(c_in, 0 as libc::c_int) == -(1 as libc::c_int)
-            || dup2(c_out, 1 as libc::c_int) == -(1 as libc::c_int)
+        if libc::dup2(c_in, 0 as libc::c_int) == -(1 as libc::c_int)
+            || libc::dup2(c_out, 1 as libc::c_int) == -(1 as libc::c_int)
         {
             libc::fprintf(
                 stderr,
-                b"dup2: %s\n\0" as *const u8 as *const libc::c_char,
+                b"libc::dup2: %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
             libc::_exit(1 as libc::c_int);
