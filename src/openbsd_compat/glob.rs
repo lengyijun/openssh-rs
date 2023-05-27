@@ -3,7 +3,7 @@ extern "C" {
     pub type __dirstream;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn lstat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
     fn getuid() -> __uid_t;
@@ -910,7 +910,7 @@ unsafe extern "C" fn glob2(
                 (*limitp).glim_stat = ((*limitp).glim_stat).wrapping_add(1);
                 fresh43 >= 2048 as libc::c_int as libc::c_ulong
             } {
-                *__errno_location() = 0 as libc::c_int;
+                *libc::__errno_location() = 0 as libc::c_int;
                 let fresh44 = pathend;
                 pathend = pathend.offset(1);
                 *fresh44 = '/' as i32 as Char;
@@ -1005,7 +1005,7 @@ unsafe extern "C" fn glob3(
         return 1 as libc::c_int;
     }
     *pathend = '\0' as i32 as Char;
-    *__errno_location() = 0 as libc::c_int;
+    *libc::__errno_location() = 0 as libc::c_int;
     dirp = g_opendir(pathbuf, pglob);
     if dirp.is_null() {
         if ((*pglob).gl_errfunc).is_some() {
@@ -1019,7 +1019,7 @@ unsafe extern "C" fn glob3(
             }
             if ((*pglob).gl_errfunc).expect("non-null function pointer")(
                 buf.as_mut_ptr(),
-                *__errno_location(),
+                *libc::__errno_location(),
             ) != 0
                 || (*pglob).gl_flags & 0x4 as libc::c_int != 0
             {
@@ -1052,7 +1052,7 @@ unsafe extern "C" fn glob3(
             (*limitp).glim_readdir = ((*limitp).glim_readdir).wrapping_add(1);
             fresh50 >= 16384 as libc::c_int as libc::c_ulong
         } {
-            *__errno_location() = 0 as libc::c_int;
+            *libc::__errno_location() = 0 as libc::c_int;
             let fresh51 = pathend;
             pathend = pathend.offset(1);
             *fresh51 = '/' as i32 as Char;
@@ -1186,7 +1186,7 @@ unsafe extern "C" fn globextend(
                         if (*pglob).gl_flags & 0x2000 as libc::c_int != 0
                             && (*limitp).glim_malloc >= 65536 as libc::c_int as libc::c_ulong
                         {
-                            *__errno_location() = 0 as libc::c_int;
+                            *libc::__errno_location() = 0 as libc::c_int;
                             return -(1 as libc::c_int);
                         }
                         let ref mut fresh55 = *statv
@@ -1265,7 +1265,7 @@ unsafe extern "C" fn globextend(
                                     .wrapping_add((*limitp).glim_malloc)
                                     > 65536 as libc::c_int as libc::c_ulong
                             {
-                                *__errno_location() = 0 as libc::c_int;
+                                *libc::__errno_location() = 0 as libc::c_int;
                                 return -(1 as libc::c_int);
                             }
                         }

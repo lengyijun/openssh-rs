@@ -15,8 +15,6 @@ extern "C" {
     pub type ec_key_method_st;
     pub type ECDSA_SIG_st;
 
-    fn __errno_location() -> *mut libc::c_int;
-
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
@@ -855,7 +853,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -870,7 +868,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"fork: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     } else if pid == 0 as libc::c_int {
@@ -880,7 +878,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             libc::fprintf(
                 stderr,
                 b"dup2: %s\n\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             _exit(1 as libc::c_int);
         }
@@ -917,7 +915,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             stderr,
             b"exec: %s: %s\n\0" as *const u8 as *const libc::c_char,
             helper,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         _exit(1 as libc::c_int);
     }

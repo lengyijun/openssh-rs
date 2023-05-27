@@ -18,7 +18,7 @@ extern "C" {
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn dup(__fd: libc::c_int) -> libc::c_int;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -774,7 +774,7 @@ pub unsafe extern "C" fn mm_log_handler(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     sshbuf_free(log_msg);
@@ -843,7 +843,7 @@ pub unsafe extern "C" fn mm_request_send(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     if atomicio(
@@ -867,7 +867,7 @@ pub unsafe extern "C" fn mm_request_send(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
 }
@@ -893,7 +893,7 @@ pub unsafe extern "C" fn mm_request_receive(mut sock: libc::c_int, mut m: *mut s
         ::core::mem::size_of::<[u_char; 4]>() as libc::c_ulong,
     ) != ::core::mem::size_of::<[u_char; 4]>() as libc::c_ulong
     {
-        if *__errno_location() == 32 as libc::c_int {
+        if *libc::__errno_location() == 32 as libc::c_int {
             cleanup_exit(255 as libc::c_int);
         }
         sshfatal(
@@ -905,7 +905,7 @@ pub unsafe extern "C" fn mm_request_receive(mut sock: libc::c_int, mut m: *mut s
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"read: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     msg_len = (*(buf.as_mut_ptr() as *const u_char).offset(0 as libc::c_int as isize) as u_int32_t)
@@ -958,7 +958,7 @@ pub unsafe extern "C" fn mm_request_receive(mut sock: libc::c_int, mut m: *mut s
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"read: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
 }
@@ -2751,7 +2751,7 @@ pub unsafe extern "C" fn mm_session_pty_cleanup2(mut s: *mut Session) {
             0 as *const libc::c_char,
             b"close(s->ptymaster/%d): %s\0" as *const u8 as *const libc::c_char,
             (*s).ptymaster,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     (*s).ttyfd = -(1 as libc::c_int);

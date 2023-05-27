@@ -38,7 +38,6 @@ extern "C" {
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
-    fn __errno_location() -> *mut libc::c_int;
     fn platform_disable_tracing(_: libc::c_int);
     fn platform_pledge_agent();
 
@@ -3009,7 +3008,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                     b"failed provider \"%.100s\": realpath: %s\0" as *const u8
                         as *const libc::c_char,
                     sk_provider,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
                 current_block = 12326576695480106577;
             } else {
@@ -3440,7 +3439,7 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
             0 as *const libc::c_char,
             b"failed PKCS#11 add of \"%.100s\": realpath: %s\0" as *const u8 as *const libc::c_char,
             provider,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else if match_pattern_list(
         canonical_provider.as_mut_ptr(),
@@ -3584,7 +3583,7 @@ unsafe extern "C" fn process_remove_smartcard_key(mut e: *mut SocketEntry) {
                 b"failed PKCS#11 add of \"%.100s\": realpath: %s\0" as *const u8
                     as *const libc::c_char,
                 provider,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         } else {
             crate::log::sshlog(
@@ -4233,7 +4232,7 @@ unsafe extern "C" fn handle_socket_read(mut socknum: u_int) -> libc::c_int {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"accept from AUTH_SOCKET: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -4248,7 +4247,7 @@ unsafe extern "C" fn handle_socket_read(mut socknum: u_int) -> libc::c_int {
             0 as *const libc::c_char,
             b"getpeereid %d failed: %s\0" as *const u8 as *const libc::c_char,
             fd,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         close(fd);
         return -(1 as libc::c_int);
@@ -4283,7 +4282,9 @@ unsafe extern "C" fn handle_conn_read(mut socknum: u_int) -> libc::c_int {
     );
     if len <= 0 as libc::c_int as libc::c_long {
         if len == -(1 as libc::c_int) as libc::c_long {
-            if *__errno_location() == 11 as libc::c_int || *__errno_location() == 4 as libc::c_int {
+            if *libc::__errno_location() == 11 as libc::c_int
+                || *libc::__errno_location() == 4 as libc::c_int
+            {
                 return 0 as libc::c_int;
             }
             crate::log::sshlog(
@@ -4297,7 +4298,7 @@ unsafe extern "C" fn handle_conn_read(mut socknum: u_int) -> libc::c_int {
                 b"read error on socket %u (fd %d): %s\0" as *const u8 as *const libc::c_char,
                 socknum,
                 (*sockets.offset(socknum as isize)).fd,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         return -(1 as libc::c_int);
@@ -4346,7 +4347,9 @@ unsafe extern "C" fn handle_conn_write(mut socknum: u_int) -> libc::c_int {
     );
     if len <= 0 as libc::c_int as libc::c_long {
         if len == -(1 as libc::c_int) as libc::c_long {
-            if *__errno_location() == 11 as libc::c_int || *__errno_location() == 4 as libc::c_int {
+            if *libc::__errno_location() == 11 as libc::c_int
+                || *libc::__errno_location() == 4 as libc::c_int
+            {
                 return 0 as libc::c_int;
             }
             crate::log::sshlog(
@@ -4360,7 +4363,7 @@ unsafe extern "C" fn handle_conn_write(mut socknum: u_int) -> libc::c_int {
                 b"read error on socket %u (fd %d): %s\0" as *const u8 as *const libc::c_char,
                 socknum,
                 (*sockets.offset(socknum as isize)).fd,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         return -(1 as libc::c_int);
@@ -4732,7 +4735,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             0 as *const libc::c_char,
             b"%s: getrlimit: %s\0" as *const u8 as *const libc::c_char,
             __progname,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     __progname = ssh_get_progname(*av.offset(0 as libc::c_int as isize));
@@ -5096,7 +5099,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"setsid: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             cleanup_exit(1 as libc::c_int);
         }
@@ -5125,7 +5128,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"setrlimit RLIMIT_CORE: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             cleanup_exit(1 as libc::c_int);
         }
@@ -5175,14 +5178,14 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             0 as *const libc::c_char,
             b"%s: pledge: %s\0" as *const u8 as *const libc::c_char,
             __progname,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     platform_pledge_agent();
     loop {
         prepare_poll(&mut pfd, &mut npfd, &mut timeout, maxfds);
         result = poll(pfd, npfd, timeout);
-        saved_errno = *__errno_location();
+        saved_errno = *libc::__errno_location();
         if parent_alive_interval != 0 as libc::c_int as libc::c_long {
             check_parent_exists();
         }

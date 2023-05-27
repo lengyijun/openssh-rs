@@ -1,6 +1,6 @@
 use ::libc;
 extern "C" {
-    fn __errno_location() -> *mut libc::c_int;
+
     fn prctl(__option: libc::c_int, _: ...) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn sshfatal(
@@ -37,7 +37,7 @@ pub unsafe extern "C" fn platform_disable_tracing(mut strict: libc::c_int) {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"unable to make the process undumpable: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
 }

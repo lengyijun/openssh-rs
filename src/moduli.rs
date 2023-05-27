@@ -7,7 +7,6 @@ extern "C" {
     pub type bignum_st;
     pub type bignum_ctx;
     pub type bn_gencb_st;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
@@ -699,7 +698,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
             0 as *const libc::c_char,
             b"mkstemp(%s): %s\0" as *const u8 as *const libc::c_char,
             tmp.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return;
     }
@@ -714,7 +713,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
             SYSLOG_LEVEL_INFO,
             0 as *const libc::c_char,
             b"write_checkpoint: libc::fdopen: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         unlink(tmp.as_mut_ptr());
         close(r);
@@ -750,7 +749,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
             0 as *const libc::c_char,
             b"failed to write to checkpoint file '%s': %s\0" as *const u8 as *const libc::c_char,
             cpfile,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         unlink(tmp.as_mut_ptr());
     };

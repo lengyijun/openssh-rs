@@ -1,6 +1,5 @@
 use ::libc;
 extern "C" {
-    fn __errno_location() -> *mut libc::c_int;
 
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn llabs(_: libc::c_longlong) -> libc::c_longlong;
@@ -88,7 +87,7 @@ pub unsafe extern "C" fn scan_scaled(
     while *p as libc::c_int == '-' as i32 || *p as libc::c_int == '+' as i32 {
         if *p as libc::c_int == '-' as i32 {
             if sign != 0 {
-                *__errno_location() = 22 as libc::c_int;
+                *libc::__errno_location() = 22 as libc::c_int;
                 return -(1 as libc::c_int);
             }
             sign = -(1 as libc::c_int);
@@ -96,7 +95,7 @@ pub unsafe extern "C" fn scan_scaled(
             p;
         } else if *p as libc::c_int == '+' as i32 {
             if sign != 0 {
-                *__errno_location() = 22 as libc::c_int;
+                *libc::__errno_location() = 22 as libc::c_int;
                 return -(1 as libc::c_int);
             }
             sign = 1 as libc::c_int;
@@ -112,7 +111,7 @@ pub unsafe extern "C" fn scan_scaled(
     {
         if *p as libc::c_int == '.' as i32 {
             if fract_digits > 0 as libc::c_int as libc::c_uint {
-                *__errno_location() = 22 as libc::c_int;
+                *libc::__errno_location() = 22 as libc::c_int;
                 return -(1 as libc::c_int);
             }
             fract_digits = 1 as libc::c_int as libc::c_uint;
@@ -131,12 +130,12 @@ pub unsafe extern "C" fn scan_scaled(
                         > 9223372036854775807 as libc::c_longlong
                             / 10 as libc::c_int as libc::c_longlong
                     {
-                        *__errno_location() = 34 as libc::c_int;
+                        *libc::__errno_location() = 34 as libc::c_int;
                         return -(1 as libc::c_int);
                     }
                     fpart *= 10 as libc::c_int as libc::c_longlong;
                     if i as libc::c_longlong > 9223372036854775807 as libc::c_longlong - fpart {
-                        *__errno_location() = 34 as libc::c_int;
+                        *libc::__errno_location() = 34 as libc::c_int;
                         return -(1 as libc::c_int);
                     }
                     fpart += i as libc::c_longlong;
@@ -148,19 +147,19 @@ pub unsafe extern "C" fn scan_scaled(
                         .wrapping_div(::core::mem::size_of::<unit_type>() as libc::c_ulong)
                         .wrapping_mul(3 as libc::c_int as libc::c_ulong)
                 {
-                    *__errno_location() = 34 as libc::c_int;
+                    *libc::__errno_location() = 34 as libc::c_int;
                     return -(1 as libc::c_int);
                 }
                 if whole
                     > 9223372036854775807 as libc::c_longlong
                         / 10 as libc::c_int as libc::c_longlong
                 {
-                    *__errno_location() = 34 as libc::c_int;
+                    *libc::__errno_location() = 34 as libc::c_int;
                     return -(1 as libc::c_int);
                 }
                 whole *= 10 as libc::c_int as libc::c_longlong;
                 if i as libc::c_longlong > 9223372036854775807 as libc::c_longlong - whole {
-                    *__errno_location() = 34 as libc::c_int;
+                    *libc::__errno_location() = 34 as libc::c_int;
                     return -(1 as libc::c_int);
                 }
                 whole += i as libc::c_longlong;
@@ -214,7 +213,7 @@ pub unsafe extern "C" fn scan_scaled(
                 & _ISalnum as libc::c_int as libc::c_ushort as libc::c_int
                 != 0
             {
-                *__errno_location() = 22 as libc::c_int;
+                *libc::__errno_location() = 22 as libc::c_int;
                 return -(1 as libc::c_int);
             }
             scale_fact = scale_factors[i as usize];
@@ -223,7 +222,7 @@ pub unsafe extern "C" fn scan_scaled(
                     < (-(9223372036854775807 as libc::c_longlong) - 1 as libc::c_longlong)
                         / scale_fact
             {
-                *__errno_location() = 34 as libc::c_int;
+                *libc::__errno_location() = 34 as libc::c_int;
                 return -(1 as libc::c_int);
             }
             whole *= scale_fact;
@@ -256,7 +255,7 @@ pub unsafe extern "C" fn scan_scaled(
         i = i.wrapping_add(1);
         i;
     }
-    *__errno_location() = 22 as libc::c_int;
+    *libc::__errno_location() = 22 as libc::c_int;
     return -(1 as libc::c_int);
 }
 #[no_mangle]
@@ -269,7 +268,7 @@ pub unsafe extern "C" fn fmt_scaled(
     let mut i: libc::c_uint = 0;
     let mut unit: unit_type = NONE;
     if number == -(9223372036854775807 as libc::c_longlong) - 1 as libc::c_longlong {
-        *__errno_location() = 34 as libc::c_int;
+        *libc::__errno_location() = 34 as libc::c_int;
         return -(1 as libc::c_int);
     }
     abval = llabs(number);
@@ -278,7 +277,7 @@ pub unsafe extern "C" fn fmt_scaled(
             .wrapping_div(::core::mem::size_of::<unit_type>() as libc::c_ulong)
             .wrapping_sub(1 as libc::c_int as libc::c_ulong) as usize]
     {
-        *__errno_location() = 34 as libc::c_int;
+        *libc::__errno_location() = 34 as libc::c_int;
         return -(1 as libc::c_int);
     }
     i = 0 as libc::c_int as libc::c_uint;

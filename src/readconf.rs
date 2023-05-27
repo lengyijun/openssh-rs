@@ -14,7 +14,7 @@ extern "C" {
     pub type ssh_digest_ctx;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn vis(
         _: *mut libc::c_char,
         _: libc::c_int,
@@ -1804,7 +1804,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             0 as *const libc::c_char,
             b"Shell \"%s\" is not executable: %s\0" as *const u8 as *const libc::c_char,
             shell,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     crate::log::sshlog(
@@ -1854,7 +1854,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             0 as *const libc::c_char,
             b"Unable to execute '%.100s': %s\0" as *const u8 as *const libc::c_char,
             cmd,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         ssh_signal(15 as libc::c_int, None);
         kill(getpid(), 15 as libc::c_int);
@@ -1870,11 +1870,13 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"fork: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
-        if *__errno_location() != 4 as libc::c_int && *__errno_location() != 11 as libc::c_int {
+        if *libc::__errno_location() != 4 as libc::c_int
+            && *libc::__errno_location() != 11 as libc::c_int
+        {
             sshfatal(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"execute_in_shell\0"))
@@ -1884,7 +1886,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"waitpid: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     }
@@ -2186,7 +2188,7 @@ unsafe extern "C" fn match_cfg_line(
                                     SYSLOG_LEVEL_FATAL,
                                     0 as *const libc::c_char,
                                     b"gethostname: %s\0" as *const u8 as *const libc::c_char,
-                                    strerror(*__errno_location()),
+                                    strerror(*libc::__errno_location()),
                                 );
                             }
                             strlcpy(
@@ -3422,7 +3424,7 @@ unsafe extern "C" fn process_config_line_depth(
                         filename,
                         linenum,
                         arg,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     current_block = 7482270440933722938;
                 } else if val64 != 0 as libc::c_int as libc::c_longlong
@@ -4943,7 +4945,8 @@ unsafe extern "C" fn process_config_line_depth(
                                     want_final_pass,
                                     depth + 1 as libc::c_int,
                                 );
-                                if r != 1 as libc::c_int && *__errno_location() != 2 as libc::c_int
+                                if r != 1 as libc::c_int
+                                    && *libc::__errno_location() != 2 as libc::c_int
                                 {
                                     crate::log::sshlog(
                                         b"readconf.c\0" as *const u8 as *const libc::c_char,
@@ -4958,7 +4961,7 @@ unsafe extern "C" fn process_config_line_depth(
                                         b"Can't open user config file %.100s: %.100s\0" as *const u8
                                             as *const libc::c_char,
                                         *(gl.gl_pathv).offset(i as isize),
-                                        strerror(*__errno_location()),
+                                        strerror(*libc::__errno_location()),
                                     );
                                     _ssh__compat_globfree(&mut gl);
                                     current_block = 7482270440933722938;
@@ -6060,7 +6063,7 @@ unsafe extern "C" fn read_config_file_depth(
                 0 as *const libc::c_char,
                 b"fstat %s: %s\0" as *const u8 as *const libc::c_char,
                 filename,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         if sb.st_uid != 0 as libc::c_int as libc::c_uint && sb.st_uid != getuid()

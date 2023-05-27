@@ -2,7 +2,6 @@ use ::libc;
 use libc::close;
 extern "C" {
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn chown(__file: *const libc::c_char, __owner: __uid_t, __group: __gid_t) -> libc::c_int;
     fn setsid() -> __pid_t;
@@ -149,7 +148,7 @@ pub unsafe extern "C" fn pty_allocate(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"openpty: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return 0 as libc::c_int;
     }
@@ -199,7 +198,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"setsid: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     fd = libc::open(
@@ -248,7 +247,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"ioctl(TIOCSCTTY): %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     fd = libc::open(tty, 0o2 as libc::c_int);
@@ -265,7 +264,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
             0 as *const libc::c_char,
             b"%.100s: %.100s\0" as *const u8 as *const libc::c_char,
             tty,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else {
         close(fd);
@@ -287,7 +286,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
             0 as *const libc::c_char,
             b"open /dev/tty failed - could not set controlling tty: %.100s\0" as *const u8
                 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else {
         close(fd);
@@ -379,12 +378,12 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
             0 as *const libc::c_char,
             b"stat(%.100s) failed: %.100s\0" as *const u8 as *const libc::c_char,
             tty,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     if st.st_uid != (*pw).pw_uid || st.st_gid != gid {
         if chown(tty, (*pw).pw_uid, gid) == -(1 as libc::c_int) {
-            if *__errno_location() == 30 as libc::c_int
+            if *libc::__errno_location() == 30 as libc::c_int
                 && (st.st_uid == (*pw).pw_uid || st.st_uid == 0 as libc::c_int as libc::c_uint)
             {
                 crate::log::sshlog(
@@ -399,7 +398,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
                     tty,
                     (*pw).pw_uid,
                     gid,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             } else {
                 sshfatal(
@@ -414,7 +413,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
                     tty,
                     (*pw).pw_uid,
                     gid,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             }
         }
@@ -431,7 +430,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
         != mode
     {
         if libc::chmod(tty, mode) == -(1 as libc::c_int) {
-            if *__errno_location() == 30 as libc::c_int
+            if *libc::__errno_location() == 30 as libc::c_int
                 && st.st_mode
                     & (0o400 as libc::c_int >> 3 as libc::c_int
                         | 0o400 as libc::c_int >> 3 as libc::c_int >> 3 as libc::c_int)
@@ -449,7 +448,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
                     b"chmod(%.100s, 0%o) failed: %.100s\0" as *const u8 as *const libc::c_char,
                     tty,
                     mode,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             } else {
                 sshfatal(
@@ -463,7 +462,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
                     b"chmod(%.100s, 0%o) failed: %.100s\0" as *const u8 as *const libc::c_char,
                     tty,
                     mode,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             }
         }

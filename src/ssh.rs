@@ -21,7 +21,6 @@ extern "C" {
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
-    fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
 
@@ -1927,7 +1926,7 @@ unsafe extern "C" fn check_load(
             );
         }
         -24 => {
-            if *__errno_location() == 2 as libc::c_int {
+            if *libc::__errno_location() == 2 as libc::c_int {
                 current_block_6 = 13513818773234778473;
             } else {
                 current_block_6 = 15401741586054900061;
@@ -1992,7 +1991,7 @@ unsafe extern "C" fn process_config_files(
                 0 as *const libc::c_char,
                 b"Can't open user config file %.100s: %.100s\0" as *const u8 as *const libc::c_char,
                 config,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     } else {
@@ -2495,7 +2494,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             b"Warning: Identity file %s not accessible: %s.\n\0" as *const u8
                                 as *const libc::c_char,
                             p,
-                            strerror(*__errno_location()),
+                            strerror(*libc::__errno_location()),
                         );
                     } else {
                         add_identity_file(
@@ -3399,7 +3398,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"gethostname: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     (*cinfo).thishost = xstrdup(thishost.as_mut_ptr());
@@ -3508,7 +3507,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 b"Cannot forward agent socket path \"%s\": %s\0" as *const u8
                     as *const libc::c_char,
                 options.forward_agent_sock_path,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             if options.exit_on_forward_failure != 0 {
                 cleanup_exit(255 as libc::c_int);
@@ -4455,7 +4454,7 @@ unsafe extern "C" fn control_persist_detach() {
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"fork: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         0 => {}
@@ -4544,7 +4543,7 @@ unsafe extern "C" fn fork_postauth() {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"daemon() failed: %.200s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     if stdfd_devnull(
@@ -5933,18 +5932,18 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
     );
 }
 unsafe extern "C" fn main_sigchld_handler(mut _sig: libc::c_int) {
-    let mut save_errno: libc::c_int = *__errno_location();
+    let mut save_errno: libc::c_int = *libc::__errno_location();
     let mut pid: pid_t = 0;
     let mut status: libc::c_int = 0;
     loop {
         pid = waitpid(-(1 as libc::c_int), &mut status, 1 as libc::c_int);
         if !(pid > 0 as libc::c_int
-            || pid == -(1 as libc::c_int) && *__errno_location() == 4 as libc::c_int)
+            || pid == -(1 as libc::c_int) && *libc::__errno_location() == 4 as libc::c_int)
         {
             break;
         }
     }
-    *__errno_location() = save_errno;
+    *libc::__errno_location() = save_errno;
 }
 pub fn main() {
     let mut args: Vec<*mut libc::c_char> = Vec::new();

@@ -32,8 +32,6 @@ extern "C" {
         -> libc::c_int;
     fn tcgetattr(__fd: libc::c_int, __termios_p: *mut termios) -> libc::c_int;
 
-    fn __errno_location() -> *mut libc::c_int;
-
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn getuid() -> __uid_t;
@@ -3609,7 +3607,7 @@ unsafe extern "C" fn channel_post_x11_listener(mut ssh: *mut ssh, mut c: *mut Ch
         &mut addrlen,
     );
     if (*c).single_connection != 0 {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         crate::log::sshlog(
             b"channels.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
@@ -3624,12 +3622,12 @@ unsafe extern "C" fn channel_post_x11_listener(mut ssh: *mut ssh, mut c: *mut Ch
         );
         channel_close_fd(ssh, c, &mut (*c).sock);
         chan_mark_dead(ssh, c);
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
     }
     if newsock == -(1 as libc::c_int) {
-        if *__errno_location() != 4 as libc::c_int
-            && *__errno_location() != 11 as libc::c_int
-            && *__errno_location() != 103 as libc::c_int
+        if *libc::__errno_location() != 4 as libc::c_int
+            && *libc::__errno_location() != 11 as libc::c_int
+            && *libc::__errno_location() != 103 as libc::c_int
         {
             crate::log::sshlog(
                 b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -3642,10 +3640,12 @@ unsafe extern "C" fn channel_post_x11_listener(mut ssh: *mut ssh, mut c: *mut Ch
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"accept: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
-        if *__errno_location() == 24 as libc::c_int || *__errno_location() == 23 as libc::c_int {
+        if *libc::__errno_location() == 24 as libc::c_int
+            || *libc::__errno_location() == 23 as libc::c_int
+        {
             (*c).notbefore = monotime() + 1 as libc::c_int as libc::c_long;
         }
         return;
@@ -3949,9 +3949,9 @@ unsafe extern "C" fn channel_post_port_listener(mut ssh: *mut ssh, mut c: *mut C
         &mut addrlen,
     );
     if newsock == -(1 as libc::c_int) {
-        if *__errno_location() != 4 as libc::c_int
-            && *__errno_location() != 11 as libc::c_int
-            && *__errno_location() != 103 as libc::c_int
+        if *libc::__errno_location() != 4 as libc::c_int
+            && *libc::__errno_location() != 11 as libc::c_int
+            && *libc::__errno_location() != 103 as libc::c_int
         {
             crate::log::sshlog(
                 b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -3964,10 +3964,12 @@ unsafe extern "C" fn channel_post_port_listener(mut ssh: *mut ssh, mut c: *mut C
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"accept: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
-        if *__errno_location() == 24 as libc::c_int || *__errno_location() == 23 as libc::c_int {
+        if *libc::__errno_location() == 24 as libc::c_int
+            || *libc::__errno_location() == 23 as libc::c_int
+        {
             (*c).notbefore = monotime() + 1 as libc::c_int as libc::c_long;
         }
         return;
@@ -4030,9 +4032,11 @@ unsafe extern "C" fn channel_post_auth_listener(mut ssh: *mut ssh, mut c: *mut C
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"accept from auth socket: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
-        if *__errno_location() == 24 as libc::c_int || *__errno_location() == 23 as libc::c_int {
+        if *libc::__errno_location() == 24 as libc::c_int
+            || *libc::__errno_location() == 23 as libc::c_int
+        {
             (*c).notbefore = monotime() + 1 as libc::c_int as libc::c_long;
         }
         return;
@@ -4109,7 +4113,7 @@ unsafe extern "C" fn channel_post_connecting(mut ssh: *mut ssh, mut c: *mut Chan
         &mut sz,
     ) == -(1 as libc::c_int)
     {
-        err = *__errno_location();
+        err = *libc::__errno_location();
         crate::log::sshlog(
             b"channels.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
@@ -4303,10 +4307,10 @@ unsafe extern "C" fn channel_handle_rfd(mut ssh: *mut ssh, mut c: *mut Channel) 
         }
         r = sshbuf_read((*c).rfd, (*c).input, maxlen, &mut nr);
         if r != 0 as libc::c_int {
-            if *__errno_location() == 4 as libc::c_int
+            if *libc::__errno_location() == 4 as libc::c_int
                 || force == 0
-                    && (*__errno_location() == 11 as libc::c_int
-                        || *__errno_location() == 11 as libc::c_int)
+                    && (*libc::__errno_location() == 11 as libc::c_int
+                        || *libc::__errno_location() == 11 as libc::c_int)
             {
                 return 1 as libc::c_int;
             }
@@ -4334,7 +4338,7 @@ unsafe extern "C" fn channel_handle_rfd(mut ssh: *mut ssh, mut c: *mut Channel) 
             return 1 as libc::c_int;
         }
     } else {
-        *__errno_location() = 0 as libc::c_int;
+        *libc::__errno_location() = 0 as libc::c_int;
         len = read(
             (*c).rfd,
             buf.as_mut_ptr() as *mut libc::c_void,
@@ -4342,14 +4346,14 @@ unsafe extern "C" fn channel_handle_rfd(mut ssh: *mut ssh, mut c: *mut Channel) 
         );
         if pty_zeroread != 0
             && len == 0 as libc::c_int as libc::c_long
-            && *__errno_location() != 0 as libc::c_int
+            && *libc::__errno_location() != 0 as libc::c_int
         {
             len = -(1 as libc::c_int) as ssize_t;
         }
         if len == -(1 as libc::c_int) as libc::c_long
-            && (*__errno_location() == 4 as libc::c_int
-                || (*__errno_location() == 11 as libc::c_int
-                    || *__errno_location() == 11 as libc::c_int)
+            && (*libc::__errno_location() == 4 as libc::c_int
+                || (*libc::__errno_location() == 11 as libc::c_int
+                    || *libc::__errno_location() == 11 as libc::c_int)
                     && force == 0)
         {
             return 1 as libc::c_int;
@@ -4374,7 +4378,7 @@ unsafe extern "C" fn channel_handle_rfd(mut ssh: *mut ssh, mut c: *mut Channel) 
                 if len == 0 as libc::c_int as libc::c_long {
                     b"closed\0" as *const u8 as *const libc::c_char
                 } else {
-                    strerror(*__errno_location()) as *const libc::c_char
+                    strerror(*libc::__errno_location()) as *const libc::c_char
                 },
             );
         } else {
@@ -4543,9 +4547,9 @@ unsafe extern "C" fn channel_handle_wfd(mut ssh: *mut ssh, mut c: *mut Channel) 
         len = write((*c).wfd, buf as *const libc::c_void, dlen) as libc::c_int;
         free(data as *mut libc::c_void);
         if len == -(1 as libc::c_int)
-            && (*__errno_location() == 4 as libc::c_int
-                || *__errno_location() == 11 as libc::c_int
-                || *__errno_location() == 11 as libc::c_int)
+            && (*libc::__errno_location() == 4 as libc::c_int
+                || *libc::__errno_location() == 11 as libc::c_int
+                || *libc::__errno_location() == 11 as libc::c_int)
         {
             return 1 as libc::c_int;
         }
@@ -4557,9 +4561,9 @@ unsafe extern "C" fn channel_handle_wfd(mut ssh: *mut ssh, mut c: *mut Channel) 
     } else {
         len = write((*c).wfd, buf as *const libc::c_void, dlen) as libc::c_int;
         if len == -(1 as libc::c_int)
-            && (*__errno_location() == 4 as libc::c_int
-                || *__errno_location() == 11 as libc::c_int
-                || *__errno_location() == 11 as libc::c_int)
+            && (*libc::__errno_location() == 4 as libc::c_int
+                || *libc::__errno_location() == 11 as libc::c_int
+                || *libc::__errno_location() == 11 as libc::c_int)
         {
             return 1 as libc::c_int;
         }
@@ -4677,9 +4681,9 @@ unsafe extern "C" fn channel_handle_efd_write(
         (*c).efd,
     );
     if len == -(1 as libc::c_int) as libc::c_long
-        && (*__errno_location() == 4 as libc::c_int
-            || *__errno_location() == 11 as libc::c_int
-            || *__errno_location() == 11 as libc::c_int)
+        && (*libc::__errno_location() == 4 as libc::c_int
+            || *libc::__errno_location() == 11 as libc::c_int
+            || *libc::__errno_location() == 11 as libc::c_int)
     {
         return 1 as libc::c_int;
     }
@@ -4756,9 +4760,9 @@ unsafe extern "C" fn channel_handle_efd_read(
         (*c).efd,
     );
     if len == -(1 as libc::c_int) as libc::c_long
-        && (*__errno_location() == 4 as libc::c_int
-            || (*__errno_location() == 11 as libc::c_int
-                || *__errno_location() == 11 as libc::c_int)
+        && (*libc::__errno_location() == 4 as libc::c_int
+            || (*libc::__errno_location() == 11 as libc::c_int
+                || *libc::__errno_location() == 11 as libc::c_int)
                 && force == 0)
     {
         return 1 as libc::c_int;
@@ -4927,7 +4931,8 @@ unsafe extern "C" fn read_mux(mut ssh: *mut ssh, mut c: *mut Channel, mut need: 
             }) as size_t,
         );
         if len == -(1 as libc::c_int) as libc::c_long
-            && (*__errno_location() == 4 as libc::c_int || *__errno_location() == 11 as libc::c_int)
+            && (*libc::__errno_location() == 4 as libc::c_int
+                || *libc::__errno_location() == 11 as libc::c_int)
         {
             return sshbuf_len((*c).input) as u_int;
         }
@@ -5049,7 +5054,8 @@ unsafe extern "C" fn channel_post_mux_client_write(mut ssh: *mut ssh, mut c: *mu
         sshbuf_len((*c).output),
     );
     if len == -(1 as libc::c_int) as libc::c_long
-        && (*__errno_location() == 4 as libc::c_int || *__errno_location() == 11 as libc::c_int)
+        && (*libc::__errno_location() == 4 as libc::c_int
+            || *libc::__errno_location() == 11 as libc::c_int)
     {
         return;
     }
@@ -5127,9 +5133,11 @@ unsafe extern "C" fn channel_post_mux_listener(mut ssh: *mut ssh, mut c: *mut Ch
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"accept: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
-        if *__errno_location() == 24 as libc::c_int || *__errno_location() == 23 as libc::c_int {
+        if *libc::__errno_location() == 24 as libc::c_int
+            || *libc::__errno_location() == 23 as libc::c_int
+        {
             (*c).notbefore = monotime() + 1 as libc::c_int as libc::c_long;
         }
         return;
@@ -5146,7 +5154,7 @@ unsafe extern "C" fn channel_post_mux_listener(mut ssh: *mut ssh, mut c: *mut Ch
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"getpeereid failed: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         close(newsock);
         return;
@@ -8076,7 +8084,7 @@ unsafe extern "C" fn channel_setup_fwd_listener_tcpip(
                             b"socket [%s]:%s: %.100s\0" as *const u8 as *const libc::c_char,
                             ntop.as_mut_ptr(),
                             strport.as_mut_ptr(),
-                            strerror(*__errno_location()),
+                            strerror(*libc::__errno_location()),
                         );
                     } else {
                         set_reuseaddr(sock);
@@ -8120,7 +8128,7 @@ unsafe extern "C" fn channel_setup_fwd_listener_tcpip(
                                     b"bind [%s]:%s: %.100s\0" as *const u8 as *const libc::c_char,
                                     ntop.as_mut_ptr(),
                                     strport.as_mut_ptr(),
-                                    strerror(*__errno_location()),
+                                    strerror(*libc::__errno_location()),
                                 );
                             } else {
                                 crate::log::sshlog(
@@ -8136,7 +8144,7 @@ unsafe extern "C" fn channel_setup_fwd_listener_tcpip(
                                     b"bind [%s]:%s: %.100s\0" as *const u8 as *const libc::c_char,
                                     ntop.as_mut_ptr(),
                                     strport.as_mut_ptr(),
-                                    strerror(*__errno_location()),
+                                    strerror(*libc::__errno_location()),
                                 );
                             }
                             close(sock);
@@ -8154,7 +8162,7 @@ unsafe extern "C" fn channel_setup_fwd_listener_tcpip(
                                 b"listen [%s]:%s: %.100s\0" as *const u8 as *const libc::c_char,
                                 ntop.as_mut_ptr(),
                                 strport.as_mut_ptr(),
-                                strerror(*__errno_location()),
+                                strerror(*libc::__errno_location()),
                             );
                             close(sock);
                         } else {
@@ -9416,7 +9424,7 @@ unsafe extern "C" fn connect_next(mut cctx: *mut channel_connect) -> libc::c_int
                             SYSLOG_LEVEL_ERROR,
                             0 as *const libc::c_char,
                             b"socket: %.100s\0" as *const u8 as *const libc::c_char,
-                            strerror(*__errno_location()),
+                            strerror(*libc::__errno_location()),
                         );
                     } else {
                         crate::log::sshlog(
@@ -9430,7 +9438,7 @@ unsafe extern "C" fn connect_next(mut cctx: *mut channel_connect) -> libc::c_int
                             SYSLOG_LEVEL_VERBOSE,
                             0 as *const libc::c_char,
                             b"socket: %.100s\0" as *const u8 as *const libc::c_char,
-                            strerror(*__errno_location()),
+                            strerror(*libc::__errno_location()),
                         );
                     }
                 } else {
@@ -9456,7 +9464,7 @@ unsafe extern "C" fn connect_next(mut cctx: *mut channel_connect) -> libc::c_int
                         },
                         (*(*cctx).ai).ai_addrlen,
                     ) == -(1 as libc::c_int)
-                        && *__errno_location() != 115 as libc::c_int
+                        && *libc::__errno_location() != 115 as libc::c_int
                     {
                         crate::log::sshlog(
                             b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -9473,11 +9481,11 @@ unsafe extern "C" fn connect_next(mut cctx: *mut channel_connect) -> libc::c_int
                             (*cctx).host,
                             ntop.as_mut_ptr(),
                             strport.as_mut_ptr(),
-                            strerror(*__errno_location()),
+                            strerror(*libc::__errno_location()),
                         );
-                        saved_errno = *__errno_location();
+                        saved_errno = *libc::__errno_location();
                         close(sock);
-                        *__errno_location() = saved_errno;
+                        *libc::__errno_location() = saved_errno;
                     } else {
                         if (*(*cctx).ai).ai_family != 1 as libc::c_int {
                             set_nodelay(sock);
@@ -9643,7 +9651,7 @@ unsafe extern "C" fn connect_to_helper(
             b"connect to %.100s port %d failed: %s\0" as *const u8 as *const libc::c_char,
             name,
             port,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -10246,9 +10254,9 @@ pub unsafe extern "C" fn x11_create_display_inet(
             if !((*ai).ai_family != 2 as libc::c_int && (*ai).ai_family != 10 as libc::c_int) {
                 sock = socket((*ai).ai_family, (*ai).ai_socktype, (*ai).ai_protocol);
                 if sock == -(1 as libc::c_int) {
-                    if *__errno_location() != 22 as libc::c_int
-                        && *__errno_location() != 97 as libc::c_int
-                        && *__errno_location() != 96 as libc::c_int
+                    if *libc::__errno_location() != 22 as libc::c_int
+                        && *libc::__errno_location() != 97 as libc::c_int
+                        && *libc::__errno_location() != 96 as libc::c_int
                     {
                         crate::log::sshlog(
                             b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -10261,7 +10269,7 @@ pub unsafe extern "C" fn x11_create_display_inet(
                             SYSLOG_LEVEL_ERROR,
                             0 as *const libc::c_char,
                             b"socket: %.100s\0" as *const u8 as *const libc::c_char,
-                            strerror(*__errno_location()),
+                            strerror(*libc::__errno_location()),
                         );
                         freeaddrinfo(aitop);
                         return -(1 as libc::c_int);
@@ -10308,7 +10316,7 @@ pub unsafe extern "C" fn x11_create_display_inet(
                             0 as *const libc::c_char,
                             b"bind port %d: %.100s\0" as *const u8 as *const libc::c_char,
                             port as libc::c_int,
-                            strerror(*__errno_location()),
+                            strerror(*libc::__errno_location()),
                         );
                         close(sock);
                         n = 0 as libc::c_int;
@@ -10369,7 +10377,7 @@ pub unsafe extern "C" fn x11_create_display_inet(
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"listen: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             close(sock);
             return -(1 as libc::c_int);
@@ -10429,7 +10437,7 @@ unsafe extern "C" fn connect_local_xsocket_path(mut pathname: *const libc::c_cha
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"socket: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -10467,7 +10475,7 @@ unsafe extern "C" fn connect_local_xsocket_path(mut pathname: *const libc::c_cha
         0 as *const libc::c_char,
         b"connect %.100s: %.100s\0" as *const u8 as *const libc::c_char,
         (addr.sun_path).as_mut_ptr(),
-        strerror(*__errno_location()),
+        strerror(*libc::__errno_location()),
     );
     return -(1 as libc::c_int);
 }
@@ -10640,7 +10648,7 @@ pub unsafe extern "C" fn x11_connect_display(mut ssh: *mut ssh) -> libc::c_int {
                 SYSLOG_LEVEL_DEBUG2,
                 0 as *const libc::c_char,
                 b"socket: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         } else {
             if !(connect(
@@ -10666,7 +10674,7 @@ pub unsafe extern "C" fn x11_connect_display(mut ssh: *mut ssh) -> libc::c_int {
                 b"connect %.100s port %u: %.100s\0" as *const u8 as *const libc::c_char,
                 buf.as_mut_ptr(),
                 (6000 as libc::c_int as libc::c_uint).wrapping_add(display_number),
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             close(sock);
         }
@@ -10685,7 +10693,7 @@ pub unsafe extern "C" fn x11_connect_display(mut ssh: *mut ssh) -> libc::c_int {
             b"connect %.100s port %u: %.100s\0" as *const u8 as *const libc::c_char,
             buf.as_mut_ptr(),
             (6000 as libc::c_int as libc::c_uint).wrapping_add(display_number),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }

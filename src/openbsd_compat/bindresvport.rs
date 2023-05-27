@@ -13,7 +13,7 @@ extern "C" {
     fn bind(__fd: libc::c_int, __addr: __CONST_SOCKADDR_ARG, __len: socklen_t) -> libc::c_int;
     fn getsockname(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn arc4random_uniform(_: uint32_t) -> uint32_t;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 }
@@ -164,7 +164,7 @@ pub unsafe extern "C" fn bindresvport_sa(
         salen = ::core::mem::size_of::<sockaddr_in6>() as libc::c_ulong as socklen_t;
         portp = &mut (*in6).sin6_port;
     } else {
-        *__errno_location() = 96 as libc::c_int;
+        *libc::__errno_location() = 96 as libc::c_int;
         return -(1 as libc::c_int);
     }
     (*sa).sa_family = af as sa_family_t;
@@ -185,8 +185,8 @@ pub unsafe extern "C" fn bindresvport_sa(
             break;
         }
         if error < 0 as libc::c_int
-            && !(*__errno_location() == 98 as libc::c_int
-                || *__errno_location() == 22 as libc::c_int)
+            && !(*libc::__errno_location() == 98 as libc::c_int
+                || *libc::__errno_location() == 22 as libc::c_int)
         {
             break;
         }

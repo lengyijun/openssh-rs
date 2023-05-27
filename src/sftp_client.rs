@@ -7,7 +7,7 @@ extern "C" {
     pub type sshbuf;
     pub type __dirstream;
     fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn lseek(__fd: libc::c_int, __offset: __off_t, __whence: libc::c_int) -> __off_t;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
@@ -388,7 +388,7 @@ unsafe extern "C" fn send_msg(mut conn: *mut sftp_conn, mut m: *mut sshbuf) {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"Couldn't send packet: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     sshbuf_reset(m);
@@ -428,7 +428,9 @@ unsafe extern "C" fn get_msg_extended(
         }) as *mut libc::c_void,
     ) != 4 as libc::c_int as libc::c_ulong
     {
-        if *__errno_location() == 32 as libc::c_int || *__errno_location() == 104 as libc::c_int {
+        if *libc::__errno_location() == 32 as libc::c_int
+            || *libc::__errno_location() == 104 as libc::c_int
+        {
             sshfatal(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"get_msg_extended\0"))
@@ -449,7 +451,7 @@ unsafe extern "C" fn get_msg_extended(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"Couldn't read packet: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     }
@@ -520,7 +522,7 @@ unsafe extern "C" fn get_msg_extended(
         }) as *mut libc::c_void,
     ) != msg_len as libc::c_ulong
     {
-        if *__errno_location() == 32 as libc::c_int {
+        if *libc::__errno_location() == 32 as libc::c_int {
             sshfatal(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"get_msg_extended\0"))
@@ -541,7 +543,7 @@ unsafe extern "C" fn get_msg_extended(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"Read packet: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     }
@@ -4141,7 +4143,7 @@ pub unsafe extern "C" fn do_download(
             0 as *const libc::c_char,
             b"open local \"%s\": %s\0" as *const u8 as *const libc::c_char,
             local_path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else {
         if resume_flag != 0 {
@@ -4156,7 +4158,7 @@ pub unsafe extern "C" fn do_download(
                     0 as *const libc::c_char,
                     b"stat local \"%s\": %s\0" as *const u8 as *const libc::c_char,
                     local_path,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
                 current_block = 1623598053124096515;
             } else if st.st_size < 0 as libc::c_int as libc::c_long {
@@ -4440,7 +4442,7 @@ pub unsafe extern "C" fn do_download(
                                 ) != len)
                                 && write_error == 0
                             {
-                                write_errno = *__errno_location();
+                                write_errno = *libc::__errno_location();
                                 write_error = 1 as libc::c_int;
                                 max_req = 0 as libc::c_int as u_int;
                             } else {
@@ -4622,7 +4624,7 @@ pub unsafe extern "C" fn do_download(
                             0 as *const libc::c_char,
                             b"local ftruncate \"%s\": %s\0" as *const u8 as *const libc::c_char,
                             local_path,
-                            strerror(*__errno_location()),
+                            strerror(*libc::__errno_location()),
                         );
                     }
                 }
@@ -4681,7 +4683,7 @@ pub unsafe extern "C" fn do_download(
                             0 as *const libc::c_char,
                             b"local chmod \"%s\": %s\0" as *const u8 as *const libc::c_char,
                             local_path,
-                            strerror(*__errno_location()),
+                            strerror(*libc::__errno_location()),
                         );
                     }
                     if preserve_flag != 0 && (*a).flags & 0x8 as libc::c_int as libc::c_uint != 0 {
@@ -4709,7 +4711,7 @@ pub unsafe extern "C" fn do_download(
                                 0 as *const libc::c_char,
                                 b"local set times \"%s\": %s\0" as *const u8 as *const libc::c_char,
                                 local_path,
-                                strerror(*__errno_location()),
+                                strerror(*libc::__errno_location()),
                             );
                         }
                     }
@@ -4754,7 +4756,7 @@ pub unsafe extern "C" fn do_download(
                                 0 as *const libc::c_char,
                                 b"local sync \"%s\": %s\0" as *const u8 as *const libc::c_char,
                                 local_path,
-                                strerror(*__errno_location()),
+                                strerror(*libc::__errno_location()),
                             );
                         }
                     }
@@ -4880,7 +4882,8 @@ unsafe extern "C" fn download_dir_internal(
             dst,
         );
     }
-    if libc::mkdir(dst, tmpmode) == -(1 as libc::c_int) && *__errno_location() != 17 as libc::c_int
+    if libc::mkdir(dst, tmpmode) == -(1 as libc::c_int)
+        && *libc::__errno_location() != 17 as libc::c_int
     {
         crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -4892,7 +4895,7 @@ unsafe extern "C" fn download_dir_internal(
             0 as *const libc::c_char,
             b"mkdir %s: %s\0" as *const u8 as *const libc::c_char,
             dst,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -5026,7 +5029,7 @@ unsafe extern "C" fn download_dir_internal(
                     0 as *const libc::c_char,
                     b"local set times on \"%s\": %s\0" as *const u8 as *const libc::c_char,
                     dst,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             }
         } else {
@@ -5057,7 +5060,7 @@ unsafe extern "C" fn download_dir_internal(
             0 as *const libc::c_char,
             b"local chmod directory \"%s\": %s\0" as *const u8 as *const libc::c_char,
             dst,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     free_sftp_dirents(dir_entries);
@@ -5207,7 +5210,7 @@ pub unsafe extern "C" fn do_upload(
             0 as *const libc::c_char,
             b"open local \"%s\": %s\0" as *const u8 as *const libc::c_char,
             local_path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -5221,7 +5224,7 @@ pub unsafe extern "C" fn do_upload(
             0 as *const libc::c_char,
             b"fstat local \"%s\": %s\0" as *const u8 as *const libc::c_char,
             local_path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         close(local_fd);
         return -(1 as libc::c_int);
@@ -5338,9 +5341,9 @@ pub unsafe extern "C" fn do_upload(
                     (*conn).upload_buflen as size_t,
                 ) as libc::c_int;
                 if !(len == -(1 as libc::c_int)
-                    && (*__errno_location() == 4 as libc::c_int
-                        || *__errno_location() == 11 as libc::c_int
-                        || *__errno_location() == 11 as libc::c_int))
+                    && (*libc::__errno_location() == 4 as libc::c_int
+                        || *libc::__errno_location() == 11 as libc::c_int
+                        || *libc::__errno_location() == 11 as libc::c_int))
                 {
                     break;
                 }
@@ -5357,7 +5360,7 @@ pub unsafe extern "C" fn do_upload(
                 0 as *const libc::c_char,
                 b"read local \"%s\": %s\0" as *const u8 as *const libc::c_char,
                 local_path,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         } else {
             if len != 0 as libc::c_int {
@@ -5610,7 +5613,7 @@ pub unsafe extern "C" fn do_upload(
             0 as *const libc::c_char,
             b"close local \"%s\": %s\0" as *const u8 as *const libc::c_char,
             local_path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         status = 4 as libc::c_int as u_int;
     }
@@ -5722,7 +5725,7 @@ unsafe extern "C" fn upload_dir_internal(
             0 as *const libc::c_char,
             b"stat local \"%s\": %s\0" as *const u8 as *const libc::c_char,
             src,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -5791,7 +5794,7 @@ unsafe extern "C" fn upload_dir_internal(
             0 as *const libc::c_char,
             b"local opendir \"%s\": %s\0" as *const u8 as *const libc::c_char,
             src,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -5821,7 +5824,7 @@ unsafe extern "C" fn upload_dir_internal(
                 0 as *const libc::c_char,
                 b"local lstat \"%s\": %s\0" as *const u8 as *const libc::c_char,
                 filename,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             ret = -(1 as libc::c_int);
         } else if sb.st_mode & 0o170000 as libc::c_int as libc::c_uint
@@ -5990,7 +5993,7 @@ unsafe extern "C" fn handle_dest_replies(
             pfd.events = 0x1 as libc::c_int as libc::c_short;
             r = poll(&mut pfd, 1 as libc::c_int as nfds_t, 0 as libc::c_int);
             if r == -(1 as libc::c_int) {
-                if *__errno_location() == 4 as libc::c_int {
+                if *libc::__errno_location() == 4 as libc::c_int {
                     break;
                 }
                 sshfatal(
@@ -6004,7 +6007,7 @@ unsafe extern "C" fn handle_dest_replies(
                     SYSLOG_LEVEL_FATAL,
                     0 as *const libc::c_char,
                     b"poll: %s\0" as *const u8 as *const libc::c_char,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             } else if r == 0 as libc::c_int {
                 break;

@@ -11,7 +11,7 @@ extern "C" {
         __optional_actions: libc::c_int,
         __termios_p: *const termios,
     ) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn getpid() -> __pid_t;
 
     fn sigaction(
@@ -292,7 +292,7 @@ pub unsafe extern "C" fn readpassphrase(
         sa_restorer: None,
     };
     if bufsiz == 0 as libc::c_int as libc::c_ulong {
-        *__errno_location() = 22 as libc::c_int;
+        *libc::__errno_location() = 22 as libc::c_int;
         return 0 as *mut libc::c_char;
     }
     loop {
@@ -317,7 +317,7 @@ pub unsafe extern "C" fn readpassphrase(
             input == -(1 as libc::c_int)
         } {
             if flags & 0x2 as libc::c_int != 0 {
-                *__errno_location() = 25 as libc::c_int;
+                *libc::__errno_location() = 25 as libc::c_int;
                 return 0 as *mut libc::c_char;
             }
             input = 0 as libc::c_int;
@@ -445,7 +445,7 @@ pub unsafe extern "C" fn readpassphrase(
             }
         }
         *p = '\0' as i32 as libc::c_char;
-        save_errno = *__errno_location();
+        save_errno = *libc::__errno_location();
         if term.c_lflag & 0o10 as libc::c_int as libc::c_uint == 0 {
             write(
                 output,
@@ -462,7 +462,7 @@ pub unsafe extern "C" fn readpassphrase(
             let sigttou: libc::c_int = signo[22 as libc::c_int as usize];
             while tcsetattr(input, 2 as libc::c_int | 0 as libc::c_int, &mut oterm)
                 == -(1 as libc::c_int)
-                && *__errno_location() == 4 as libc::c_int
+                && *libc::__errno_location() == 4 as libc::c_int
                 && signo[22 as libc::c_int as usize] == 0
             {}
             ::core::ptr::write_volatile(
@@ -501,7 +501,7 @@ pub unsafe extern "C" fn readpassphrase(
         }
     }
     if save_errno != 0 {
-        *__errno_location() = save_errno;
+        *libc::__errno_location() = save_errno;
     }
     return if nr == -(1 as libc::c_int) as libc::c_long {
         0 as *mut libc::c_char

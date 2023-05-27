@@ -10,7 +10,6 @@ extern "C" {
     pub type dsa_st;
     pub type rsa_st;
     pub type ec_key_st;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn closefrom(__lowfd: libc::c_int);
     fn dup(__fd: libc::c_int) -> libc::c_int;
@@ -878,7 +877,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             0 as *const libc::c_char,
             b"%s: dup: %s\0" as *const u8 as *const libc::c_char,
             __progname,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     close(0 as libc::c_int);

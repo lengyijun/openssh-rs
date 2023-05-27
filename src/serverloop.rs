@@ -11,7 +11,7 @@ extern "C" {
     pub type ssh_hmac_ctx;
     pub type sshcipher;
     pub type session_state;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn sigemptyset(__set: *mut sigset_t) -> libc::c_int;
     fn sigaddset(__set: *mut sigset_t, __signo: libc::c_int) -> libc::c_int;
     fn sigprocmask(
@@ -1065,7 +1065,7 @@ unsafe extern "C" fn wait_until_can_do_something(
             p = p.wrapping_add(1);
             p;
         }
-        if *__errno_location() != 4 as libc::c_int {
+        if *libc::__errno_location() != 4 as libc::c_int {
             sshfatal(
                 b"serverloop.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
@@ -1077,7 +1077,7 @@ unsafe extern "C" fn wait_until_can_do_something(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"ppoll: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         return;
@@ -1132,13 +1132,13 @@ unsafe extern "C" fn process_input(
         return 0 as libc::c_int;
     }
     if r == -(24 as libc::c_int) {
-        if *__errno_location() == 11 as libc::c_int
-            || *__errno_location() == 4 as libc::c_int
-            || *__errno_location() == 11 as libc::c_int
+        if *libc::__errno_location() == 11 as libc::c_int
+            || *libc::__errno_location() == 4 as libc::c_int
+            || *libc::__errno_location() == 11 as libc::c_int
         {
             return 0 as libc::c_int;
         }
-        if *__errno_location() == 32 as libc::c_int {
+        if *libc::__errno_location() == 32 as libc::c_int {
             crate::log::sshlog(
                 b"serverloop.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"process_input\0"))
@@ -1164,7 +1164,7 @@ unsafe extern "C" fn process_input(
             b"Read error from remote host %s port %d: %s\0" as *const u8 as *const libc::c_char,
             ssh_remote_ipaddr(ssh),
             ssh_remote_port(ssh),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         cleanup_exit(255 as libc::c_int);
     }
@@ -1207,7 +1207,7 @@ unsafe extern "C" fn collect_children(mut ssh: *mut ssh) {
         loop {
             pid = waitpid(-(1 as libc::c_int), &mut status, 1 as libc::c_int);
             if !(pid > 0 as libc::c_int
-                || pid == -(1 as libc::c_int) && *__errno_location() == 4 as libc::c_int)
+                || pid == -(1 as libc::c_int) && *libc::__errno_location() == 4 as libc::c_int)
             {
                 break;
             }
@@ -1249,7 +1249,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"bsigset setup: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     ssh_signal(
@@ -1289,7 +1289,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"bsigset sigprocmask: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         collect_children(ssh);
@@ -1314,7 +1314,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"osigset sigprocmask: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         if received_sigterm != 0 {

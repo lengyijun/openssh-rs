@@ -14,7 +14,7 @@ extern "C" {
     pub type sshcipher;
     pub type session_state;
     pub type ssh_digest_ctx;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
@@ -2741,7 +2741,7 @@ unsafe extern "C" fn send_error(mut ssh: *mut ssh, mut msg: *mut libc::c_char) {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"write: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
 }
@@ -2796,7 +2796,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
         },
     );
     if r != 0 as libc::c_int {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
@@ -2821,7 +2821,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
         sshbuf_len(our_version),
     ) != sshbuf_len(our_version)
     {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
@@ -2833,13 +2833,13 @@ pub unsafe extern "C" fn kex_exchange_identification(
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"write: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         r = -(24 as libc::c_int);
     } else {
         r = sshbuf_consume_end(our_version, 2 as libc::c_int as size_t);
         if r != 0 as libc::c_int {
-            oerrno = *__errno_location();
+            oerrno = *libc::__errno_location();
             crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
@@ -2915,7 +2915,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                             if timeout_ms > 0 as libc::c_int {
                                 r = waitrfd(ssh_packet_get_connection_in(ssh), &mut timeout_ms);
                                 if r == -(1 as libc::c_int)
-                                    && *__errno_location() == 110 as libc::c_int
+                                    && *libc::__errno_location() == 110 as libc::c_int
                                 {
                                     send_error(
                                         ssh,
@@ -2942,7 +2942,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                     current_block = 4276536258050058664;
                                     break 's_97;
                                 } else if r == -(1 as libc::c_int) {
-                                    oerrno = *__errno_location();
+                                    oerrno = *libc::__errno_location();
                                     crate::log::sshlog(
                                         b"kex.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
@@ -2954,7 +2954,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                         SYSLOG_LEVEL_ERROR,
                                         0 as *const libc::c_char,
                                         b"%s\0" as *const u8 as *const libc::c_char,
-                                        strerror(*__errno_location()),
+                                        strerror(*libc::__errno_location()),
                                     );
                                     r = -(24 as libc::c_int);
                                     current_block = 4276536258050058664;
@@ -2975,7 +2975,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                 1 as libc::c_int as size_t,
                             );
                             if len != 1 as libc::c_int as libc::c_ulong
-                                && *__errno_location() == 32 as libc::c_int
+                                && *libc::__errno_location() == 32 as libc::c_int
                             {
                                 crate::log::sshlog(
                                     b"kex.c\0" as *const u8 as *const libc::c_char,
@@ -2994,7 +2994,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                 current_block = 4276536258050058664;
                                 break 's_97;
                             } else if len != 1 as libc::c_int as libc::c_ulong {
-                                oerrno = *__errno_location();
+                                oerrno = *libc::__errno_location();
                                 crate::log::sshlog(
                                     b"kex.c\0" as *const u8 as *const libc::c_char,
                                     (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
@@ -3006,7 +3006,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                     SYSLOG_LEVEL_ERROR,
                                     0 as *const libc::c_char,
                                     b"read: %.100s\0" as *const u8 as *const libc::c_char,
-                                    strerror(*__errno_location()),
+                                    strerror(*libc::__errno_location()),
                                 );
                                 r = -(24 as libc::c_int);
                                 current_block = 4276536258050058664;
@@ -3036,7 +3036,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                 } else {
                                     r = sshbuf_put_u8(peer_version, c);
                                     if r != 0 as libc::c_int {
-                                        oerrno = *__errno_location();
+                                        oerrno = *libc::__errno_location();
                                         crate::log::sshlog(
                                             b"kex.c\0" as *const u8 as *const libc::c_char,
                                             (*::core::mem::transmute::<
@@ -3350,7 +3350,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
     free(peer_version_string as *mut libc::c_void);
     free(remote_version as *mut libc::c_void);
     if r == -(24 as libc::c_int) {
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
     }
     return r;
 }

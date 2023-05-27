@@ -25,7 +25,6 @@ extern "C" {
     fn connect(__fd: libc::c_int, __addr: __CONST_SOCKADDR_ARG, __len: socklen_t) -> libc::c_int;
     fn tcgetattr(__fd: libc::c_int, __termios_p: *mut termios) -> libc::c_int;
 
-    fn __errno_location() -> *mut libc::c_int;
     fn platform_pledge_mux();
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
@@ -1602,7 +1601,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                                     SYSLOG_LEVEL_ERROR,
                                     0 as *const libc::c_char,
                                     b"tcgetattr: %s\0" as *const u8 as *const libc::c_char,
-                                    strerror(*__errno_location()),
+                                    strerror(*libc::__errno_location()),
                                 );
                             }
                             window = (64 as libc::c_int * (32 as libc::c_int * 1024 as libc::c_int))
@@ -3759,7 +3758,7 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
     );
     old_umask = libc::umask(0o177 as libc::c_int as __mode_t);
     muxserver_sock = unix_listener(options.control_path, 64 as libc::c_int, 0 as libc::c_int);
-    oerrno = *__errno_location();
+    oerrno = *libc::__errno_location();
     libc::umask(old_umask);
     if muxserver_sock < 0 as libc::c_int {
         if oerrno == 22 as libc::c_int || oerrno == 98 as libc::c_int {
@@ -3779,7 +3778,7 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
             cleanup_exit(255 as libc::c_int);
         }
     } else if link(options.control_path, orig_control_path) != 0 as libc::c_int {
-        if *__errno_location() != 17 as libc::c_int {
+        if *libc::__errno_location() != 17 as libc::c_int {
             sshfatal(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"muxserver_listen\0"))
@@ -3791,7 +3790,7 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
                 b"link mux listener %s => %s: %s\0" as *const u8 as *const libc::c_char,
                 options.control_path,
                 orig_control_path,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         crate::log::sshlog(
@@ -4107,11 +4106,11 @@ unsafe extern "C" fn control_client_sighandler(mut signo: libc::c_int) {
     ::core::ptr::write_volatile(&mut muxclient_terminate as *mut sig_atomic_t, signo);
 }
 unsafe extern "C" fn control_client_sigrelay(mut signo: libc::c_int) {
-    let mut save_errno: libc::c_int = *__errno_location();
+    let mut save_errno: libc::c_int = *libc::__errno_location();
     if muxserver_pid > 1 as libc::c_int as libc::c_uint {
         kill(muxserver_pid as __pid_t, signo);
     }
-    *__errno_location() = save_errno;
+    *libc::__errno_location() = save_errno;
 }
 unsafe extern "C" fn mux_client_read(
     mut fd: libc::c_int,
@@ -4145,7 +4144,7 @@ unsafe extern "C" fn mux_client_read(
     have = 0 as libc::c_int as size_t;
     while have < need {
         if muxclient_terminate != 0 {
-            *__errno_location() = 4 as libc::c_int;
+            *libc::__errno_location() = 4 as libc::c_int;
             return -(1 as libc::c_int);
         }
         len = read(
@@ -4154,7 +4153,7 @@ unsafe extern "C" fn mux_client_read(
             need.wrapping_sub(have),
         );
         if len == -(1 as libc::c_int) as libc::c_long {
-            match *__errno_location() {
+            match *libc::__errno_location() {
                 11 => {
                     poll(&mut pfd, 1 as libc::c_int as nfds_t, -(1 as libc::c_int));
                 }
@@ -4163,7 +4162,7 @@ unsafe extern "C" fn mux_client_read(
             }
         } else {
             if len == 0 as libc::c_int as libc::c_long {
-                *__errno_location() = 32 as libc::c_int;
+                *libc::__errno_location() = 32 as libc::c_int;
                 return -(1 as libc::c_int);
             }
             have = (have as libc::c_ulong).wrapping_add(len as size_t) as size_t as size_t;
@@ -4225,7 +4224,7 @@ unsafe extern "C" fn mux_client_write_packet(
     while have < need {
         if muxclient_terminate != 0 {
             sshbuf_free(queue);
-            *__errno_location() = 4 as libc::c_int;
+            *libc::__errno_location() = 4 as libc::c_int;
             return -(1 as libc::c_int);
         }
         len = write(
@@ -4234,22 +4233,22 @@ unsafe extern "C" fn mux_client_write_packet(
             need.wrapping_sub(have) as size_t,
         ) as libc::c_int;
         if len == -(1 as libc::c_int) {
-            match *__errno_location() {
+            match *libc::__errno_location() {
                 11 => {
                     poll(&mut pfd, 1 as libc::c_int as nfds_t, -(1 as libc::c_int));
                 }
                 4 => {}
                 _ => {
-                    oerrno = *__errno_location();
+                    oerrno = *libc::__errno_location();
                     sshbuf_free(queue);
-                    *__errno_location() = oerrno;
+                    *libc::__errno_location() = oerrno;
                     return -(1 as libc::c_int);
                 }
             }
         } else {
             if len == 0 as libc::c_int {
                 sshbuf_free(queue);
-                *__errno_location() = 32 as libc::c_int;
+                *libc::__errno_location() = 32 as libc::c_int;
                 return -(1 as libc::c_int);
             }
             have = (have as libc::c_uint).wrapping_add(len as u_int) as u_int as u_int;
@@ -4284,7 +4283,7 @@ unsafe extern "C" fn mux_client_read_packet(
         );
     }
     if mux_client_read(fd, queue, 4 as libc::c_int as size_t) != 0 as libc::c_int {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         if oerrno == 32 as libc::c_int {
             crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
@@ -4297,11 +4296,11 @@ unsafe extern "C" fn mux_client_read_packet(
                 SYSLOG_LEVEL_DEBUG3,
                 0 as *const libc::c_char,
                 b"read header failed: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         sshbuf_free(queue);
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         return -(1 as libc::c_int);
     }
     need = ((*(sshbuf_ptr(queue)).offset(0 as libc::c_int as isize) as u_int32_t)
@@ -4311,7 +4310,7 @@ unsafe extern "C" fn mux_client_read_packet(
         | (*(sshbuf_ptr(queue)).offset(2 as libc::c_int as isize) as u_int32_t) << 8 as libc::c_int
         | *(sshbuf_ptr(queue)).offset(3 as libc::c_int as isize) as u_int32_t) as size_t;
     if mux_client_read(fd, queue, need) != 0 as libc::c_int {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
@@ -4323,10 +4322,10 @@ unsafe extern "C" fn mux_client_read_packet(
             SYSLOG_LEVEL_DEBUG3,
             0 as *const libc::c_char,
             b"read body failed: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         sshbuf_free(queue);
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         return -(1 as libc::c_int);
     }
     r = sshbuf_get_string_direct(queue, &mut ptr, &mut have);
@@ -4402,7 +4401,7 @@ unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_i
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"write packet: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else {
         sshbuf_reset(m);
@@ -4618,7 +4617,7 @@ unsafe extern "C" fn mux_client_request_alive(mut fd: libc::c_int) -> u_int {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write packet: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     sshbuf_reset(m);
@@ -4796,12 +4795,12 @@ unsafe extern "C" fn mux_client_request_terminate(mut fd: libc::c_int) {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write packet: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     sshbuf_reset(m);
     if mux_client_read_packet(fd, m) != 0 as libc::c_int {
-        if *__errno_location() == 32 as libc::c_int {
+        if *libc::__errno_location() == 32 as libc::c_int {
             sshbuf_free(m);
             return;
         }
@@ -4816,7 +4815,7 @@ unsafe extern "C" fn mux_client_request_terminate(mut fd: libc::c_int) {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"read from master failed: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     r = sshbuf_get_u32(m, &mut type_0);
@@ -5049,7 +5048,7 @@ unsafe extern "C" fn mux_client_forward(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write packet: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     sshbuf_reset(m);
@@ -5506,7 +5505,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write packet: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     if mm_send_fd(fd, 0 as libc::c_int) == -(1 as libc::c_int)
@@ -5551,7 +5550,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"read from master failed: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         sshbuf_free(m);
         return -(1 as libc::c_int);
@@ -5721,7 +5720,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"pledge(): %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     platform_pledge_mux();
@@ -6002,7 +6001,7 @@ unsafe extern "C" fn mux_client_proxy(mut fd: libc::c_int) -> libc::c_int {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write packet: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     sshbuf_reset(m);
@@ -6197,7 +6196,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write packet: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     if mm_send_fd(fd, 0 as libc::c_int) == -(1 as libc::c_int)
@@ -6232,7 +6231,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"pledge(): %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     platform_pledge_mux();
@@ -6261,7 +6260,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"read from master failed: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         sshbuf_free(m);
         return -(1 as libc::c_int);
@@ -6432,8 +6431,9 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
     );
     sshbuf_reset(m);
     if mux_client_read_packet(fd, m) != 0 as libc::c_int {
-        if *__errno_location() == 32 as libc::c_int
-            || *__errno_location() == 4 as libc::c_int && muxclient_terminate != 0 as libc::c_int
+        if *libc::__errno_location() == 32 as libc::c_int
+            || *libc::__errno_location() == 4 as libc::c_int
+                && muxclient_terminate != 0 as libc::c_int
         {
             return 0 as libc::c_int;
         }
@@ -6448,7 +6448,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"mux_client_read_packet: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     sshfatal(
@@ -6528,7 +6528,7 @@ unsafe extern "C" fn mux_client_request_stop_listening(mut fd: libc::c_int) {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write packet: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     sshbuf_reset(m);
@@ -6544,7 +6544,7 @@ unsafe extern "C" fn mux_client_request_stop_listening(mut fd: libc::c_int) {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"read from master failed: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     r = sshbuf_get_u32(m, &mut type_0);
@@ -6731,7 +6731,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"socket(): %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     if connect(
@@ -6755,11 +6755,13 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
                     0 as *const libc::c_char,
                     b"Control socket connect(%.100s): %s\0" as *const u8 as *const libc::c_char,
                     path,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             }
         }
-        if *__errno_location() == 111 as libc::c_int && options.control_master != 0 as libc::c_int {
+        if *libc::__errno_location() == 111 as libc::c_int
+            && options.control_master != 0 as libc::c_int
+        {
             crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"muxclient\0"))
@@ -6772,7 +6774,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
                 path,
             );
             unlink(path);
-        } else if *__errno_location() == 2 as libc::c_int {
+        } else if *libc::__errno_location() == 2 as libc::c_int {
             crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"muxclient\0"))
@@ -6795,7 +6797,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
                 0 as *const libc::c_char,
                 b"Control socket connect(%.100s): %s\0" as *const u8 as *const libc::c_char,
                 path,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         close(sock);

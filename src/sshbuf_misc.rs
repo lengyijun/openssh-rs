@@ -4,7 +4,7 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
     pub type sshbuf;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
 
     fn __b64_ntop(
@@ -484,7 +484,7 @@ pub unsafe extern "C" fn sshbuf_read(
         return r;
     }
     rr = read(fd, d as *mut libc::c_void, maxlen);
-    oerrno = *__errno_location();
+    oerrno = *libc::__errno_location();
     adjust = maxlen.wrapping_sub(
         (if rr > 0 as libc::c_int as libc::c_long {
             rr
@@ -504,10 +504,10 @@ pub unsafe extern "C" fn sshbuf_read(
         }
     }
     if rr < 0 as libc::c_int as libc::c_long {
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
     } else if rr == 0 as libc::c_int as libc::c_long {
-        *__errno_location() = 32 as libc::c_int;
+        *libc::__errno_location() = 32 as libc::c_int;
         return -(24 as libc::c_int);
     }
     if !rlen.is_null() {

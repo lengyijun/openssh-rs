@@ -1,7 +1,7 @@
 use ::libc;
 extern "C" {
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn readv(__fd: libc::c_int, __iovec: *const iovec, __count: libc::c_int) -> ssize_t;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -55,18 +55,18 @@ pub unsafe extern "C" fn atomicio6(
         );
         match res {
             -1 => {
-                if *__errno_location() == 4 as libc::c_int {
+                if *libc::__errno_location() == 4 as libc::c_int {
                     if cb.is_some()
                         && cb.expect("non-null function pointer")(
                             cb_arg,
                             0 as libc::c_int as size_t,
                         ) == -(1 as libc::c_int)
                     {
-                        *__errno_location() = 4 as libc::c_int;
+                        *libc::__errno_location() = 4 as libc::c_int;
                         return pos;
                     }
-                } else if *__errno_location() == 11 as libc::c_int
-                    || *__errno_location() == 11 as libc::c_int
+                } else if *libc::__errno_location() == 11 as libc::c_int
+                    || *libc::__errno_location() == 11 as libc::c_int
                 {
                     poll(&mut pfd, 1 as libc::c_int as nfds_t, -(1 as libc::c_int));
                 } else {
@@ -74,7 +74,7 @@ pub unsafe extern "C" fn atomicio6(
                 }
             }
             0 => {
-                *__errno_location() = 32 as libc::c_int;
+                *libc::__errno_location() = 32 as libc::c_int;
                 return pos;
             }
             _ => {
@@ -83,7 +83,7 @@ pub unsafe extern "C" fn atomicio6(
                     && cb.expect("non-null function pointer")(cb_arg, res as size_t)
                         == -(1 as libc::c_int)
                 {
-                    *__errno_location() = 4 as libc::c_int;
+                    *libc::__errno_location() = 4 as libc::c_int;
                     return pos;
                 }
             }
@@ -121,7 +121,7 @@ pub unsafe extern "C" fn atomiciov6(
         revents: 0,
     };
     if iovcnt < 0 as libc::c_int || iovcnt > 1024 as libc::c_int {
-        *__errno_location() = 22 as libc::c_int;
+        *libc::__errno_location() = 22 as libc::c_int;
         return 0 as libc::c_int as size_t;
     }
     memcpy(
@@ -143,18 +143,18 @@ pub unsafe extern "C" fn atomiciov6(
         res = f.expect("non-null function pointer")(fd, iov, iovcnt);
         match res {
             -1 => {
-                if *__errno_location() == 4 as libc::c_int {
+                if *libc::__errno_location() == 4 as libc::c_int {
                     if cb.is_some()
                         && cb.expect("non-null function pointer")(
                             cb_arg,
                             0 as libc::c_int as size_t,
                         ) == -(1 as libc::c_int)
                     {
-                        *__errno_location() = 4 as libc::c_int;
+                        *libc::__errno_location() = 4 as libc::c_int;
                         return pos;
                     }
-                } else if *__errno_location() == 11 as libc::c_int
-                    || *__errno_location() == 11 as libc::c_int
+                } else if *libc::__errno_location() == 11 as libc::c_int
+                    || *libc::__errno_location() == 11 as libc::c_int
                 {
                     poll(&mut pfd, 1 as libc::c_int as nfds_t, -(1 as libc::c_int));
                 } else {
@@ -162,7 +162,7 @@ pub unsafe extern "C" fn atomiciov6(
                 }
             }
             0 => {
-                *__errno_location() = 32 as libc::c_int;
+                *libc::__errno_location() = 32 as libc::c_int;
                 return pos;
             }
             _ => {
@@ -183,7 +183,7 @@ pub unsafe extern "C" fn atomiciov6(
                     && (iovcnt <= 0 as libc::c_int
                         || rem > (*iov.offset(0 as libc::c_int as isize)).iov_len)
                 {
-                    *__errno_location() = 14 as libc::c_int;
+                    *libc::__errno_location() = 14 as libc::c_int;
                     return 0 as libc::c_int as size_t;
                 }
                 if !(iovcnt == 0 as libc::c_int) {
@@ -198,7 +198,7 @@ pub unsafe extern "C" fn atomiciov6(
                     && cb.expect("non-null function pointer")(cb_arg, res as size_t)
                         == -(1 as libc::c_int)
                 {
-                    *__errno_location() = 4 as libc::c_int;
+                    *libc::__errno_location() = 4 as libc::c_int;
                     return pos;
                 }
             }

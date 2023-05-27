@@ -37,7 +37,6 @@ extern "C" {
         __optlen: socklen_t,
     ) -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn sleep(__seconds: libc::c_uint) -> libc::c_uint;
@@ -983,7 +982,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
             0 as *const libc::c_char,
             b"Could not create libc::socketpair to communicate with proxy dialer: %.100s\0"
                 as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     command_string = expand_proxy_command(
@@ -1064,7 +1063,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"fork failed: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     close(sp[0 as libc::c_int as usize]);
@@ -1086,7 +1085,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
     }
     close(sp[1 as libc::c_int as usize]);
     while waitpid(pid, 0 as *mut libc::c_int, 0 as libc::c_int) == -(1 as libc::c_int) {
-        if *__errno_location() != 4 as libc::c_int {
+        if *libc::__errno_location() != 4 as libc::c_int {
             sshfatal(
                 b"sshconnect.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
@@ -1098,7 +1097,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"Couldn't wait for child: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     }
@@ -1136,7 +1135,7 @@ unsafe extern "C" fn ssh_proxy_connect(
             0 as *const libc::c_char,
             b"Could not create pipes to communicate with the proxy: %.100s\0" as *const u8
                 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     command_string = expand_proxy_command(
@@ -1212,7 +1211,7 @@ unsafe extern "C" fn ssh_proxy_connect(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"fork failed: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else {
         proxy_command_pid = pid;
@@ -1507,7 +1506,7 @@ unsafe extern "C" fn ssh_create_socket(mut ai: *mut addrinfo) -> libc::c_int {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"socket: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -1582,7 +1581,7 @@ unsafe extern "C" fn ssh_create_socket(mut ai: *mut addrinfo) -> libc::c_int {
                 0 as *const libc::c_char,
                 b"getifaddrs: %s: %s\0" as *const u8 as *const libc::c_char,
                 options.bind_interface,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             current_block = 11409641321532490549;
         } else {
@@ -1662,7 +1661,7 @@ unsafe extern "C" fn ssh_create_socket(mut ai: *mut addrinfo) -> libc::c_int {
                     0 as *const libc::c_char,
                     b"bind %s: %s\0" as *const u8 as *const libc::c_char,
                     ntop.as_mut_ptr(),
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
                 current_block = 11409641321532490549;
             } else {
@@ -1757,7 +1756,7 @@ unsafe extern "C" fn ssh_connect_direct(
         ai = aitop;
         while !ai.is_null() {
             if (*ai).ai_family != 2 as libc::c_int && (*ai).ai_family != 10 as libc::c_int {
-                *__errno_location() = 97 as libc::c_int;
+                *libc::__errno_location() = 97 as libc::c_int;
             } else if getnameinfo(
                 (*ai).ai_addr,
                 (*ai).ai_addrlen,
@@ -1768,7 +1767,7 @@ unsafe extern "C" fn ssh_connect_direct(
                 1 as libc::c_int | 2 as libc::c_int,
             ) != 0 as libc::c_int
             {
-                oerrno = *__errno_location();
+                oerrno = *libc::__errno_location();
                 crate::log::sshlog(
                     b"sshconnect.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
@@ -1781,7 +1780,7 @@ unsafe extern "C" fn ssh_connect_direct(
                     0 as *const libc::c_char,
                     b"getnameinfo failed\0" as *const u8 as *const libc::c_char,
                 );
-                *__errno_location() = oerrno;
+                *libc::__errno_location() = oerrno;
             } else {
                 crate::log::sshlog(
                     b"sshconnect.c\0" as *const u8 as *const libc::c_char,
@@ -1800,7 +1799,7 @@ unsafe extern "C" fn ssh_connect_direct(
                 );
                 sock = ssh_create_socket(ai);
                 if sock < 0 as libc::c_int {
-                    *__errno_location() = 0 as libc::c_int;
+                    *libc::__errno_location() = 0 as libc::c_int;
                 } else {
                     *timeout_ms = saved_timeout_ms;
                     if timeout_connect(sock, (*ai).ai_addr, (*ai).ai_addrlen, timeout_ms)
@@ -1813,7 +1812,7 @@ unsafe extern "C" fn ssh_connect_direct(
                         );
                         break;
                     } else {
-                        oerrno = *__errno_location();
+                        oerrno = *libc::__errno_location();
                         crate::log::sshlog(
                             b"sshconnect.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
@@ -1828,11 +1827,11 @@ unsafe extern "C" fn ssh_connect_direct(
                                 as *const libc::c_char,
                             ntop.as_mut_ptr(),
                             strport.as_mut_ptr(),
-                            strerror(*__errno_location()),
+                            strerror(*libc::__errno_location()),
                         );
                         close(sock);
                         sock = -(1 as libc::c_int);
-                        *__errno_location() = oerrno;
+                        *libc::__errno_location() = oerrno;
                     }
                 }
             }
@@ -1856,10 +1855,10 @@ unsafe extern "C" fn ssh_connect_direct(
             b"ssh: connect to host %s port %s: %s\0" as *const u8 as *const libc::c_char,
             host,
             strport.as_mut_ptr(),
-            if *__errno_location() == 0 as libc::c_int {
+            if *libc::__errno_location() == 0 as libc::c_int {
                 b"failure\0" as *const u8 as *const libc::c_char
             } else {
-                strerror(*__errno_location()) as *const libc::c_char
+                strerror(*libc::__errno_location()) as *const libc::c_char
             },
         );
         return -(1 as libc::c_int);
@@ -1892,7 +1891,7 @@ unsafe extern "C" fn ssh_connect_direct(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"setsockopt SO_KEEPALIVE: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     if (ssh_packet_set_connection(ssh, sock, sock)).is_null() {
@@ -2249,7 +2248,7 @@ unsafe extern "C" fn hostkeys_find_by_key_hostfile(
         0 as libc::c_int as u_int,
     );
     if r != 0 as libc::c_int {
-        if r == -(24 as libc::c_int) && *__errno_location() == 2 as libc::c_int {
+        if r == -(24 as libc::c_int) && *libc::__errno_location() == 2 as libc::c_int {
             crate::log::sshlog(
                 b"sshconnect.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 30], &[libc::c_char; 30]>(
@@ -4622,7 +4621,7 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
             b"Couldn't execute %s -c \"%s\": %s\0" as *const u8 as *const libc::c_char,
             shell,
             args,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         _exit(1 as libc::c_int);
     } else if pid == -(1 as libc::c_int) {
@@ -4635,11 +4634,11 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"fork failed: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
-        if *__errno_location() != 4 as libc::c_int {
+        if *libc::__errno_location() != 4 as libc::c_int {
             sshfatal(
                 b"sshconnect.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"ssh_local_cmd\0"))
@@ -4649,7 +4648,7 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"Couldn't wait for child: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     }

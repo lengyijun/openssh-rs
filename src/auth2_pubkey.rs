@@ -15,7 +15,7 @@ extern "C" {
     pub type sshcipher;
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
@@ -1578,7 +1578,7 @@ unsafe extern "C" fn match_principals_command(
             b"AuthorizedPrincipalsCommandUser \"%s\" not found: %s\0" as *const u8
                 as *const libc::c_char,
             username,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else if argv_split(
         options.authorized_principals_command,
@@ -2105,7 +2105,7 @@ unsafe extern "C" fn user_key_command_allowed2(
             0 as *const libc::c_char,
             b"AuthorizedKeysCommandUser \"%s\" not found: %s\0" as *const u8 as *const libc::c_char,
             username,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else {
         key_fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);

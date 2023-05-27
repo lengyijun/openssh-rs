@@ -8,7 +8,6 @@ extern "C" {
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn innetgr(
         __netgroup: *const libc::c_char,
@@ -695,7 +694,7 @@ pub unsafe extern "C" fn auth_rhosts2(
                 0 as *const libc::c_char,
                 b"stat %s: %s\0" as *const u8 as *const libc::c_char,
                 path,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             free(path as *mut libc::c_void);
         } else if options.strict_modes != 0

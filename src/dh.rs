@@ -5,7 +5,7 @@ extern "C" {
     pub type _IO_marker;
     pub type bignum_st;
     pub type dh_st;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
     fn __getdelim(
@@ -427,7 +427,7 @@ pub unsafe extern "C" fn choose_dh(
             b"WARNING: could not open %s (%s), using fixed modulus\0" as *const u8
                 as *const libc::c_char,
             get_moduli_filename(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return dh_new_group_fallback(max);
     }

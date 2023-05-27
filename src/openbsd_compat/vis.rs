@@ -1,6 +1,6 @@
 use ::libc;
 extern "C" {
-    fn __errno_location() -> *mut libc::c_int;
+
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -1069,14 +1069,14 @@ pub unsafe extern "C" fn stravis(
         return -(1 as libc::c_int);
     }
     len = strvis(buf, src, flag);
-    serrno = *__errno_location();
+    serrno = *libc::__errno_location();
     *outp = realloc(
         buf as *mut libc::c_void,
         (len + 1 as libc::c_int) as libc::c_ulong,
     ) as *mut libc::c_char;
     if (*outp).is_null() {
         *outp = buf;
-        *__errno_location() = serrno;
+        *libc::__errno_location() = serrno;
     }
     return len;
 }

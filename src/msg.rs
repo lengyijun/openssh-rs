@@ -5,7 +5,7 @@ extern "C" {
     pub type sshbuf;
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn sshbuf_reserve(buf: *mut sshbuf, len: size_t, dpp: *mut *mut u_char) -> libc::c_int;
     fn sshbuf_mutable_ptr(buf: *const sshbuf) -> *mut u_char;
@@ -78,7 +78,7 @@ pub unsafe extern "C" fn ssh_msg_send(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"write: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -102,7 +102,7 @@ pub unsafe extern "C" fn ssh_msg_send(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"write: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -129,7 +129,7 @@ pub unsafe extern "C" fn ssh_msg_recv(mut fd: libc::c_int, mut m: *mut sshbuf) -
         ::core::mem::size_of::<[u_char; 4]>() as libc::c_ulong,
     ) != ::core::mem::size_of::<[u_char; 4]>() as libc::c_ulong
     {
-        if *__errno_location() != 32 as libc::c_int {
+        if *libc::__errno_location() != 32 as libc::c_int {
             crate::log::sshlog(
                 b"msg.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"ssh_msg_recv\0"))
@@ -139,7 +139,7 @@ pub unsafe extern "C" fn ssh_msg_recv(mut fd: libc::c_int, mut m: *mut sshbuf) -
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"read header: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         return -(1 as libc::c_int);
@@ -187,7 +187,7 @@ pub unsafe extern "C" fn ssh_msg_recv(mut fd: libc::c_int, mut m: *mut sshbuf) -
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"read: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }

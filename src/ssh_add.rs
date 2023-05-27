@@ -12,7 +12,7 @@ extern "C" {
     pub type ec_key_st;
 
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn getuid() -> __uid_t;
     static mut BSDoptarg: *mut libc::c_char;
@@ -556,7 +556,7 @@ unsafe extern "C" fn delete_file(
         );
         r = sshkey_load_public(certpath, &mut cert, &mut comment);
         if r != 0 as libc::c_int {
-            if r != -(24 as libc::c_int) || *__errno_location() != 2 as libc::c_int {
+            if r != -(24 as libc::c_int) || *libc::__errno_location() != 2 as libc::c_int {
                 crate::log::sshlog(
                     b"ssh-add.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"delete_file\0"))
@@ -931,7 +931,8 @@ unsafe extern "C" fn add_file(
                                                 );
                                                 if r != 0 as libc::c_int {
                                                     if r != -(24 as libc::c_int)
-                                                        || *__errno_location() != 2 as libc::c_int
+                                                        || *libc::__errno_location()
+                                                            != 2 as libc::c_int
                                                     {
                                                         crate::log::sshlog(
                                                             b"ssh-add.c\0" as *const u8

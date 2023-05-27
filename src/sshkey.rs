@@ -19,7 +19,7 @@ extern "C" {
     pub type sshcipher;
     pub type sshcipher_ctx;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     static mut stderr: *mut libc::FILE;
 
     fn fputs(__s: *const libc::c_char, __stream: *mut libc::FILE) -> libc::c_int;
@@ -1969,7 +1969,7 @@ pub unsafe extern "C" fn sshkey_write(
         ) != 1 as libc::c_int as libc::c_ulong
         {
             if feof(f) != 0 {
-                *__errno_location() = 32 as libc::c_int;
+                *libc::__errno_location() = 32 as libc::c_int;
             }
             r = -(24 as libc::c_int);
         } else {

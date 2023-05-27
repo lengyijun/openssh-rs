@@ -29,7 +29,6 @@ extern "C" {
 
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
@@ -1291,7 +1290,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
         4 as libc::c_int as size_t,
     ) != 4 as libc::c_int as libc::c_ulong
     {
-        if *__errno_location() == 32 as libc::c_int {
+        if *libc::__errno_location() == 32 as libc::c_int {
             sshbuf_free(logmsg);
             crate::log::sshlog(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -1316,7 +1315,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"log fd read: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     r = sshbuf_get_u32(logmsg, &mut len);
@@ -1375,7 +1374,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"log fd read: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     r = sshbuf_get_u32(logmsg, &mut level);
@@ -1463,7 +1462,9 @@ unsafe extern "C" fn monitor_read(
             -(1 as libc::c_int),
         ) == -(1 as libc::c_int)
         {
-            if *__errno_location() == 4 as libc::c_int || *__errno_location() == 11 as libc::c_int {
+            if *libc::__errno_location() == 4 as libc::c_int
+                || *libc::__errno_location() == 11 as libc::c_int
+            {
                 continue;
             }
             sshfatal(
@@ -1475,7 +1476,7 @@ unsafe extern "C" fn monitor_read(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"poll: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         } else if pfd[1 as libc::c_int as usize].revents != 0 {
             monitor_read_log(pmonitor);
@@ -3881,7 +3882,7 @@ unsafe extern "C" fn mm_record_login(mut ssh: *mut ssh, mut s: *mut Session, mut
                 SYSLOG_LEVEL_DEBUG1,
                 0 as *const libc::c_char,
                 b"getpeername: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             cleanup_exit(255 as libc::c_int);
         }
@@ -4033,7 +4034,7 @@ pub unsafe extern "C" fn mm_answer_pty(
                     SYSLOG_LEVEL_FATAL,
                     0 as *const libc::c_char,
                     b"open(/dev/null): %s\0" as *const u8 as *const libc::c_char,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             }
             if fd0 != 0 as libc::c_int {
@@ -4309,7 +4310,7 @@ unsafe extern "C" fn monitor_openfds(mut mon: *mut monitor, mut do_logfds: libc:
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     if fcntl(
@@ -4361,7 +4362,7 @@ unsafe extern "C" fn monitor_openfds(mut mon: *mut monitor, mut do_logfds: libc:
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"pipe: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         if fcntl(

@@ -9,7 +9,7 @@ extern "C" {
     pub type dsa_st;
     pub type rsa_st;
     pub type ec_key_st;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn _exit(_: libc::c_int) -> !;
@@ -903,7 +903,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             -(1 as libc::c_int),
         );
         if r <= 0 as libc::c_int {
-            if r == 0 as libc::c_int || *__errno_location() == 4 as libc::c_int {
+            if r == 0 as libc::c_int || *libc::__errno_location() == 4 as libc::c_int {
                 continue;
             }
             sshfatal(
@@ -914,7 +914,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"poll: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         } else {
             if pfd[0 as libc::c_int as usize].revents as libc::c_int
@@ -948,7 +948,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
                         b"read: %s\0" as *const u8 as *const libc::c_char,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     cleanup_exit(1 as libc::c_int);
                 } else {
@@ -990,7 +990,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
                         b"write: %s\0" as *const u8 as *const libc::c_char,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     cleanup_exit(1 as libc::c_int);
                 } else {

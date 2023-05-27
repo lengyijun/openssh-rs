@@ -27,7 +27,6 @@ extern "C" {
     pub type ec_point_st;
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
@@ -2093,9 +2092,9 @@ pub unsafe extern "C" fn ssh_packet_read_seqnr(
                 if r >= 0 as libc::c_int {
                     break;
                 }
-                if *__errno_location() != 11 as libc::c_int
-                    && *__errno_location() != 4 as libc::c_int
-                    && *__errno_location() != 11 as libc::c_int
+                if *libc::__errno_location() != 11 as libc::c_int
+                    && *libc::__errno_location() != 4 as libc::c_int
+                    && *libc::__errno_location() != 11 as libc::c_int
                 {
                     r = -(24 as libc::c_int);
                     break 's_26;
@@ -3057,7 +3056,7 @@ unsafe extern "C" fn sshpkt_vfatal(
 ) {
     let mut tag: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut remote_id: [libc::c_char; 512] = [0; 512];
-    let mut oerrno: libc::c_int = *__errno_location();
+    let mut oerrno: libc::c_int = *libc::__errno_location();
     sshpkt_fmt_connection_id(
         ssh,
         remote_id.as_mut_ptr(),
@@ -3113,7 +3112,7 @@ unsafe extern "C" fn sshpkt_vfatal(
             );
         }
         -24 => {
-            if *__errno_location() == 104 as libc::c_int {
+            if *libc::__errno_location() == 104 as libc::c_int {
                 ssh_packet_clear_keys(ssh);
                 sshlogdie(
                     b"packet.c\0" as *const u8 as *const libc::c_char,
@@ -3140,7 +3139,7 @@ unsafe extern "C" fn sshpkt_vfatal(
         1402817794221548365 => {
             if !((*ssh).kex).is_null() && !((*(*ssh).kex).failed_choice).is_null() {
                 ssh_packet_clear_keys(ssh);
-                *__errno_location() = oerrno;
+                *libc::__errno_location() = oerrno;
                 sshlogdie(
                     b"packet.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"sshpkt_vfatal\0"))
@@ -3173,7 +3172,7 @@ unsafe extern "C" fn sshpkt_vfatal(
         );
     }
     ssh_packet_clear_keys(ssh);
-    *__errno_location() = oerrno;
+    *libc::__errno_location() = oerrno;
     sshlogdie(
         b"packet.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"sshpkt_vfatal\0")).as_ptr(),
@@ -3304,9 +3303,9 @@ pub unsafe extern "C" fn ssh_packet_write_poll(mut ssh: *mut ssh) -> libc::c_int
             len as size_t,
         ) as libc::c_int;
         if len == -(1 as libc::c_int) {
-            if *__errno_location() == 4 as libc::c_int
-                || *__errno_location() == 11 as libc::c_int
-                || *__errno_location() == 11 as libc::c_int
+            if *libc::__errno_location() == 4 as libc::c_int
+                || *libc::__errno_location() == 11 as libc::c_int
+                || *libc::__errno_location() == 11 as libc::c_int
             {
                 return 0 as libc::c_int;
             }
@@ -3366,9 +3365,9 @@ pub unsafe extern "C" fn ssh_packet_write_wait(mut ssh: *mut ssh) -> libc::c_int
             if ret >= 0 as libc::c_int {
                 break;
             }
-            if *__errno_location() != 11 as libc::c_int
-                && *__errno_location() != 4 as libc::c_int
-                && *__errno_location() != 11 as libc::c_int
+            if *libc::__errno_location() != 11 as libc::c_int
+                && *libc::__errno_location() != 4 as libc::c_int
+                && *libc::__errno_location() != 11 as libc::c_int
             {
                 break;
             }

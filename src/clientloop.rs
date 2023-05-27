@@ -19,7 +19,6 @@ extern "C" {
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn sys_tun_outfilter(
         _: *mut ssh,
@@ -1351,7 +1350,7 @@ pub unsafe extern "C" fn client_x11_get_proto(
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
                     b"mkdtemp: %s\0" as *const u8 as *const libc::c_char,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
                 return -(1 as libc::c_int);
             }
@@ -1746,12 +1745,12 @@ unsafe extern "C" fn client_wait_until_can_do_something(
             p = p.wrapping_add(1);
             p;
         }
-        if *__errno_location() == 4 as libc::c_int {
+        if *libc::__errno_location() == 4 as libc::c_int {
             return;
         }
         quit_message(
             b"poll: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return;
     }
@@ -1816,13 +1815,13 @@ unsafe extern "C" fn client_process_net_input(mut ssh: *mut ssh) {
         return;
     }
     if r == -(24 as libc::c_int) {
-        if *__errno_location() == 11 as libc::c_int
-            || *__errno_location() == 4 as libc::c_int
-            || *__errno_location() == 11 as libc::c_int
+        if *libc::__errno_location() == 11 as libc::c_int
+            || *libc::__errno_location() == 4 as libc::c_int
+            || *libc::__errno_location() == 11 as libc::c_int
         {
             return;
         }
-        if *__errno_location() == 32 as libc::c_int {
+        if *libc::__errno_location() == 32 as libc::c_int {
             quit_message(
                 b"Connection to %s closed by remote host.\0" as *const u8 as *const libc::c_char,
                 host,
@@ -2101,7 +2100,7 @@ unsafe extern "C" fn client_repledge() {
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"pledge(): %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     } else if options.forward_agent != 0 as libc::c_int {
@@ -2129,7 +2128,7 @@ unsafe extern "C" fn client_repledge() {
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"pledge(): %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     } else {
@@ -2157,7 +2156,7 @@ unsafe extern "C" fn client_repledge() {
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"pledge(): %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     };
@@ -3002,7 +3001,7 @@ unsafe extern "C" fn process_escapes(
                                 SYSLOG_LEVEL_ERROR,
                                 0 as *const libc::c_char,
                                 b"fork: %.100s\0" as *const u8 as *const libc::c_char,
-                                strerror(*__errno_location()),
+                                strerror(*libc::__errno_location()),
                             );
                         } else {
                             if pid != 0 as libc::c_int {
@@ -3300,7 +3299,7 @@ pub unsafe extern "C" fn client_loop(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"pledge(): %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     } else if options.forward_x11 != 0 || options.permit_local_command != 0 {
@@ -3328,7 +3327,7 @@ pub unsafe extern "C" fn client_loop(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"pledge(): %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     } else if options.update_hostkeys != 0 {
@@ -3355,7 +3354,7 @@ pub unsafe extern "C" fn client_loop(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"pledge(): %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     } else if option_clear_or_none(options.proxy_command) == 0
@@ -3384,7 +3383,7 @@ pub unsafe extern "C" fn client_loop(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"pledge(): %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     } else {
@@ -3411,7 +3410,7 @@ pub unsafe extern "C" fn client_loop(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"pledge(): %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     }
@@ -5033,7 +5032,7 @@ unsafe extern "C" fn check_old_keys_othernames(mut ctx: *mut hostkeys_update_ctx
             0 as libc::c_int as u_int,
         );
         if r != 0 as libc::c_int {
-            if r == -(24 as libc::c_int) && *__errno_location() == 2 as libc::c_int {
+            if r == -(24 as libc::c_int) && *libc::__errno_location() == 2 as libc::c_int {
                 crate::log::sshlog(
                     b"clientloop.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
@@ -5274,7 +5273,7 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
     i = 0 as libc::c_int as size_t;
     while i < options.num_user_hostfiles as libc::c_ulong {
         if stat(options.user_hostfiles[i as usize], &mut sb) != 0 as libc::c_int {
-            if *__errno_location() == 2 as libc::c_int {
+            if *libc::__errno_location() == 2 as libc::c_int {
                 crate::log::sshlog(
                     b"clientloop.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
@@ -5301,7 +5300,7 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
                     0 as *const libc::c_char,
                     b"known hosts file %s inaccessible: %s\0" as *const u8 as *const libc::c_char,
                     options.user_hostfiles[i as usize],
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             }
         } else {
@@ -5917,7 +5916,9 @@ unsafe extern "C" fn client_input_hostkeys(mut ssh: *mut ssh) -> libc::c_int {
                         0 as libc::c_int as u_int,
                     );
                     if r != 0 as libc::c_int {
-                        if r == -(24 as libc::c_int) && *__errno_location() == 2 as libc::c_int {
+                        if r == -(24 as libc::c_int)
+                            && *libc::__errno_location() == 2 as libc::c_int
+                        {
                             crate::log::sshlog(
                                 b"clientloop.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(

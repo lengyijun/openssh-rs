@@ -13,7 +13,7 @@ extern "C" {
         -> libc::c_int;
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn gethostname(__name: *mut libc::c_char, __len: size_t) -> libc::c_int;
     fn getnameinfo(
         __sa: *const sockaddr,
@@ -324,7 +324,7 @@ pub unsafe extern "C" fn get_local_name(mut fd: libc::c_int) -> *mut libc::c_cha
             SYSLOG_LEVEL_VERBOSE,
             0 as *const libc::c_char,
             b"gethostname: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         host = xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
     } else {
@@ -368,7 +368,7 @@ unsafe extern "C" fn get_sock_port(mut sock: libc::c_int, mut local: libc::c_int
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"getsockname failed: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             return 0 as libc::c_int;
         }
@@ -389,7 +389,7 @@ unsafe extern "C" fn get_sock_port(mut sock: libc::c_int, mut local: libc::c_int
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"getpeername failed: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }

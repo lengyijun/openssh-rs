@@ -18,7 +18,6 @@ extern "C" {
     pub type ec_key_st;
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
     fn connect(__fd: libc::c_int, __addr: __CONST_SOCKADDR_ARG, __len: socklen_t) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
@@ -324,9 +323,9 @@ pub unsafe extern "C" fn ssh_get_authentication_socket_path(
             ::core::mem::size_of::<sockaddr_un>() as libc::c_ulong as socklen_t,
         ) == -(1 as libc::c_int)
     {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         close(sock);
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
     }
     if !fdp.is_null() {

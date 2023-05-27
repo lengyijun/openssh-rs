@@ -43,7 +43,7 @@ extern "C" {
     fn gettimeofday(__tv: *mut timeval, __tz: *mut libc::c_void) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
     fn platform_sys_dir_uid(_: uid_t) -> libc::c_int;
@@ -673,7 +673,7 @@ pub unsafe extern "C" fn set_nonblock(mut fd: libc::c_int) -> libc::c_int {
             0 as *const libc::c_char,
             b"fcntl(%d, F_GETFL): %s\0" as *const u8 as *const libc::c_char,
             fd,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -711,7 +711,7 @@ pub unsafe extern "C" fn set_nonblock(mut fd: libc::c_int) -> libc::c_int {
             0 as *const libc::c_char,
             b"fcntl(%d, F_SETFL, O_NONBLOCK): %s\0" as *const u8 as *const libc::c_char,
             fd,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -731,7 +731,7 @@ pub unsafe extern "C" fn unset_nonblock(mut fd: libc::c_int) -> libc::c_int {
             0 as *const libc::c_char,
             b"fcntl(%d, F_GETFL): %s\0" as *const u8 as *const libc::c_char,
             fd,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -771,15 +771,15 @@ pub unsafe extern "C" fn unset_nonblock(mut fd: libc::c_int) -> libc::c_int {
             0 as *const libc::c_char,
             b"fcntl(%d, F_SETFL, ~O_NONBLOCK): %s\0" as *const u8 as *const libc::c_char,
             fd,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn ssh_gai_strerror(mut gaierr: libc::c_int) -> *const libc::c_char {
-    if gaierr == -(11 as libc::c_int) && *__errno_location() != 0 as libc::c_int {
-        return strerror(*__errno_location());
+    if gaierr == -(11 as libc::c_int) && *libc::__errno_location() != 0 as libc::c_int {
+        return strerror(*libc::__errno_location());
     }
     return gai_strerror(gaierr);
 }
@@ -803,7 +803,7 @@ pub unsafe extern "C" fn set_nodelay(mut fd: libc::c_int) {
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"getsockopt TCP_NODELAY: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return;
     }
@@ -847,7 +847,7 @@ pub unsafe extern "C" fn set_nodelay(mut fd: libc::c_int) {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"setsockopt TCP_NODELAY: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
 }
@@ -871,7 +871,7 @@ pub unsafe extern "C" fn set_reuseaddr(mut fd: libc::c_int) -> libc::c_int {
             0 as *const libc::c_char,
             b"setsockopt SO_REUSEADDR fd %d: %s\0" as *const u8 as *const libc::c_char,
             fd,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -963,7 +963,7 @@ pub unsafe extern "C" fn set_sock_tos(mut fd: libc::c_int, mut tos: libc::c_int)
                     b"setsockopt socket %d IP_TOS %d: %s\0" as *const u8 as *const libc::c_char,
                     fd,
                     tos,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             }
         }
@@ -1000,7 +1000,7 @@ pub unsafe extern "C" fn set_sock_tos(mut fd: libc::c_int, mut tos: libc::c_int)
                         as *const libc::c_char,
                     fd,
                     tos,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             }
         }
@@ -1040,21 +1040,21 @@ unsafe extern "C" fn waitfd(
     while *timeoutp >= 0 as libc::c_int {
         monotime_tv(&mut t_start);
         r = poll(&mut pfd, 1 as libc::c_int as nfds_t, *timeoutp);
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         ms_subtract_diff(&mut t_start, timeoutp);
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         if r > 0 as libc::c_int {
             return 0 as libc::c_int;
         } else if r == -(1 as libc::c_int)
-            && *__errno_location() != 11 as libc::c_int
-            && *__errno_location() != 4 as libc::c_int
+            && *libc::__errno_location() != 11 as libc::c_int
+            && *libc::__errno_location() != 4 as libc::c_int
         {
             return -(1 as libc::c_int);
         } else if r == 0 as libc::c_int {
             break;
         }
     }
-    *__errno_location() = 110 as libc::c_int;
+    *libc::__errno_location() = 110 as libc::c_int;
     return -(1 as libc::c_int);
 }
 pub unsafe extern "C" fn waitrfd(
@@ -1093,10 +1093,10 @@ pub unsafe extern "C" fn timeout_connect(
             unset_nonblock(sockfd);
             return 0 as libc::c_int;
         } else {
-            if *__errno_location() == 4 as libc::c_int {
+            if *libc::__errno_location() == 4 as libc::c_int {
                 continue;
             }
-            if *__errno_location() != 115 as libc::c_int {
+            if *libc::__errno_location() != 115 as libc::c_int {
                 return -(1 as libc::c_int);
             }
             break;
@@ -1127,12 +1127,12 @@ pub unsafe extern "C" fn timeout_connect(
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"getsockopt: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
     if optval != 0 as libc::c_int {
-        *__errno_location() = optval;
+        *libc::__errno_location() = optval;
         return -(1 as libc::c_int);
     }
     unset_nonblock(sockfd);
@@ -1296,7 +1296,7 @@ pub unsafe extern "C" fn convtime(mut s: *const libc::c_char) -> libc::c_int {
     let mut multiplier: libc::c_long = 0;
     let mut p: *const libc::c_char = 0 as *const libc::c_char;
     let mut endp: *mut libc::c_char = 0 as *mut libc::c_char;
-    *__errno_location() = 0 as libc::c_int;
+    *libc::__errno_location() = 0 as libc::c_int;
     total = 0 as libc::c_int as libc::c_long;
     p = s;
     if p.is_null() || *p as libc::c_int == '\0' as i32 {
@@ -1305,7 +1305,7 @@ pub unsafe extern "C" fn convtime(mut s: *const libc::c_char) -> libc::c_int {
     while *p != 0 {
         secs = strtol(p, &mut endp, 10 as libc::c_int);
         if p == endp as *const libc::c_char
-            || *__errno_location() == 34 as libc::c_int
+            || *libc::__errno_location() == 34 as libc::c_int
                 && (secs == (-(2147483647 as libc::c_int) - 1 as libc::c_int) as libc::c_long
                     || secs == 2147483647 as libc::c_int as libc::c_long)
             || secs < 0 as libc::c_int as libc::c_long
@@ -1435,7 +1435,7 @@ pub unsafe extern "C" fn put_host_port(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"put_host_port: asprintf: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     crate::log::sshlog(
@@ -2637,7 +2637,7 @@ pub unsafe extern "C" fn sanitise_stdfd() {
         libc::fprintf(
             stderr,
             b"Couldn't open /dev/null: %s\n\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         exit(1 as libc::c_int);
     }
@@ -2647,13 +2647,13 @@ pub unsafe extern "C" fn sanitise_stdfd() {
             break;
         }
         if fcntl(dupfd, 3 as libc::c_int) == -(1 as libc::c_int)
-            && *__errno_location() == 9 as libc::c_int
+            && *libc::__errno_location() == 9 as libc::c_int
         {
             if dup2(nullfd, dupfd) == -(1 as libc::c_int) {
                 libc::fprintf(
                     stderr,
                     b"dup2: %s\n\0" as *const u8 as *const libc::c_char,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
                 exit(1 as libc::c_int);
             }
@@ -2863,7 +2863,7 @@ pub unsafe extern "C" fn monotime_ts(mut ts: *mut timespec) {
             SYSLOG_LEVEL_DEBUG3,
             0 as *const libc::c_char,
             b"clock_gettime: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         gettime_failed = 1 as libc::c_int;
     }
@@ -2979,7 +2979,7 @@ pub unsafe extern "C" fn bandwidth_limit(mut bw: *mut bwlimit, mut read_len: siz
         ts.tv_sec = (*bw).bwend.tv_sec;
         ts.tv_nsec = (*bw).bwend.tv_usec * 1000 as libc::c_int as libc::c_long;
         while nanosleep(&mut ts, &mut rm) == -(1 as libc::c_int) {
-            if *__errno_location() != 4 as libc::c_int {
+            if *libc::__errno_location() != 4 as libc::c_int {
                 break;
             }
             ts = rm;
@@ -3314,7 +3314,7 @@ pub unsafe extern "C" fn unix_listener(
             b"path \"%s\" too long for Unix domain socket\0" as *const u8 as *const libc::c_char,
             path,
         );
-        *__errno_location() = 36 as libc::c_int;
+        *libc::__errno_location() = 36 as libc::c_int;
         return -(1 as libc::c_int);
     }
     sock = socket(
@@ -3323,7 +3323,7 @@ pub unsafe extern "C" fn unix_listener(
         0 as libc::c_int,
     );
     if sock == -(1 as libc::c_int) {
-        saved_errno = *__errno_location();
+        saved_errno = *libc::__errno_location();
         crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"unix_listener\0"))
@@ -3333,13 +3333,13 @@ pub unsafe extern "C" fn unix_listener(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"socket: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
-        *__errno_location() = saved_errno;
+        *libc::__errno_location() = saved_errno;
         return -(1 as libc::c_int);
     }
     if unlink_first == 1 as libc::c_int {
-        if unlink(path) != 0 as libc::c_int && *__errno_location() != 2 as libc::c_int {
+        if unlink(path) != 0 as libc::c_int && *libc::__errno_location() != 2 as libc::c_int {
             crate::log::sshlog(
                 b"misc.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"unix_listener\0"))
@@ -3350,7 +3350,7 @@ pub unsafe extern "C" fn unix_listener(
                 0 as *const libc::c_char,
                 b"unlink(%s): %.100s\0" as *const u8 as *const libc::c_char,
                 path,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     }
@@ -3362,7 +3362,7 @@ pub unsafe extern "C" fn unix_listener(
         ::core::mem::size_of::<sockaddr_un>() as libc::c_ulong as socklen_t,
     ) == -(1 as libc::c_int)
     {
-        saved_errno = *__errno_location();
+        saved_errno = *libc::__errno_location();
         crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"unix_listener\0"))
@@ -3373,14 +3373,14 @@ pub unsafe extern "C" fn unix_listener(
             0 as *const libc::c_char,
             b"cannot bind to path %s: %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         close(sock);
-        *__errno_location() = saved_errno;
+        *libc::__errno_location() = saved_errno;
         return -(1 as libc::c_int);
     }
     if listen(sock, backlog) == -(1 as libc::c_int) {
-        saved_errno = *__errno_location();
+        saved_errno = *libc::__errno_location();
         crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"unix_listener\0"))
@@ -3391,11 +3391,11 @@ pub unsafe extern "C" fn unix_listener(
             0 as *const libc::c_char,
             b"cannot listen on path %s: %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         close(sock);
         unlink(path);
-        *__errno_location() = saved_errno;
+        *libc::__errno_location() = saved_errno;
         return -(1 as libc::c_int);
     }
     return sock;
@@ -3430,7 +3430,7 @@ pub unsafe extern "C" fn sock_set_v6only(mut s: libc::c_int) {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"setsockopt IPV6_V6ONLY: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
 }
@@ -3788,7 +3788,7 @@ pub unsafe extern "C" fn exited_cleanly(
 ) -> libc::c_int {
     let mut status: libc::c_int = 0;
     while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
-        if *__errno_location() != 4 as libc::c_int {
+        if *libc::__errno_location() != 4 as libc::c_int {
             crate::log::sshlog(
                 b"misc.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"exited_cleanly\0"))
@@ -3799,7 +3799,7 @@ pub unsafe extern "C" fn exited_cleanly(
                 0 as *const libc::c_char,
                 b"%s waitpid: %s\0" as *const u8 as *const libc::c_char,
                 tag,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             return -(1 as libc::c_int);
         }
@@ -3888,7 +3888,7 @@ pub unsafe extern "C" fn safe_path(
             errlen as usize,
             b"realpath %s failed: %s\0" as *const u8 as *const libc::c_char,
             name,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -3995,7 +3995,7 @@ pub unsafe extern "C" fn safe_path_fd(
             errlen as usize,
             b"cannot stat file %s: %s\0" as *const u8 as *const libc::c_char,
             file,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -4605,7 +4605,7 @@ pub unsafe extern "C" fn ssh_signal(mut signum: libc::c_int, mut handler: sshsig
             0 as *const libc::c_char,
             b"sigaction(%s): %s\0" as *const u8 as *const libc::c_char,
             strsignal(signum),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             -(1 as libc::c_int) as libc::intptr_t,
@@ -4635,7 +4635,7 @@ pub unsafe extern "C" fn stdfd_devnull(
             0 as *const libc::c_char,
             b"open %s: %s\0" as *const u8 as *const libc::c_char,
             b"/dev/null\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -4652,7 +4652,7 @@ pub unsafe extern "C" fn stdfd_devnull(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"dup2: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         ret = -(1 as libc::c_int);
     }
@@ -4810,7 +4810,7 @@ pub unsafe extern "C" fn subprocess(
             b"Could not stat %s \"%s\": %s\0" as *const u8 as *const libc::c_char,
             tag,
             *av.offset(0 as libc::c_int as isize),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else if flags & ((1 as libc::c_int) << 3 as libc::c_int) as libc::c_uint
         == 0 as libc::c_int as libc::c_uint
@@ -4845,7 +4845,7 @@ pub unsafe extern "C" fn subprocess(
             0 as *const libc::c_char,
             b"%s: pipe: %s\0" as *const u8 as *const libc::c_char,
             tag,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else {
         if restore_privs.is_some() {
@@ -4864,7 +4864,7 @@ pub unsafe extern "C" fn subprocess(
                     0 as *const libc::c_char,
                     b"%s: fork: %s\0" as *const u8 as *const libc::c_char,
                     tag,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
                 close(p[0 as libc::c_int as usize]);
                 close(p[1 as libc::c_int as usize]);
@@ -4938,7 +4938,7 @@ pub unsafe extern "C" fn subprocess(
                         b"%s: open %s: %s\0" as *const u8 as *const libc::c_char,
                         tag,
                         b"/dev/null\0" as *const u8 as *const libc::c_char,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     _exit(1 as libc::c_int);
                 }
@@ -4955,7 +4955,7 @@ pub unsafe extern "C" fn subprocess(
                         0 as *const libc::c_char,
                         b"%s: dup2: %s\0" as *const u8 as *const libc::c_char,
                         tag,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     _exit(1 as libc::c_int);
                 }
@@ -4982,7 +4982,7 @@ pub unsafe extern "C" fn subprocess(
                         0 as *const libc::c_char,
                         b"%s: dup2: %s\0" as *const u8 as *const libc::c_char,
                         tag,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     _exit(1 as libc::c_int);
                 }
@@ -5004,7 +5004,7 @@ pub unsafe extern "C" fn subprocess(
                         tag,
                         (*pw).pw_name,
                         (*pw).pw_gid,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     _exit(1 as libc::c_int);
                 }
@@ -5022,7 +5022,7 @@ pub unsafe extern "C" fn subprocess(
                         b"%s: setresgid %u: %s\0" as *const u8 as *const libc::c_char,
                         tag,
                         (*pw).pw_gid,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     _exit(1 as libc::c_int);
                 }
@@ -5040,7 +5040,7 @@ pub unsafe extern "C" fn subprocess(
                         b"%s: setresuid %u: %s\0" as *const u8 as *const libc::c_char,
                         tag,
                         (*pw).pw_uid,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     _exit(1 as libc::c_int);
                 }
@@ -5059,7 +5059,7 @@ pub unsafe extern "C" fn subprocess(
                         0 as *const libc::c_char,
                         b"%s: dup2: %s\0" as *const u8 as *const libc::c_char,
                         tag,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     _exit(1 as libc::c_int);
                 }
@@ -5091,7 +5091,7 @@ pub unsafe extern "C" fn subprocess(
                         b"execve\0" as *const u8 as *const libc::c_char
                     },
                     command,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
                 _exit(127 as libc::c_int);
             }
@@ -5118,12 +5118,12 @@ pub unsafe extern "C" fn subprocess(
                     0 as *const libc::c_char,
                     b"%s: libc::fdopen: %s\0" as *const u8 as *const libc::c_char,
                     tag,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
                 close(p[0 as libc::c_int as usize]);
                 kill(pid, 15 as libc::c_int);
                 while waitpid(pid, 0 as *mut libc::c_int, 0 as libc::c_int) == -(1 as libc::c_int)
-                    && *__errno_location() == 4 as libc::c_int
+                    && *libc::__errno_location() == 4 as libc::c_int
                 {}
                 return 0 as libc::c_int;
             }

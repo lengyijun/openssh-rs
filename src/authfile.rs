@@ -12,8 +12,6 @@ extern "C" {
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
 
-    fn __errno_location() -> *mut libc::c_int;
-
     fn getuid() -> __uid_t;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
@@ -561,13 +559,13 @@ pub unsafe extern "C" fn sshkey_load_public(
             r = sshkey_load_pubkey_from_private(filename, keyp);
             if !(r == 0 as libc::c_int) {
                 r = -(24 as libc::c_int);
-                *__errno_location() = 2 as libc::c_int;
+                *libc::__errno_location() = 2 as libc::c_int;
             }
         }
     }
-    oerrno = *__errno_location();
+    oerrno = *libc::__errno_location();
     free(pubfile as *mut libc::c_void);
-    *__errno_location() = oerrno;
+    *libc::__errno_location() = oerrno;
     return r;
 }
 pub unsafe extern "C" fn sshkey_load_cert(
@@ -808,9 +806,9 @@ pub unsafe extern "C" fn sshkey_save_public(
         }
     }
     if !f.is_null() {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         fclose(f);
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
     }
     return r;
 }

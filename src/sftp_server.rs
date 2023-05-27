@@ -29,7 +29,7 @@ extern "C" {
         __times: *const timespec,
         __flags: libc::c_int,
     ) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
     fn platform_disable_tracing(_: libc::c_int);
@@ -1098,7 +1098,7 @@ unsafe extern "C" fn handle_close(mut handle: libc::c_int) -> libc::c_int {
         free((*handles.offset(handle as isize)).name as *mut libc::c_void);
         handle_unused(handle);
     } else {
-        *__errno_location() = 2 as libc::c_int;
+        *libc::__errno_location() = 2 as libc::c_int;
     }
     return ret;
 }
@@ -1862,7 +1862,7 @@ unsafe extern "C" fn process_open(mut id: u_int32_t) {
     } else {
         fd = libc::open(name, flags, mode);
         if fd == -(1 as libc::c_int) {
-            status = errno_to_portable(*__errno_location());
+            status = errno_to_portable(*libc::__errno_location());
         } else {
             handle = handle_new(HANDLE_FILE as libc::c_int, name, fd, flags, 0 as *mut DIR);
             if handle < 0 as libc::c_int {
@@ -1910,7 +1910,7 @@ unsafe extern "C" fn process_close(mut id: u_int32_t) {
     handle_log_close(handle, 0 as *mut libc::c_char);
     ret = handle_close(handle);
     status = if ret == -(1 as libc::c_int) {
-        errno_to_portable(*__errno_location())
+        errno_to_portable(*libc::__errno_location())
     } else {
         0 as libc::c_int
     };
@@ -2009,7 +2009,7 @@ unsafe extern "C" fn process_read(mut id: u_int32_t) {
             buflen = len as size_t;
         }
         if lseek(fd, off as __off_t, 0 as libc::c_int) == -(1 as libc::c_int) as libc::c_long {
-            status = errno_to_portable(*__errno_location());
+            status = errno_to_portable(*libc::__errno_location());
             crate::log::sshlog(
                 b"sftp-server.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"process_read\0"))
@@ -2020,7 +2020,7 @@ unsafe extern "C" fn process_read(mut id: u_int32_t) {
                 0 as *const libc::c_char,
                 b"seek \"%.100s\": %s\0" as *const u8 as *const libc::c_char,
                 handle_to_name(handle),
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         } else {
             if len == 0 as libc::c_int as libc::c_uint {
@@ -2029,7 +2029,7 @@ unsafe extern "C" fn process_read(mut id: u_int32_t) {
             } else {
                 ret = read(fd, buf as *mut libc::c_void, len as size_t) as libc::c_int;
                 if ret == -(1 as libc::c_int) {
-                    status = errno_to_portable(*__errno_location());
+                    status = errno_to_portable(*libc::__errno_location());
                     crate::log::sshlog(
                         b"sftp-server.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
@@ -2042,7 +2042,7 @@ unsafe extern "C" fn process_read(mut id: u_int32_t) {
                         0 as *const libc::c_char,
                         b"read \"%.100s\": %s\0" as *const u8 as *const libc::c_char,
                         handle_to_name(handle),
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     current_block = 7767887306780309995;
                 } else if ret == 0 as libc::c_int {
@@ -2118,7 +2118,7 @@ unsafe extern "C" fn process_write(mut id: u_int32_t) {
     } else if handle_to_flags(handle) & 0o2000 as libc::c_int == 0
         && lseek(fd, off as __off_t, 0 as libc::c_int) == -(1 as libc::c_int) as libc::c_long
     {
-        status = errno_to_portable(*__errno_location());
+        status = errno_to_portable(*libc::__errno_location());
         crate::log::sshlog(
             b"sftp-server.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"process_write\0"))
@@ -2129,12 +2129,12 @@ unsafe extern "C" fn process_write(mut id: u_int32_t) {
             0 as *const libc::c_char,
             b"seek \"%.100s\": %s\0" as *const u8 as *const libc::c_char,
             handle_to_name(handle),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else {
         ret = write(fd, data as *const libc::c_void, len) as libc::c_int;
         if ret == -(1 as libc::c_int) {
-            status = errno_to_portable(*__errno_location());
+            status = errno_to_portable(*libc::__errno_location());
             crate::log::sshlog(
                 b"sftp-server.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"process_write\0"))
@@ -2145,7 +2145,7 @@ unsafe extern "C" fn process_write(mut id: u_int32_t) {
                 0 as *const libc::c_char,
                 b"write \"%.100s\": %s\0" as *const u8 as *const libc::c_char,
                 handle_to_name(handle),
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         } else if ret as size_t == len {
             status = 0 as libc::c_int;
@@ -2255,7 +2255,7 @@ unsafe extern "C" fn process_do_stat(mut id: u_int32_t, mut do_lstat: libc::c_in
         stat(name, &mut st)
     };
     if r == -(1 as libc::c_int) {
-        status = errno_to_portable(*__errno_location());
+        status = errno_to_portable(*libc::__errno_location());
     } else {
         stat_to_attrib(&mut st, &mut a);
         send_attrib(id, &mut a);
@@ -2341,7 +2341,7 @@ unsafe extern "C" fn process_fstat(mut id: u_int32_t) {
     if fd >= 0 as libc::c_int {
         r = fstat(fd, &mut st);
         if r == -(1 as libc::c_int) {
-            status = errno_to_portable(*__errno_location());
+            status = errno_to_portable(*libc::__errno_location());
         } else {
             stat_to_attrib(&mut st, &mut a);
             send_attrib(id, &mut a);
@@ -2429,7 +2429,7 @@ unsafe extern "C" fn process_setstat(mut id: u_int32_t) {
         );
         r = truncate(name, a.size as __off_t);
         if r == -(1 as libc::c_int) {
-            status = errno_to_portable(*__errno_location());
+            status = errno_to_portable(*libc::__errno_location());
         }
     }
     if a.flags & 0x4 as libc::c_int as libc::c_uint != 0 {
@@ -2447,7 +2447,7 @@ unsafe extern "C" fn process_setstat(mut id: u_int32_t) {
         );
         r = libc::chmod(name, a.perm & 0o7777 as libc::c_int as libc::c_uint);
         if r == -(1 as libc::c_int) {
-            status = errno_to_portable(*__errno_location());
+            status = errno_to_portable(*libc::__errno_location());
         }
     }
     if a.flags & 0x8 as libc::c_int as libc::c_uint != 0 {
@@ -2473,7 +2473,7 @@ unsafe extern "C" fn process_setstat(mut id: u_int32_t) {
         );
         r = utimes(name, attrib_to_tv(&mut a) as *const timeval);
         if r == -(1 as libc::c_int) {
-            status = errno_to_portable(*__errno_location());
+            status = errno_to_portable(*libc::__errno_location());
         }
     }
     if a.flags & 0x2 as libc::c_int as libc::c_uint != 0 {
@@ -2492,7 +2492,7 @@ unsafe extern "C" fn process_setstat(mut id: u_int32_t) {
         );
         r = chown(name, a.uid, a.gid);
         if r == -(1 as libc::c_int) {
-            status = errno_to_portable(*__errno_location());
+            status = errno_to_portable(*libc::__errno_location());
         }
     }
     send_status(id, status as u_int32_t);
@@ -2559,7 +2559,7 @@ unsafe extern "C" fn process_fsetstat(mut id: u_int32_t) {
             );
             r = ftruncate(fd, a.size as __off_t);
             if r == -(1 as libc::c_int) {
-                status = errno_to_portable(*__errno_location());
+                status = errno_to_portable(*libc::__errno_location());
             }
         }
         if a.flags & 0x4 as libc::c_int as libc::c_uint != 0 {
@@ -2577,7 +2577,7 @@ unsafe extern "C" fn process_fsetstat(mut id: u_int32_t) {
             );
             r = libc::fchmod(fd, a.perm & 0o7777 as libc::c_int as libc::c_uint);
             if r == -(1 as libc::c_int) {
-                status = errno_to_portable(*__errno_location());
+                status = errno_to_portable(*libc::__errno_location());
             }
         }
         if a.flags & 0x8 as libc::c_int as libc::c_uint != 0 {
@@ -2603,7 +2603,7 @@ unsafe extern "C" fn process_fsetstat(mut id: u_int32_t) {
             );
             r = futimes(fd, attrib_to_tv(&mut a) as *const timeval);
             if r == -(1 as libc::c_int) {
-                status = errno_to_portable(*__errno_location());
+                status = errno_to_portable(*libc::__errno_location());
             }
         }
         if a.flags & 0x2 as libc::c_int as libc::c_uint != 0 {
@@ -2622,7 +2622,7 @@ unsafe extern "C" fn process_fsetstat(mut id: u_int32_t) {
             );
             r = fchown(fd, a.uid, a.gid);
             if r == -(1 as libc::c_int) {
-                status = errno_to_portable(*__errno_location());
+                status = errno_to_portable(*libc::__errno_location());
             }
         }
     }
@@ -2669,7 +2669,7 @@ unsafe extern "C" fn process_opendir(mut id: u_int32_t) {
     );
     dirp = opendir(path);
     if dirp.is_null() {
-        status = errno_to_portable(*__errno_location());
+        status = errno_to_portable(*libc::__errno_location());
     } else {
         handle = handle_new(
             HANDLE_DIR as libc::c_int,
@@ -2861,7 +2861,7 @@ unsafe extern "C" fn process_remove(mut id: u_int32_t) {
     );
     r = unlink(name);
     status = if r == -(1 as libc::c_int) {
-        errno_to_portable(*__errno_location())
+        errno_to_portable(*libc::__errno_location())
     } else {
         0 as libc::c_int
     };
@@ -2926,7 +2926,7 @@ unsafe extern "C" fn process_mkdir(mut id: u_int32_t) {
     );
     r = libc::mkdir(name, mode as __mode_t);
     status = if r == -(1 as libc::c_int) {
-        errno_to_portable(*__errno_location())
+        errno_to_portable(*libc::__errno_location())
     } else {
         0 as libc::c_int
     };
@@ -2972,7 +2972,7 @@ unsafe extern "C" fn process_rmdir(mut id: u_int32_t) {
     );
     r = rmdir(name);
     status = if r == -(1 as libc::c_int) {
-        errno_to_portable(*__errno_location())
+        errno_to_portable(*libc::__errno_location())
     } else {
         0 as libc::c_int
     };
@@ -3021,7 +3021,10 @@ unsafe extern "C" fn process_realpath(mut id: u_int32_t) {
         path,
     );
     if (sftp_realpath(path, resolvedname.as_mut_ptr())).is_null() {
-        send_status(id, errno_to_portable(*__errno_location()) as u_int32_t);
+        send_status(
+            id,
+            errno_to_portable(*libc::__errno_location()) as u_int32_t,
+        );
     } else {
         let mut s: Stat = Stat {
             name: 0 as *mut libc::c_char,
@@ -3113,15 +3116,15 @@ unsafe extern "C" fn process_rename(mut id: u_int32_t) {
     );
     status = 4 as libc::c_int;
     if lstat(oldpath, &mut sb) == -(1 as libc::c_int) {
-        status = errno_to_portable(*__errno_location());
+        status = errno_to_portable(*libc::__errno_location());
     } else if sb.st_mode & 0o170000 as libc::c_int as libc::c_uint
         == 0o100000 as libc::c_int as libc::c_uint
     {
         if link(oldpath, newpath) == -(1 as libc::c_int) {
-            if *__errno_location() == 95 as libc::c_int
-                || *__errno_location() == 38 as libc::c_int
-                || *__errno_location() == 18 as libc::c_int
-                || *__errno_location() == 1 as libc::c_int
+            if *libc::__errno_location() == 95 as libc::c_int
+                || *libc::__errno_location() == 38 as libc::c_int
+                || *libc::__errno_location() == 18 as libc::c_int
+                || *libc::__errno_location() == 1 as libc::c_int
             {
                 let mut st: stat = stat {
                     st_dev: 0,
@@ -3151,23 +3154,23 @@ unsafe extern "C" fn process_rename(mut id: u_int32_t) {
                 };
                 if stat(newpath, &mut st) == -(1 as libc::c_int) {
                     if rename(oldpath, newpath) == -(1 as libc::c_int) {
-                        status = errno_to_portable(*__errno_location());
+                        status = errno_to_portable(*libc::__errno_location());
                     } else {
                         status = 0 as libc::c_int;
                     }
                 }
             } else {
-                status = errno_to_portable(*__errno_location());
+                status = errno_to_portable(*libc::__errno_location());
             }
         } else if unlink(oldpath) == -(1 as libc::c_int) {
-            status = errno_to_portable(*__errno_location());
+            status = errno_to_portable(*libc::__errno_location());
             unlink(newpath);
         } else {
             status = 0 as libc::c_int;
         }
     } else if stat(newpath, &mut sb) == -(1 as libc::c_int) {
         if rename(oldpath, newpath) == -(1 as libc::c_int) {
-            status = errno_to_portable(*__errno_location());
+            status = errno_to_portable(*libc::__errno_location());
         } else {
             status = 0 as libc::c_int;
         }
@@ -3221,7 +3224,10 @@ unsafe extern "C" fn process_readlink(mut id: u_int32_t) {
             .wrapping_sub(1 as libc::c_int as libc::c_ulong),
     ) as libc::c_int;
     if len == -(1 as libc::c_int) {
-        send_status(id, errno_to_portable(*__errno_location()) as u_int32_t);
+        send_status(
+            id,
+            errno_to_portable(*libc::__errno_location()) as u_int32_t,
+        );
     } else {
         let mut s: Stat = Stat {
             name: 0 as *mut libc::c_char,
@@ -3288,7 +3294,7 @@ unsafe extern "C" fn process_symlink(mut id: u_int32_t) {
     );
     r = symlink(oldpath, newpath);
     status = if r == -(1 as libc::c_int) {
-        errno_to_portable(*__errno_location())
+        errno_to_portable(*libc::__errno_location())
     } else {
         0 as libc::c_int
     };
@@ -3348,7 +3354,7 @@ unsafe extern "C" fn process_extended_posix_rename(mut id: u_int32_t) {
     );
     r = rename(oldpath, newpath);
     status = if r == -(1 as libc::c_int) {
-        errno_to_portable(*__errno_location())
+        errno_to_portable(*libc::__errno_location())
     } else {
         0 as libc::c_int
     };
@@ -3411,7 +3417,10 @@ unsafe extern "C" fn process_extended_statvfs(mut id: u_int32_t) {
         path,
     );
     if statvfs(path, &mut st) != 0 as libc::c_int {
-        send_status(id, errno_to_portable(*__errno_location()) as u_int32_t);
+        send_status(
+            id,
+            errno_to_portable(*libc::__errno_location()) as u_int32_t,
+        );
     } else {
         send_statvfs(id, &mut st);
     }
@@ -3469,7 +3478,10 @@ unsafe extern "C" fn process_extended_fstatvfs(mut id: u_int32_t) {
         return;
     }
     if fstatvfs(fd, &mut st) != 0 as libc::c_int {
-        send_status(id, errno_to_portable(*__errno_location()) as u_int32_t);
+        send_status(
+            id,
+            errno_to_portable(*libc::__errno_location()) as u_int32_t,
+        );
     } else {
         send_statvfs(id, &mut st);
     };
@@ -3522,7 +3534,7 @@ unsafe extern "C" fn process_extended_hardlink(mut id: u_int32_t) {
     );
     r = link(oldpath, newpath);
     status = if r == -(1 as libc::c_int) {
-        errno_to_portable(*__errno_location())
+        errno_to_portable(*libc::__errno_location())
     } else {
         0 as libc::c_int
     };
@@ -3579,7 +3591,7 @@ unsafe extern "C" fn process_extended_fsync(mut id: u_int32_t) {
     } else if handle_is_ok(handle, HANDLE_FILE as libc::c_int) != 0 {
         r = fsync(fd);
         status = if r == -(1 as libc::c_int) {
-            errno_to_portable(*__errno_location())
+            errno_to_portable(*libc::__errno_location())
         } else {
             0 as libc::c_int
         };
@@ -3654,7 +3666,7 @@ unsafe extern "C" fn process_extended_lsetstat(mut id: u_int32_t) {
                 0x100 as libc::c_int,
             );
             if r == -(1 as libc::c_int) {
-                status = errno_to_portable(*__errno_location());
+                status = errno_to_portable(*libc::__errno_location());
             }
         }
         if a.flags & 0x8 as libc::c_int as libc::c_uint != 0 {
@@ -3687,7 +3699,7 @@ unsafe extern "C" fn process_extended_lsetstat(mut id: u_int32_t) {
                 0x100 as libc::c_int,
             );
             if r == -(1 as libc::c_int) {
-                status = errno_to_portable(*__errno_location());
+                status = errno_to_portable(*libc::__errno_location());
             }
         }
         if a.flags & 0x2 as libc::c_int as libc::c_uint != 0 {
@@ -3714,7 +3726,7 @@ unsafe extern "C" fn process_extended_lsetstat(mut id: u_int32_t) {
                 0x100 as libc::c_int,
             );
             if r == -(1 as libc::c_int) {
-                status = errno_to_portable(*__errno_location());
+                status = errno_to_portable(*libc::__errno_location());
             }
         }
     }
@@ -3846,7 +3858,10 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
     ))
     .is_null()
     {
-        send_status(id, errno_to_portable(*__errno_location()) as u_int32_t);
+        send_status(
+            id,
+            errno_to_portable(*libc::__errno_location()) as u_int32_t,
+        );
     } else {
         crate::log::sshlog(
             b"sftp-server.c\0" as *const u8 as *const libc::c_char,
@@ -3929,7 +3944,10 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
                     path,
                 );
                 if (sftp_realpath(path, resolvedname.as_mut_ptr())).is_null() {
-                    send_status(id, errno_to_portable(*__errno_location()) as u_int32_t);
+                    send_status(
+                        id,
+                        errno_to_portable(*libc::__errno_location()) as u_int32_t,
+                    );
                 } else {
                     attrib_clear(&mut s.attrib);
                     s.long_name = resolvedname.as_mut_ptr();
@@ -4031,7 +4049,7 @@ unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
     } else if lseek(read_fd, read_off as __off_t, 0 as libc::c_int)
         < 0 as libc::c_int as libc::c_long
     {
-        status = errno_to_portable(*__errno_location());
+        status = errno_to_portable(*libc::__errno_location());
         crate::log::sshlog(
             b"sftp-server.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
@@ -4052,7 +4070,7 @@ unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
         && lseek(write_fd, write_off as __off_t, 0 as libc::c_int)
             < 0 as libc::c_int as libc::c_long
     {
-        status = errno_to_portable(*__errno_location());
+        status = errno_to_portable(*libc::__errno_location());
         crate::log::sshlog(
             b"sftp-server.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
@@ -4085,7 +4103,8 @@ unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
                 buf.as_mut_ptr() as *mut libc::c_void,
                 len,
             );
-            if ret == 0 as libc::c_int as libc::c_ulong && *__errno_location() == 32 as libc::c_int
+            if ret == 0 as libc::c_int as libc::c_ulong
+                && *libc::__errno_location() == 32 as libc::c_int
             {
                 status = if copy_until_eof != 0 {
                     0 as libc::c_int
@@ -4094,7 +4113,7 @@ unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
                 };
                 break;
             } else if ret == 0 as libc::c_int as libc::c_ulong {
-                status = errno_to_portable(*__errno_location());
+                status = errno_to_portable(*libc::__errno_location());
                 crate::log::sshlog(
                     b"sftp-server.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
@@ -4110,7 +4129,7 @@ unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
                         b"process_extended_copy_data\0",
                     ))
                     .as_ptr(),
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
                 break;
             } else {
@@ -4141,7 +4160,7 @@ unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
                     len,
                 );
                 if ret != len {
-                    status = errno_to_portable(*__errno_location());
+                    status = errno_to_portable(*libc::__errno_location());
                     crate::log::sshlog(
                         b"sftp-server.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
@@ -4159,7 +4178,7 @@ unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
                         .as_ptr(),
                         ret as libc::c_ulonglong,
                         len as libc::c_ulonglong,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     break;
                 } else {

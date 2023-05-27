@@ -12,8 +12,6 @@ extern "C" {
     pub type ssh_hmac_ctx;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
-    fn __errno_location() -> *mut libc::c_int;
-
     fn getuid() -> __uid_t;
     fn link(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
@@ -682,7 +680,7 @@ pub unsafe extern "C" fn load_hostkeys_file(
         note,
     );
     if r != 0 as libc::c_int {
-        if r != -(24 as libc::c_int) && *__errno_location() != 2 as libc::c_int {
+        if r != -(24 as libc::c_int) && *libc::__errno_location() != 2 as libc::c_int {
             crate::log::sshlog(
                 b"hostfile.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
@@ -732,7 +730,7 @@ pub unsafe extern "C" fn load_hostkeys(
             0 as *const libc::c_char,
             b"fopen %s: %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return;
     }
@@ -1017,7 +1015,7 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
     dotsshdir = tilde_expand_filename(b"~/.ssh\0" as *const u8 as *const libc::c_char, getuid());
     if !(strlen(dotsshdir) > len || strncmp(filename, dotsshdir, len) != 0 as libc::c_int) {
         if !(stat(dotsshdir, &mut st) == 0 as libc::c_int) {
-            if *__errno_location() != 2 as libc::c_int {
+            if *libc::__errno_location() != 2 as libc::c_int {
                 crate::log::sshlog(
                     b"hostfile.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
@@ -1030,7 +1028,7 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
                     0 as *const libc::c_char,
                     b"Could not stat %s: %s\0" as *const u8 as *const libc::c_char,
                     dotsshdir,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             } else if libc::mkdir(dotsshdir, 0o700 as libc::c_int as __mode_t)
                 == -(1 as libc::c_int)
@@ -1048,7 +1046,7 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
                     b"Could not create directory '%.200s' (%s).\0" as *const u8
                         as *const libc::c_char,
                     dotsshdir,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             } else if notify != 0 {
                 crate::log::sshlog(
@@ -1104,7 +1102,7 @@ pub unsafe extern "C" fn add_host_to_hostfile(
             0 as *const libc::c_char,
             b"Failed to add terminating newline to %s: %s\0" as *const u8 as *const libc::c_char,
             filename,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         fclose(f);
         return 0 as libc::c_int;
@@ -1281,7 +1279,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
     } else {
         fd = _ssh_mkstemp(temp);
         if fd == -(1 as libc::c_int) {
-            oerrno = *__errno_location();
+            oerrno = *libc::__errno_location();
             crate::log::sshlog(
                 b"hostfile.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
@@ -1299,7 +1297,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
         } else {
             ctx.out = libc::fdopen(fd, b"w\0" as *const u8 as *const libc::c_char);
             if (ctx.out).is_null() {
-                oerrno = *__errno_location();
+                oerrno = *libc::__errno_location();
                 close(fd);
                 crate::log::sshlog(
                     b"hostfile.c\0" as *const u8 as *const libc::c_char,
@@ -1332,7 +1330,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                     0 as libc::c_int as u_int,
                 );
                 if r != 0 as libc::c_int {
-                    oerrno = *__errno_location();
+                    oerrno = *libc::__errno_location();
                     crate::log::sshlog(
                         b"hostfile.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
@@ -1478,9 +1476,9 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                             ctx.out = 0 as *mut libc::FILE;
                             if ctx.modified != 0 {
                                 if unlink(back) == -(1 as libc::c_int)
-                                    && *__errno_location() != 2 as libc::c_int
+                                    && *libc::__errno_location() != 2 as libc::c_int
                                 {
-                                    oerrno = *__errno_location();
+                                    oerrno = *libc::__errno_location();
                                     crate::log::sshlog(
                                         b"hostfile.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
@@ -1493,12 +1491,12 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                                         0 as *const libc::c_char,
                                         b"unlink %.100s: %s\0" as *const u8 as *const libc::c_char,
                                         back,
-                                        strerror(*__errno_location()),
+                                        strerror(*libc::__errno_location()),
                                     );
                                     r = -(24 as libc::c_int);
                                     current_block = 3224374282125147660;
                                 } else if link(filename, back) == -(1 as libc::c_int) {
-                                    oerrno = *__errno_location();
+                                    oerrno = *libc::__errno_location();
                                     crate::log::sshlog(
                                         b"hostfile.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
@@ -1513,12 +1511,12 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                                             as *const libc::c_char,
                                         filename,
                                         back,
-                                        strerror(*__errno_location()),
+                                        strerror(*libc::__errno_location()),
                                     );
                                     r = -(24 as libc::c_int);
                                     current_block = 3224374282125147660;
                                 } else if rename(temp, filename) == -(1 as libc::c_int) {
-                                    oerrno = *__errno_location();
+                                    oerrno = *libc::__errno_location();
                                     crate::log::sshlog(
                                         b"hostfile.c\0" as *const u8 as *const libc::c_char,
                                         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
@@ -1533,7 +1531,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                                             as *const libc::c_char,
                                         temp,
                                         filename,
-                                        strerror(*__errno_location()),
+                                        strerror(*libc::__errno_location()),
                                     );
                                     r = -(24 as libc::c_int);
                                     current_block = 3224374282125147660;
@@ -1554,7 +1552,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                                         0 as *const libc::c_char,
                                         b"unlink \"%s\": %s\0" as *const u8 as *const libc::c_char,
                                         temp,
-                                        strerror(*__errno_location()),
+                                        strerror(*libc::__errno_location()),
                                     );
                                 }
                                 current_block = 8545136480011357681;
@@ -1582,7 +1580,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
     free(ctx.match_keys as *mut libc::c_void);
     libc::umask(omask);
     if r == -(24 as libc::c_int) {
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
     }
     return r;
 }
@@ -1986,8 +1984,8 @@ pub unsafe extern "C" fn hostkeys_foreach(
         path,
     );
     r = hostkeys_foreach_file(path, f, callback, ctx, host, ip, options, note);
-    oerrno = *__errno_location();
+    oerrno = *libc::__errno_location();
     fclose(f);
-    *__errno_location() = oerrno;
+    *libc::__errno_location() = oerrno;
     return r;
 }

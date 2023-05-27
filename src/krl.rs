@@ -8,7 +8,6 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
     pub type bitmap;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn fputc(__c: libc::c_int, __stream: *mut libc::FILE) -> libc::c_int;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
@@ -4027,7 +4026,7 @@ pub unsafe extern "C" fn ssh_krl_file_contains_key(
     }
     r = sshbuf_load_file(path, &mut krlbuf);
     if r != 0 as libc::c_int {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
     } else {
         r = ssh_krl_from_blob(
             krlbuf,
@@ -4055,7 +4054,7 @@ pub unsafe extern "C" fn ssh_krl_file_contains_key(
     sshbuf_free(krlbuf);
     ssh_krl_free(krl);
     if r != 0 as libc::c_int {
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
     }
     return r;
 }

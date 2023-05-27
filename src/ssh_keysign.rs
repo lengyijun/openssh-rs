@@ -8,7 +8,7 @@ extern "C" {
     fn seed_rng();
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
 
     fn getuid() -> __uid_t;
@@ -783,7 +783,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             0 as *const libc::c_char,
             b"%s: pledge: %s\0" as *const u8 as *const libc::c_char,
             __progname,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     fd = libc::open(
@@ -879,7 +879,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             0 as *const libc::c_char,
             b"%s: pledge: %s\0" as *const u8 as *const libc::c_char,
             __progname,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     found = 0 as libc::c_int;

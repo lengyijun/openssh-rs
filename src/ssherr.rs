@@ -1,6 +1,6 @@
 use ::libc;
 extern "C" {
-    fn __errno_location() -> *mut libc::c_int;
+
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
 }
 pub unsafe extern "C" fn ssh_err(mut n: libc::c_int) -> *const libc::c_char {
@@ -46,7 +46,7 @@ pub unsafe extern "C" fn ssh_err(mut n: libc::c_int) -> *const libc::c_char {
         -23 => {
             return b"unexpected bytes remain after decoding\0" as *const u8 as *const libc::c_char;
         }
-        -24 => return strerror(*__errno_location()),
+        -24 => return strerror(*libc::__errno_location()),
         -25 => return b"invalid certificate\0" as *const u8 as *const libc::c_char,
         -26 => {
             return b"communication with agent failed\0" as *const u8 as *const libc::c_char;

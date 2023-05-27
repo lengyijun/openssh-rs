@@ -7,7 +7,6 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn _exit(_: libc::c_int) -> !;
@@ -472,7 +471,7 @@ pub unsafe extern "C" fn log_redirect_stderr_to(mut logfile: *const libc::c_char
             stderr,
             b"Couldn't open logfile %s: %s\n\0" as *const u8 as *const libc::c_char,
             logfile,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         exit(1 as libc::c_int);
     }
@@ -496,7 +495,7 @@ unsafe extern "C" fn do_log(
     let mut fmtbuf: [libc::c_char; 1024] = [0; 1024];
     let mut txt: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut pri: libc::c_int = 6 as libc::c_int;
-    let mut saved_errno: libc::c_int = *__errno_location();
+    let mut saved_errno: libc::c_int = *libc::__errno_location();
     let mut tmp_handler: Option<log_handler_fn> = None;
     let mut progname: *const libc::c_char = if !argv0.is_null() {
         argv0
@@ -631,7 +630,7 @@ unsafe extern "C" fn do_log(
         );
         closelog();
     }
-    *__errno_location() = saved_errno;
+    *libc::__errno_location() = saved_errno;
 }
 pub unsafe extern "C" fn sshlog(
     mut file: *const libc::c_char,

@@ -1,6 +1,6 @@
 use ::libc;
 extern "C" {
-    fn __errno_location() -> *mut libc::c_int;
+
     fn getpagesize() -> libc::c_int;
     fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
@@ -34,7 +34,7 @@ pub unsafe extern "C" fn recallocarray(
         && newnmemb > 0 as libc::c_int as libc::c_ulong
         && (18446744073709551615 as libc::c_ulong).wrapping_div(newnmemb) < size
     {
-        *__errno_location() = 12 as libc::c_int;
+        *libc::__errno_location() = 12 as libc::c_int;
         return 0 as *mut libc::c_void;
     }
     newsize = newnmemb.wrapping_mul(size);
@@ -49,7 +49,7 @@ pub unsafe extern "C" fn recallocarray(
         && oldnmemb > 0 as libc::c_int as libc::c_ulong
         && (18446744073709551615 as libc::c_ulong).wrapping_div(oldnmemb) < size
     {
-        *__errno_location() = 22 as libc::c_int;
+        *libc::__errno_location() = 22 as libc::c_int;
         return 0 as *mut libc::c_void;
     }
     oldsize = oldnmemb.wrapping_mul(size);

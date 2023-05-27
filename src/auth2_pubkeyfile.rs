@@ -12,7 +12,6 @@ extern "C" {
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
 
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
@@ -1109,7 +1108,7 @@ unsafe extern "C" fn auth_openfile(
     let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     fd = libc::open(file, 0 as libc::c_int | 0o4000 as libc::c_int);
     if fd == -(1 as libc::c_int) {
-        if *__errno_location() != 2 as libc::c_int {
+        if *libc::__errno_location() != 2 as libc::c_int {
             crate::log::sshlog(
                 b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"auth_openfile\0"))
@@ -1122,7 +1121,7 @@ unsafe extern "C" fn auth_openfile(
                 (*pw).pw_name,
                 file_type,
                 file,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         } else if log_missing != 0 {
             crate::log::sshlog(
@@ -1137,7 +1136,7 @@ unsafe extern "C" fn auth_openfile(
                 (*pw).pw_name,
                 file_type,
                 file,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         return 0 as *mut libc::FILE;

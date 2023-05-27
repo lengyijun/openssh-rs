@@ -1,7 +1,7 @@
 use ::libc;
 extern "C" {
     pub type monitor;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn setrlimit(__resource: __rlimit_resource_t, __rlimits: *const rlimit) -> libc::c_int;
     fn prctl(__option: libc::c_int, _: ...) -> libc::c_int;
     fn free(_: *mut libc::c_void);
@@ -143,7 +143,7 @@ pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
             b"%s: setrlimit(RLIMIT_FSIZE, { 0, 0 }): %s\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"ssh_sandbox_child\0"))
                 .as_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     if setrlimit(RLIMIT_NOFILE, &mut rl_one) == -(1 as libc::c_int) {
@@ -158,7 +158,7 @@ pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
             b"%s: setrlimit(RLIMIT_NOFILE, { 0, 0 }): %s\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"ssh_sandbox_child\0"))
                 .as_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     if setrlimit(__RLIMIT_NPROC, &mut rl_zero) == -(1 as libc::c_int) {
@@ -173,7 +173,7 @@ pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
             b"%s: setrlimit(RLIMIT_NPROC, { 0, 0 }): %s\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"ssh_sandbox_child\0"))
                 .as_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     crate::log::sshlog(
@@ -207,7 +207,7 @@ pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
             b"%s: prctl(PR_SET_NO_NEW_PRIVS): %s\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"ssh_sandbox_child\0"))
                 .as_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         nnp_failed = 1 as libc::c_int;
     }
@@ -240,7 +240,7 @@ pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
             b"%s: prctl(PR_SET_SECCOMP): %s\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"ssh_sandbox_child\0"))
                 .as_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else if nnp_failed != 0 {
         sshfatal(

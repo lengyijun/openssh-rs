@@ -21,7 +21,7 @@ extern "C" {
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
     fn platform_locked_account(_: *mut passwd) -> libc::c_int;
     fn getaddrinfo(
@@ -1692,7 +1692,7 @@ unsafe extern "C" fn remote_hostname(mut ssh: *mut ssh) -> *mut libc::c_char {
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"getpeername failed: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return xstrdup(ntop);
     }

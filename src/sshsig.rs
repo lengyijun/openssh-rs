@@ -8,7 +8,7 @@ extern "C" {
     pub type dsa_st;
     pub type rsa_st;
     pub type ssh_digest_ctx;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
@@ -1430,10 +1430,12 @@ unsafe extern "C" fn hash_file(
             ::core::mem::size_of::<[libc::c_char; 8192]>() as libc::c_ulong,
         );
         if n == -(1 as libc::c_int) as libc::c_long {
-            if *__errno_location() == 4 as libc::c_int || *__errno_location() == 11 as libc::c_int {
+            if *libc::__errno_location() == 4 as libc::c_int
+                || *libc::__errno_location() == 11 as libc::c_int
+            {
                 continue;
             }
-            oerrno = *__errno_location();
+            oerrno = *libc::__errno_location();
             crate::log::sshlog(
                 b"sshsig.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"hash_file\0"))
@@ -1443,9 +1445,9 @@ unsafe extern "C" fn hash_file(
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"read: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
-            *__errno_location() = oerrno;
+            *libc::__errno_location() = oerrno;
             r = -(24 as libc::c_int);
             current_block = 6182669104404250719;
             break;
@@ -1552,14 +1554,14 @@ unsafe extern "C" fn hash_file(
         }
         _ => {}
     }
-    oerrno = *__errno_location();
+    oerrno = *libc::__errno_location();
     sshbuf_free(b);
     ssh_digest_free(ctx);
     explicit_bzero(
         hash.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[libc::c_char; 64]>() as libc::c_ulong,
     );
-    *__errno_location() = oerrno;
+    *libc::__errno_location() = oerrno;
     return r;
 }
 pub unsafe extern "C" fn sshsig_sign_fd(
@@ -2461,7 +2463,7 @@ pub unsafe extern "C" fn sshsig_check_allowed_keys(
     let mut oerrno: libc::c_int = 0;
     f = fopen(path, b"r\0" as *const u8 as *const libc::c_char);
     if f.is_null() {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         crate::log::sshlog(
             b"sshsig.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
@@ -2474,9 +2476,9 @@ pub unsafe extern "C" fn sshsig_check_allowed_keys(
             0 as *const libc::c_char,
             b"Unable to open allowed keys file \"%s\": %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
     }
     while getline(&mut line, &mut linesize, f) != -(1 as libc::c_int) as libc::c_long {
@@ -2522,7 +2524,7 @@ pub unsafe extern "C" fn sshsig_find_principals(
     let mut oerrno: libc::c_int = 0;
     f = fopen(path, b"r\0" as *const u8 as *const libc::c_char);
     if f.is_null() {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         crate::log::sshlog(
             b"sshsig.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
@@ -2535,9 +2537,9 @@ pub unsafe extern "C" fn sshsig_find_principals(
             0 as *const libc::c_char,
             b"Unable to open allowed keys file \"%s\": %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
     }
     while getline(&mut line, &mut linesize, f) != -(1 as libc::c_int) as libc::c_long {
@@ -2567,7 +2569,7 @@ pub unsafe extern "C" fn sshsig_find_principals(
     }
     free(line as *mut libc::c_void);
     if ferror(f) != 0 as libc::c_int {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         fclose(f);
         crate::log::sshlog(
             b"sshsig.c\0" as *const u8 as *const libc::c_char,
@@ -2581,9 +2583,9 @@ pub unsafe extern "C" fn sshsig_find_principals(
             0 as *const libc::c_char,
             b"Unable to read allowed keys file \"%s\": %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
     }
     fclose(f);
@@ -2615,7 +2617,7 @@ pub unsafe extern "C" fn sshsig_match_principals(
     }
     f = fopen(path, b"r\0" as *const u8 as *const libc::c_char);
     if f.is_null() {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         crate::log::sshlog(
             b"sshsig.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
@@ -2628,9 +2630,9 @@ pub unsafe extern "C" fn sshsig_match_principals(
             0 as *const libc::c_char,
             b"Unable to open allowed keys file \"%s\": %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
     }
     while getline(&mut line, &mut linesize, f) != -(1 as libc::c_int) as libc::c_long {
@@ -2650,7 +2652,7 @@ pub unsafe extern "C" fn sshsig_match_principals(
                 continue;
             }
             ret = r;
-            oerrno = *__errno_location();
+            oerrno = *libc::__errno_location();
             break;
         } else {
             tmp = recallocarray(
@@ -2696,7 +2698,7 @@ pub unsafe extern "C" fn sshsig_match_principals(
         i;
     }
     free(principals as *mut libc::c_void);
-    *__errno_location() = oerrno;
+    *libc::__errno_location() = oerrno;
     return ret;
 }
 pub unsafe extern "C" fn sshsig_get_pubkey(

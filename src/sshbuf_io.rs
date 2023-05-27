@@ -7,7 +7,7 @@ extern "C" {
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
 
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
@@ -119,7 +119,7 @@ pub unsafe extern "C" fn sshbuf_load_fd(
             ::core::mem::size_of::<[u_char; 4096]>() as libc::c_ulong,
         );
         if len == 0 as libc::c_int as libc::c_ulong {
-            if *__errno_location() == 32 as libc::c_int {
+            if *libc::__errno_location() == 32 as libc::c_int {
                 current_block = 10048703153582371463;
                 break;
             }
@@ -180,10 +180,10 @@ pub unsafe extern "C" fn sshbuf_load_file(
     if !(r != 0 as libc::c_int) {
         r = 0 as libc::c_int;
     }
-    oerrno = *__errno_location();
+    oerrno = *libc::__errno_location();
     close(fd);
     if r != 0 as libc::c_int {
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
     }
     return r;
 }
@@ -214,10 +214,10 @@ pub unsafe extern "C" fn sshbuf_write_file(
     ) != sshbuf_len(buf)
         || close(fd) != 0 as libc::c_int
     {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         close(fd);
         unlink(path);
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
     }
     return 0 as libc::c_int;

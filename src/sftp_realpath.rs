@@ -3,7 +3,7 @@ extern "C" {
     fn getcwd(__buf: *mut libc::c_char, __size: size_t) -> *mut libc::c_char;
     fn readlink(__path: *const libc::c_char, __buf: *mut libc::c_char, __len: size_t) -> ssize_t;
     fn lstat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
@@ -100,10 +100,10 @@ pub unsafe extern "C" fn sftp_realpath(
     let mut next_token: [libc::c_char; 4096] = [0; 4096];
     let mut symlink: [libc::c_char; 4096] = [0; 4096];
     if *path.offset(0 as libc::c_int as isize) as libc::c_int == '\0' as i32 {
-        *__errno_location() = 2 as libc::c_int;
+        *libc::__errno_location() = 2 as libc::c_int;
         return 0 as *mut libc::c_char;
     }
-    serrno = *__errno_location();
+    serrno = *libc::__errno_location();
     if resolved.is_null() {
         resolved = malloc(4096 as libc::c_int as libc::c_ulong) as *mut libc::c_char;
         if resolved.is_null() {
@@ -149,7 +149,7 @@ pub unsafe extern "C" fn sftp_realpath(
     if left_len >= ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong
         || resolved_len >= 4096 as libc::c_int as libc::c_ulong
     {
-        *__errno_location() = 36 as libc::c_int;
+        *libc::__errno_location() = 36 as libc::c_int;
     } else {
         loop {
             if !(left_len != 0 as libc::c_int as libc::c_ulong) {
@@ -165,7 +165,7 @@ pub unsafe extern "C" fn sftp_realpath(
             if s.offset_from(left.as_mut_ptr()) as libc::c_long
                 >= ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong as ptrdiff_t
             {
-                *__errno_location() = 36 as libc::c_int;
+                *libc::__errno_location() = 36 as libc::c_int;
                 current_block = 1606475609200722585;
                 break;
             } else {
@@ -194,7 +194,7 @@ pub unsafe extern "C" fn sftp_realpath(
                     if resolved_len.wrapping_add(1 as libc::c_int as libc::c_ulong)
                         >= 4096 as libc::c_int as libc::c_ulong
                     {
-                        *__errno_location() = 36 as libc::c_int;
+                        *libc::__errno_location() = 36 as libc::c_int;
                         current_block = 1606475609200722585;
                         break;
                     } else {
@@ -234,12 +234,12 @@ pub unsafe extern "C" fn sftp_realpath(
                         4096 as libc::c_int as size_t,
                     );
                     if resolved_len >= 4096 as libc::c_int as libc::c_ulong {
-                        *__errno_location() = 36 as libc::c_int;
+                        *libc::__errno_location() = 36 as libc::c_int;
                         current_block = 1606475609200722585;
                         break;
                     } else if lstat(resolved, &mut sb) != 0 as libc::c_int {
-                        if *__errno_location() == 2 as libc::c_int && p.is_null() {
-                            *__errno_location() = serrno;
+                        if *libc::__errno_location() == 2 as libc::c_int && p.is_null() {
+                            *libc::__errno_location() = serrno;
                             return resolved;
                         }
                         current_block = 1606475609200722585;
@@ -253,7 +253,7 @@ pub unsafe extern "C" fn sftp_realpath(
                         let fresh1 = symlinks;
                         symlinks = symlinks.wrapping_add(1);
                         if fresh1 > 32 as libc::c_int as libc::c_uint {
-                            *__errno_location() = 40 as libc::c_int;
+                            *libc::__errno_location() = 40 as libc::c_int;
                             current_block = 1606475609200722585;
                             break;
                         } else {
@@ -291,7 +291,7 @@ pub unsafe extern "C" fn sftp_realpath(
                                             as libc::c_ulong
                                             as ptrdiff_t
                                     {
-                                        *__errno_location() = 36 as libc::c_int;
+                                        *libc::__errno_location() = 36 as libc::c_int;
                                         current_block = 1606475609200722585;
                                         break;
                                     } else {
@@ -309,7 +309,7 @@ pub unsafe extern "C" fn sftp_realpath(
                                     >= ::core::mem::size_of::<[libc::c_char; 4096]>()
                                         as libc::c_ulong
                                 {
-                                    *__errno_location() = 36 as libc::c_int;
+                                    *libc::__errno_location() = 36 as libc::c_int;
                                     current_block = 1606475609200722585;
                                     break;
                                 }

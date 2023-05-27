@@ -23,7 +23,6 @@ extern "C" {
         -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
-    fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
 
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
@@ -1364,7 +1363,7 @@ unsafe extern "C" fn do_convert_to(mut pw: *mut passwd) {
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     r = sshkey_load_public(
@@ -1994,7 +1993,7 @@ unsafe extern "C" fn get_line(
                         SYSLOG_LEVEL_FATAL,
                         0 as *const libc::c_char,
                         b"unget: %s\0" as *const u8 as *const libc::c_char,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                 }
                 return pos as libc::c_int;
@@ -2051,7 +2050,7 @@ unsafe extern "C" fn do_convert_from_ssh2(
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     encoded[0 as libc::c_int as usize] = '\0' as i32 as libc::c_char;
@@ -2191,7 +2190,7 @@ unsafe extern "C" fn do_convert_from_pkcs8(
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     pubkey = PEM_read_PUBKEY(fp, 0 as *mut *mut EVP_PKEY, None, 0 as *mut libc::c_void);
@@ -2305,7 +2304,7 @@ unsafe extern "C" fn do_convert_from_pem(mut k: *mut *mut sshkey, mut _private: 
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     rsa = PEM_read_RSAPublicKey(fp, 0 as *mut *mut RSA, None, 0 as *mut libc::c_void);
@@ -2390,7 +2389,7 @@ unsafe extern "C" fn do_convert_from(mut pw: *mut passwd) {
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     match convert_format as libc::c_uint {
@@ -2539,7 +2538,7 @@ unsafe extern "C" fn do_print_public(mut pw: *mut passwd) {
             0 as *const libc::c_char,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     prv = load_identity(identity_file.as_mut_ptr(), &mut comment);
@@ -2783,7 +2782,7 @@ unsafe extern "C" fn fingerprint_private(mut path: *const libc::c_char) {
             0 as *const libc::c_char,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     r = sshkey_load_public(path, &mut pubkey, &mut comment);
@@ -2877,7 +2876,7 @@ unsafe extern "C" fn do_fingerprint(mut pw: *mut passwd) {
                 b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
                 __progname,
                 path,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     }
@@ -3081,7 +3080,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
             } else {
                 current_block = 11650488183268122163;
             }
-        } else if *__errno_location() != 2 as libc::c_int {
+        } else if *libc::__errno_location() != 2 as libc::c_int {
             crate::log::sshlog(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(
@@ -3094,7 +3093,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                 0 as *const libc::c_char,
                 b"Could not stat %s: %s\0" as *const u8 as *const libc::c_char,
                 key_types[i as usize].path,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             current_block = 10340423718687530949;
         } else {
@@ -3148,7 +3147,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                         b"Could not save your private key in %s: %s\0" as *const u8
                             as *const libc::c_char,
                         prv_tmp,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                     current_block = 10340423718687530949;
                 } else {
@@ -3233,7 +3232,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                                     b"Could not save your public key in %s: %s\0" as *const u8
                                         as *const libc::c_char,
                                     pub_tmp,
-                                    strerror(*__errno_location()),
+                                    strerror(*libc::__errno_location()),
                                 );
                                 current_block = 10340423718687530949;
                             } else {
@@ -3270,7 +3269,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                                         b"Unable to move %s into position: %s\0" as *const u8
                                             as *const libc::c_char,
                                         pub_file,
-                                        strerror(*__errno_location()),
+                                        strerror(*libc::__errno_location()),
                                     );
                                     current_block = 10340423718687530949;
                                 } else if rename(prv_tmp, prv_file) != 0 as libc::c_int {
@@ -3287,7 +3286,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                                         b"Unable to move %s into position: %s\0" as *const u8
                                             as *const libc::c_char,
                                         key_types[i as usize].path,
-                                        strerror(*__errno_location()),
+                                        strerror(*libc::__errno_location()),
                                     );
                                     current_block = 10340423718687530949;
                                 } else {
@@ -3633,7 +3632,7 @@ unsafe extern "C" fn do_known_hosts(
             0 as *const libc::c_char,
             b"Cannot stat %s: %s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     memset(
@@ -3691,12 +3690,12 @@ unsafe extern "C" fn do_known_hosts(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"mkstemp: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         ctx.out = libc::fdopen(fd, b"w\0" as *const u8 as *const libc::c_char);
         if (ctx.out).is_null() {
-            oerrno = *__errno_location();
+            oerrno = *libc::__errno_location();
             unlink(tmp.as_mut_ptr());
             sshfatal(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -3811,7 +3810,7 @@ unsafe extern "C" fn do_known_hosts(
         }
     } else if inplace != 0 {
         if unlink(old.as_mut_ptr()) == -(1 as libc::c_int)
-            && *__errno_location() != 2 as libc::c_int
+            && *libc::__errno_location() != 2 as libc::c_int
         {
             sshfatal(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -3823,7 +3822,7 @@ unsafe extern "C" fn do_known_hosts(
                 0 as *const libc::c_char,
                 b"unlink %.100s: %s\0" as *const u8 as *const libc::c_char,
                 old.as_mut_ptr(),
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         if link(identity_file.as_mut_ptr(), old.as_mut_ptr()) == -(1 as libc::c_int) {
@@ -3838,7 +3837,7 @@ unsafe extern "C" fn do_known_hosts(
                 b"link %.100s to %.100s: %s\0" as *const u8 as *const libc::c_char,
                 identity_file.as_mut_ptr(),
                 old.as_mut_ptr(),
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         if rename(tmp.as_mut_ptr(), identity_file.as_mut_ptr()) == -(1 as libc::c_int) {
@@ -3853,7 +3852,7 @@ unsafe extern "C" fn do_known_hosts(
                 b"rename\"%s\" to \"%s\": %s\0" as *const u8 as *const libc::c_char,
                 tmp.as_mut_ptr(),
                 identity_file.as_mut_ptr(),
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             unlink(tmp.as_mut_ptr());
             unlink(old.as_mut_ptr());
@@ -3944,7 +3943,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut passwd) {
             0 as *const libc::c_char,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     r = sshkey_load_private(
@@ -4162,7 +4161,7 @@ unsafe extern "C" fn do_print_resource_record(
         );
     }
     if stat(fname, &mut st) == -(1 as libc::c_int) {
-        if *__errno_location() == 2 as libc::c_int {
+        if *libc::__errno_location() == 2 as libc::c_int {
             return 0 as libc::c_int;
         }
         sshfatal(
@@ -4177,7 +4176,7 @@ unsafe extern "C" fn do_print_resource_record(
             0 as *const libc::c_char,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             fname,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     r = sshkey_load_public(fname, &mut public, &mut comment);
@@ -4254,7 +4253,7 @@ unsafe extern "C" fn do_change_comment(
             0 as *const libc::c_char,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     r = sshkey_load_private(
@@ -5219,7 +5218,7 @@ unsafe extern "C" fn parse_relative_time(mut s: *const libc::c_char, mut now: ti
 unsafe extern "C" fn parse_hex_u64(mut s: *const libc::c_char, mut up: *mut uint64_t) {
     let mut ep: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut ull: libc::c_ulonglong = 0;
-    *__errno_location() = 0 as libc::c_int;
+    *libc::__errno_location() = 0 as libc::c_int;
     ull = strtoull(s, &mut ep, 16 as libc::c_int);
     if *s as libc::c_int == '\0' as i32 || *ep as libc::c_int != '\0' as i32 {
         sshfatal(
@@ -5233,7 +5232,7 @@ unsafe extern "C" fn parse_hex_u64(mut s: *const libc::c_char, mut up: *mut uint
             b"Invalid certificate time: not a number\0" as *const u8 as *const libc::c_char,
         );
     }
-    if *__errno_location() == 34 as libc::c_int
+    if *libc::__errno_location() == 34 as libc::c_int
         && ull
             == (9223372036854775807 as libc::c_long as libc::c_ulong)
                 .wrapping_mul(2 as libc::c_ulong)
@@ -5822,7 +5821,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut passwd) {
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     path = identity_file.as_mut_ptr();
@@ -5846,7 +5845,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut passwd) {
                 0 as *const libc::c_char,
                 b"fopen %s: %s\0" as *const u8 as *const libc::c_char,
                 identity_file.as_mut_ptr(),
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     }
@@ -6086,7 +6085,7 @@ unsafe extern "C" fn update_krl_from_file(
                 0 as *const libc::c_char,
                 b"fopen %s: %s\0" as *const u8 as *const libc::c_char,
                 path,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     }
@@ -6155,7 +6154,7 @@ unsafe extern "C" fn update_krl_from_file(
             }
             cp = cp.offset(7 as libc::c_int as isize);
             cp = cp.offset(strspn(cp, b" \t\0" as *const u8 as *const libc::c_char) as isize);
-            *__errno_location() = 0 as libc::c_int;
+            *libc::__errno_location() = 0 as libc::c_int;
             serial = strtoull(cp, &mut ep, 0 as libc::c_int);
             if *cp as libc::c_int == '\0' as i32
                 || *ep as libc::c_int != '\0' as i32 && *ep as libc::c_int != '-' as i32
@@ -6176,7 +6175,7 @@ unsafe extern "C" fn update_krl_from_file(
                     cp,
                 );
             }
-            if *__errno_location() == 34 as libc::c_int
+            if *libc::__errno_location() == 34 as libc::c_int
                 && serial
                     == (9223372036854775807 as libc::c_longlong as libc::c_ulonglong)
                         .wrapping_mul(2 as libc::c_ulonglong)
@@ -6200,7 +6199,7 @@ unsafe extern "C" fn update_krl_from_file(
             serial2 = serial;
             if *ep as libc::c_int == '-' as i32 {
                 cp = ep.offset(1 as libc::c_int as isize);
-                *__errno_location() = 0 as libc::c_int;
+                *libc::__errno_location() = 0 as libc::c_int;
                 serial2 = strtoull(cp, &mut ep, 0 as libc::c_int);
                 if *cp as libc::c_int == '\0' as i32 || *ep as libc::c_int != '\0' as i32 {
                     sshfatal(
@@ -6219,7 +6218,7 @@ unsafe extern "C" fn update_krl_from_file(
                         cp,
                     );
                 }
-                if *__errno_location() == 34 as libc::c_int
+                if *libc::__errno_location() == 34 as libc::c_int
                     && serial2
                         == (9223372036854775807 as libc::c_longlong as libc::c_ulonglong)
                             .wrapping_mul(2 as libc::c_ulonglong)
@@ -6527,7 +6526,7 @@ unsafe extern "C" fn do_gen_krl(
         );
     }
     if stat(identity_file.as_mut_ptr(), &mut sb) == -(1 as libc::c_int) {
-        if *__errno_location() != 2 as libc::c_int {
+        if *libc::__errno_location() != 2 as libc::c_int {
             sshfatal(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"do_gen_krl\0"))
@@ -6538,7 +6537,7 @@ unsafe extern "C" fn do_gen_krl(
                 0 as *const libc::c_char,
                 b"Cannot access KRL \"%s\": %s\0" as *const u8 as *const libc::c_char,
                 identity_file.as_mut_ptr(),
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
         if updating != 0 {
@@ -6644,7 +6643,7 @@ unsafe extern "C" fn do_gen_krl(
             0 as *const libc::c_char,
             b"write %s: %s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     sshbuf_free(kbuf);
@@ -6800,7 +6799,7 @@ unsafe extern "C" fn load_sign_key(
     }
     if waspub != 0
         && stat(privpath, &mut st) != 0 as libc::c_int
-        && *__errno_location() == 2 as libc::c_int
+        && *libc::__errno_location() == 2 as libc::c_int
     {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -7053,7 +7052,7 @@ unsafe extern "C" fn sign_one(
                             0o666 as libc::c_int,
                         );
                         if wfd == -(1 as libc::c_int) {
-                            oerrno = *__errno_location();
+                            oerrno = *libc::__errno_location();
                             crate::log::sshlog(
                                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(
@@ -7066,9 +7065,9 @@ unsafe extern "C" fn sign_one(
                                 0 as *const libc::c_char,
                                 b"Cannot open %s: %s\0" as *const u8 as *const libc::c_char,
                                 wfile,
-                                strerror(*__errno_location()),
+                                strerror(*libc::__errno_location()),
                             );
-                            *__errno_location() = oerrno;
+                            *libc::__errno_location() = oerrno;
                             r = -(24 as libc::c_int);
                             current_block = 6958312750300924261;
                         } else if atomicio(
@@ -7103,7 +7102,7 @@ unsafe extern "C" fn sign_one(
                             strlen(asig),
                         ) != strlen(asig)
                         {
-                            oerrno = *__errno_location();
+                            oerrno = *libc::__errno_location();
                             crate::log::sshlog(
                                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                                 (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(
@@ -7116,9 +7115,9 @@ unsafe extern "C" fn sign_one(
                                 0 as *const libc::c_char,
                                 b"Cannot write to %s: %s\0" as *const u8 as *const libc::c_char,
                                 wfile,
-                                strerror(*__errno_location()),
+                                strerror(*libc::__errno_location()),
                             );
-                            *__errno_location() = oerrno;
+                            *libc::__errno_location() = oerrno;
                             r = -(24 as libc::c_int);
                             current_block = 6958312750300924261;
                         } else {
@@ -7449,7 +7448,7 @@ unsafe extern "C" fn sig_sign(
                                         b"Cannot open %s for signing: %s\0" as *const u8
                                             as *const libc::c_char,
                                         *argv.offset(i as isize),
-                                        strerror(*__errno_location()),
+                                        strerror(*libc::__errno_location()),
                                     );
                                     current_block = 15713335055486353288;
                                     break;
@@ -8014,7 +8013,7 @@ unsafe extern "C" fn do_moduli_gen(
             b"Couldn't open modulus candidate file \"%s\": %s\0" as *const u8
                 as *const libc::c_char,
             out_file,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     setvbuf(
@@ -8182,7 +8181,7 @@ unsafe extern "C" fn do_moduli_screen(
                 b"Couldn't open modulus candidate file \"%s\": %s\0" as *const u8
                     as *const libc::c_char,
                 identity_file.as_mut_ptr(),
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     }
@@ -8198,7 +8197,7 @@ unsafe extern "C" fn do_moduli_screen(
             0 as *const libc::c_char,
             b"Couldn't open moduli file \"%s\": %s\0" as *const u8 as *const libc::c_char,
             out_file,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     setvbuf(
@@ -8778,7 +8777,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"gethostname: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
     sk_provider = getenv(b"SSH_SK_PROVIDER\0" as *const u8 as *const libc::c_char);
@@ -9044,7 +9043,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 sk_provider = BSDoptarg;
             }
             122 => {
-                *__errno_location() = 0 as libc::c_int;
+                *libc::__errno_location() = 0 as libc::c_int;
                 if *BSDoptarg as libc::c_int == '+' as i32 {
                     cert_serial_autoinc = 1 as libc::c_int;
                     BSDoptarg = BSDoptarg.offset(1);
@@ -9054,7 +9053,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 if (*BSDoptarg as libc::c_int) < '0' as i32
                     || *BSDoptarg as libc::c_int > '9' as i32
                     || *ep as libc::c_int != '\0' as i32
-                    || *__errno_location() == 34 as libc::c_int
+                    || *libc::__errno_location() == 34 as libc::c_int
                         && cert_serial
                             == (9223372036854775807 as libc::c_longlong as libc::c_ulonglong)
                                 .wrapping_mul(2 as libc::c_ulonglong)
@@ -9512,7 +9511,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     0 as *const libc::c_char,
                     b"%s: %s\0" as *const u8 as *const libc::c_char,
                     identity_file.as_mut_ptr(),
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             }
             exit(0 as libc::c_int);

@@ -3,7 +3,7 @@ extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
 
@@ -100,7 +100,7 @@ pub unsafe extern "C" fn oom_adjust_setup() {
                     0 as *const libc::c_char,
                     b"error reading %s: %s\0" as *const u8 as *const libc::c_char,
                     oom_adj_path,
-                    strerror(*__errno_location()),
+                    strerror(*libc::__errno_location()),
                 );
             } else {
                 rewind(fp);
@@ -119,7 +119,7 @@ pub unsafe extern "C" fn oom_adjust_setup() {
                         0 as *const libc::c_char,
                         b"error writing %s: %s\0" as *const u8 as *const libc::c_char,
                         oom_adj_path,
-                        strerror(*__errno_location()),
+                        strerror(*libc::__errno_location()),
                     );
                 } else {
                     crate::log::sshlog(
@@ -187,7 +187,7 @@ pub unsafe extern "C" fn oom_adjust_restore() {
             0 as *const libc::c_char,
             b"error writing %s: %s\0" as *const u8 as *const libc::c_char,
             oom_adj_path,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     } else {
         crate::log::sshlog(

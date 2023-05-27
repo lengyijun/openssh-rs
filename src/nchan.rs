@@ -6,7 +6,7 @@ extern "C" {
     pub type session_state;
     pub type sshbuf;
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
-    fn __errno_location() -> *mut libc::c_int;
+
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn sshbuf_len(buf: *const sshbuf) -> size_t;
@@ -920,7 +920,7 @@ unsafe extern "C" fn chan_shutdown_write(mut ssh: *mut ssh, mut c: *mut Channel)
                 (*c).sock,
                 (*c).istate,
                 (*c).ostate,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     } else if channel_close_fd(ssh, c, &mut (*c).wfd) < 0 as libc::c_int {
@@ -938,7 +938,7 @@ unsafe extern "C" fn chan_shutdown_write(mut ssh: *mut ssh, mut c: *mut Channel)
             (*c).wfd,
             (*c).istate,
             (*c).ostate,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
 }
@@ -965,7 +965,7 @@ unsafe extern "C" fn chan_shutdown_read(mut ssh: *mut ssh, mut c: *mut Channel) 
     );
     if (*c).sock != -(1 as libc::c_int) {
         if shutdown((*c).sock, SHUT_RD as libc::c_int) == -(1 as libc::c_int)
-            && *__errno_location() != 107 as libc::c_int
+            && *libc::__errno_location() != 107 as libc::c_int
         {
             crate::log::sshlog(
                 b"nchan.c\0" as *const u8 as *const libc::c_char,
@@ -983,7 +983,7 @@ unsafe extern "C" fn chan_shutdown_read(mut ssh: *mut ssh, mut c: *mut Channel) 
                 (*c).sock,
                 (*c).istate,
                 (*c).ostate,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
         }
     } else if channel_close_fd(ssh, c, &mut (*c).rfd) < 0 as libc::c_int {
@@ -1001,7 +1001,7 @@ unsafe extern "C" fn chan_shutdown_read(mut ssh: *mut ssh, mut c: *mut Channel) 
             (*c).rfd,
             (*c).istate,
             (*c).ostate,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
 }
@@ -1048,7 +1048,7 @@ unsafe extern "C" fn chan_shutdown_extended_read(mut ssh: *mut ssh, mut c: *mut 
             (*c).efd,
             (*c).istate,
             (*c).ostate,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
     }
 }

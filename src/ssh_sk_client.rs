@@ -7,7 +7,7 @@ extern "C" {
     pub type ec_key_st;
 
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn __errno_location() -> *mut libc::c_int;
+
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
 
     fn closefrom(__lowfd: libc::c_int);
@@ -164,7 +164,7 @@ unsafe extern "C" fn start_helper(
             as *mut libc::c_char;
     }
     if access(helper, 1 as libc::c_int) != 0 as libc::c_int {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         crate::log::sshlog(
             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"start_helper\0")).as_ptr(),
@@ -174,9 +174,9 @@ unsafe extern "C" fn start_helper(
             0 as *const libc::c_char,
             b"helper \"%s\" unusable: %s\0" as *const u8 as *const libc::c_char,
             helper,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
     }
     if libc::socketpair(
@@ -194,14 +194,14 @@ unsafe extern "C" fn start_helper(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         return -(24 as libc::c_int);
     }
     osigchld = ssh_signal(17 as libc::c_int, None);
     pid = fork();
     if pid == -(1 as libc::c_int) {
-        oerrno = *__errno_location();
+        oerrno = *libc::__errno_location();
         crate::log::sshlog(
             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"start_helper\0")).as_ptr(),
@@ -210,12 +210,12 @@ unsafe extern "C" fn start_helper(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"fork: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         close(pair[0 as libc::c_int as usize]);
         close(pair[1 as libc::c_int as usize]);
         ssh_signal(17 as libc::c_int, osigchld);
-        *__errno_location() = oerrno;
+        *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
     }
     if pid == 0 as libc::c_int {
@@ -231,7 +231,7 @@ unsafe extern "C" fn start_helper(
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"dup2: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
             _exit(1 as libc::c_int);
         }
@@ -267,7 +267,7 @@ unsafe extern "C" fn start_helper(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"execlp: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*__errno_location()),
+            strerror(*libc::__errno_location()),
         );
         _exit(1 as libc::c_int);
     }
@@ -300,12 +300,12 @@ unsafe extern "C" fn reap_helper(mut pid: pid_t) -> libc::c_int {
         b"pid=%ld\0" as *const u8 as *const libc::c_char,
         pid as libc::c_long,
     );
-    *__errno_location() = 0 as libc::c_int;
+    *libc::__errno_location() = 0 as libc::c_int;
     while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
-        if *__errno_location() == 4 as libc::c_int {
-            *__errno_location() = 0 as libc::c_int;
+        if *libc::__errno_location() == 4 as libc::c_int {
+            *libc::__errno_location() = 0 as libc::c_int;
         } else {
-            oerrno = *__errno_location();
+            oerrno = *libc::__errno_location();
             crate::log::sshlog(
                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"reap_helper\0"))
@@ -315,9 +315,9 @@ unsafe extern "C" fn reap_helper(mut pid: pid_t) -> libc::c_int {
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"waitpid: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*__errno_location()),
+                strerror(*libc::__errno_location()),
             );
-            *__errno_location() = oerrno;
+            *libc::__errno_location() = oerrno;
             return -(24 as libc::c_int);
         }
     }
@@ -552,13 +552,13 @@ unsafe extern "C" fn client_converse(
             }
         }
     }
-    oerrno = *__errno_location();
+    oerrno = *libc::__errno_location();
     close(fd);
     r2 = reap_helper(pid);
     if r2 != 0 as libc::c_int {
         if r == 0 as libc::c_int {
             r = r2;
-            oerrno = *__errno_location();
+            oerrno = *libc::__errno_location();
         }
     }
     if r == 0 as libc::c_int {
@@ -568,7 +568,7 @@ unsafe extern "C" fn client_converse(
     sshbuf_free(req);
     sshbuf_free(resp);
     ssh_signal(17 as libc::c_int, osigchld);
-    *__errno_location() = oerrno;
+    *libc::__errno_location() = oerrno;
     return r;
 }
 pub unsafe extern "C" fn sshsk_sign(
@@ -680,7 +680,7 @@ pub unsafe extern "C" fn sshsk_sign(
             }
         }
     }
-    oerrno = *__errno_location();
+    oerrno = *libc::__errno_location();
     if r != 0 as libc::c_int {
         freezero(*sigp as *mut libc::c_void, *lenp);
         *sigp = 0 as *mut u_char;
@@ -689,7 +689,7 @@ pub unsafe extern "C" fn sshsk_sign(
     sshbuf_free(kbuf);
     sshbuf_free(req);
     sshbuf_free(resp);
-    *__errno_location() = oerrno;
+    *libc::__errno_location() = oerrno;
     return r;
 }
 pub unsafe extern "C" fn sshsk_enroll(
@@ -847,13 +847,13 @@ pub unsafe extern "C" fn sshsk_enroll(
             }
         }
     }
-    oerrno = *__errno_location();
+    oerrno = *libc::__errno_location();
     sshkey_free(key);
     sshbuf_free(kbuf);
     sshbuf_free(abuf);
     sshbuf_free(req);
     sshbuf_free(resp);
-    *__errno_location() = oerrno;
+    *libc::__errno_location() = oerrno;
     return r;
 }
 unsafe extern "C" fn sshsk_free_resident_key(mut srk: *mut sshsk_resident_key) {
@@ -1085,7 +1085,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
             }
         }
     }
-    oerrno = *__errno_location();
+    oerrno = *libc::__errno_location();
     sshsk_free_resident_key(srk);
     sshsk_free_resident_keys(srks, nsrks);
     freezero(userid as *mut libc::c_void, userid_len);
@@ -1093,6 +1093,6 @@ pub unsafe extern "C" fn sshsk_load_resident(
     sshbuf_free(kbuf);
     sshbuf_free(req);
     sshbuf_free(resp);
-    *__errno_location() = oerrno;
+    *libc::__errno_location() = oerrno;
     return r;
 }
