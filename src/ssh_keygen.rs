@@ -49,7 +49,7 @@ extern "C" {
     static mut stderr: *mut libc::FILE;
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    fn fflush(__stream: *mut libc::FILE) -> libc::c_int;
+    
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
     fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
     fn setvbuf(
@@ -951,7 +951,7 @@ unsafe extern "C" fn confirm_overwrite(mut filename: *const libc::c_char) -> lib
         filename,
     );
     printf(b"Overwrite (y/n)? \0" as *const u8 as *const libc::c_char);
-    fflush(stdout);
+    libc::fflush(stdout);
     if (fgets(
         yesno.as_mut_ptr(),
         ::core::mem::size_of::<[libc::c_char; 3]>() as libc::c_ulong as libc::c_int,
@@ -1025,7 +1025,7 @@ unsafe extern "C" fn ask_filename(mut pw: *mut passwd, mut prompt: *const libc::
         prompt,
         identity_file.as_mut_ptr(),
     );
-    fflush(stdout);
+    libc::fflush(stdout);
     if (fgets(
         buf.as_mut_ptr(),
         ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong as libc::c_int,
@@ -3127,7 +3127,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                     b"%s \0" as *const u8 as *const libc::c_char,
                     key_types[i as usize].key_type_display,
                 );
-                fflush(stdout);
+                libc::fflush(stdout);
                 type_0 = sshkey_type_from_name(key_types[i as usize].key_type);
                 fd = _ssh_mkstemp(prv_tmp);
                 if fd == -(1 as libc::c_int) {
@@ -4340,7 +4340,7 @@ unsafe extern "C" fn do_change_comment(
         );
     } else {
         printf(b"New comment: \0" as *const u8 as *const libc::c_char);
-        fflush(stdout);
+        libc::fflush(stdout);
         if (fgets(
             new_comment.as_mut_ptr(),
             ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong as libc::c_int,
@@ -7034,7 +7034,7 @@ unsafe extern "C" fn sign_one(
             } else {
                 if fd == 0 as libc::c_int {
                     fputs(asig, stdout);
-                    fflush(stdout);
+                    libc::fflush(stdout);
                     current_block = 14832935472441733737;
                 } else {
                     xasprintf(
@@ -8251,7 +8251,7 @@ unsafe extern "C" fn read_check_passphrase(
         freezero(passphrase2 as *mut libc::c_void, strlen(passphrase2));
         fputs(retry_prompt, stdout);
         fputc('\n' as i32, stdout);
-        fflush(stdout);
+        libc::fflush(stdout);
     }
 }
 unsafe extern "C" fn private_key_passphrase() -> *mut libc::c_char {
@@ -8646,7 +8646,7 @@ unsafe extern "C" fn confirm_sk_overwrite(
         },
     );
     printf(b"Overwrite key in token (y/n)? \0" as *const u8 as *const libc::c_char);
-    fflush(stdout);
+    libc::fflush(stdout);
     if (fgets(
         yesno.as_mut_ptr(),
         ::core::mem::size_of::<[libc::c_char; 3]>() as libc::c_ulong as libc::c_int,
@@ -9756,7 +9756,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                         },
                     );
                 }
-                fflush(stdout);
+                libc::fflush(stdout);
                 r = sshsk_enroll(
                     type_0,
                     sk_provider,

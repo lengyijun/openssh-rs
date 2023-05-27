@@ -27,7 +27,7 @@ extern "C" {
     fn fork() -> __pid_t;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
-    fn fflush(__stream: *mut libc::FILE) -> libc::c_int;
+    
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -4139,7 +4139,7 @@ unsafe extern "C" fn ssh_keysign(
         );
         return -(1 as libc::c_int);
     }
-    if fflush(stdout) != 0 as libc::c_int {
+    if libc::fflush(stdout) != 0 as libc::c_int {
         crate::log::sshlog(
             b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"ssh_keysign\0")).as_ptr(),
@@ -4147,7 +4147,7 @@ unsafe extern "C" fn ssh_keysign(
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"fflush: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::fflush: %s\0" as *const u8 as *const libc::c_char,
             strerror(*__errno_location()),
         );
         return -(1 as libc::c_int);

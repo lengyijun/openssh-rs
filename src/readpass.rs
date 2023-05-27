@@ -24,7 +24,7 @@ extern "C" {
     fn fork() -> __pid_t;
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut stdout: *mut libc::FILE;
-    fn fflush(__stream: *mut libc::FILE) -> libc::c_int;
+    
     fn vsnprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -117,7 +117,7 @@ unsafe extern "C" fn ssh_askpass(
     let mut status: libc::c_int = 0;
     let mut buf: [libc::c_char; 1024] = [0; 1024];
     let mut osigchld: Option<unsafe extern "C" fn(libc::c_int) -> ()> = None;
-    if fflush(stdout) != 0 as libc::c_int {
+    if libc::fflush(stdout) != 0 as libc::c_int {
         crate::log::sshlog(
             b"readpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"ssh_askpass\0")).as_ptr(),
@@ -125,7 +125,7 @@ unsafe extern "C" fn ssh_askpass(
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"fflush: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::fflush: %s\0" as *const u8 as *const libc::c_char,
             strerror(*__errno_location()),
         );
     }
@@ -461,7 +461,7 @@ pub unsafe extern "C" fn notify_start(
     let mut ret: *mut notifier_ctx = 0 as *mut notifier_ctx;
     args_0 = args.clone();
     xvasprintf(&mut prompt, fmt, args_0.as_va_list());
-    if fflush(0 as *mut libc::FILE) != 0 as libc::c_int {
+    if libc::fflush(0 as *mut libc::FILE) != 0 as libc::c_int {
         crate::log::sshlog(
             b"readpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"notify_start\0")).as_ptr(),
@@ -469,7 +469,7 @@ pub unsafe extern "C" fn notify_start(
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"fflush: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::fflush: %s\0" as *const u8 as *const libc::c_char,
             strerror(*__errno_location()),
         );
     }

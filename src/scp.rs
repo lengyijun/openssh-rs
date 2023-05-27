@@ -32,7 +32,7 @@ extern "C" {
     pub type _IO_marker;
     pub type __dirstream;
     static mut stderr: *mut libc::FILE;
-    fn fflush(__stream: *mut libc::FILE) -> libc::c_int;
+    
     fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn vfprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ::core::ffi::VaList) -> libc::c_int;
@@ -4797,7 +4797,7 @@ pub unsafe extern "C" fn run_err(mut fmt: *const libc::c_char, mut args_0: ...) 
         ap = args_0.clone();
         vfprintf(fp, fmt, ap.as_va_list());
         fprintf(fp, b"\n\0" as *const u8 as *const libc::c_char);
-        fflush(fp);
+        libc::fflush(fp);
     }
     if iamremote == 0 {
         ap = args_0.clone();

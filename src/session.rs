@@ -28,7 +28,7 @@ extern "C" {
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    fn fflush(__stream: *mut libc::FILE) -> libc::c_int;
+    
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
@@ -2799,7 +2799,7 @@ pub unsafe extern "C" fn do_setusercontext(mut pw: *mut passwd) {
     }
 }
 unsafe extern "C" fn do_pwchange(mut s: *mut Session) {
-    fflush(0 as *mut libc::FILE);
+    libc::fflush(0 as *mut libc::FILE);
     fprintf(
         stderr,
         b"WARNING: Your password has expired.\n\0" as *const u8 as *const libc::c_char,
@@ -2918,7 +2918,7 @@ pub unsafe extern "C" fn do_child(
         printf(
             b"This service allows sftp connections only.\n\0" as *const u8 as *const libc::c_char,
         );
-        fflush(0 as *mut libc::FILE);
+        libc::fflush(0 as *mut libc::FILE);
         exit(1 as libc::c_int);
     } else if (*s).is_subsystem == 2 as libc::c_int {
         extern "C" {
@@ -2961,7 +2961,7 @@ pub unsafe extern "C" fn do_child(
         __progname = argv[0 as libc::c_int as usize];
         exit(sftp_server_main(i, argv.as_mut_ptr(), (*s).pw));
     }
-    fflush(0 as *mut libc::FILE);
+    libc::fflush(0 as *mut libc::FILE);
     shell0 = strrchr(shell, '/' as i32);
     if !shell0.is_null() {
         shell0 = shell0.offset(1);

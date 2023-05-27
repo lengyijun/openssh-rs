@@ -55,7 +55,7 @@ extern "C" {
     ) -> libc::c_int;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
-    fn fflush(__stream: *mut libc::FILE) -> libc::c_int;
+    
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
@@ -5027,7 +5027,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             b"echo Agent pid %ld;\n\0" as *const u8 as *const libc::c_char,
             parent_pid as libc::c_long,
         );
-        fflush(stdout);
+        libc::fflush(stdout);
     } else {
         pid = fork();
         if pid == -(1 as libc::c_int) {

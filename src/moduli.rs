@@ -12,7 +12,7 @@ extern "C" {
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    fn fflush(__stream: *mut libc::FILE) -> libc::c_int;
+    
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
     fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
@@ -170,7 +170,7 @@ unsafe extern "C" fn qfileout(
         return -(1 as libc::c_int);
     }
     res = fprintf(ofile, b"\n\0" as *const u8 as *const libc::c_char);
-    fflush(ofile);
+    libc::fflush(ofile);
     return if res > 0 as libc::c_int {
         0 as libc::c_int
     } else {
