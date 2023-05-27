@@ -51,7 +51,7 @@ extern "C" {
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    
     fn setvbuf(
         __stream: *mut libc::FILE,
         __buf: *mut libc::c_char,
@@ -3690,7 +3690,7 @@ unsafe extern "C" fn do_known_hosts(
                 strerror(*__errno_location()),
             );
         }
-        ctx.out = fdopen(fd, b"w\0" as *const u8 as *const libc::c_char);
+        ctx.out = libc::fdopen(fd, b"w\0" as *const u8 as *const libc::c_char);
         if (ctx.out).is_null() {
             oerrno = *__errno_location();
             unlink(tmp.as_mut_ptr());
@@ -3702,7 +3702,7 @@ unsafe extern "C" fn do_known_hosts(
                 0 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"fdopen: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::fdopen: %s\0" as *const u8 as *const libc::c_char,
                 strerror(oerrno),
             );
         }

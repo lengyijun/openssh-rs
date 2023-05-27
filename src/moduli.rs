@@ -14,7 +14,7 @@ extern "C" {
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -706,7 +706,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
         );
         return;
     }
-    fp = fdopen(r, b"w\0" as *const u8 as *const libc::c_char);
+    fp = libc::fdopen(r, b"w\0" as *const u8 as *const libc::c_char);
     if fp.is_null() {
         crate::log::sshlog(
             b"moduli.c\0" as *const u8 as *const libc::c_char,
@@ -716,7 +716,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
             0 as libc::c_int,
             SYSLOG_LEVEL_INFO,
             0 as *const libc::c_char,
-            b"write_checkpoint: fdopen: %s\0" as *const u8 as *const libc::c_char,
+            b"write_checkpoint: libc::fdopen: %s\0" as *const u8 as *const libc::c_char,
             strerror(*__errno_location()),
         );
         unlink(tmp.as_mut_ptr());

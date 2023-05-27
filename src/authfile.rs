@@ -16,7 +16,7 @@ extern "C" {
 
     fn getuid() -> __uid_t;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn asprintf(__ptr: *mut *mut libc::c_char, __fmt: *const libc::c_char, _: ...) -> libc::c_int;
     fn __getdelim(
@@ -790,7 +790,7 @@ pub unsafe extern "C" fn sshkey_save_public(
     if fd == -(1 as libc::c_int) {
         return -(24 as libc::c_int);
     }
-    f = fdopen(fd, b"w\0" as *const u8 as *const libc::c_char);
+    f = libc::fdopen(fd, b"w\0" as *const u8 as *const libc::c_char);
     if f.is_null() {
         r = -(24 as libc::c_int);
         close(fd);

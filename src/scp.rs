@@ -33,7 +33,7 @@ extern "C" {
     pub type __dirstream;
     static mut stderr: *mut libc::FILE;
     
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn vfprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ::core::ffi::VaList) -> libc::c_int;
     fn snprintf(
@@ -4784,7 +4784,7 @@ pub unsafe extern "C" fn run_err(mut fmt: *const libc::c_char, mut args_0: ...) 
     errs;
     if !fp.is_null()
         || remout != -(1 as libc::c_int) && {
-            fp = fdopen(remout, b"w\0" as *const u8 as *const libc::c_char);
+            fp = libc::fdopen(remout, b"w\0" as *const u8 as *const libc::c_char);
             !fp.is_null()
         }
     {

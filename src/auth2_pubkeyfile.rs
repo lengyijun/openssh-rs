@@ -10,7 +10,7 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
 
@@ -1172,7 +1172,7 @@ unsafe extern "C" fn auth_openfile(
         return 0 as *mut libc::FILE;
     }
     unset_nonblock(fd);
-    f = fdopen(fd, b"r\0" as *const u8 as *const libc::c_char);
+    f = libc::fdopen(fd, b"r\0" as *const u8 as *const libc::c_char);
     if f.is_null() {
         close(fd);
         return 0 as *mut libc::FILE;

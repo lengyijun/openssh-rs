@@ -60,7 +60,7 @@ extern "C" {
     fn getservbyname(__name: *const libc::c_char, __proto: *const libc::c_char) -> *mut servent;
     fn gai_strerror(__ecode: libc::c_int) -> *const libc::c_char;
     static mut stderr: *mut libc::FILE;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -5110,7 +5110,7 @@ pub unsafe extern "C" fn subprocess(
         {
             close(p[0 as libc::c_int as usize]);
         } else {
-            f = fdopen(
+            f = libc::fdopen(
                 p[0 as libc::c_int as usize],
                 b"r\0" as *const u8 as *const libc::c_char,
             );
@@ -5123,7 +5123,7 @@ pub unsafe extern "C" fn subprocess(
                     0 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"%s: fdopen: %s\0" as *const u8 as *const libc::c_char,
+                    b"%s: libc::fdopen: %s\0" as *const u8 as *const libc::c_char,
                     tag,
                     strerror(*__errno_location()),
                 );

@@ -20,7 +20,7 @@ extern "C" {
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn asprintf(__ptr: *mut *mut libc::c_char, __fmt: *const libc::c_char, _: ...) -> libc::c_int;
     fn fgetc(__stream: *mut libc::FILE) -> libc::c_int;
@@ -1298,7 +1298,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
             );
             r = -(24 as libc::c_int);
         } else {
-            ctx.out = fdopen(fd, b"w\0" as *const u8 as *const libc::c_char);
+            ctx.out = libc::fdopen(fd, b"w\0" as *const u8 as *const libc::c_char);
             if (ctx.out).is_null() {
                 oerrno = *__errno_location();
                 close(fd);
@@ -1312,7 +1312,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"fdopen: %s\0" as *const u8 as *const libc::c_char,
+                    b"libc::fdopen: %s\0" as *const u8 as *const libc::c_char,
                     strerror(oerrno),
                 );
                 r = -(24 as libc::c_int);

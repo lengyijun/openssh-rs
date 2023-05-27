@@ -17,7 +17,7 @@ extern "C" {
         __domain: *const libc::c_char,
     ) -> libc::c_int;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut libc::FILE) -> *mut libc::c_char;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
@@ -348,7 +348,7 @@ unsafe extern "C" fn check_rhosts_file(
         return 0 as libc::c_int;
     }
     unset_nonblock(fd);
-    f = fdopen(fd, b"r\0" as *const u8 as *const libc::c_char);
+    f = libc::fdopen(fd, b"r\0" as *const u8 as *const libc::c_char);
     if f.is_null() {
         close(fd);
         return 0 as libc::c_int;
