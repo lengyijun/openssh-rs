@@ -40,7 +40,7 @@ extern "C" {
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn getpid() -> __pid_t;
     fn getuid() -> __uid_t;
     fn fork() -> __pid_t;
@@ -892,7 +892,7 @@ unsafe extern "C" fn killchild(mut _signo: libc::c_int) {
         kill(pid, 15 as libc::c_int);
         waitpid(pid, 0 as *mut libc::c_int, 0 as libc::c_int);
     }
-    _exit(1 as libc::c_int);
+    libc::_exit(1 as libc::c_int);
 }
 unsafe extern "C" fn suspchild(mut signo: libc::c_int) {
     if sshpid > 1 as libc::c_int {
@@ -1015,7 +1015,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
             shell,
             strerror(*libc::__errno_location()),
         );
-        _exit(1 as libc::c_int);
+        libc::_exit(1 as libc::c_int);
     }
     while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
         if *libc::__errno_location() != 4 as libc::c_int {
@@ -4159,7 +4159,7 @@ unsafe extern "C" fn connect_to_server(
                 b"dup2: %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
-            _exit(1 as libc::c_int);
+            libc::_exit(1 as libc::c_int);
         }
         close(*in_0);
         close(*out);
@@ -4179,7 +4179,7 @@ unsafe extern "C" fn connect_to_server(
             path,
             strerror(*libc::__errno_location()),
         );
-        _exit(1 as libc::c_int);
+        libc::_exit(1 as libc::c_int);
     }
     ssh_signal(
         15 as libc::c_int,

@@ -13,7 +13,7 @@ extern "C" {
     fn closefrom(__lowfd: libc::c_int);
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
     fn execlp(__file: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn fork() -> __pid_t;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
@@ -233,7 +233,7 @@ unsafe extern "C" fn start_helper(
                 b"dup2: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
-            _exit(1 as libc::c_int);
+            libc::_exit(1 as libc::c_int);
         }
         close(pair[0 as libc::c_int as usize]);
         close(pair[1 as libc::c_int as usize]);
@@ -269,7 +269,7 @@ unsafe extern "C" fn start_helper(
             b"execlp: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
-        _exit(1 as libc::c_int);
+        libc::_exit(1 as libc::c_int);
     }
     close(pair[1 as libc::c_int as usize]);
     crate::log::sshlog(

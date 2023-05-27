@@ -27,7 +27,7 @@ extern "C" {
     fn usleep(__useconds: __useconds_t) -> libc::c_int;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn getpid() -> __pid_t;
     fn getppid() -> __pid_t;
     fn setsid() -> __pid_t;
@@ -4665,17 +4665,17 @@ unsafe extern "C" fn cleanup_socket() {
 }
 pub unsafe extern "C" fn cleanup_exit(mut i: libc::c_int) -> ! {
     cleanup_socket();
-    _exit(i);
+    libc::_exit(i);
 }
 unsafe extern "C" fn cleanup_handler(mut _sig: libc::c_int) {
     cleanup_socket();
     pkcs11_terminate();
-    _exit(2 as libc::c_int);
+    libc::_exit(2 as libc::c_int);
 }
 unsafe extern "C" fn check_parent_exists() {
     if parent_pid != -(1 as libc::c_int) && getppid() != parent_pid {
         cleanup_socket();
-        _exit(2 as libc::c_int);
+        libc::_exit(2 as libc::c_int);
     }
 }
 unsafe extern "C" fn usage() {

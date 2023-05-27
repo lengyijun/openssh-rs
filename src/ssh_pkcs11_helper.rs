@@ -12,7 +12,7 @@ extern "C" {
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn BSDgetopt(
         ___argc: libc::c_int,
         ___argv: *const *mut libc::c_char,
@@ -787,7 +787,7 @@ unsafe extern "C" fn process() {
     }
 }
 pub unsafe extern "C" fn cleanup_exit(mut i: libc::c_int) -> ! {
-    _exit(i);
+    libc::_exit(i);
 }
 unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> libc::c_int {
     let mut r: libc::c_int = 0;

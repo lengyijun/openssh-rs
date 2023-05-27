@@ -93,7 +93,7 @@ extern "C" {
     fn getppid() -> __pid_t;
     fn getpid() -> __pid_t;
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -4939,7 +4939,7 @@ pub unsafe extern "C" fn subprocess(
                         b"/dev/null\0" as *const u8 as *const libc::c_char,
                         strerror(*libc::__errno_location()),
                     );
-                    _exit(1 as libc::c_int);
+                    libc::_exit(1 as libc::c_int);
                 }
                 if dup2(devnull, 0 as libc::c_int) == -(1 as libc::c_int) {
                     crate::log::sshlog(
@@ -4956,7 +4956,7 @@ pub unsafe extern "C" fn subprocess(
                         tag,
                         strerror(*libc::__errno_location()),
                     );
-                    _exit(1 as libc::c_int);
+                    libc::_exit(1 as libc::c_int);
                 }
                 fd = -(1 as libc::c_int);
                 if flags & ((1 as libc::c_int) << 1 as libc::c_int) as libc::c_uint
@@ -4983,7 +4983,7 @@ pub unsafe extern "C" fn subprocess(
                         tag,
                         strerror(*libc::__errno_location()),
                     );
-                    _exit(1 as libc::c_int);
+                    libc::_exit(1 as libc::c_int);
                 }
                 closefrom(2 as libc::c_int + 1 as libc::c_int);
                 if geteuid() == 0 as libc::c_int as libc::c_uint
@@ -5005,7 +5005,7 @@ pub unsafe extern "C" fn subprocess(
                         (*pw).pw_gid,
                         strerror(*libc::__errno_location()),
                     );
-                    _exit(1 as libc::c_int);
+                    libc::_exit(1 as libc::c_int);
                 }
                 if setresgid((*pw).pw_gid, (*pw).pw_gid, (*pw).pw_gid) == -(1 as libc::c_int) {
                     crate::log::sshlog(
@@ -5023,7 +5023,7 @@ pub unsafe extern "C" fn subprocess(
                         (*pw).pw_gid,
                         strerror(*libc::__errno_location()),
                     );
-                    _exit(1 as libc::c_int);
+                    libc::_exit(1 as libc::c_int);
                 }
                 if setresuid((*pw).pw_uid, (*pw).pw_uid, (*pw).pw_uid) == -(1 as libc::c_int) {
                     crate::log::sshlog(
@@ -5041,7 +5041,7 @@ pub unsafe extern "C" fn subprocess(
                         (*pw).pw_uid,
                         strerror(*libc::__errno_location()),
                     );
-                    _exit(1 as libc::c_int);
+                    libc::_exit(1 as libc::c_int);
                 }
                 if flags & 1 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint
                     && dup2(0 as libc::c_int, 2 as libc::c_int) == -(1 as libc::c_int)
@@ -5060,7 +5060,7 @@ pub unsafe extern "C" fn subprocess(
                         tag,
                         strerror(*libc::__errno_location()),
                     );
-                    _exit(1 as libc::c_int);
+                    libc::_exit(1 as libc::c_int);
                 }
                 if !env.is_null() {
                     execve(
@@ -5092,7 +5092,7 @@ pub unsafe extern "C" fn subprocess(
                     command,
                     strerror(*libc::__errno_location()),
                 );
-                _exit(127 as libc::c_int);
+                libc::_exit(127 as libc::c_int);
             }
             _ => {}
         }

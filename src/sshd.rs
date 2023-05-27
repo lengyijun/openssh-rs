@@ -86,7 +86,7 @@ extern "C" {
     fn dup(__fd: libc::c_int) -> libc::c_int;
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn getpid() -> __pid_t;
     fn getpgid(__pid: __pid_t) -> __pid_t;
     fn setsid() -> __pid_t;
@@ -5406,7 +5406,7 @@ pub unsafe extern "C" fn cleanup_exit(mut i: libc::c_int) -> ! {
             }
         }
     }
-    _exit(i);
+    libc::_exit(i);
 }
 pub fn main() {
     let mut args: Vec<*mut libc::c_char> = Vec::new();

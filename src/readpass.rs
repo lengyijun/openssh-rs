@@ -20,7 +20,7 @@ extern "C" {
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
     fn execlp(__file: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn fork() -> __pid_t;
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut stdout: *mut libc::FILE;
@@ -571,7 +571,7 @@ pub unsafe extern "C" fn notify_start(
                     askpass,
                     strerror(*libc::__errno_location()),
                 );
-                _exit(1 as libc::c_int);
+                libc::_exit(1 as libc::c_int);
             }
             current_block = 8351141560393962031;
         }

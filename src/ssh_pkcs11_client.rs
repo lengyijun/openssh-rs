@@ -19,7 +19,7 @@ extern "C" {
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
     fn execlp(__file: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn fork() -> __pid_t;
     static mut stderr: *mut libc::FILE;
 
@@ -880,7 +880,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
                 b"dup2: %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
-            _exit(1 as libc::c_int);
+            libc::_exit(1 as libc::c_int);
         }
         close(pair[0 as libc::c_int as usize]);
         close(pair[1 as libc::c_int as usize]);
@@ -917,7 +917,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             helper,
             strerror(*libc::__errno_location()),
         );
-        _exit(1 as libc::c_int);
+        libc::_exit(1 as libc::c_int);
     }
     close(pair[1 as libc::c_int as usize]);
     fd = pair[0 as libc::c_int as usize];

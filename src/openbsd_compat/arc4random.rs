@@ -9,7 +9,7 @@ extern "C" {
         __offset: __off_t,
     ) -> *mut libc::c_void;
     fn munmap(__addr: *mut libc::c_void, __len: size_t) -> libc::c_int;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn getpid() -> __pid_t;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -788,7 +788,7 @@ unsafe extern "C" fn _rs_init(mut buf: *mut u_char, mut n: size_t) {
     }
     if rs.is_null() {
         if _rs_allocate(&mut rs, &mut rsx) == -(1 as libc::c_int) {
-            _exit(1 as libc::c_int);
+            libc::_exit(1 as libc::c_int);
         }
     }
     chacha_keysetup(

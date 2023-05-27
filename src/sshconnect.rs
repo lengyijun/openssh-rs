@@ -44,7 +44,7 @@ extern "C" {
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn fork() -> __pid_t;
     fn getaddrinfo(
         __name: *const libc::c_char,
@@ -4622,7 +4622,7 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
             args,
             strerror(*libc::__errno_location()),
         );
-        _exit(1 as libc::c_int);
+        libc::_exit(1 as libc::c_int);
     } else if pid == -(1 as libc::c_int) {
         sshfatal(
             b"sshconnect.c\0" as *const u8 as *const libc::c_char,

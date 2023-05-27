@@ -48,7 +48,7 @@ extern "C" {
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn dup2(__fd: libc::c_int, __fd2: libc::c_int) -> libc::c_int;
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn getpid() -> __pid_t;
     fn getuid() -> __uid_t;
     fn fork() -> __pid_t;
@@ -379,7 +379,7 @@ unsafe extern "C" fn killchild(mut signo: libc::c_int) {
         waitpid(do_cmd_pid2, 0 as *mut libc::c_int, 0 as libc::c_int);
     }
     if signo != 0 {
-        _exit(1 as libc::c_int);
+        libc::_exit(1 as libc::c_int);
     }
     libc::exit(1 as libc::c_int);
 }
@@ -571,7 +571,7 @@ pub unsafe extern "C" fn do_cmd(
                     b"dup2: %s\0" as *const u8 as *const libc::c_char,
                     strerror(*libc::__errno_location()),
                 );
-                _exit(1 as libc::c_int);
+                libc::_exit(1 as libc::c_int);
             }
             close(sv[0 as libc::c_int as usize]);
             close(sv[1 as libc::c_int as usize]);
@@ -625,7 +625,7 @@ pub unsafe extern "C" fn do_cmd(
             );
             execvp(program, args.list as *const *mut libc::c_char);
             perror(program);
-            _exit(1 as libc::c_int);
+            libc::_exit(1 as libc::c_int);
         }
         _ => {
             close(sv[0 as libc::c_int as usize]);
@@ -4962,7 +4962,7 @@ pub unsafe extern "C" fn lostconn(mut signo: libc::c_int) {
         );
     }
     if signo != 0 {
-        _exit(1 as libc::c_int);
+        libc::_exit(1 as libc::c_int);
     } else {
         libc::exit(1 as libc::c_int);
     };

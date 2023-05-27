@@ -49,7 +49,7 @@ extern "C" {
     ) -> libc::c_int;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn getcwd(__buf: *mut libc::c_char, __size: size_t) -> *mut libc::c_char;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn link(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
     fn symlink(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
     fn readlink(__path: *const libc::c_char, __buf: *mut libc::c_char, __len: size_t) -> ssize_t;
@@ -4732,7 +4732,7 @@ pub unsafe extern "C" fn sftp_server_cleanup_exit(mut i: libc::c_int) -> ! {
             client_addr,
         );
     }
-    _exit(i);
+    libc::_exit(i);
 }
 unsafe extern "C" fn sftp_server_usage() {
     extern "C" {

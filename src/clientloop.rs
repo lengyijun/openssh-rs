@@ -56,7 +56,7 @@ extern "C" {
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn fork() -> __pid_t;
     fn getpid() -> __pid_t;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
@@ -6839,7 +6839,7 @@ pub unsafe extern "C" fn cleanup_exit(mut i: libc::c_int) -> ! {
         unlink(options.control_path);
     }
     ssh_kill_proxy_command();
-    _exit(i);
+    libc::_exit(i);
 }
 unsafe extern "C" fn run_static_initializers() {
     global_confirms = {

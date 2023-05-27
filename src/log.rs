@@ -9,7 +9,7 @@ extern "C" {
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
-    fn _exit(_: libc::c_int) -> !;
+    
     fn getpid() -> __pid_t;
     static mut stderr: *mut libc::FILE;
 
@@ -699,7 +699,7 @@ pub unsafe extern "C" fn sshsigdie(
         fmt,
         args_0.as_va_list(),
     );
-    _exit(1 as libc::c_int);
+    libc::_exit(1 as libc::c_int);
 }
 pub unsafe extern "C" fn sshlogv(
     mut file: *const libc::c_char,
