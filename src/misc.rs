@@ -61,7 +61,6 @@ extern "C" {
     fn gai_strerror(__ecode: libc::c_int) -> *const libc::c_char;
     static mut stderr: *mut libc::FILE;
 
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -2641,7 +2640,7 @@ pub unsafe extern "C" fn sanitise_stdfd() {
     );
     nullfd = dupfd;
     if nullfd == -(1 as libc::c_int) {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Couldn't open /dev/null: %s\n\0" as *const u8 as *const libc::c_char,
             strerror(*__errno_location()),
@@ -2657,7 +2656,7 @@ pub unsafe extern "C" fn sanitise_stdfd() {
             && *__errno_location() == 9 as libc::c_int
         {
             if dup2(nullfd, dupfd) == -(1 as libc::c_int) {
-                fprintf(
+                libc::fprintf(
                     stderr,
                     b"dup2: %s\n\0" as *const u8 as *const libc::c_char,
                     strerror(*__errno_location()),

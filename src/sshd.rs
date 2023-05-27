@@ -34,7 +34,7 @@ extern "C" {
     static mut stderr: *mut libc::FILE;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -2308,13 +2308,13 @@ unsafe extern "C" fn drop_connection(
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn usage() {
-    fprintf(
+    libc::fprintf(
         stderr,
         b"%s, %s\n\0" as *const u8 as *const libc::c_char,
         b"OpenSSH_9.3p1\0" as *const u8 as *const libc::c_char,
         OpenSSL_version(0 as libc::c_int),
     );
-    fprintf(
+    libc::fprintf(
         stderr,
         b"usage: sshd [-46DdeGiqTtV] [-C connection_spec] [-c host_cert_file]\n            [-E log_file] [-f config_file] [-g login_grace_time]\n            [-h host_key_file] [-o option] [-p port] [-u len]\n\0"
             as *const u8 as *const libc::c_char,
@@ -3855,7 +3855,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             112 => {
                 options.ports_from_cmdline = 1 as libc::c_int as u_int;
                 if options.num_ports >= 256 as libc::c_int as libc::c_uint {
-                    fprintf(
+                    libc::fprintf(
                         stderr,
                         b"too many ports.\n\0" as *const u8 as *const libc::c_char,
                     );
@@ -3868,7 +3868,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     [(options.num_ports).wrapping_sub(1 as libc::c_int as libc::c_uint) as usize]
                     <= 0 as libc::c_int
                 {
-                    fprintf(
+                    libc::fprintf(
                         stderr,
                         b"Bad port number.\n\0" as *const u8 as *const libc::c_char,
                     );
@@ -3879,7 +3879,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             103 => {
                 options.login_grace_time = convtime(BSDoptarg);
                 if options.login_grace_time == -(1 as libc::c_int) {
-                    fprintf(
+                    libc::fprintf(
                         stderr,
                         b"Invalid login grace time.\n\0" as *const u8 as *const libc::c_char,
                     );
@@ -3923,7 +3923,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     0 as *mut *const libc::c_char,
                 ) as u_int;
                 if utmp_len > (64 as libc::c_int + 1 as libc::c_int) as libc::c_uint {
-                    fprintf(
+                    libc::fprintf(
                         stderr,
                         b"Invalid utmp length.\n\0" as *const u8 as *const libc::c_char,
                     );
@@ -3949,7 +3949,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 current_block_66 = 7178192492338286402;
             }
             86 => {
-                fprintf(
+                libc::fprintf(
                     stderr,
                     b"%s, %s\n\0" as *const u8 as *const libc::c_char,
                     b"OpenSSH_9.3\0" as *const u8 as *const libc::c_char,
@@ -4151,7 +4151,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         }
     }
     if BSDoptind < ac {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Extra argument %s.\n\0" as *const u8 as *const libc::c_char,
             *av.offset(BSDoptind as isize),
@@ -4777,7 +4777,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     strerror(*__errno_location()),
                 );
             } else {
-                fprintf(
+                libc::fprintf(
                     f,
                     b"%ld\n\0" as *const u8 as *const libc::c_char,
                     getpid() as libc::c_long,

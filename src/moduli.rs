@@ -15,7 +15,6 @@ extern "C" {
 
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
 
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -152,7 +151,7 @@ unsafe extern "C" fn qfileout(
     if gtm.is_null() {
         return -(1 as libc::c_int);
     }
-    res = fprintf(
+    res = libc::fprintf(
         ofile,
         b"%04d%02d%02d%02d%02d%02d %u %u %u %u %x \0" as *const u8 as *const libc::c_char,
         (*gtm).tm_year + 1900 as libc::c_int,
@@ -173,7 +172,7 @@ unsafe extern "C" fn qfileout(
     if BN_print_fp(ofile, omodulus) < 1 as libc::c_int {
         return -(1 as libc::c_int);
     }
-    res = fprintf(ofile, b"\n\0" as *const u8 as *const libc::c_char);
+    res = libc::fprintf(ofile, b"\n\0" as *const u8 as *const libc::c_char);
     libc::fflush(ofile);
     return if res > 0 as libc::c_int {
         0 as libc::c_int
@@ -727,7 +726,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
         close(r);
         return;
     }
-    writeok = (fprintf(
+    writeok = (libc::fprintf(
         fp,
         b"%lu\n\0" as *const u8 as *const libc::c_char,
         lineno as libc::c_ulong,

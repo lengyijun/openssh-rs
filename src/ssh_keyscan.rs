@@ -54,7 +54,7 @@ extern "C" {
     static mut stderr: *mut libc::FILE;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -1062,7 +1062,7 @@ unsafe extern "C" fn keygrab_ssh2(mut c: *mut con) {
     r = kex_setup((*c).c_ssh, myproposal.as_mut_ptr());
     if r != 0 as libc::c_int {
         free((*c).c_ssh as *mut libc::c_void);
-        fprintf(
+        libc::fprintf(
             stderr,
             b"kex_setup: %s\n\0" as *const u8 as *const libc::c_char,
             ssh_err(r),
@@ -1131,7 +1131,7 @@ unsafe extern "C" fn keyprint_one(mut host: *const libc::c_char, mut key: *mut s
     }
     known_host = if hash_hosts != 0 { hashed } else { hostport };
     if get_cert == 0 {
-        r = fprintf(
+        r = libc::fprintf(
             stdout,
             b"%s \0" as *const u8 as *const libc::c_char,
             known_host,
@@ -1641,7 +1641,7 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
         confree(s);
         return;
     }
-    fprintf(
+    libc::fprintf(
         stderr,
         b"%c %s:%d %s\n\0" as *const u8 as *const libc::c_char,
         if print_sshfp != 0 {
@@ -1935,7 +1935,7 @@ pub unsafe extern "C" fn sshfatal(
     cleanup_exit(255 as libc::c_int);
 }
 unsafe extern "C" fn usage() {
-    fprintf(
+    libc::fprintf(
         stderr,
         b"usage: ssh-keyscan [-46cDHv] [-f file] [-O option] [-p port] [-T timeout]\n                   [-t type] [host | addrlist namelist]\n\0"
             as *const u8 as *const libc::c_char,
@@ -1991,7 +1991,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             112 => {
                 ssh_port = crate::misc::a2port(BSDoptarg);
                 if ssh_port <= 0 as libc::c_int {
-                    fprintf(
+                    libc::fprintf(
                         stderr,
                         b"Bad port '%s'\n\0" as *const u8 as *const libc::c_char,
                         BSDoptarg,
@@ -2002,7 +2002,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             84 => {
                 timeout = convtime(BSDoptarg);
                 if timeout == -(1 as libc::c_int) || timeout == 0 as libc::c_int {
-                    fprintf(
+                    libc::fprintf(
                         stderr,
                         b"Bad timeout '%s'\n\0" as *const u8 as *const libc::c_char,
                         BSDoptarg,

@@ -9,7 +9,7 @@ extern "C" {
     pub type ec_key_st;
     pub type bitmap;
     fn __errno_location() -> *mut libc::c_int;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn fputc(__c: libc::c_int, __stream: *mut libc::FILE) -> libc::c_int;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
@@ -4074,12 +4074,12 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
         timestamp.as_mut_ptr(),
         ::core::mem::size_of::<[libc::c_char; 64]>() as libc::c_ulong,
     );
-    fprintf(
+    libc::fprintf(
         f,
         b"# KRL version %llu\n\0" as *const u8 as *const libc::c_char,
         (*krl).krl_version as libc::c_ulonglong,
     );
-    fprintf(
+    libc::fprintf(
         f,
         b"# Generated at %s\n\0" as *const u8 as *const libc::c_char,
         timestamp.as_mut_ptr(),
@@ -4093,7 +4093,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
             b"%s\0" as *const u8 as *const libc::c_char,
             (*krl).comment,
         );
-        fprintf(
+        libc::fprintf(
             f,
             b"# Comment: %s\n\0" as *const u8 as *const libc::c_char,
             fp,
@@ -4130,7 +4130,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
                     b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
                 );
             } else {
-                fprintf(
+                libc::fprintf(
                     f,
                     b"hash: %s # %s\n\0" as *const u8 as *const libc::c_char,
                     fp,
@@ -4145,7 +4145,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
     rb = revoked_blob_tree_RB_MINMAX(&mut (*krl).revoked_sha256s, -(1 as libc::c_int));
     while !rb.is_null() {
         fp = tohex((*rb).blob as *const libc::c_void, (*rb).len);
-        fprintf(
+        libc::fprintf(
             f,
             b"hash: SHA256:%s\n\0" as *const u8 as *const libc::c_char,
             fp,
@@ -4156,7 +4156,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
     rb = revoked_blob_tree_RB_MINMAX(&mut (*krl).revoked_sha1s, -(1 as libc::c_int));
     while !rb.is_null() {
         fp = tohex((*rb).blob as *const libc::c_void, (*rb).len);
-        fprintf(
+        libc::fprintf(
             f,
             b"# hash SHA1:%s\n\0" as *const u8 as *const libc::c_char,
             fp,
@@ -4169,7 +4169,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
     while !rc.is_null() {
         fputc('\n' as i32, f);
         if ((*rc).ca_key).is_null() {
-            fprintf(f, b"# Wildcard CA\n\0" as *const u8 as *const libc::c_char);
+            libc::fprintf(f, b"# Wildcard CA\n\0" as *const u8 as *const libc::c_char);
             current_block_52 = 8180496224585318153;
         } else {
             fp = sshkey_fingerprint((*rc).ca_key, 2 as libc::c_int, SSH_FP_DEFAULT);
@@ -4187,7 +4187,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
                 );
                 current_block_52 = 4761528863920922185;
             } else {
-                fprintf(
+                libc::fprintf(
                     f,
                     b"# CA key %s %s\n\0" as *const u8 as *const libc::c_char,
                     sshkey_ssh_name((*rc).ca_key),
@@ -4202,13 +4202,13 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
                 rs = revoked_serial_tree_RB_MINMAX(&mut (*rc).revoked_serials, -(1 as libc::c_int));
                 while !rs.is_null() {
                     if (*rs).lo == (*rs).hi {
-                        fprintf(
+                        libc::fprintf(
                             f,
                             b"serial: %llu\n\0" as *const u8 as *const libc::c_char,
                             (*rs).lo as libc::c_ulonglong,
                         );
                     } else {
-                        fprintf(
+                        libc::fprintf(
                             f,
                             b"serial: %llu-%llu\n\0" as *const u8 as *const libc::c_char,
                             (*rs).lo as libc::c_ulonglong,
@@ -4228,7 +4228,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
                         b"%s\0" as *const u8 as *const libc::c_char,
                         (*rki).key_id,
                     );
-                    fprintf(f, b"id: %s\n\0" as *const u8 as *const libc::c_char, fp);
+                    libc::fprintf(f, b"id: %s\n\0" as *const u8 as *const libc::c_char, fp);
                     free(fp as *mut libc::c_void);
                     rki = revoked_key_id_tree_RB_NEXT(rki);
                 }

@@ -58,7 +58,7 @@ extern "C" {
         __modes: libc::c_int,
         __n: size_t,
     ) -> libc::c_int;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -1169,18 +1169,18 @@ unsafe extern "C" fn do_convert_to_ssh2(mut pw: *mut passwd, mut k: *mut sshkey)
     );
     sshkey_free(k);
     sshbuf_free(b);
-    fprintf(
+    libc::fprintf(
         stdout,
         b"%s\n\0" as *const u8 as *const libc::c_char,
         b"---- BEGIN SSH2 PUBLIC KEY ----\0" as *const u8 as *const libc::c_char,
     );
-    fprintf(
+    libc::fprintf(
         stdout,
         b"Comment: \"%s\"\n%s\0" as *const u8 as *const libc::c_char,
         comment.as_mut_ptr(),
         b64,
     );
-    fprintf(
+    libc::fprintf(
         stdout,
         b"%s\n\0" as *const u8 as *const libc::c_char,
         b"---- END SSH2 PUBLIC KEY ----\0" as *const u8 as *const libc::c_char,
@@ -2428,7 +2428,7 @@ unsafe extern "C" fn do_convert_from(mut pw: *mut passwd) {
             ok = 1 as libc::c_int;
         }
         if ok != 0 {
-            fprintf(stdout, b"\n\0" as *const u8 as *const libc::c_char);
+            libc::fprintf(stdout, b"\n\0" as *const u8 as *const libc::c_char);
         }
     } else {
         match (*k).type_0 {
@@ -2562,13 +2562,13 @@ unsafe extern "C" fn do_print_public(mut pw: *mut passwd) {
         );
     }
     if !comment.is_null() && *comment as libc::c_int != '\0' as i32 {
-        fprintf(
+        libc::fprintf(
             stdout,
             b" %s\0" as *const u8 as *const libc::c_char,
             comment,
         );
     }
-    fprintf(stdout, b"\n\0" as *const u8 as *const libc::c_char);
+    libc::fprintf(stdout, b"\n\0" as *const u8 as *const libc::c_char);
     if sshkey_is_sk(prv) != 0 {
         crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -2654,7 +2654,7 @@ unsafe extern "C" fn do_download(mut _pw: *mut passwd) {
             free(fp as *mut libc::c_void);
         } else {
             sshkey_write(*keys.offset(i as isize), stdout);
-            fprintf(
+            libc::fprintf(
                 stdout,
                 b"%s%s\n\0" as *const u8 as *const libc::c_char,
                 if **comments.offset(i as isize) as libc::c_int == '\0' as i32 {
@@ -3342,7 +3342,7 @@ unsafe extern "C" fn known_hosts_hash(
     match (*l).status {
         0 | 3 => {
             if was_hashed != 0 || has_wild != 0 || (*l).marker != MRK_NONE as libc::c_int {
-                fprintf(
+                libc::fprintf(
                     (*ctx).out,
                     b"%s\n\0" as *const u8 as *const libc::c_char,
                     (*l).line,
@@ -3390,7 +3390,7 @@ unsafe extern "C" fn known_hosts_hash(
                         b"hash_host failed\0" as *const u8 as *const libc::c_char,
                     );
                 }
-                fprintf(
+                libc::fprintf(
                     (*ctx).out,
                     b"%s %s\n\0" as *const u8 as *const libc::c_char,
                     hashed,
@@ -3419,7 +3419,7 @@ unsafe extern "C" fn known_hosts_hash(
         }
         _ => {}
     }
-    fprintf(
+    libc::fprintf(
         (*ctx).out,
         b"%s\n\0" as *const u8 as *const libc::c_char,
         (*l).line,
@@ -3448,7 +3448,7 @@ unsafe extern "C" fn known_hosts_find_delete(
     if (*l).status == 3 as libc::c_int as libc::c_uint {
         if (*ctx).delete_host != 0 {
             if (*l).marker != MRK_NONE as libc::c_int {
-                fprintf(
+                libc::fprintf(
                     (*ctx).out,
                     b"%s\n\0" as *const u8 as *const libc::c_char,
                     (*l).line,
@@ -3517,7 +3517,7 @@ unsafe extern "C" fn known_hosts_find_delete(
                 free(ra as *mut libc::c_void);
                 free(fp as *mut libc::c_void);
             } else {
-                fprintf(
+                libc::fprintf(
                     (*ctx).out,
                     b"%s\n\0" as *const u8 as *const libc::c_char,
                     (*l).line,
@@ -3543,7 +3543,7 @@ unsafe extern "C" fn known_hosts_find_delete(
                 (*l).linenum,
             );
         }
-        fprintf(
+        libc::fprintf(
             (*ctx).out,
             b"%s\n\0" as *const u8 as *const libc::c_char,
             (*l).line,
@@ -6936,12 +6936,12 @@ unsafe extern "C" fn sign_one(
     let mut prompt: *mut libc::c_char = 0 as *mut libc::c_char;
     if quiet == 0 {
         if fd == 0 as libc::c_int {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Signing data on standard input\n\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Signing file %s\n\0" as *const u8 as *const libc::c_char,
                 filename,
@@ -6983,7 +6983,7 @@ unsafe extern "C" fn sign_one(
                     b"fingerprint failed\0" as *const u8 as *const libc::c_char,
                 );
             }
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Confirm user presence for key %s %s\n\0" as *const u8 as *const libc::c_char,
                 sshkey_type(signkey),
@@ -7128,7 +7128,7 @@ unsafe extern "C" fn sign_one(
                             current_block = 6958312750300924261;
                         } else {
                             if quiet == 0 {
-                                fprintf(
+                                libc::fprintf(
                                     stderr,
                                     b"Write signature to %s\n\0" as *const u8
                                         as *const libc::c_char,
@@ -7837,7 +7837,7 @@ unsafe extern "C" fn sig_find_principals(
             puts(cp);
         }
     } else {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"No principal matched.\n\0" as *const u8 as *const libc::c_char,
         );
@@ -7881,7 +7881,7 @@ unsafe extern "C" fn sig_match_principals(
             b"match: %s\0" as *const u8 as *const libc::c_char,
             ssh_err(r),
         );
-        fprintf(
+        libc::fprintf(
             stderr,
             b"No principal matched.\n\0" as *const u8 as *const libc::c_char,
         );
@@ -8673,16 +8673,16 @@ unsafe extern "C" fn confirm_sk_overwrite(
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn usage() {
-    fprintf(
+    libc::fprintf(
         stderr,
         b"usage: ssh-keygen [-q] [-a rounds] [-b bits] [-C comment] [-f output_keyfile]\n                  [-m format] [-N new_passphrase] [-O option]\n                  [-t dsa | ecdsa | ecdsa-sk | ed25519 | ed25519-sk | rsa]\n                  [-w provider] [-Z cipher]\n       ssh-keygen -p [-a rounds] [-f keyfile] [-m format] [-N new_passphrase]\n                   [-P old_passphrase] [-Z cipher]\n       ssh-keygen -i [-f input_keyfile] [-m key_format]\n       ssh-keygen -e [-f input_keyfile] [-m key_format]\n       ssh-keygen -y [-f input_keyfile]\n       ssh-keygen -c [-a rounds] [-C comment] [-f keyfile] [-P passphrase]\n       ssh-keygen -l [-v] [-E fingerprint_hash] [-f input_keyfile]\n       ssh-keygen -B [-f input_keyfile]\n\0"
             as *const u8 as *const libc::c_char,
     );
-    fprintf(
+    libc::fprintf(
         stderr,
         b"       ssh-keygen -D pkcs11\n\0" as *const u8 as *const libc::c_char,
     );
-    fprintf(
+    libc::fprintf(
         stderr,
         b"       ssh-keygen -F hostname [-lv] [-f known_hosts_file]\n       ssh-keygen -H [-f known_hosts_file]\n       ssh-keygen -K [-a rounds] [-w provider]\n       ssh-keygen -R hostname [-f known_hosts_file]\n       ssh-keygen -r hostname [-g] [-f input_keyfile]\n       ssh-keygen -M generate [-O option] output_file\n       ssh-keygen -M screen [-f input_file] [-O option] output_file\n       ssh-keygen -I certificate_identity -s ca_key [-hU] [-D pkcs11_provider]\n                  [-n principals] [-O option] [-V validity_interval]\n                  [-z serial_number] file ...\n       ssh-keygen -L [-f input_keyfile]\n       ssh-keygen -A [-a rounds] [-f prefix_path]\n       ssh-keygen -k -f krl_file [-u] [-s ca_public] [-z version_number]\n                  file ...\n       ssh-keygen -Q [-l] -f krl_file [file ...]\n       ssh-keygen -Y find-principals -s signature_file -f allowed_signers_file\n       ssh-keygen -Y match-principals -I signer_identity -f allowed_signers_file\n       ssh-keygen -Y check-novalidate -n namespace -s signature_file\n       ssh-keygen -Y sign -f key_file -n namespace file [-O option] ...\n       ssh-keygen -Y verify -f allowed_signers_file -I signer_identity\n                  -n namespace -s signature_file [-r krl_file] [-O option]\n\0"
             as *const u8 as *const libc::c_char,

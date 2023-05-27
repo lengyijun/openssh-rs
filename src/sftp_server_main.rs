@@ -6,7 +6,7 @@ extern "C" {
     fn getuid() -> __uid_t;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     static mut stderr: *mut libc::FILE;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn sftp_server_main(_: libc::c_int, _: *mut *mut libc::c_char, _: *mut passwd) -> libc::c_int;
     fn sftp_server_cleanup_exit(_: libc::c_int) -> !;
 
@@ -40,7 +40,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     crate::misc::sanitise_stdfd();
     user_pw = getpwuid(getuid());
     if user_pw.is_null() {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"No user found for uid %lu\n\0" as *const u8 as *const libc::c_char,
             getuid() as u_long,

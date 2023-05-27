@@ -20,7 +20,7 @@ extern "C" {
         __shortopts: *const libc::c_char,
     ) -> libc::c_int;
     static mut stderr: *mut libc::FILE;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
@@ -853,7 +853,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 }
             }
             _ => {
-                fprintf(
+                libc::fprintf(
                     stderr,
                     b"usage: %s [-v]\n\0" as *const u8 as *const libc::c_char,
                     __progname,

@@ -6,7 +6,7 @@ extern "C" {
     pub type sshbuf;
     fn __errno_location() -> *mut libc::c_int;
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn __b64_ntop(
         _: *const libc::c_uchar,
         _: size_t,
@@ -73,22 +73,22 @@ pub unsafe extern "C" fn sshbuf_dump_data(
     let mut p: *const u_char = s as *const u_char;
     i = 0 as libc::c_int as size_t;
     while i < len {
-        fprintf(f, b"%.4zu: \0" as *const u8 as *const libc::c_char, i);
+        libc::fprintf(f, b"%.4zu: \0" as *const u8 as *const libc::c_char, i);
         j = i;
         while j < i.wrapping_add(16 as libc::c_int as libc::c_ulong) {
             if j < len {
-                fprintf(
+                libc::fprintf(
                     f,
                     b"%02x \0" as *const u8 as *const libc::c_char,
                     *p.offset(j as isize) as libc::c_int,
                 );
             } else {
-                fprintf(f, b"   \0" as *const u8 as *const libc::c_char);
+                libc::fprintf(f, b"   \0" as *const u8 as *const libc::c_char);
             }
             j = j.wrapping_add(1);
             j;
         }
-        fprintf(f, b" \0" as *const u8 as *const libc::c_char);
+        libc::fprintf(f, b" \0" as *const u8 as *const libc::c_char);
         j = i;
         while j < i.wrapping_add(16 as libc::c_int as libc::c_ulong) {
             if j < len {
@@ -98,25 +98,25 @@ pub unsafe extern "C" fn sshbuf_dump_data(
                         & _ISprint as libc::c_int as libc::c_ushort as libc::c_int
                         != 0
                 {
-                    fprintf(
+                    libc::fprintf(
                         f,
                         b"%c\0" as *const u8 as *const libc::c_char,
                         *p.offset(j as isize) as libc::c_int,
                     );
                 } else {
-                    fprintf(f, b".\0" as *const u8 as *const libc::c_char);
+                    libc::fprintf(f, b".\0" as *const u8 as *const libc::c_char);
                 }
             }
             j = j.wrapping_add(1);
             j;
         }
-        fprintf(f, b"\n\0" as *const u8 as *const libc::c_char);
+        libc::fprintf(f, b"\n\0" as *const u8 as *const libc::c_char);
         i = (i as libc::c_ulong).wrapping_add(16 as libc::c_int as libc::c_ulong) as size_t
             as size_t;
     }
 }
 pub unsafe extern "C" fn sshbuf_dump(mut buf: *const sshbuf, mut f: *mut libc::FILE) {
-    fprintf(
+    libc::fprintf(
         f,
         b"buffer len = %zu\n\0" as *const u8 as *const libc::c_char,
         sshbuf_len(buf),

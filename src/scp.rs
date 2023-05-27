@@ -35,7 +35,6 @@ extern "C" {
     pub type __dirstream;
     static mut stderr: *mut libc::FILE;
 
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn vfprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ::core::ffi::VaList) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -432,7 +431,7 @@ unsafe extern "C" fn do_local_cmd(mut a: *mut arglist) -> libc::c_int {
         );
     }
     if verbose_mode != 0 {
-        fprintf(stderr, b"Executing:\0" as *const u8 as *const libc::c_char);
+        libc::fprintf(stderr, b"Executing:\0" as *const u8 as *const libc::c_char);
         i = 0 as libc::c_int as u_int;
         while i < (*a).num {
             fmprintf(
@@ -443,7 +442,7 @@ unsafe extern "C" fn do_local_cmd(mut a: *mut arglist) -> libc::c_int {
             i = i.wrapping_add(1);
             i;
         }
-        fprintf(stderr, b"\n\0" as *const u8 as *const libc::c_char);
+        libc::fprintf(stderr, b"\n\0" as *const u8 as *const libc::c_char);
     }
     pid = fork();
     if pid == -(1 as libc::c_int) {
@@ -1262,13 +1261,13 @@ unsafe extern "C" fn do_times(
         }) as libc::c_ulonglong,
     );
     if verb != 0 {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"File mtime %lld atime %lld\n\0" as *const u8 as *const libc::c_char,
             (*sb).st_mtim.tv_sec as libc::c_longlong,
             (*sb).st_atim.tv_sec as libc::c_longlong,
         );
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Sending file timestamps: %s\0" as *const u8 as *const libc::c_char,
             buf.as_mut_ptr(),
@@ -4768,7 +4767,7 @@ pub unsafe extern "C" fn response() -> libc::c_int {
     exit(1 as libc::c_int);
 }
 pub unsafe extern "C" fn usage() {
-    fprintf(
+    libc::fprintf(
         stderr,
         b"usage: scp [-346ABCOpqRrsTv] [-c cipher] [-D sftp_server_path] [-F ssh_config]\n           [-i identity_file] [-J destination] [-l limit] [-o ssh_option]\n           [-P port] [-S program] [-X sftp_option] source ... target\n\0"
             as *const u8 as *const libc::c_char,
@@ -4786,21 +4785,21 @@ pub unsafe extern "C" fn run_err(mut fmt: *const libc::c_char, mut args_0: ...) 
             !fp.is_null()
         }
     {
-        fprintf(
+        libc::fprintf(
             fp,
             b"%c\0" as *const u8 as *const libc::c_char,
             0x1 as libc::c_int,
         );
-        fprintf(fp, b"scp: \0" as *const u8 as *const libc::c_char);
+        libc::fprintf(fp, b"scp: \0" as *const u8 as *const libc::c_char);
         ap = args_0.clone();
         vfprintf(fp, fmt, ap.as_va_list());
-        fprintf(fp, b"\n\0" as *const u8 as *const libc::c_char);
+        libc::fprintf(fp, b"\n\0" as *const u8 as *const libc::c_char);
         libc::fflush(fp);
     }
     if iamremote == 0 {
         ap = args_0.clone();
         vfmprintf(stderr, fmt, ap.as_va_list());
-        fprintf(stderr, b"\n\0" as *const u8 as *const libc::c_char);
+        libc::fprintf(stderr, b"\n\0" as *const u8 as *const libc::c_char);
     }
 }
 pub unsafe extern "C" fn note_err(mut fmt: *const libc::c_char, mut args_0: ...) -> libc::c_int {

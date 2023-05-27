@@ -31,7 +31,7 @@ extern "C" {
         __modes: libc::c_int,
         __n: size_t,
     ) -> libc::c_int;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -438,7 +438,7 @@ unsafe extern "C" fn delete_one(
     let mut r: libc::c_int = 0;
     r = ssh_remove_identity(agent_fd, key);
     if r != 0 as libc::c_int {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Could not remove identity \"%s\": %s\n\0" as *const u8 as *const libc::c_char,
             path,
@@ -447,7 +447,7 @@ unsafe extern "C" fn delete_one(
         return r;
     }
     if qflag == 0 {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Identity removed: %s %s (%s)\n\0" as *const u8 as *const libc::c_char,
             path,
@@ -608,12 +608,12 @@ unsafe extern "C" fn delete_all(mut agent_fd: libc::c_int, mut qflag: libc::c_in
     }
     ssh_remove_all_identities(agent_fd, 1 as libc::c_int);
     if ret != 0 as libc::c_int {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Failed to remove all identities.\n\0" as *const u8 as *const libc::c_char,
         );
     } else if qflag == 0 {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"All identities removed.\n\0" as *const u8 as *const libc::c_char,
         );
@@ -660,7 +660,7 @@ unsafe extern "C" fn add_file(
     }
     r = sshbuf_load_fd(fd, &mut keyblob);
     if r != 0 as libc::c_int {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Error loading key \"%s\": %s\n\0" as *const u8 as *const libc::c_char,
             filename,
@@ -678,7 +678,7 @@ unsafe extern "C" fn add_file(
         &mut comment,
     );
     if r != 0 as libc::c_int && r != -(43 as libc::c_int) {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Error loading key \"%s\": %s\n\0" as *const u8 as *const libc::c_char,
             filename,
@@ -688,7 +688,7 @@ unsafe extern "C" fn add_file(
         if private.is_null() && !pass.is_null() {
             r = sshkey_parse_private_fileblob(keyblob, pass, &mut private, &mut comment);
             if r != 0 as libc::c_int && r != -(43 as libc::c_int) {
-                fprintf(
+                libc::fprintf(
                     stderr,
                     b"Error loading key \"%s\": %s\n\0" as *const u8 as *const libc::c_char,
                     filename,
@@ -736,7 +736,7 @@ unsafe extern "C" fn add_file(
                             break;
                         }
                         if r != -(43 as libc::c_int) {
-                            fprintf(
+                            libc::fprintf(
                                 stderr,
                                 b"Error loading key \"%s\": %s\n\0" as *const u8
                                     as *const libc::c_char,
@@ -774,7 +774,7 @@ unsafe extern "C" fn add_file(
                         sshbuf_free(keyblob);
                         r = sshkey_set_filename(private, filename);
                         if r != 0 as libc::c_int {
-                            fprintf(
+                            libc::fprintf(
                                 stderr,
                                 b"Could not add filename to private key: %s (%s)\n\0" as *const u8
                                     as *const libc::c_char,
@@ -804,7 +804,7 @@ unsafe extern "C" fn add_file(
                                             *((*idlist).keys).offset(i as isize),
                                         );
                                         if left < minleft {
-                                            fprintf(
+                                            libc::fprintf(
                                                 stderr,
                                                 b"Only %d signatures left.\n\0" as *const u8
                                                     as *const libc::c_char,
@@ -813,13 +813,13 @@ unsafe extern "C" fn add_file(
                                             current_block = 10095721787123848864;
                                             break;
                                         } else {
-                                            fprintf(
+                                            libc::fprintf(
                                                 stderr,
                                                 b"Skipping update: \0" as *const u8
                                                     as *const libc::c_char,
                                             );
                                             if left == minleft {
-                                                fprintf(
+                                                libc::fprintf(
                                                     stderr,
                                                     b"required signatures left (%d).\n\0"
                                                         as *const u8
@@ -827,7 +827,7 @@ unsafe extern "C" fn add_file(
                                                     left,
                                                 );
                                             } else {
-                                                fprintf(
+                                                libc::fprintf(
                                                     stderr,
                                                     b"more signatures left (%d) than required (%d).\n\0"
                                                         as *const u8 as *const libc::c_char,
@@ -856,7 +856,7 @@ unsafe extern "C" fn add_file(
                                 _ => {
                                     if sshkey_is_sk(private) != 0 {
                                         if skprovider.is_null() {
-                                            fprintf(
+                                            libc::fprintf(
                                                 stderr,
                                                 b"Cannot load FIDO key %s without provider\n\0"
                                                     as *const u8
@@ -888,7 +888,7 @@ unsafe extern "C" fn add_file(
                                             if r == 0 as libc::c_int {
                                                 ret = 0 as libc::c_int;
                                                 if qflag == 0 {
-                                                    fprintf(
+                                                    libc::fprintf(
                                                         stderr,
                                                         b"Identity added: %s (%s)\n\0" as *const u8
                                                             as *const libc::c_char,
@@ -896,7 +896,7 @@ unsafe extern "C" fn add_file(
                                                         comment,
                                                     );
                                                     if lifetime != 0 as libc::c_int {
-                                                        fprintf(
+                                                        libc::fprintf(
                                                             stderr,
                                                             b"Lifetime set to %d seconds\n\0"
                                                                 as *const u8
@@ -905,7 +905,7 @@ unsafe extern "C" fn add_file(
                                                         );
                                                     }
                                                     if confirm != 0 as libc::c_int {
-                                                        fprintf(
+                                                        libc::fprintf(
                                                             stderr,
                                                             b"The user must confirm each use of the key\n\0"
                                                                 as *const u8 as *const libc::c_char,
@@ -913,7 +913,7 @@ unsafe extern "C" fn add_file(
                                                     }
                                                 }
                                             } else {
-                                                fprintf(
+                                                libc::fprintf(
                                                     stderr,
                                                     b"Could not add identity \"%s\": %s\n\0"
                                                         as *const u8
@@ -1049,7 +1049,7 @@ unsafe extern "C" fn add_file(
                                                                     (*(*private).cert).key_id,
                                                                 );
                                                             } else if qflag == 0 {
-                                                                fprintf(
+                                                                libc::fprintf(
                                                                     stderr,
                                                                     b"Certificate added: %s (%s)\n\0" as *const u8
                                                                         as *const libc::c_char,
@@ -1057,7 +1057,7 @@ unsafe extern "C" fn add_file(
                                                                     (*(*private).cert).key_id,
                                                                 );
                                                                 if lifetime != 0 as libc::c_int {
-                                                                    fprintf(
+                                                                    libc::fprintf(
                                                                         stderr,
                                                                         b"Lifetime set to %d seconds\n\0" as *const u8
                                                                             as *const libc::c_char,
@@ -1065,7 +1065,7 @@ unsafe extern "C" fn add_file(
                                                                     );
                                                                 }
                                                                 if confirm != 0 as libc::c_int {
-                                                                    fprintf(
+                                                                    libc::fprintf(
                                                                         stderr,
                                                                         b"The user must confirm each use of the key\n\0"
                                                                             as *const u8 as *const libc::c_char,
@@ -1131,7 +1131,7 @@ unsafe extern "C" fn update_card(
     if r == 0 as libc::c_int {
         ret = 0 as libc::c_int;
         if qflag == 0 {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Card %s: %s\n\0" as *const u8 as *const libc::c_char,
                 if add != 0 {
@@ -1143,7 +1143,7 @@ unsafe extern "C" fn update_card(
             );
         }
     } else {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Could not %s card \"%s\": %s\n\0" as *const u8 as *const libc::c_char,
             if add != 0 {
@@ -1254,7 +1254,7 @@ unsafe extern "C" fn list_identities(
     r = ssh_fetch_identitylist(agent_fd, &mut idlist);
     if r != 0 as libc::c_int {
         if r != -(48 as libc::c_int) {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"error fetching identities: %s\n\0" as *const u8 as *const libc::c_char,
                 ssh_err(r),
@@ -1287,26 +1287,26 @@ unsafe extern "C" fn list_identities(
         } else {
             r = sshkey_write(*((*idlist).keys).offset(i as isize), stdout);
             if r != 0 as libc::c_int {
-                fprintf(
+                libc::fprintf(
                     stderr,
                     b"sshkey_write: %s\n\0" as *const u8 as *const libc::c_char,
                     ssh_err(r),
                 );
             } else {
-                fprintf(
+                libc::fprintf(
                     stdout,
                     b" %s\0" as *const u8 as *const libc::c_char,
                     *((*idlist).comments).offset(i as isize),
                 );
                 left = sshkey_signatures_left(*((*idlist).keys).offset(i as isize));
                 if left > 0 as libc::c_int as libc::c_uint {
-                    fprintf(
+                    libc::fprintf(
                         stdout,
                         b" [signatures left %d]\0" as *const u8 as *const libc::c_char,
                         left,
                     );
                 }
-                fprintf(stdout, b"\n\0" as *const u8 as *const libc::c_char);
+                libc::fprintf(stdout, b"\n\0" as *const u8 as *const libc::c_char);
             }
         }
         i = i.wrapping_add(1);
@@ -1336,7 +1336,7 @@ unsafe extern "C" fn lock_agent(mut agent_fd: libc::c_int, mut lock: libc::c_int
         );
         p2 = read_passphrase(prompt.as_mut_ptr(), 0x2 as libc::c_int);
         if strcmp(p1, p2) != 0 as libc::c_int {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Passwords do not match.\n\0" as *const u8 as *const libc::c_char,
             );
@@ -1347,7 +1347,7 @@ unsafe extern "C" fn lock_agent(mut agent_fd: libc::c_int, mut lock: libc::c_int
     if passok != 0 {
         r = ssh_lock_agent(agent_fd, lock, p1);
         if r == 0 as libc::c_int {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Agent %slocked.\n\0" as *const u8 as *const libc::c_char,
                 if lock != 0 {
@@ -1358,7 +1358,7 @@ unsafe extern "C" fn lock_agent(mut agent_fd: libc::c_int, mut lock: libc::c_int
             );
             ret = 0 as libc::c_int;
         } else {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Failed to %slock agent: %s\n\0" as *const u8 as *const libc::c_char,
                 if lock != 0 {
@@ -1463,21 +1463,21 @@ unsafe extern "C" fn load_resident_keys(
                 ok = 1 as libc::c_int;
             }
             if qflag == 0 {
-                fprintf(
+                libc::fprintf(
                     stderr,
                     b"Resident identity added: %s %s\n\0" as *const u8 as *const libc::c_char,
                     sshkey_type(key),
                     fp,
                 );
                 if lifetime != 0 as libc::c_int {
-                    fprintf(
+                    libc::fprintf(
                         stderr,
                         b"Lifetime set to %d seconds\n\0" as *const u8 as *const libc::c_char,
                         lifetime,
                     );
                 }
                 if confirm != 0 as libc::c_int {
-                    fprintf(
+                    libc::fprintf(
                         stderr,
                         b"The user must confirm each use of the key\n\0" as *const u8
                             as *const libc::c_char,
@@ -1840,7 +1840,7 @@ unsafe extern "C" fn parse_dest_constraint(
     free(os as *mut libc::c_void);
 }
 unsafe extern "C" fn usage() {
-    fprintf(
+    libc::fprintf(
         stderr,
         b"usage: ssh-add [-cDdKkLlqvXx] [-E fingerprint_hash] [-H hostkey_file]\n               [-h destination_constraint] [-S provider] [-t life]\n               [file ...]\n       ssh-add -s pkcs11\n       ssh-add -e pkcs11\n       ssh-add -T pubkey ...\n\0"
             as *const u8 as *const libc::c_char,
@@ -1891,7 +1891,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     match r {
         0 => {}
         -47 => {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Could not open a connection to your authentication agent.\n\0" as *const u8
                     as *const libc::c_char,
@@ -1899,7 +1899,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             exit(2 as libc::c_int);
         }
         _ => {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Error connecting to agent: %s\n\0" as *const u8 as *const libc::c_char,
                 ssh_err(r),
@@ -2048,7 +2048,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 {
                     continue;
                 }
-                fprintf(
+                libc::fprintf(
                     stderr,
                     b"Invalid lifetime\n\0" as *const u8 as *const libc::c_char,
                 );
@@ -2242,7 +2242,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     let mut count: libc::c_int = 0 as libc::c_int;
                     pw = getpwuid(getuid());
                     if pw.is_null() {
-                        fprintf(
+                        libc::fprintf(
                             stderr,
                             b"No user found with uid %u\n\0" as *const u8 as *const libc::c_char,
                             getuid(),

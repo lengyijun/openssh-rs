@@ -30,7 +30,7 @@ extern "C" {
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -1968,7 +1968,7 @@ unsafe extern "C" fn read_environment_file(
             '\0' as i32 as libc::c_char;
         value = strchr(cp, '=' as i32);
         if value.is_null() {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Bad line %u in %.100s\n\0" as *const u8 as *const libc::c_char,
                 lineno,
@@ -2246,13 +2246,13 @@ unsafe extern "C" fn do_setup_env(
         );
     }
     if debug_flag != 0 {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Environment:\n\0" as *const u8 as *const libc::c_char,
         );
         i = 0 as libc::c_int as u_int;
         while !(*env.offset(i as isize)).is_null() {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"  %.200s\n\0" as *const u8 as *const libc::c_char,
                 *env.offset(i as isize),
@@ -2334,7 +2334,7 @@ unsafe extern "C" fn do_rc_files(
             );
         }
         if debug_flag != 0 {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Running %s\n\0" as *const u8 as *const libc::c_char,
                 cmd,
@@ -2343,7 +2343,7 @@ unsafe extern "C" fn do_rc_files(
         f = popen(cmd, b"w\0" as *const u8 as *const libc::c_char);
         if !f.is_null() {
             if do_xauth != 0 {
-                fprintf(
+                libc::fprintf(
                     f,
                     b"%s %s\n\0" as *const u8 as *const libc::c_char,
                     (*s).auth_proto,
@@ -2352,7 +2352,7 @@ unsafe extern "C" fn do_rc_files(
             }
             pclose(f);
         } else {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Could not run %s\n\0" as *const u8 as *const libc::c_char,
                 user_rc,
@@ -2364,7 +2364,7 @@ unsafe extern "C" fn do_rc_files(
     ) >= 0 as libc::c_int
     {
         if debug_flag != 0 {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Running %s %s\n\0" as *const u8 as *const libc::c_char,
                 b"/bin/sh\0" as *const u8 as *const libc::c_char,
@@ -2377,7 +2377,7 @@ unsafe extern "C" fn do_rc_files(
         );
         if !f.is_null() {
             if do_xauth != 0 {
-                fprintf(
+                libc::fprintf(
                     f,
                     b"%s %s\n\0" as *const u8 as *const libc::c_char,
                     (*s).auth_proto,
@@ -2386,7 +2386,7 @@ unsafe extern "C" fn do_rc_files(
             }
             pclose(f);
         } else {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Could not run %s\n\0" as *const u8 as *const libc::c_char,
                 b"/usr/local/etc/sshrc\0" as *const u8 as *const libc::c_char,
@@ -2394,13 +2394,13 @@ unsafe extern "C" fn do_rc_files(
         }
     } else if do_xauth != 0 && !(options.xauth_location).is_null() {
         if debug_flag != 0 {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Running %.500s remove %.100s\n\0" as *const u8 as *const libc::c_char,
                 options.xauth_location,
                 (*s).auth_display,
             );
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"%.500s add %.100s %.100s %.100s\n\0" as *const u8 as *const libc::c_char,
                 options.xauth_location,
@@ -2429,12 +2429,12 @@ unsafe extern "C" fn do_rc_files(
         }
         f = popen(cmd, b"w\0" as *const u8 as *const libc::c_char);
         if !f.is_null() {
-            fprintf(
+            libc::fprintf(
                 f,
                 b"remove %s\n\0" as *const u8 as *const libc::c_char,
                 (*s).auth_display,
             );
-            fprintf(
+            libc::fprintf(
                 f,
                 b"add %s %s %s\n\0" as *const u8 as *const libc::c_char,
                 (*s).auth_display,
@@ -2443,7 +2443,7 @@ unsafe extern "C" fn do_rc_files(
             );
             pclose(f);
         } else {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Could not run %s\n\0" as *const u8 as *const libc::c_char,
                 cmd,
@@ -2804,12 +2804,12 @@ pub unsafe extern "C" fn do_setusercontext(mut pw: *mut passwd) {
 }
 unsafe extern "C" fn do_pwchange(mut s: *mut Session) {
     libc::fflush(0 as *mut libc::FILE);
-    fprintf(
+    libc::fprintf(
         stderr,
         b"WARNING: Your password has expired.\n\0" as *const u8 as *const libc::c_char,
     );
     if (*s).ttyfd != -(1 as libc::c_int) {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"You must change your password now and login again!\n\0" as *const u8
                 as *const libc::c_char,
@@ -2821,7 +2821,7 @@ unsafe extern "C" fn do_pwchange(mut s: *mut Session) {
         );
         perror(b"passwd\0" as *const u8 as *const libc::c_char);
     } else {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Password change required but no TTY available.\n\0" as *const u8
                 as *const libc::c_char,
@@ -2894,7 +2894,7 @@ pub unsafe extern "C" fn do_child(
     environ = env;
     if chdir((*pw).pw_dir) == -(1 as libc::c_int) {
         if r != 0 || in_chroot == 0 {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Could not chdir to home directory %s: %s\n\0" as *const u8 as *const libc::c_char,
                 (*pw).pw_dir,

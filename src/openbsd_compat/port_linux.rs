@@ -6,7 +6,7 @@ extern "C" {
     fn __errno_location() -> *mut libc::c_int;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn fscanf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn rewind(__stream: *mut libc::FILE);
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
@@ -104,7 +104,7 @@ pub unsafe extern "C" fn oom_adjust_setup() {
                 );
             } else {
                 rewind(fp);
-                if fprintf(fp, b"%d\n\0" as *const u8 as *const libc::c_char, value)
+                if libc::fprintf(fp, b"%d\n\0" as *const u8 as *const libc::c_char, value)
                     <= 0 as libc::c_int
                 {
                     crate::log::sshlog(
@@ -171,7 +171,7 @@ pub unsafe extern "C" fn oom_adjust_restore() {
     {
         return;
     }
-    if fprintf(
+    if libc::fprintf(
         fp,
         b"%d\n\0" as *const u8 as *const libc::c_char,
         oom_adj_save,

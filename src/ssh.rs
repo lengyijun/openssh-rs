@@ -55,7 +55,7 @@ extern "C" {
     ) -> libc::c_int;
     static mut stdin: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -1194,7 +1194,7 @@ pub static mut sensitive_data: Sensitive = Sensitive {
 pub static mut command: *mut sshbuf = 0 as *const sshbuf as *mut sshbuf;
 static mut forward_confirms_pending: libc::c_int = -(1 as libc::c_int);
 unsafe extern "C" fn usage() {
-    fprintf(
+    libc::fprintf(
         stderr,
         b"usage: ssh [-46AaCfGgKkMNnqsTtVvXxYy] [-B bind_interface]\n           [-b bind_address] [-c cipher_spec] [-D [bind_address:]port]\n           [-E log_file] [-e escape_char] [-F configfile] [-I pkcs11]\n           [-i identity_file] [-J [user@]host[:port]] [-L address]\n           [-l login_name] [-m mac_spec] [-O ctl_cmd] [-o option] [-p port]\n           [-Q query_option] [-R address] [-S ctl_path] [-W host:port]\n           [-w local_tun[:remote_tun]] destination [command [argument ...]]\n\0"
             as *const u8 as *const libc::c_char,
@@ -2495,7 +2495,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 105 => {
                     p = tilde_expand_filename(BSDoptarg, getuid());
                     if stat(p, &mut st) == -(1 as libc::c_int) {
-                        fprintf(
+                        libc::fprintf(
                             stderr,
                             b"Warning: Identity file %s not accessible: %s.\n\0" as *const u8
                                 as *const libc::c_char,
@@ -2582,7 +2582,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     }
                 }
                 86 => {
-                    fprintf(
+                    libc::fprintf(
                         stderr,
                         b"%s, %s\n\0" as *const u8 as *const libc::c_char,
                         b"OpenSSH_9.3p1\0" as *const u8 as *const libc::c_char,
@@ -2596,7 +2596,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     }
                     options.tun_local = a2tun(BSDoptarg, &mut options.tun_remote);
                     if options.tun_local == 0x7fffffff as libc::c_int - 1 as libc::c_int {
-                        fprintf(
+                        libc::fprintf(
                             stderr,
                             b"Bad tun device '%s'\n\0" as *const u8 as *const libc::c_char,
                             BSDoptarg,
@@ -2636,7 +2636,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         options.stdio_forward_port = fwd.listen_port;
                         free(fwd.connect_host as *mut libc::c_void);
                     } else {
-                        fprintf(
+                        libc::fprintf(
                             stderr,
                             b"Bad stdio forwarding specification '%s'\n\0" as *const u8
                                 as *const libc::c_char,
@@ -2670,7 +2670,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     {
                         options.escape_char = -(2 as libc::c_int);
                     } else {
-                        fprintf(
+                        libc::fprintf(
                             stderr,
                             b"Bad escape character '%s'.\n\0" as *const u8 as *const libc::c_char,
                             BSDoptarg,
@@ -2689,7 +2689,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         },
                     ) == 0
                     {
-                        fprintf(
+                        libc::fprintf(
                             stderr,
                             b"Unknown cipher type '%s'\n\0" as *const u8 as *const libc::c_char,
                             BSDoptarg,
@@ -2704,7 +2704,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         free(options.macs as *mut libc::c_void);
                         options.macs = xstrdup(BSDoptarg);
                     } else {
-                        fprintf(
+                        libc::fprintf(
                             stderr,
                             b"Unknown mac type '%s'\n\0" as *const u8 as *const libc::c_char,
                             BSDoptarg,
@@ -2723,7 +2723,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     if options.port == -(1 as libc::c_int) {
                         options.port = crate::misc::a2port(BSDoptarg);
                         if options.port <= 0 as libc::c_int {
-                            fprintf(
+                            libc::fprintf(
                                 stderr,
                                 b"Bad port '%s'\n\0" as *const u8 as *const libc::c_char,
                                 BSDoptarg,
@@ -2741,7 +2741,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     if parse_forward(&mut fwd, BSDoptarg, 0 as libc::c_int, 0 as libc::c_int) != 0 {
                         add_local_forward(&mut options, &mut fwd);
                     } else {
-                        fprintf(
+                        libc::fprintf(
                             stderr,
                             b"Bad local forwarding specification '%s'\n\0" as *const u8
                                 as *const libc::c_char,
@@ -2757,7 +2757,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     {
                         add_remote_forward(&mut options, &mut fwd);
                     } else {
-                        fprintf(
+                        libc::fprintf(
                             stderr,
                             b"Bad remote forwarding specification '%s'\n\0" as *const u8
                                 as *const libc::c_char,
@@ -2770,7 +2770,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     if parse_forward(&mut fwd, BSDoptarg, 1 as libc::c_int, 0 as libc::c_int) != 0 {
                         add_local_forward(&mut options, &mut fwd);
                     } else {
-                        fprintf(
+                        libc::fprintf(
                             stderr,
                             b"Bad dynamic forwarding specification '%s'\n\0" as *const u8
                                 as *const libc::c_char,
@@ -2945,7 +2945,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     }
     if ac == 0 {
         if options.session_type == 1 as libc::c_int {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"You must specify a subsystem to invoke.\n\0" as *const u8 as *const libc::c_char,
             );

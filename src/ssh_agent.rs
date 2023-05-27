@@ -56,7 +56,6 @@ extern "C" {
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
 
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -4683,7 +4682,7 @@ unsafe extern "C" fn check_parent_exists() {
     }
 }
 unsafe extern "C" fn usage() {
-    fprintf(
+    libc::fprintf(
         stderr,
         b"usage: ssh-agent [-c | -s] [-Dd] [-a bind_address] [-E fingerprint_hash]\n                 [-O option] [-P allowed_providers] [-t life]\n       ssh-agent [-a bind_address] [-E fingerprint_hash] [-O option]\n                 [-P allowed_providers] [-t life] command [arg ...]\n       ssh-agent [-c | -s] -k\n\0"
             as *const u8 as *const libc::c_char,
@@ -4842,7 +4841,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             116 => {
                 lifetime = convtime(BSDoptarg);
                 if lifetime == -(1 as libc::c_int) {
-                    fprintf(
+                    libc::fprintf(
                         stderr,
                         b"Invalid lifetime\n\0" as *const u8 as *const libc::c_char,
                     );
@@ -4887,7 +4886,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         let mut errstr: *const libc::c_char = 0 as *const libc::c_char;
         pidstr = getenv(b"SSH_AGENT_PID\0" as *const u8 as *const libc::c_char);
         if pidstr.is_null() {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"%s not set, cannot kill agent\n\0" as *const u8 as *const libc::c_char,
                 b"SSH_AGENT_PID\0" as *const u8 as *const libc::c_char,
@@ -4901,7 +4900,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             &mut errstr,
         ) as libc::c_int;
         if !errstr.is_null() {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"%s=\"%s\", which is not a good PID: %s\n\0" as *const u8 as *const libc::c_char,
                 b"SSH_AGENT_PID\0" as *const u8 as *const libc::c_char,

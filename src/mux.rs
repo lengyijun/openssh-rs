@@ -38,7 +38,7 @@ extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -5149,7 +5149,7 @@ unsafe extern "C" fn mux_client_forward(
                 (*fwd).connect_port,
             );
             if muxclient_command == 5 as libc::c_int as libc::c_uint {
-                fprintf(
+                libc::fprintf(
                     stdout,
                     b"%i\n\0" as *const u8 as *const libc::c_char,
                     (*fwd).allocated_port,
@@ -5955,7 +5955,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
         );
     }
     if tty_flag != 0 && options.log_level as libc::c_int >= SYSLOG_LEVEL_INFO as libc::c_int {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Shared connection to %s closed.\r\n\0" as *const u8 as *const libc::c_char,
             host,
@@ -6836,7 +6836,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
                     b"master alive check failed\0" as *const u8 as *const libc::c_char,
                 );
             }
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Master running (pid=%u)\r\n\0" as *const u8 as *const libc::c_char,
                 pid,
@@ -6846,7 +6846,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
         3 => {
             mux_client_request_terminate(sock);
             if options.log_level as libc::c_int != SYSLOG_LEVEL_QUIET as libc::c_int {
-                fprintf(
+                libc::fprintf(
                     stderr,
                     b"Exit request sent.\r\n\0" as *const u8 as *const libc::c_char,
                 );
@@ -6892,7 +6892,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
         6 => {
             mux_client_request_stop_listening(sock);
             if options.log_level as libc::c_int != SYSLOG_LEVEL_QUIET as libc::c_int {
-                fprintf(
+                libc::fprintf(
                     stderr,
                     b"Stop listening request sent.\r\n\0" as *const u8 as *const libc::c_char,
                 );

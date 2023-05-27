@@ -14,7 +14,7 @@ extern "C" {
         __pai: *mut *mut addrinfo,
     ) -> libc::c_int;
     fn freeaddrinfo(__ai: *mut addrinfo);
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn getrrsetbyname(
         _: *const libc::c_char,
         _: libc::c_uint,
@@ -630,7 +630,7 @@ pub unsafe extern "C" fn export_dns_rr(
             ) != 0
             {
                 if generic != 0 {
-                    fprintf(
+                    libc::fprintf(
                         f,
                         b"%s IN TYPE%d \\# %zu %02x %02x \0" as *const u8 as *const libc::c_char,
                         hostname,
@@ -640,7 +640,7 @@ pub unsafe extern "C" fn export_dns_rr(
                         rdata_digest_type as libc::c_int,
                     );
                 } else {
-                    fprintf(
+                    libc::fprintf(
                         f,
                         b"%s IN SSHFP %d %d \0" as *const u8 as *const libc::c_char,
                         hostname,
@@ -650,7 +650,7 @@ pub unsafe extern "C" fn export_dns_rr(
                 }
                 i = 0 as libc::c_int as size_t;
                 while i < rdata_digest_len {
-                    fprintf(
+                    libc::fprintf(
                         f,
                         b"%02x\0" as *const u8 as *const libc::c_char,
                         *rdata_digest.offset(i as isize) as libc::c_int,
@@ -658,7 +658,7 @@ pub unsafe extern "C" fn export_dns_rr(
                     i = i.wrapping_add(1);
                     i;
                 }
-                fprintf(f, b"\n\0" as *const u8 as *const libc::c_char);
+                libc::fprintf(f, b"\n\0" as *const u8 as *const libc::c_char);
                 free(rdata_digest as *mut libc::c_void);
                 success = 1 as libc::c_int;
             }

@@ -65,7 +65,7 @@ extern "C" {
     fn truncate(__file: *const libc::c_char, __length: __off_t) -> libc::c_int;
     fn ftruncate(__fd: libc::c_int, __length: __off_t) -> libc::c_int;
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -4725,7 +4725,7 @@ unsafe extern "C" fn sftp_server_usage() {
     extern "C" {
         static mut __progname: *mut libc::c_char;
     }
-    fprintf(
+    libc::fprintf(
         stderr,
         b"usage: %s [-ehR] [-d start_directory] [-f log_facility] [-l log_level]\n\t[-P denied_requests] [-p allowed_requests] [-u umask]\n       %s -Q protocol_feature\n\0"
             as *const u8 as *const libc::c_char,

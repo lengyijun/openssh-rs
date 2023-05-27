@@ -21,7 +21,6 @@ extern "C" {
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
 
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn asprintf(__ptr: *mut *mut libc::c_char, __fmt: *const libc::c_char, _: ...) -> libc::c_int;
     fn fgetc(__stream: *mut libc::FILE) -> libc::c_int;
     fn fputc(__c: libc::c_int, __stream: *mut libc::FILE) -> libc::c_int;
@@ -943,16 +942,16 @@ unsafe extern "C" fn write_host_entry(
             free(lhost as *mut libc::c_void);
             return 0 as libc::c_int;
         }
-        fprintf(f, b"%s \0" as *const u8 as *const libc::c_char, hashed_host);
+        libc::fprintf(f, b"%s \0" as *const u8 as *const libc::c_char, hashed_host);
     } else if !ip.is_null() {
-        fprintf(
+        libc::fprintf(
             f,
             b"%s,%s \0" as *const u8 as *const libc::c_char,
             lhost,
             ip,
         );
     } else {
-        fprintf(f, b"%s \0" as *const u8 as *const libc::c_char, lhost);
+        libc::fprintf(f, b"%s \0" as *const u8 as *const libc::c_char, lhost);
     }
     free(hashed_host as *mut libc::c_void);
     free(lhost as *mut libc::c_void);
@@ -1134,7 +1133,7 @@ unsafe extern "C" fn host_delete(
             } else {
                 let ref mut fresh3 = *((*ctx).match_keys).offset(i as isize);
                 *fresh3 |= (*l).match_0;
-                fprintf(
+                libc::fprintf(
                     (*ctx).out,
                     b"%s\n\0" as *const u8 as *const libc::c_char,
                     (*l).line,
@@ -1206,7 +1205,7 @@ unsafe extern "C" fn host_delete(
             (*l).linenum,
         );
     }
-    fprintf(
+    libc::fprintf(
         (*ctx).out,
         b"%s\n\0" as *const u8 as *const libc::c_char,
         (*l).line,

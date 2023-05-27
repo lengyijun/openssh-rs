@@ -29,7 +29,7 @@ extern "C" {
     fn _exit(_: libc::c_int) -> !;
     fn fork() -> __pid_t;
     static mut stderr: *mut libc::FILE;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
@@ -882,7 +882,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
         if dup2(pair[1 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int)
             || dup2(pair[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int)
         {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"dup2: %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__errno_location()),
@@ -918,7 +918,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             verbosity,
             0 as *mut libc::c_void as *mut libc::c_char,
         );
-        fprintf(
+        libc::fprintf(
             stderr,
             b"exec: %s: %s\n\0" as *const u8 as *const libc::c_char,
             helper,

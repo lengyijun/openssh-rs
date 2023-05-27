@@ -17,7 +17,7 @@ extern "C" {
     fn _exit(_: libc::c_int) -> !;
     fn getpid() -> __pid_t;
     static mut stderr: *mut libc::FILE;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -377,7 +377,7 @@ pub unsafe extern "C" fn log_init(
 ) {
     argv0 = av0;
     if log_change_level(level) != 0 as libc::c_int {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Unrecognized internal syslog level code %d\n\0" as *const u8 as *const libc::c_char,
             level as libc::c_int,
@@ -428,7 +428,7 @@ pub unsafe extern "C" fn log_init(
             log_facility = (23 as libc::c_int) << 3 as libc::c_int;
         }
         _ => {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Unrecognized internal syslog facility code %d\n\0" as *const u8
                     as *const libc::c_char,
@@ -478,7 +478,7 @@ pub unsafe extern "C" fn log_redirect_stderr_to(mut logfile: *const libc::c_char
         0o600 as libc::c_int,
     );
     if fd == -(1 as libc::c_int) {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Couldn't open logfile %s: %s\n\0" as *const u8 as *const libc::c_char,
             logfile,

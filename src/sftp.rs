@@ -72,7 +72,7 @@ extern "C" {
         __modes: libc::c_int,
         __n: size_t,
     ) -> libc::c_int;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -1022,7 +1022,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
             );
             execl(shell, shell, 0 as *mut libc::c_void as *mut libc::c_char);
         }
-        fprintf(
+        libc::fprintf(
             stderr,
             b"Couldn't execute \"%s\": %s\n\0" as *const u8 as *const libc::c_char,
             shell,
@@ -4167,7 +4167,7 @@ unsafe extern "C" fn connect_to_server(
         if dup2(c_in, 0 as libc::c_int) == -(1 as libc::c_int)
             || dup2(c_out, 1 as libc::c_int) == -(1 as libc::c_int)
         {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"dup2: %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__errno_location()),
@@ -4186,7 +4186,7 @@ unsafe extern "C" fn connect_to_server(
         );
         ssh_signal(15 as libc::c_int, None);
         execvp(path, args as *const *mut libc::c_char);
-        fprintf(
+        libc::fprintf(
             stderr,
             b"exec: %s: %s\n\0" as *const u8 as *const libc::c_char,
             path,
@@ -4230,7 +4230,7 @@ unsafe extern "C" fn usage() {
         #[link_name = "__progname"]
         static mut __progname_0: *mut libc::c_char;
     }
-    fprintf(
+    libc::fprintf(
         stderr,
         b"usage: %s [-46AaCfNpqrv] [-B buffer_size] [-b batchfile] [-c cipher]\n          [-D sftp_server_command] [-F ssh_config] [-i identity_file]\n          [-J destination] [-l limit] [-o ssh_option] [-P port]\n          [-R num_requests] [-S program] [-s subsystem | sftp_server]\n          [-X sftp_option] destination\n\0"
             as *const u8 as *const libc::c_char,
@@ -4632,7 +4632,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         }
         file2 = *argv.offset(1 as libc::c_int as isize);
         if *host == 0 {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Missing hostname\n\0" as *const u8 as *const libc::c_char,
             );
@@ -4734,13 +4734,13 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     }
     if quiet == 0 {
         if sftp_direct.is_null() {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Connected to %s.\n\0" as *const u8 as *const libc::c_char,
                 host,
             );
         } else {
-            fprintf(
+            libc::fprintf(
                 stderr,
                 b"Attached to %s.\n\0" as *const u8 as *const libc::c_char,
                 sftp_direct,

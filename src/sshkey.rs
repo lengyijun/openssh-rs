@@ -21,7 +21,7 @@ extern "C" {
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
     static mut stderr: *mut libc::FILE;
-    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -3878,14 +3878,14 @@ pub unsafe extern "C" fn sshkey_dump_ec_point(
         y = BN_new();
         y.is_null()
     } {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"%s: BN_new failed\n\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"sshkey_dump_ec_point\0"))
                 .as_ptr(),
         );
     } else if EC_METHOD_get_field_type(EC_GROUP_method_of(group)) != 406 as libc::c_int {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"%s: group is not a prime field\n\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"sshkey_dump_ec_point\0"))
@@ -3894,7 +3894,7 @@ pub unsafe extern "C" fn sshkey_dump_ec_point(
     } else if EC_POINT_get_affine_coordinates_GFp(group, point, x, y, 0 as *mut BN_CTX)
         != 1 as libc::c_int
     {
-        fprintf(
+        libc::fprintf(
             stderr,
             b"%s: EC_POINT_get_affine_coordinates_GFp\n\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"sshkey_dump_ec_point\0"))
