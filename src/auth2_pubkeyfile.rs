@@ -9,8 +9,8 @@ extern "C" {
     pub type dsa_st;
     pub type rsa_st;
     pub type ec_key_st;
-    fn fclose(__stream: *mut FILE) -> libc::c_int;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut FILE;
+    fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
 
@@ -24,9 +24,9 @@ extern "C" {
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
         __delimiter: libc::c_int,
-        __stream: *mut FILE,
+        __stream: *mut libc::FILE,
     ) -> __ssize_t;
-    fn fileno(__stream: *mut FILE) -> libc::c_int;
+    fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
     fn free(_: *mut libc::c_void);
 
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -159,41 +159,9 @@ pub struct passwd {
     pub pw_dir: *mut libc::c_char,
     pub pw_shell: *mut libc::c_char,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;
 pub const SYSLOG_LEVEL_DEBUG3: LogLevel = 7;
@@ -300,7 +268,7 @@ pub struct sshauthopt {
 unsafe extern "C" fn getline(
     mut __lineptr: *mut *mut libc::c_char,
     mut __n: *mut size_t,
-    mut __stream: *mut FILE,
+    mut __stream: *mut libc::FILE,
 ) -> __ssize_t {
     return __getdelim(__lineptr, __n, '\n' as i32, __stream);
 }
@@ -625,7 +593,7 @@ pub unsafe extern "C" fn auth_check_principals_line(
     };
 }
 pub unsafe extern "C" fn auth_process_principals(
-    mut f: *mut FILE,
+    mut f: *mut libc::FILE,
     mut file: *const libc::c_char,
     mut cert: *const sshkey_cert,
     mut authoptsp: *mut *mut sshauthopt,
@@ -1043,7 +1011,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
 }
 pub unsafe extern "C" fn auth_check_authkeys_file(
     mut pw: *mut passwd,
-    mut f: *mut FILE,
+    mut f: *mut libc::FILE,
     mut file: *mut libc::c_char,
     mut key: *mut sshkey,
     mut remote_ip: *const libc::c_char,
@@ -1115,7 +1083,7 @@ unsafe extern "C" fn auth_openfile(
     mut strict_modes: libc::c_int,
     mut log_missing: libc::c_int,
     mut file_type: *mut libc::c_char,
-) -> *mut FILE {
+) -> *mut libc::FILE {
     let mut line: [libc::c_char; 1024] = [0; 1024];
     let mut st: stat = stat {
         st_dev: 0,
@@ -1144,7 +1112,7 @@ unsafe extern "C" fn auth_openfile(
         __glibc_reserved: [0; 3],
     };
     let mut fd: libc::c_int = 0;
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     fd = libc::open(file, 0 as libc::c_int | 0o4000 as libc::c_int);
     if fd == -(1 as libc::c_int) {
         if *__errno_location() != 2 as libc::c_int {
@@ -1178,11 +1146,11 @@ unsafe extern "C" fn auth_openfile(
                 strerror(*__errno_location()),
             );
         }
-        return 0 as *mut FILE;
+        return 0 as *mut libc::FILE;
     }
     if fstat(fd, &mut st) == -(1 as libc::c_int) {
         close(fd);
-        return 0 as *mut FILE;
+        return 0 as *mut libc::FILE;
     }
     if !(st.st_mode & 0o170000 as libc::c_int as libc::c_uint
         == 0o100000 as libc::c_int as libc::c_uint)
@@ -1201,13 +1169,13 @@ unsafe extern "C" fn auth_openfile(
             file,
         );
         close(fd);
-        return 0 as *mut FILE;
+        return 0 as *mut libc::FILE;
     }
     unset_nonblock(fd);
     f = fdopen(fd, b"r\0" as *const u8 as *const libc::c_char);
     if f.is_null() {
         close(fd);
-        return 0 as *mut FILE;
+        return 0 as *mut libc::FILE;
     }
     if strict_modes != 0
         && safe_path_fd(
@@ -1235,7 +1203,7 @@ unsafe extern "C" fn auth_openfile(
             file_type,
             line.as_mut_ptr(),
         );
-        return 0 as *mut FILE;
+        return 0 as *mut libc::FILE;
     }
     return f;
 }
@@ -1243,7 +1211,7 @@ pub unsafe extern "C" fn auth_openkeyfile(
     mut file: *const libc::c_char,
     mut pw: *mut passwd,
     mut strict_modes: libc::c_int,
-) -> *mut FILE {
+) -> *mut libc::FILE {
     return auth_openfile(
         file,
         pw,
@@ -1256,7 +1224,7 @@ pub unsafe extern "C" fn auth_openprincipals(
     mut file: *const libc::c_char,
     mut pw: *mut passwd,
     mut strict_modes: libc::c_int,
-) -> *mut FILE {
+) -> *mut libc::FILE {
     return auth_openfile(
         file,
         pw,

@@ -25,12 +25,12 @@ extern "C" {
     pub type ssh_hmac_ctx;
     pub type sshcipher;
     pub type session_state;
-    static mut stdout: *mut FILE;
-    static mut stderr: *mut FILE;
-    fn fclose(__stream: *mut FILE) -> libc::c_int;
-    fn fflush(__stream: *mut FILE) -> libc::c_int;
-    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
-    fn fprintf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+    static mut stdout: *mut libc::FILE;
+    static mut stderr: *mut libc::FILE;
+    fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fflush(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
+    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -38,17 +38,17 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> libc::c_int;
-    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut FILE) -> *mut libc::c_char;
+    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut libc::FILE) -> *mut libc::c_char;
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
         __delimiter: libc::c_int,
-        __stream: *mut FILE,
+        __stream: *mut libc::FILE,
     ) -> __ssize_t;
-    fn fputs(__s: *const libc::c_char, __stream: *mut FILE) -> libc::c_int;
+    fn fputs(__s: *const libc::c_char, __stream: *mut libc::FILE) -> libc::c_int;
     fn perror(__s: *const libc::c_char);
-    fn pclose(__stream: *mut FILE) -> libc::c_int;
-    fn popen(__command: *const libc::c_char, __modes: *const libc::c_char) -> *mut FILE;
+    fn pclose(__stream: *mut libc::FILE) -> libc::c_int;
+    fn popen(__command: *const libc::c_char, __modes: *const libc::c_char) -> *mut libc::FILE;
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -429,41 +429,9 @@ pub struct passwd {
     pub pw_dir: *mut libc::c_char,
     pub pw_shell: *mut libc::c_char,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type sig_atomic_t = __sig_atomic_t;
 pub type __sighandler_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 #[derive(Copy, Clone)]
@@ -1049,7 +1017,7 @@ pub struct C2RustUnnamed_5 {
 unsafe extern "C" fn getline(
     mut __lineptr: *mut *mut libc::c_char,
     mut __n: *mut size_t,
-    mut __stream: *mut FILE,
+    mut __stream: *mut libc::FILE,
 ) -> __ssize_t {
     return __getdelim(__lineptr, __n, '\n' as i32, __stream);
 }
@@ -1884,7 +1852,7 @@ pub unsafe extern "C" fn do_login(
     do_motd();
 }
 pub unsafe extern "C" fn do_motd() {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut buf: [libc::c_char; 256] = [0; 256];
     if options.print_motd != 0 {
         f = fopen(
@@ -1957,7 +1925,7 @@ unsafe extern "C" fn read_environment_file(
     mut filename: *const libc::c_char,
     mut allowlist: *const libc::c_char,
 ) {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut line: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut value: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -2296,7 +2264,7 @@ unsafe extern "C" fn do_rc_files(
     mut s: *mut Session,
     mut shell: *const libc::c_char,
 ) {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut cmd: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut user_rc: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut do_xauth: libc::c_int = 0;
@@ -2482,7 +2450,7 @@ unsafe extern "C" fn do_rc_files(
     free(user_rc as *mut libc::c_void);
 }
 unsafe extern "C" fn do_nologin(mut pw: *mut passwd) {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut buf: [libc::c_char; 1024] = [0; 1024];
     let mut nl: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut def_nl: *mut libc::c_char =
@@ -2831,7 +2799,7 @@ pub unsafe extern "C" fn do_setusercontext(mut pw: *mut passwd) {
     }
 }
 unsafe extern "C" fn do_pwchange(mut s: *mut Session) {
-    fflush(0 as *mut FILE);
+    fflush(0 as *mut libc::FILE);
     fprintf(
         stderr,
         b"WARNING: Your password has expired.\n\0" as *const u8 as *const libc::c_char,
@@ -2950,7 +2918,7 @@ pub unsafe extern "C" fn do_child(
         printf(
             b"This service allows sftp connections only.\n\0" as *const u8 as *const libc::c_char,
         );
-        fflush(0 as *mut FILE);
+        fflush(0 as *mut libc::FILE);
         exit(1 as libc::c_int);
     } else if (*s).is_subsystem == 2 as libc::c_int {
         extern "C" {
@@ -2993,7 +2961,7 @@ pub unsafe extern "C" fn do_child(
         __progname = argv[0 as libc::c_int as usize];
         exit(sftp_server_main(i, argv.as_mut_ptr(), (*s).pw));
     }
-    fflush(0 as *mut FILE);
+    fflush(0 as *mut libc::FILE);
     shell0 = strrchr(shell, '/' as i32);
     if !shell0.is_null() {
         shell0 = shell0.offset(1);

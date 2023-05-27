@@ -12,15 +12,15 @@ extern "C" {
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn fclose(__stream: *mut FILE) -> libc::c_int;
-    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
+    fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
         __delimiter: libc::c_int,
-        __stream: *mut FILE,
+        __stream: *mut libc::FILE,
     ) -> __ssize_t;
-    fn ferror(__stream: *mut FILE) -> libc::c_int;
+    fn ferror(__stream: *mut libc::FILE) -> libc::c_int;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -178,41 +178,9 @@ pub type u_int64_t = __uint64_t;
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshkey {
@@ -314,7 +282,7 @@ pub const KEY_DSA: sshkey_types = 1;
 unsafe extern "C" fn getline(
     mut __lineptr: *mut *mut libc::c_char,
     mut __n: *mut size_t,
-    mut __stream: *mut FILE,
+    mut __stream: *mut libc::FILE,
 ) -> __ssize_t {
     return __getdelim(__lineptr, __n, '\n' as i32, __stream);
 }
@@ -2485,7 +2453,7 @@ pub unsafe extern "C" fn sshsig_check_allowed_keys(
     mut sig_namespace: *const libc::c_char,
     mut verify_time: uint64_t,
 ) -> libc::c_int {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut line: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut linesize: size_t = 0 as libc::c_int as size_t;
     let mut linenum: u_long = 0 as libc::c_int as u_long;
@@ -2546,7 +2514,7 @@ pub unsafe extern "C" fn sshsig_find_principals(
     mut verify_time: uint64_t,
     mut principals: *mut *mut libc::c_char,
 ) -> libc::c_int {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut line: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut linesize: size_t = 0 as libc::c_int as size_t;
     let mut linenum: u_long = 0 as libc::c_int as u_long;
@@ -2627,7 +2595,7 @@ pub unsafe extern "C" fn sshsig_match_principals(
     mut principalsp: *mut *mut *mut libc::c_char,
     mut nprincipalsp: *mut size_t,
 ) -> libc::c_int {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut found: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut line: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut principals: *mut *mut libc::c_char = 0 as *mut *mut libc::c_char;

@@ -20,22 +20,22 @@ extern "C" {
     pub type sshcipher_ctx;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
-    static mut stderr: *mut FILE;
-    fn fprintf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+    static mut stderr: *mut libc::FILE;
+    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
         _: *const libc::c_char,
         _: ...
     ) -> libc::c_int;
-    fn fputs(__s: *const libc::c_char, __stream: *mut FILE) -> libc::c_int;
+    fn fputs(__s: *const libc::c_char, __stream: *mut libc::FILE) -> libc::c_int;
     fn fwrite(
         _: *const libc::c_void,
         _: libc::c_ulong,
         _: libc::c_ulong,
-        _: *mut FILE,
+        _: *mut libc::FILE,
     ) -> libc::c_ulong;
-    fn feof(__stream: *mut FILE) -> libc::c_int;
+    fn feof(__stream: *mut libc::FILE) -> libc::c_int;
     fn __b64_ntop(
         _: *const libc::c_uchar,
         _: size_t,
@@ -89,7 +89,7 @@ extern "C" {
     fn BN_clear_free(a: *mut BIGNUM);
     fn BN_sub(r: *mut BIGNUM, a: *const BIGNUM, b: *const BIGNUM) -> libc::c_int;
     fn BN_cmp(a: *const BIGNUM, b: *const BIGNUM) -> libc::c_int;
-    fn BN_print_fp(fp: *mut FILE, a: *const BIGNUM) -> libc::c_int;
+    fn BN_print_fp(fp: *mut libc::FILE, a: *const BIGNUM) -> libc::c_int;
     fn ERR_get_error() -> libc::c_ulong;
     fn ERR_peek_error() -> libc::c_ulong;
     fn ERR_peek_last_error() -> libc::c_ulong;
@@ -317,41 +317,9 @@ pub type u_int64_t = __uint64_t;
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type BIO = bio_st;
 pub type BIGNUM = bignum_st;
 pub type BN_CTX = bignum_ctx;
@@ -1987,7 +1955,7 @@ pub unsafe extern "C" fn sshkey_format_text(
     free(uu as *mut libc::c_void);
     return r;
 }
-pub unsafe extern "C" fn sshkey_write(mut key: *const sshkey, mut f: *mut FILE) -> libc::c_int {
+pub unsafe extern "C" fn sshkey_write(mut key: *const sshkey, mut f: *mut libc::FILE) -> libc::c_int {
     let mut b: *mut sshbuf = 0 as *mut sshbuf;
     let mut r: libc::c_int = -(1 as libc::c_int);
     b = sshbuf_new();

@@ -18,20 +18,20 @@ extern "C" {
     fn link(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
-    fn fclose(__stream: *mut FILE) -> libc::c_int;
-    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut FILE;
-    fn fprintf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+    fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
+    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn asprintf(__ptr: *mut *mut libc::c_char, __fmt: *const libc::c_char, _: ...) -> libc::c_int;
-    fn fgetc(__stream: *mut FILE) -> libc::c_int;
-    fn fputc(__c: libc::c_int, __stream: *mut FILE) -> libc::c_int;
+    fn fgetc(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fputc(__c: libc::c_int, __stream: *mut libc::FILE) -> libc::c_int;
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
         __delimiter: libc::c_int,
-        __stream: *mut FILE,
+        __stream: *mut libc::FILE,
     ) -> __ssize_t;
-    fn fseek(__stream: *mut FILE, __off: libc::c_long, __whence: libc::c_int) -> libc::c_int;
+    fn fseek(__stream: *mut libc::FILE, __off: libc::c_long, __whence: libc::c_int) -> libc::c_int;
     fn __b64_ntop(
         _: *const libc::c_uchar,
         _: size_t,
@@ -68,7 +68,7 @@ extern "C" {
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_size(_: *const sshkey) -> u_int;
     fn sshkey_read(_: *mut sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
-    fn sshkey_write(_: *const sshkey, _: *mut FILE) -> libc::c_int;
+    fn sshkey_write(_: *const sshkey, _: *mut libc::FILE) -> libc::c_int;
     fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
     fn sshkey_fingerprint(_: *const sshkey, _: libc::c_int, _: sshkey_fp_rep) -> *mut libc::c_char;
     fn sshkey_equal(_: *const sshkey, _: *const sshkey) -> libc::c_int;
@@ -150,41 +150,9 @@ pub struct stat {
     pub st_ctim: timespec,
     pub __glibc_reserved: [__syscall_slong_t; 3],
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type DSA = dsa_st;
 pub type RSA = rsa_st;
 pub type EC_KEY = ec_key_st;
@@ -317,7 +285,7 @@ pub type hostkeys_foreach_fn =
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct host_delete_ctx {
-    pub out: *mut FILE,
+    pub out: *mut libc::FILE,
     pub quiet: libc::c_int,
     pub host: *const libc::c_char,
     pub ip: *const libc::c_char,
@@ -330,7 +298,7 @@ pub struct host_delete_ctx {
 unsafe extern "C" fn getline(
     mut __lineptr: *mut *mut libc::c_char,
     mut __n: *mut size_t,
-    mut __stream: *mut FILE,
+    mut __stream: *mut libc::FILE,
 ) -> __ssize_t {
     return __getdelim(__lineptr, __n, '\n' as i32, __stream);
 }
@@ -686,7 +654,7 @@ pub unsafe extern "C" fn load_hostkeys_file(
     mut hostkeys: *mut hostkeys,
     mut host: *const libc::c_char,
     mut path: *const libc::c_char,
-    mut f: *mut FILE,
+    mut f: *mut libc::FILE,
     mut note: u_int,
 ) {
     let mut r: libc::c_int = 0;
@@ -752,7 +720,7 @@ pub unsafe extern "C" fn load_hostkeys(
     mut path: *const libc::c_char,
     mut note: u_int,
 ) {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     f = fopen(path, b"r\0" as *const u8 as *const libc::c_char);
     if f.is_null() {
         crate::log::sshlog(
@@ -947,7 +915,7 @@ pub unsafe extern "C" fn lookup_marker_in_hostkeys(
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn write_host_entry(
-    mut f: *mut FILE,
+    mut f: *mut libc::FILE,
     mut host: *const libc::c_char,
     mut ip: *const libc::c_char,
     mut key: *const sshkey,
@@ -1108,7 +1076,7 @@ pub unsafe extern "C" fn add_host_to_hostfile(
     mut key: *const sshkey,
     mut store_hash: libc::c_int,
 ) -> libc::c_int {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut success: libc::c_int = 0;
     let mut addnl: libc::c_int = 0 as libc::c_int;
     if key.is_null() {
@@ -1265,7 +1233,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
         SYSLOG_LEVEL_VERBOSE as libc::c_int
     };
     let mut ctx: host_delete_ctx = host_delete_ctx {
-        out: 0 as *mut FILE,
+        out: 0 as *mut libc::FILE,
         quiet: 0,
         host: 0 as *const libc::c_char,
         ip: 0 as *const libc::c_char,
@@ -1508,7 +1476,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                         3224374282125147660 => {}
                         _ => {
                             fclose(ctx.out);
-                            ctx.out = 0 as *mut FILE;
+                            ctx.out = 0 as *mut libc::FILE;
                             if ctx.modified != 0 {
                                 if unlink(back) == -(1 as libc::c_int)
                                     && *__errno_location() != 2 as libc::c_int
@@ -1645,7 +1613,7 @@ unsafe extern "C" fn match_maybe_hashed(
 }
 pub unsafe extern "C" fn hostkeys_foreach_file(
     mut path: *const libc::c_char,
-    mut f: *mut FILE,
+    mut f: *mut libc::FILE,
     mut callback: Option<hostkeys_foreach_fn>,
     mut ctx: *mut libc::c_void,
     mut host: *const libc::c_char,
@@ -2001,7 +1969,7 @@ pub unsafe extern "C" fn hostkeys_foreach(
     mut options: u_int,
     mut note: u_int,
 ) -> libc::c_int {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut r: libc::c_int = 0;
     let mut oerrno: libc::c_int = 0;
     f = fopen(path, b"r\0" as *const u8 as *const libc::c_char);

@@ -11,21 +11,21 @@ extern "C" {
 
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
-    fn fclose(__stream: *mut FILE) -> libc::c_int;
-    fn fflush(__stream: *mut FILE) -> libc::c_int;
-    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut FILE;
-    fn fprintf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+    fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fflush(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
+    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
         _: *const libc::c_char,
         _: ...
     ) -> libc::c_int;
-    fn fscanf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut FILE) -> *mut libc::c_char;
-    fn fseek(__stream: *mut FILE, __off: libc::c_long, __whence: libc::c_int) -> libc::c_int;
-    fn rewind(__stream: *mut FILE);
+    fn fscanf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut libc::FILE) -> *mut libc::c_char;
+    fn fseek(__stream: *mut libc::FILE, __off: libc::c_long, __whence: libc::c_int) -> libc::c_int;
+    fn rewind(__stream: *mut libc::FILE);
     fn _ssh_mkstemp(_: *mut libc::c_char) -> libc::c_int;
     fn BN_is_prime_ex(
         p: *const BIGNUM,
@@ -37,7 +37,7 @@ extern "C" {
     fn BN_bn2hex(a: *const BIGNUM) -> *mut libc::c_char;
     fn BN_set_bit(a: *mut BIGNUM, n: libc::c_int) -> libc::c_int;
     fn BN_rshift(r: *mut BIGNUM, a: *const BIGNUM, n: libc::c_int) -> libc::c_int;
-    fn BN_print_fp(fp: *mut FILE, a: *const BIGNUM) -> libc::c_int;
+    fn BN_print_fp(fp: *mut libc::FILE, a: *const BIGNUM) -> libc::c_int;
     fn BN_lshift(r: *mut BIGNUM, a: *const BIGNUM, n: libc::c_int) -> libc::c_int;
     fn BN_free(a: *mut BIGNUM);
     fn BN_set_word(a: *mut BIGNUM, w: libc::c_ulong) -> libc::c_int;
@@ -88,41 +88,9 @@ pub type time_t = __time_t;
 pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type BIGNUM = bignum_st;
 pub type BN_CTX = bignum_ctx;
 pub type BN_GENCB = bn_gencb_st;
@@ -164,7 +132,7 @@ static mut largebits: u_int32_t = 0;
 static mut largememory: u_int32_t = 0;
 static mut largebase: *mut BIGNUM = 0 as *const BIGNUM as *mut BIGNUM;
 unsafe extern "C" fn qfileout(
-    mut ofile: *mut FILE,
+    mut ofile: *mut libc::FILE,
     mut otype: u_int32_t,
     mut otests: u_int32_t,
     mut otries: u_int32_t,
@@ -279,7 +247,7 @@ unsafe extern "C" fn sieve_large(mut s32: u_int32_t) {
     }
 }
 pub unsafe extern "C" fn gen_candidates(
-    mut out: *mut FILE,
+    mut out: *mut libc::FILE,
     mut memory: u_int32_t,
     mut power: u_int32_t,
     mut start: *mut BIGNUM,
@@ -698,7 +666,7 @@ pub unsafe extern "C" fn gen_candidates(
     return ret;
 }
 unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno: u_int32_t) {
-    let mut fp: *mut FILE = 0 as *mut FILE;
+    let mut fp: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut tmp: [libc::c_char; 4096] = [0; 4096];
     let mut r: libc::c_int = 0;
     let mut writeok: libc::c_int = 0;
@@ -791,7 +759,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
     };
 }
 unsafe extern "C" fn read_checkpoint(mut cpfile: *mut libc::c_char) -> libc::c_ulong {
-    let mut fp: *mut FILE = 0 as *mut FILE;
+    let mut fp: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut lineno: libc::c_ulong = 0 as libc::c_int as libc::c_ulong;
     fp = fopen(cpfile, b"r\0" as *const u8 as *const libc::c_char);
     if fp.is_null() {
@@ -831,7 +799,7 @@ unsafe extern "C" fn read_checkpoint(mut cpfile: *mut libc::c_char) -> libc::c_u
     fclose(fp);
     return lineno;
 }
-unsafe extern "C" fn count_lines(mut f: *mut FILE) -> libc::c_ulong {
+unsafe extern "C" fn count_lines(mut f: *mut libc::FILE) -> libc::c_ulong {
     let mut count: libc::c_ulong = 0 as libc::c_int as libc::c_ulong;
     let mut lp: [libc::c_char; 8293] = [0; 8293];
     if fseek(f, 0 as libc::c_int as libc::c_long, 0 as libc::c_int) != 0 as libc::c_int {
@@ -979,8 +947,8 @@ unsafe extern "C" fn print_progress(
     free(eta_str as *mut libc::c_void);
 }
 pub unsafe extern "C" fn prime_test(
-    mut in_0: *mut FILE,
-    mut out: *mut FILE,
+    mut in_0: *mut libc::FILE,
+    mut out: *mut libc::FILE,
     mut trials: u_int32_t,
     mut generator_wanted: u_int32_t,
     mut checkpoint_file: *mut libc::c_char,

@@ -6,15 +6,15 @@ extern "C" {
     pub type bignum_st;
     pub type dh_st;
     fn __errno_location() -> *mut libc::c_int;
-    fn fclose(__stream: *mut FILE) -> libc::c_int;
-    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
+    fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
         __delimiter: libc::c_int,
-        __stream: *mut FILE,
+        __stream: *mut libc::FILE,
     ) -> __ssize_t;
-    fn rewind(__stream: *mut FILE);
+    fn rewind(__stream: *mut libc::FILE);
     fn arc4random_uniform(_: uint32_t) -> uint32_t;
     fn strtonum(
         _: *const libc::c_char,
@@ -58,41 +58,9 @@ pub type __ssize_t = libc::c_long;
 pub type u_int = __u_int;
 pub type size_t = libc::c_ulong;
 pub type uint32_t = __uint32_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type BIGNUM = bignum_st;
 pub type DH = dh_st;
 #[derive(Copy, Clone)]
@@ -116,7 +84,7 @@ pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 unsafe extern "C" fn getline(
     mut __lineptr: *mut *mut libc::c_char,
     mut __n: *mut size_t,
-    mut __stream: *mut FILE,
+    mut __stream: *mut libc::FILE,
 ) -> __ssize_t {
     return __getdelim(__lineptr, __n, '\n' as i32, __stream);
 }
@@ -432,7 +400,7 @@ pub unsafe extern "C" fn choose_dh(
     mut wantbits: libc::c_int,
     mut max: libc::c_int,
 ) -> *mut DH {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut line: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut linesize: size_t = 0 as libc::c_int as size_t;
     let mut best: libc::c_int = 0;

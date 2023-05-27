@@ -9,23 +9,23 @@ extern "C" {
     pub type dsa_st;
     pub type rsa_st;
     pub type ec_key_st;
-    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
+    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
 
     fn __errno_location() -> *mut libc::c_int;
 
     fn getuid() -> __uid_t;
-    fn fclose(__stream: *mut FILE) -> libc::c_int;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut FILE;
-    fn fprintf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+    fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn asprintf(__ptr: *mut *mut libc::c_char, __fmt: *const libc::c_char, _: ...) -> libc::c_int;
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
         __delimiter: libc::c_int,
-        __stream: *mut FILE,
+        __stream: *mut libc::FILE,
     ) -> __ssize_t;
-    fn ferror(__stream: *mut FILE) -> libc::c_int;
+    fn ferror(__stream: *mut libc::FILE) -> libc::c_int;
 
     fn free(_: *mut libc::c_void);
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -34,7 +34,7 @@ extern "C" {
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
 
     fn sshkey_new(_: libc::c_int) -> *mut sshkey;
-    fn sshkey_write(_: *const sshkey, _: *mut FILE) -> libc::c_int;
+    fn sshkey_write(_: *const sshkey, _: *mut libc::FILE) -> libc::c_int;
     fn sshkey_private_to_fileblob(
         key: *mut sshkey,
         blob: *mut sshbuf,
@@ -118,41 +118,9 @@ pub struct stat {
     pub st_ctim: timespec,
     pub __glibc_reserved: [__syscall_slong_t; 3],
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type DSA = dsa_st;
 pub type RSA = rsa_st;
 pub type EC_KEY = ec_key_st;
@@ -228,7 +196,7 @@ pub const KEY_RSA_CERT: sshkey_types = 4;
 unsafe extern "C" fn getline(
     mut __lineptr: *mut *mut libc::c_char,
     mut __n: *mut size_t,
-    mut __stream: *mut FILE,
+    mut __stream: *mut libc::FILE,
 ) -> __ssize_t {
     return __getdelim(__lineptr, __n, '\n' as i32, __stream);
 }
@@ -331,7 +299,7 @@ pub unsafe extern "C" fn sshkey_perm_ok(
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @\0" as *const u8
+            b"@         WARNING: UNPROTECTED PRIVATE KEY libc::FILE!          @\0" as *const u8
                 as *const libc::c_char,
         );
         crate::log::sshlog(
@@ -490,7 +458,7 @@ unsafe extern "C" fn sshkey_try_load_public(
     mut filename: *const libc::c_char,
     mut commentp: *mut *mut libc::c_char,
 ) -> libc::c_int {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut line: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut linesize: size_t = 0 as libc::c_int as size_t;
@@ -527,7 +495,7 @@ unsafe extern "C" fn sshkey_try_load_public(
         ) == 0 as libc::c_int
             || strcmp(
                 cp,
-                b"SSH PRIVATE KEY FILE\0" as *const u8 as *const libc::c_char,
+                b"SSH PRIVATE KEY libc::FILE\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             break;
@@ -680,7 +648,7 @@ pub unsafe extern "C" fn sshkey_in_file(
     mut check_ca: libc::c_int,
 ) -> libc::c_int {
     let mut current_block: u64;
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut line: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut linesize: size_t = 0 as libc::c_int as size_t;
@@ -812,7 +780,7 @@ pub unsafe extern "C" fn sshkey_save_public(
 ) -> libc::c_int {
     let mut fd: libc::c_int = 0;
     let mut oerrno: libc::c_int = 0;
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut r: libc::c_int = -(1 as libc::c_int);
     fd = libc::open(
         path,
@@ -834,7 +802,7 @@ pub unsafe extern "C" fn sshkey_save_public(
                 r = -(24 as libc::c_int);
             } else if fclose(f) != 0 as libc::c_int {
                 r = -(24 as libc::c_int);
-                f = 0 as *mut FILE;
+                f = 0 as *mut libc::FILE;
             } else {
                 return 0 as libc::c_int;
             }

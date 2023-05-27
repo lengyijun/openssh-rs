@@ -13,13 +13,13 @@ extern "C" {
     ) -> *mut libc::c_char;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    static mut stdout: *mut FILE;
+    static mut stdout: *mut libc::FILE;
     fn vasprintf(
         __ptr: *mut *mut libc::c_char,
         __f: *const libc::c_char,
         __arg: ::core::ffi::VaList,
     ) -> libc::c_int;
-    fn fputs(__s: *const libc::c_char, __stream: *mut FILE) -> libc::c_int;
+    fn fputs(__s: *const libc::c_char, __stream: *mut libc::FILE) -> libc::c_int;
     fn nl_langinfo(__item: nl_item) -> *mut libc::c_char;
     fn setlocale(__category: libc::c_int, __locale: *const libc::c_char) -> *mut libc::c_char;
     fn __ctype_get_mb_cur_max() -> size_t;
@@ -48,41 +48,9 @@ pub struct __va_list_tag {
 pub type __off_t = libc::c_long;
 pub type __off64_t = libc::c_long;
 pub type size_t = libc::c_ulong;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type wchar_t = libc::c_int;
 pub type va_list = __builtin_va_list;
 pub type nl_item = libc::c_int;
@@ -712,7 +680,7 @@ pub unsafe extern "C" fn asmprintf(
     return ret;
 }
 pub unsafe extern "C" fn vfmprintf(
-    mut stream: *mut FILE,
+    mut stream: *mut libc::FILE,
     mut fmt: *const libc::c_char,
     mut ap: ::core::ffi::VaList,
 ) -> libc::c_int {
@@ -736,7 +704,7 @@ pub unsafe extern "C" fn vfmprintf(
     return ret;
 }
 pub unsafe extern "C" fn fmprintf(
-    mut stream: *mut FILE,
+    mut stream: *mut libc::FILE,
     mut fmt: *const libc::c_char,
     mut args: ...
 ) -> libc::c_int {

@@ -23,8 +23,8 @@ extern "C" {
     fn _exit(_: libc::c_int) -> !;
     fn fork() -> __pid_t;
     fn isatty(__fd: libc::c_int) -> libc::c_int;
-    static mut stdout: *mut FILE;
-    fn fflush(__stream: *mut FILE) -> libc::c_int;
+    static mut stdout: *mut libc::FILE;
+    fn fflush(__stream: *mut libc::FILE) -> libc::c_int;
     fn vsnprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -82,41 +82,9 @@ pub type __ssize_t = libc::c_long;
 pub type pid_t = __pid_t;
 pub type ssize_t = __ssize_t;
 pub type size_t = libc::c_ulong;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type __sighandler_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 pub type va_list = __builtin_va_list;
 #[derive(Copy, Clone)]
@@ -493,7 +461,7 @@ pub unsafe extern "C" fn notify_start(
     let mut ret: *mut notifier_ctx = 0 as *mut notifier_ctx;
     args_0 = args.clone();
     xvasprintf(&mut prompt, fmt, args_0.as_va_list());
-    if fflush(0 as *mut FILE) != 0 as libc::c_int {
+    if fflush(0 as *mut libc::FILE) != 0 as libc::c_int {
         crate::log::sshlog(
             b"readpass.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"notify_start\0")).as_ptr(),

@@ -49,12 +49,12 @@ extern "C" {
         __pai: *mut *mut addrinfo,
     ) -> libc::c_int;
     fn freeaddrinfo(__ai: *mut addrinfo);
-    static mut stdin: *mut FILE;
-    static mut stdout: *mut FILE;
-    static mut stderr: *mut FILE;
-    fn fclose(__stream: *mut FILE) -> libc::c_int;
-    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
-    fn fprintf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+    static mut stdin: *mut libc::FILE;
+    static mut stdout: *mut libc::FILE;
+    static mut stderr: *mut libc::FILE;
+    fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
+    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -66,10 +66,10 @@ extern "C" {
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
         __delimiter: libc::c_int,
-        __stream: *mut FILE,
+        __stream: *mut libc::FILE,
     ) -> __ssize_t;
-    fn fputs(__s: *const libc::c_char, __stream: *mut FILE) -> libc::c_int;
-    fn ferror(__stream: *mut FILE) -> libc::c_int;
+    fn fputs(__s: *const libc::c_char, __stream: *mut libc::FILE) -> libc::c_int;
+    fn ferror(__stream: *mut libc::FILE) -> libc::c_int;
     fn seed_rng();
     fn ssh_get_progname(_: *mut libc::c_char) -> *mut libc::c_char;
     fn ppoll(
@@ -95,7 +95,7 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn sshkey_write(_: *const sshkey, _: *mut FILE) -> libc::c_int;
+    fn sshkey_write(_: *const sshkey, _: *mut libc::FILE) -> libc::c_int;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn ssh_digest_alg_by_name(name: *const libc::c_char) -> libc::c_int;
     fn kex_setup(_: *mut ssh, _: *mut *mut libc::c_char) -> libc::c_int;
@@ -130,7 +130,7 @@ extern "C" {
     fn export_dns_rr(
         _: *const libc::c_char,
         _: *mut sshkey,
-        _: *mut FILE,
+        _: *mut libc::FILE,
         _: libc::c_int,
         _: libc::c_int,
     ) -> libc::c_int;
@@ -259,41 +259,9 @@ pub union __CONST_SOCKADDR_ARG {
     pub __sockaddr_un__: *const sockaddr_un,
     pub __sockaddr_x25__: *const sockaddr_x25,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type sig_atomic_t = __sig_atomic_t;
 pub type C2RustUnnamed_0 = libc::c_uint;
 pub const _SC_SIGSTKSZ: C2RustUnnamed_0 = 250;
@@ -875,7 +843,7 @@ unsafe extern "C" fn __bswap_32(mut __bsx: __uint32_t) -> __uint32_t {
 unsafe extern "C" fn getline(
     mut __lineptr: *mut *mut libc::c_char,
     mut __n: *mut size_t,
-    mut __stream: *mut FILE,
+    mut __stream: *mut libc::FILE,
 ) -> __ssize_t {
     return __getdelim(__lineptr, __n, '\n' as i32, __stream);
 }
@@ -1984,7 +1952,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut line: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut linesize: size_t = 0 as libc::c_int as size_t;
-    let mut fp: *mut FILE = 0 as *mut FILE;
+    let mut fp: *mut libc::FILE = 0 as *mut libc::FILE;
     extern "C" {
         #[link_name = "BSDoptind"]
         static mut BSDoptind_0: libc::c_int;

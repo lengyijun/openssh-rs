@@ -44,21 +44,21 @@ extern "C" {
         _: *mut *const libc::c_char,
     ) -> libc::c_longlong;
     fn ssh_get_progname(_: *mut libc::c_char) -> *mut libc::c_char;
-    static mut stdin: *mut FILE;
-    static mut stdout: *mut FILE;
-    static mut stderr: *mut FILE;
+    static mut stdin: *mut libc::FILE;
+    static mut stdout: *mut libc::FILE;
+    static mut stderr: *mut libc::FILE;
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
-    fn fclose(__stream: *mut FILE) -> libc::c_int;
-    fn fflush(__stream: *mut FILE) -> libc::c_int;
-    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut FILE;
+    fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fflush(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
+    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
     fn setvbuf(
-        __stream: *mut FILE,
+        __stream: *mut libc::FILE,
         __buf: *mut libc::c_char,
         __modes: libc::c_int,
         __n: size_t,
     ) -> libc::c_int;
-    fn fprintf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -66,18 +66,18 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> libc::c_int;
-    fn fgetc(__stream: *mut FILE) -> libc::c_int;
-    fn fputc(__c: libc::c_int, __stream: *mut FILE) -> libc::c_int;
-    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut FILE) -> *mut libc::c_char;
+    fn fgetc(__stream: *mut libc::FILE) -> libc::c_int;
+    fn fputc(__c: libc::c_int, __stream: *mut libc::FILE) -> libc::c_int;
+    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut libc::FILE) -> *mut libc::c_char;
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
         __delimiter: libc::c_int,
-        __stream: *mut FILE,
+        __stream: *mut libc::FILE,
     ) -> __ssize_t;
-    fn fputs(__s: *const libc::c_char, __stream: *mut FILE) -> libc::c_int;
+    fn fputs(__s: *const libc::c_char, __stream: *mut libc::FILE) -> libc::c_int;
     fn puts(__s: *const libc::c_char) -> libc::c_int;
-    fn ungetc(__c: libc::c_int, __stream: *mut FILE) -> libc::c_int;
+    fn ungetc(__c: libc::c_int, __stream: *mut libc::FILE) -> libc::c_int;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn _ssh_mkstemp(_: *mut libc::c_char) -> libc::c_int;
@@ -125,14 +125,14 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn PEM_read_PUBKEY(
-        out: *mut FILE,
+        out: *mut libc::FILE,
         x: *mut *mut EVP_PKEY,
         cb: Option<pem_password_cb>,
         u: *mut libc::c_void,
     ) -> *mut EVP_PKEY;
-    fn PEM_write_EC_PUBKEY(out: *mut FILE, x: *const EC_KEY) -> libc::c_int;
+    fn PEM_write_EC_PUBKEY(out: *mut libc::FILE, x: *const EC_KEY) -> libc::c_int;
     fn PEM_write_ECPrivateKey(
-        out: *mut FILE,
+        out: *mut libc::FILE,
         x: *const EC_KEY,
         enc: *const EVP_CIPHER,
         kstr: *const libc::c_uchar,
@@ -140,9 +140,9 @@ extern "C" {
         cb: Option<pem_password_cb>,
         u: *mut libc::c_void,
     ) -> libc::c_int;
-    fn PEM_write_DSA_PUBKEY(out: *mut FILE, x: *const DSA) -> libc::c_int;
+    fn PEM_write_DSA_PUBKEY(out: *mut libc::FILE, x: *const DSA) -> libc::c_int;
     fn PEM_write_DSAPrivateKey(
-        out: *mut FILE,
+        out: *mut libc::FILE,
         x: *const DSA,
         enc: *const EVP_CIPHER,
         kstr: *const libc::c_uchar,
@@ -150,16 +150,16 @@ extern "C" {
         cb: Option<pem_password_cb>,
         u: *mut libc::c_void,
     ) -> libc::c_int;
-    fn PEM_write_RSA_PUBKEY(out: *mut FILE, x: *const RSA) -> libc::c_int;
-    fn PEM_write_RSAPublicKey(out: *mut FILE, x: *const RSA) -> libc::c_int;
+    fn PEM_write_RSA_PUBKEY(out: *mut libc::FILE, x: *const RSA) -> libc::c_int;
+    fn PEM_write_RSAPublicKey(out: *mut libc::FILE, x: *const RSA) -> libc::c_int;
     fn PEM_read_RSAPublicKey(
-        out: *mut FILE,
+        out: *mut libc::FILE,
         x: *mut *mut RSA,
         cb: Option<pem_password_cb>,
         u: *mut libc::c_void,
     ) -> *mut RSA;
     fn PEM_write_RSAPrivateKey(
-        out: *mut FILE,
+        out: *mut libc::FILE,
         x: *const RSA,
         enc: *const EVP_CIPHER,
         kstr: *const libc::c_uchar,
@@ -186,7 +186,7 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
     fn sshkey_cert_type(_: *const sshkey) -> *const libc::c_char;
-    fn sshkey_write(_: *const sshkey, _: *mut FILE) -> libc::c_int;
+    fn sshkey_write(_: *const sshkey, _: *mut libc::FILE) -> libc::c_int;
     fn sshkey_read(_: *mut sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
     fn sshkey_size(_: *const sshkey) -> u_int;
     fn sshkey_generate(type_0: libc::c_int, bits: u_int, keyp: *mut *mut sshkey) -> libc::c_int;
@@ -345,7 +345,7 @@ extern "C" {
     fn export_dns_rr(
         _: *const libc::c_char,
         _: *mut sshkey,
-        _: *mut FILE,
+        _: *mut libc::FILE,
         _: libc::c_int,
         _: libc::c_int,
     ) -> libc::c_int;
@@ -390,7 +390,7 @@ extern "C" {
         nsign_ca_keys: size_t,
     ) -> libc::c_int;
     fn ssh_krl_check_key(krl: *mut ssh_krl, key: *const sshkey) -> libc::c_int;
-    fn krl_dump(krl: *mut ssh_krl, f: *mut FILE) -> libc::c_int;
+    fn krl_dump(krl: *mut ssh_krl, f: *mut libc::FILE) -> libc::c_int;
     fn ssh_digest_alg_by_name(name: *const libc::c_char) -> libc::c_int;
     fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn asmprintf(
@@ -478,10 +478,10 @@ extern "C" {
     fn sshsk_free_resident_keys(srks: *mut *mut sshsk_resident_key, nsrks: size_t);
     fn cipher_by_name(_: *const libc::c_char) -> *const sshcipher;
     static mut __progname: *mut libc::c_char;
-    fn gen_candidates(_: *mut FILE, _: u_int32_t, _: u_int32_t, _: *mut BIGNUM) -> libc::c_int;
+    fn gen_candidates(_: *mut libc::FILE, _: u_int32_t, _: u_int32_t, _: *mut BIGNUM) -> libc::c_int;
     fn prime_test(
-        _: *mut FILE,
-        _: *mut FILE,
+        _: *mut libc::FILE,
+        _: *mut libc::FILE,
         _: u_int32_t,
         _: u_int32_t,
         _: *mut libc::c_char,
@@ -559,41 +559,9 @@ pub struct passwd {
     pub pw_dir: *mut libc::c_char,
     pub pw_shell: *mut libc::c_char,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type BIGNUM = bignum_st;
 pub type EVP_CIPHER = evp_cipher_st;
 pub type EVP_PKEY = evp_pkey_st;
@@ -788,7 +756,7 @@ pub struct C2RustUnnamed_1 {
 #[repr(C)]
 pub struct known_hosts_ctx {
     pub host: *const libc::c_char,
-    pub out: *mut FILE,
+    pub out: *mut libc::FILE,
     pub has_unhashed: libc::c_int,
     pub found_key: libc::c_int,
     pub invalid: libc::c_int,
@@ -800,7 +768,7 @@ pub struct known_hosts_ctx {
 unsafe extern "C" fn getline(
     mut __lineptr: *mut *mut libc::c_char,
     mut __n: *mut size_t,
-    mut __stream: *mut FILE,
+    mut __stream: *mut libc::FILE,
 ) -> __ssize_t {
     return __getdelim(__lineptr, __n, '\n' as i32, __stream);
 }
@@ -1983,7 +1951,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut sshbuf) -> *mut sshkey 
     return key;
 }
 unsafe extern "C" fn get_line(
-    mut fp: *mut FILE,
+    mut fp: *mut libc::FILE,
     mut line: *mut libc::c_char,
     mut len: size_t,
 ) -> libc::c_int {
@@ -2049,7 +2017,7 @@ unsafe extern "C" fn do_convert_from_ssh2(
     let mut line: [libc::c_char; 1024] = [0; 1024];
     let mut buf: *mut sshbuf = 0 as *mut sshbuf;
     let mut encoded: [libc::c_char; 8096] = [0; 8096];
-    let mut fp: *mut FILE = 0 as *mut FILE;
+    let mut fp: *mut libc::FILE = 0 as *mut libc::FILE;
     buf = sshbuf_new();
     if buf.is_null() {
         sshfatal(
@@ -2202,7 +2170,7 @@ unsafe extern "C" fn do_convert_from_pkcs8(
     mut _private: *mut libc::c_int,
 ) {
     let mut pubkey: *mut EVP_PKEY = 0 as *mut EVP_PKEY;
-    let mut fp: *mut FILE = 0 as *mut FILE;
+    let mut fp: *mut libc::FILE = 0 as *mut libc::FILE;
     fp = fopen(
         identity_file.as_mut_ptr(),
         b"r\0" as *const u8 as *const libc::c_char,
@@ -2315,7 +2283,7 @@ unsafe extern "C" fn do_convert_from_pkcs8(
     EVP_PKEY_free(pubkey);
 }
 unsafe extern "C" fn do_convert_from_pem(mut k: *mut *mut sshkey, mut _private: *mut libc::c_int) {
-    let mut fp: *mut FILE = 0 as *mut FILE;
+    let mut fp: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut rsa: *mut RSA = 0 as *mut RSA;
     fp = fopen(
         identity_file.as_mut_ptr(),
@@ -2866,7 +2834,7 @@ unsafe extern "C" fn fingerprint_private(mut path: *const libc::c_char) {
     free(comment as *mut libc::c_void);
 }
 unsafe extern "C" fn do_fingerprint(mut pw: *mut passwd) {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut public: *mut sshkey = 0 as *mut sshkey;
     let mut comment: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -3590,7 +3558,7 @@ unsafe extern "C" fn do_known_hosts(
     let mut inplace: libc::c_int = 0 as libc::c_int;
     let mut ctx: known_hosts_ctx = known_hosts_ctx {
         host: 0 as *const libc::c_char,
-        out: 0 as *mut FILE,
+        out: 0 as *mut libc::FILE,
         has_unhashed: 0,
         found_key: 0,
         invalid: 0,
@@ -5822,7 +5790,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut passwd) {
     let mut r: libc::c_int = 0;
     let mut is_stdin: libc::c_int = 0 as libc::c_int;
     let mut ok: libc::c_int = 0 as libc::c_int;
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut line: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut path: *const libc::c_char = 0 as *const libc::c_char;
@@ -6093,7 +6061,7 @@ unsafe extern "C" fn update_krl_from_file(
     let mut was_sha256: libc::c_int = 0;
     let mut was_hash: libc::c_int = 0;
     let mut r: libc::c_int = 0;
-    let mut krl_spec: *mut FILE = 0 as *mut FILE;
+    let mut krl_spec: *mut libc::FILE = 0 as *mut libc::FILE;
     path = tilde_expand_filename(file, (*pw).pw_uid);
     if strcmp(path, b"-\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         krl_spec = stdin;
@@ -7931,7 +7899,7 @@ unsafe extern "C" fn do_moduli_gen(
     let mut memory: u_int32_t = 0 as libc::c_int as u_int32_t;
     let mut start: *mut BIGNUM = 0 as *mut BIGNUM;
     let mut moduli_bits: libc::c_int = 0 as libc::c_int;
-    let mut out: *mut FILE = 0 as *mut FILE;
+    let mut out: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut i: size_t = 0;
     let mut errstr: *const libc::c_char = 0 as *const libc::c_char;
     i = 0 as libc::c_int as size_t;
@@ -8077,8 +8045,8 @@ unsafe extern "C" fn do_moduli_screen(
     let mut start_lineno: libc::c_ulong = 0 as libc::c_int as libc::c_ulong;
     let mut lines_to_process: libc::c_ulong = 0 as libc::c_int as libc::c_ulong;
     let mut prime_tests: libc::c_int = 0 as libc::c_int;
-    let mut out: *mut FILE = 0 as *mut FILE;
-    let mut in_0: *mut FILE = stdin;
+    let mut out: *mut libc::FILE = 0 as *mut libc::FILE;
+    let mut in_0: *mut libc::FILE = stdin;
     let mut i: size_t = 0;
     let mut errstr: *const libc::c_char = 0 as *const libc::c_char;
     i = 0 as libc::c_int as size_t;

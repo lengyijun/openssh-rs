@@ -59,9 +59,9 @@ extern "C" {
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn getservbyname(__name: *const libc::c_char, __proto: *const libc::c_char) -> *mut servent;
     fn gai_strerror(__ecode: libc::c_int) -> *const libc::c_char;
-    static mut stderr: *mut FILE;
-    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut FILE;
-    fn fprintf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+    static mut stderr: *mut libc::FILE;
+    fn fdopen(__fd: libc::c_int, __modes: *const libc::c_char) -> *mut libc::FILE;
+    fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -406,41 +406,9 @@ pub struct passwd {
     pub pw_dir: *mut libc::c_char,
     pub pw_shell: *mut libc::c_char,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union sigval {
@@ -4705,13 +4673,13 @@ pub unsafe extern "C" fn subprocess(
     mut command: *const libc::c_char,
     mut _ac: libc::c_int,
     mut av: *mut *mut libc::c_char,
-    mut child: *mut *mut FILE,
+    mut child: *mut *mut libc::FILE,
     mut flags: u_int,
     mut pw: *mut passwd,
     mut drop_privs: Option<privdrop_fn>,
     mut restore_privs: Option<privrestore_fn>,
 ) -> pid_t {
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut st: stat = stat {
         st_dev: 0,
         st_ino: 0,
@@ -4777,7 +4745,7 @@ pub unsafe extern "C" fn subprocess(
         return 0 as libc::c_int;
     }
     if !child.is_null() {
-        *child = 0 as *mut FILE;
+        *child = 0 as *mut libc::FILE;
     }
     crate::log::sshlog(
         b"misc.c\0" as *const u8 as *const libc::c_char,
@@ -4809,7 +4777,7 @@ pub unsafe extern "C" fn subprocess(
     }
     if (flags & ((1 as libc::c_int) << 1 as libc::c_int) as libc::c_uint
         == 0 as libc::c_int as libc::c_uint) as libc::c_int
-        != (child == 0 as *mut libc::c_void as *mut *mut FILE) as libc::c_int
+        != (child == 0 as *mut libc::c_void as *mut *mut libc::FILE) as libc::c_int
     {
         crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,

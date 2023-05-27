@@ -40,8 +40,8 @@ extern "C" {
     fn setproctitle(fmt: *const libc::c_char, _: ...);
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    static mut stdout: *mut FILE;
-    static mut stderr: *mut FILE;
+    static mut stdout: *mut libc::FILE;
+    static mut stderr: *mut libc::FILE;
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -49,10 +49,10 @@ extern "C" {
         _: ...
     ) -> libc::c_int;
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut FILE) -> *mut libc::c_char;
-    fn fileno(__stream: *mut FILE) -> libc::c_int;
-    fn pclose(__stream: *mut FILE) -> libc::c_int;
-    fn popen(__command: *const libc::c_char, __modes: *const libc::c_char) -> *mut FILE;
+    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut libc::FILE) -> *mut libc::c_char;
+    fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
+    fn pclose(__stream: *mut libc::FILE) -> libc::c_int;
+    fn popen(__command: *const libc::c_char, __modes: *const libc::c_char) -> *mut libc::FILE;
     fn rmdir(__path: *const libc::c_char) -> libc::c_int;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
@@ -454,41 +454,9 @@ pub struct stat {
     pub st_ctim: timespec,
     pub __glibc_reserved: [__syscall_slong_t; 3],
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _IO_FILE {
-    pub _flags: libc::c_int,
-    pub _IO_read_ptr: *mut libc::c_char,
-    pub _IO_read_end: *mut libc::c_char,
-    pub _IO_read_base: *mut libc::c_char,
-    pub _IO_write_base: *mut libc::c_char,
-    pub _IO_write_ptr: *mut libc::c_char,
-    pub _IO_write_end: *mut libc::c_char,
-    pub _IO_buf_base: *mut libc::c_char,
-    pub _IO_buf_end: *mut libc::c_char,
-    pub _IO_save_base: *mut libc::c_char,
-    pub _IO_backup_base: *mut libc::c_char,
-    pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: libc::c_int,
-    pub _flags2: libc::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: libc::c_ushort,
-    pub _vtable_offset: libc::c_schar,
-    pub _shortbuf: [libc::c_char; 1],
-    pub _lock: *mut libc::c_void,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut libc::c_void,
-    pub __pad5: size_t,
-    pub _mode: libc::c_int,
-    pub _unused2: [libc::c_char; 20],
-}
+
 pub type _IO_lock_t = ();
-pub type FILE = _IO_FILE;
+
 pub type sig_atomic_t = __sig_atomic_t;
 pub type __sighandler_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 #[derive(Copy, Clone)]
@@ -1264,7 +1232,7 @@ pub unsafe extern "C" fn client_x11_get_proto(
     let mut xauthdir: [libc::c_char; 4096] = [0; 4096];
     static mut proto: [libc::c_char; 512] = [0; 512];
     static mut data: [libc::c_char; 512] = [0; 512];
-    let mut f: *mut FILE = 0 as *mut FILE;
+    let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut got_data: libc::c_int = 0 as libc::c_int;
     let mut generated: libc::c_int = 0 as libc::c_int;
     let mut do_unlink: libc::c_int = 0 as libc::c_int;
