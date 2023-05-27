@@ -23,7 +23,7 @@ extern "C" {
     fn nl_langinfo(__item: nl_item) -> *mut libc::c_char;
     fn setlocale(__category: libc::c_int, __locale: *const libc::c_char) -> *mut libc::c_char;
     fn __ctype_get_mb_cur_max() -> size_t;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn free(_: *mut libc::c_void);
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn mbtowc(__pwc: *mut wchar_t, __s: *const libc::c_char, __n: size_t) -> libc::c_int;
@@ -503,7 +503,7 @@ pub unsafe extern "C" fn vasnmprintf(
     ret = vasprintf(&mut src, fmt, ap.as_va_list());
     if !(ret <= 0 as libc::c_int) {
         sz = (strlen(src)).wrapping_add(1 as libc::c_int as libc::c_ulong);
-        dst = malloc(sz) as *mut libc::c_char;
+        dst = libc::malloc(sz as usize) as *mut libc::c_char;
         if dst.is_null() {
             free(src as *mut libc::c_void);
             ret = -(1 as libc::c_int);

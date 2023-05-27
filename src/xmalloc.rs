@@ -6,7 +6,7 @@ extern "C" {
         __arg: ::core::ffi::VaList,
     ) -> libc::c_int;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn reallocarray(__ptr: *mut libc::c_void, __nmemb: size_t, __size: size_t)
         -> *mut libc::c_void;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
@@ -57,7 +57,7 @@ pub unsafe extern "C" fn xmalloc(mut size: size_t) -> *mut libc::c_void {
             b"xmalloc: zero size\0" as *const u8 as *const libc::c_char,
         );
     }
-    ptr = malloc(size);
+    ptr = libc::malloc(size as usize);
     if ptr.is_null() {
         sshfatal(
             b"xmalloc.c\0" as *const u8 as *const libc::c_char,

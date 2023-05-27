@@ -16,7 +16,7 @@ extern "C" {
     fn __b64_pton(_: *const libc::c_char, _: *mut libc::c_uchar, _: size_t) -> libc::c_int;
     fn timingsafe_bcmp(_: *const libc::c_void, _: *const libc::c_void, _: size_t) -> libc::c_int;
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
@@ -137,9 +137,9 @@ pub unsafe extern "C" fn sshbuf_dtob16(mut buf: *mut sshbuf) -> *mut libc::c_cha
     if (18446744073709551615 as libc::c_ulong).wrapping_div(2 as libc::c_int as libc::c_ulong)
         <= len
         || {
-            ret = malloc(
-                len.wrapping_mul(2 as libc::c_int as libc::c_ulong)
-                    .wrapping_add(1 as libc::c_int as libc::c_ulong),
+            ret = libc::malloc(
+                (len.wrapping_mul(2 as libc::c_int as libc::c_ulong)
+                    .wrapping_add(1 as libc::c_int as libc::c_ulong)) as usize,
             ) as *mut libc::c_char;
             ret.is_null()
         }
@@ -190,7 +190,7 @@ pub unsafe extern "C" fn sshbuf_dtob64(
         .wrapping_div(3 as libc::c_int as libc::c_ulong)
         .wrapping_mul(4 as libc::c_int as libc::c_ulong)
         .wrapping_add(1 as libc::c_int as libc::c_ulong);
-    s = malloc(slen) as *mut libc::c_char;
+    s = libc::malloc(slen as usize) as *mut libc::c_char;
     if s.is_null() {
         return -(2 as libc::c_int);
     }
@@ -286,7 +286,7 @@ pub unsafe extern "C" fn sshbuf_b64tod(
     if plen == 0 as libc::c_int as libc::c_ulong {
         return 0 as libc::c_int;
     }
-    p = malloc(plen) as *mut u_char;
+    p = libc::malloc(plen as usize) as *mut u_char;
     if p.is_null() {
         return -(2 as libc::c_int);
     }
@@ -390,7 +390,8 @@ pub unsafe extern "C" fn sshbuf_dup_string(mut buf: *mut sshbuf) -> *mut libc::c
         l = l.wrapping_sub(1);
         l;
     }
-    r = malloc(l.wrapping_add(1 as libc::c_int as libc::c_ulong)) as *mut libc::c_char;
+    r = libc::malloc((l.wrapping_add(1 as libc::c_int as libc::c_ulong)) as usize)
+        as *mut libc::c_char;
     if r.is_null() {
         return 0 as *mut libc::c_char;
     }

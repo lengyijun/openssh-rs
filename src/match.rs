@@ -3,7 +3,7 @@ extern "C" {
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __ctype_tolower_loc() -> *mut *const __int32_t;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn free(_: *mut libc::c_void);
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
@@ -329,7 +329,7 @@ unsafe extern "C" fn filter_list(
     mut denylist: libc::c_int,
 ) -> *mut libc::c_char {
     let mut len: size_t = (strlen(proposal)).wrapping_add(1 as libc::c_int as libc::c_ulong);
-    let mut fix_prop: *mut libc::c_char = malloc(len) as *mut libc::c_char;
+    let mut fix_prop: *mut libc::c_char = libc::malloc(len as usize) as *mut libc::c_char;
     let mut orig_prop: *mut libc::c_char = strdup(proposal);
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;

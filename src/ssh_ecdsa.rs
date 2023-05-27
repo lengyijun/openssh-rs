@@ -9,7 +9,7 @@ extern "C" {
     pub type ec_group_st;
     pub type ec_point_st;
     pub type ECDSA_SIG_st;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn free(_: *mut libc::c_void);
     fn BN_clear_free(a: *mut BIGNUM);
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
@@ -484,7 +484,7 @@ unsafe extern "C" fn ssh_ecdsa_sign(
                     }) {
                         len = sshbuf_len(b);
                         if !sigp.is_null() {
-                            *sigp = malloc(len) as *mut u_char;
+                            *sigp = libc::malloc(len as usize) as *mut u_char;
                             if (*sigp).is_null() {
                                 ret = -(2 as libc::c_int);
                                 current_block = 12351472656133197307;

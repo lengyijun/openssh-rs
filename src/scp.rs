@@ -89,7 +89,7 @@ extern "C" {
         _: *mut *mut libc::c_char,
         _: libc::c_int,
     ) -> libc::c_ulonglong;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn free(_: *mut libc::c_void);
     fn reallocarray(__ptr: *mut libc::c_void, __nmemb: size_t, __size: size_t)
         -> *mut libc::c_void;
@@ -1393,9 +1393,8 @@ unsafe extern "C" fn emit_expansion(
             .offset(brace_end as isize)
             .offset(1 as libc::c_int as isize),
     ) as libc::c_int;
-    cp = malloc(
-        (brace_start + (sel_end - sel_start) + tail_len + 1 as libc::c_int) as libc::c_ulong,
-    ) as *mut libc::c_char;
+    cp = libc::malloc((brace_start + (sel_end - sel_start) + tail_len + 1 as libc::c_int) as usize)
+        as *mut libc::c_char;
     if cp.is_null() {
         return -(1 as libc::c_int);
     }

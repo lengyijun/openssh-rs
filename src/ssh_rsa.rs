@@ -9,7 +9,7 @@ extern "C" {
     pub type ec_key_st;
     fn timingsafe_bcmp(_: *const libc::c_void, _: *const libc::c_void, _: size_t) -> libc::c_int;
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn BN_set_flags(b: *mut BIGNUM, n: libc::c_int);
@@ -752,7 +752,7 @@ unsafe extern "C" fn ssh_rsa_sign(
         ::core::mem::size_of::<[u_char; 64]>() as libc::c_ulong,
     );
     if !(ret != 0 as libc::c_int) {
-        sig = malloc(slen) as *mut u_char;
+        sig = libc::malloc(slen as usize) as *mut u_char;
         if sig.is_null() {
             ret = -(2 as libc::c_int);
         } else if RSA_sign(nid, digest.as_mut_ptr(), hlen, sig, &mut len, (*key).rsa)
@@ -789,7 +789,7 @@ unsafe extern "C" fn ssh_rsa_sign(
                         }) {
                             len = sshbuf_len(b) as u_int;
                             if !sigp.is_null() {
-                                *sigp = malloc(len as libc::c_ulong) as *mut u_char;
+                                *sigp = libc::malloc(len as usize) as *mut u_char;
                                 if (*sigp).is_null() {
                                     ret = -(2 as libc::c_int);
                                     current_block = 14398652845524645006;
@@ -1089,7 +1089,7 @@ unsafe extern "C" fn openssh_RSA_verify(
         {
             ret = -(10 as libc::c_int);
         } else {
-            decrypted = malloc(rsasize) as *mut u_char;
+            decrypted = libc::malloc(rsasize as usize) as *mut u_char;
             if decrypted.is_null() {
                 ret = -(2 as libc::c_int);
             } else {

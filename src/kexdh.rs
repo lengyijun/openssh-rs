@@ -12,7 +12,7 @@ extern "C" {
     pub type ssh_hmac_ctx;
     pub type sshcipher;
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn BN_new() -> *mut BIGNUM;
     fn BN_clear_free(a: *mut BIGNUM);
     fn BN_bin2bn(s: *const libc::c_uchar, len: libc::c_int, ret: *mut BIGNUM) -> *mut BIGNUM;
@@ -242,7 +242,7 @@ pub unsafe extern "C" fn kex_dh_compute_key(
         r = -(3 as libc::c_int);
     } else {
         klen = DH_size((*kex).dh) as size_t;
-        kbuf = malloc(klen) as *mut u_char;
+        kbuf = libc::malloc(klen as usize) as *mut u_char;
         if kbuf.is_null() || {
             shared_secret = BN_new();
             shared_secret.is_null()

@@ -12,7 +12,7 @@ extern "C" {
     fn fputc(__c: libc::c_int, __stream: *mut libc::FILE) -> libc::c_int;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -2082,8 +2082,8 @@ unsafe extern "C" fn insert_serial_range(
     rs.hi = hi;
     ers = revoked_serial_tree_RB_NFIND(rt, &mut rs);
     if ers.is_null() || serial_cmp(ers, &mut rs) != 0 as libc::c_int {
-        irs = malloc(::core::mem::size_of::<revoked_serial>() as libc::c_ulong)
-            as *mut revoked_serial;
+        irs =
+            libc::malloc(::core::mem::size_of::<revoked_serial>() as usize) as *mut revoked_serial;
         if irs.is_null() {
             return -(2 as libc::c_int);
         }
@@ -2273,7 +2273,7 @@ unsafe extern "C" fn revoke_by_hash(
 ) -> libc::c_int {
     let mut blob: *mut u_char = 0 as *mut u_char;
     let mut r: libc::c_int = 0;
-    blob = malloc(len) as *mut u_char;
+    blob = libc::malloc(len as usize) as *mut u_char;
     if blob.is_null() {
         return -(24 as libc::c_int);
     }
@@ -2470,7 +2470,7 @@ unsafe extern "C" fn put_bitmap(mut buf: *mut sshbuf, mut bitmap: *mut bitmap) -
     let mut blob: *mut u_char = 0 as *mut u_char;
     let mut r: libc::c_int = 0;
     len = bitmap_nbytes(bitmap);
-    blob = malloc(len) as *mut u_char;
+    blob = libc::malloc(len as usize) as *mut u_char;
     if blob.is_null() {
         return -(2 as libc::c_int);
     }

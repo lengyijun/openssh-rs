@@ -5,7 +5,7 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn crypto_sign_ed25519_open(
@@ -410,7 +410,7 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
                 sm = sshbuf_ptr(encoded);
                 smlen = sshbuf_len(encoded) as libc::c_ulonglong;
                 mlen = smlen;
-                m = malloc(smlen as libc::c_ulong) as *mut u_char;
+                m = libc::malloc(smlen as usize) as *mut u_char;
                 if m.is_null() {
                     r = -(2 as libc::c_int);
                 } else {

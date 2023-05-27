@@ -112,7 +112,7 @@ extern "C" {
     fn strsignal(__sig: libc::c_int) -> *mut libc::c_char;
     fn dirname(__path: *mut libc::c_char) -> *mut libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
@@ -3727,7 +3727,7 @@ pub unsafe extern "C" fn argv_assemble(
         i += 1;
         i;
     }
-    ret = malloc((sshbuf_len(buf)).wrapping_add(1 as libc::c_int as libc::c_ulong))
+    ret = libc::malloc((sshbuf_len(buf) as usize).wrapping_add(1 as libc::c_int as usize))
         as *mut libc::c_char;
     if ret.is_null() {
         sshfatal(
@@ -3738,7 +3738,7 @@ pub unsafe extern "C" fn argv_assemble(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"malloc failed\0" as *const u8 as *const libc::c_char,
+            b"libc::malloc failed\0" as *const u8 as *const libc::c_char,
         );
     }
     memcpy(
@@ -4465,7 +4465,8 @@ pub unsafe extern "C" fn opt_dequote(
     }
     s = s.offset(1);
     s;
-    ret = malloc((strlen(s)).wrapping_add(1 as libc::c_int as libc::c_ulong)) as *mut libc::c_char;
+    ret = libc::malloc(((strlen(s)).wrapping_add(1 as libc::c_int as libc::c_ulong)) as usize)
+        as *mut libc::c_char;
     if ret.is_null() {
         *errstrp = b"memory allocation failed\0" as *const u8 as *const libc::c_char;
         return 0 as *mut libc::c_char;

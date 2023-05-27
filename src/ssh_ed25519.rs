@@ -5,7 +5,7 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn free(_: *mut libc::c_void);
     fn crypto_sign_ed25519(
         _: *mut libc::c_uchar,
@@ -274,9 +274,9 @@ unsafe extern "C" fn ssh_ed25519_generate(
     mut k: *mut sshkey,
     mut _bits: libc::c_int,
 ) -> libc::c_int {
-    (*k).ed25519_pk = malloc(32 as libc::c_uint as libc::c_ulong) as *mut u_char;
+    (*k).ed25519_pk = libc::malloc(32 as usize) as *mut u_char;
     if ((*k).ed25519_pk).is_null() || {
-        (*k).ed25519_sk = malloc(64 as libc::c_uint as libc::c_ulong) as *mut u_char;
+        (*k).ed25519_sk = libc::malloc(64 as usize) as *mut u_char;
         ((*k).ed25519_sk).is_null()
     } {
         return -(2 as libc::c_int);
@@ -291,7 +291,7 @@ unsafe extern "C" fn ssh_ed25519_copy_public(
     if ((*from).ed25519_pk).is_null() {
         return 0 as libc::c_int;
     }
-    (*to).ed25519_pk = malloc(32 as libc::c_uint as libc::c_ulong) as *mut u_char;
+    (*to).ed25519_pk = libc::malloc(32 as usize) as *mut u_char;
     if ((*to).ed25519_pk).is_null() {
         return -(2 as libc::c_int);
     }
@@ -381,7 +381,7 @@ unsafe extern "C" fn ssh_ed25519_sign(
     }
     slen = datalen.wrapping_add(64 as libc::c_uint as libc::c_ulong);
     smlen = slen as libc::c_ulonglong;
-    sig = malloc(slen) as *mut u_char;
+    sig = libc::malloc(slen as usize) as *mut u_char;
     if sig.is_null() {
         return -(2 as libc::c_int);
     }
@@ -410,7 +410,7 @@ unsafe extern "C" fn ssh_ed25519_sign(
             }) {
                 len = sshbuf_len(b);
                 if !sigp.is_null() {
-                    *sigp = malloc(len) as *mut u_char;
+                    *sigp = libc::malloc(len as usize) as *mut u_char;
                     if (*sigp).is_null() {
                         r = -(2 as libc::c_int);
                         current_block = 7497926444865556885;
@@ -494,9 +494,9 @@ unsafe extern "C" fn ssh_ed25519_verify(
         } else {
             smlen = len.wrapping_add(dlen) as libc::c_ulonglong;
             mlen = smlen;
-            sm = malloc(smlen as libc::c_ulong) as *mut u_char;
+            sm = libc::malloc(smlen as usize) as *mut u_char;
             if sm.is_null() || {
-                m = malloc(mlen as libc::c_ulong) as *mut u_char;
+                m = libc::malloc(mlen as usize) as *mut u_char;
                 m.is_null()
             } {
                 r = -(2 as libc::c_int);

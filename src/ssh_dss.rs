@@ -8,7 +8,7 @@ extern "C" {
     pub type ec_key_st;
     pub type DSA_SIG_st;
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn free(_: *mut libc::c_void);
     fn BN_num_bits(a: *const BIGNUM) -> libc::c_int;
     fn BN_new() -> *mut BIGNUM;
@@ -575,7 +575,7 @@ unsafe extern "C" fn ssh_dss_sign(
                     }) {
                         len = sshbuf_len(b);
                         if !sigp.is_null() {
-                            *sigp = malloc(len) as *mut u_char;
+                            *sigp = libc::malloc(len as usize) as *mut u_char;
                             if (*sigp).is_null() {
                                 ret = -(2 as libc::c_int);
                                 current_block = 17014927154208801450;

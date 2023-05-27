@@ -18,7 +18,7 @@ extern "C" {
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn EC_POINT_new(group: *const EC_GROUP) -> *mut EC_POINT;
@@ -677,7 +677,7 @@ unsafe extern "C" fn sshsk_ed25519_assemble(
             );
             r = -(2 as libc::c_int);
         } else {
-            (*key).ed25519_pk = malloc(32 as libc::c_uint as libc::c_ulong) as *mut u_char;
+            (*key).ed25519_pk = libc::malloc(32 as usize) as *mut u_char;
             if ((*key).ed25519_pk).is_null() {
                 crate::log::sshlog(
                     b"ssh-sk.c\0" as *const u8 as *const libc::c_char,
@@ -689,7 +689,7 @@ unsafe extern "C" fn sshsk_ed25519_assemble(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"malloc failed\0" as *const u8 as *const libc::c_char,
+                    b"libc::malloc failed\0" as *const u8 as *const libc::c_char,
                 );
                 r = -(2 as libc::c_int);
             } else {
@@ -1523,7 +1523,7 @@ pub unsafe extern "C" fn sshsk_sign(
                             7648509926025298111 => {}
                             _ => {
                                 if !sigp.is_null() {
-                                    *sigp = malloc(sshbuf_len(sig)) as *mut u_char;
+                                    *sigp = libc::malloc(sshbuf_len(sig) as usize) as *mut u_char;
                                     if (*sigp).is_null() {
                                         r = -(2 as libc::c_int);
                                         current_block = 7648509926025298111;

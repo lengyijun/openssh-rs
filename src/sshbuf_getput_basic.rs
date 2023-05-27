@@ -7,7 +7,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ::core::ffi::VaList,
     ) -> libc::c_int;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -272,7 +272,8 @@ pub unsafe extern "C" fn sshbuf_get_string(
         return r;
     }
     if !valp.is_null() {
-        *valp = malloc(len.wrapping_add(1 as libc::c_int as libc::c_ulong)) as *mut u_char;
+        *valp = libc::malloc((len.wrapping_add(1 as libc::c_int as libc::c_ulong)) as usize)
+            as *mut u_char;
         if (*valp).is_null() {
             return -(2 as libc::c_int);
         }
@@ -383,7 +384,8 @@ pub unsafe extern "C" fn sshbuf_get_cstring(
         return -(1 as libc::c_int);
     }
     if !valp.is_null() {
-        *valp = malloc(len.wrapping_add(1 as libc::c_int as libc::c_ulong)) as *mut libc::c_char;
+        *valp = libc::malloc((len.wrapping_add(1 as libc::c_int as libc::c_ulong)) as usize)
+            as *mut libc::c_char;
         if (*valp).is_null() {
             return -(2 as libc::c_int);
         }

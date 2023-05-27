@@ -24,7 +24,7 @@ extern "C" {
     fn isupper(_: libc::c_int) -> libc::c_int;
     fn isxdigit(_: libc::c_int) -> libc::c_int;
     fn isblank(_: libc::c_int) -> libc::c_int;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn reallocarray(__ptr: *mut libc::c_void, __nmemb: size_t, __size: size_t)
@@ -1192,7 +1192,7 @@ unsafe extern "C" fn globextend(
                         let ref mut fresh55 = *statv
                             .offset(((*pglob).gl_offs).wrapping_add((*pglob).gl_pathc) as isize);
                         *fresh55 =
-                            malloc(::core::mem::size_of::<stat>() as libc::c_ulong) as *mut stat;
+                            libc::malloc(::core::mem::size_of::<stat>() as usize) as *mut stat;
                         if (*fresh55).is_null() {
                             current_block = 15014530240646645919;
                         } else {
@@ -1241,7 +1241,7 @@ unsafe extern "C" fn globextend(
                                 .wrapping_add(len)
                                 as size_t
                                 as size_t;
-                            copy = malloc(len) as *mut libc::c_char;
+                            copy = libc::malloc(len as usize) as *mut libc::c_char;
                             if !copy.is_null() {
                                 if g_Ctoc(path, copy, len) != 0 {
                                     free(copy as *mut libc::c_void);

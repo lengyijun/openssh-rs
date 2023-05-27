@@ -6,7 +6,7 @@ extern "C" {
 
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn free(_: *mut libc::c_void);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
@@ -105,7 +105,7 @@ pub unsafe extern "C" fn sftp_realpath(
     }
     serrno = *libc::__errno_location();
     if resolved.is_null() {
-        resolved = malloc(4096 as libc::c_int as libc::c_ulong) as *mut libc::c_char;
+        resolved = libc::malloc(4096 as libc::c_int as usize) as *mut libc::c_char;
         if resolved.is_null() {
             return 0 as *mut libc::c_char;
         }

@@ -18,7 +18,7 @@ extern "C" {
         _: *mut libc::c_char,
         _: libc::c_int,
     ) -> libc::c_int;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -444,7 +444,7 @@ pub unsafe extern "C" fn getrrsetbyname(
                                         }
                                         if !rdata.is_null() {
                                             (*rdata).rdi_length = (*rr).size as libc::c_uint;
-                                            (*rdata).rdi_data = malloc((*rr).size as libc::c_ulong)
+                                            (*rdata).rdi_data = libc::malloc((*rr).size as usize)
                                                 as *mut libc::c_uchar;
                                             if ((*rdata).rdi_data).is_null() {
                                                 result = 1 as libc::c_int;
@@ -729,7 +729,7 @@ unsafe extern "C" fn parse_dns_rrsection(
                                     if !((*cp).offset((*curr).size as libc::c_int as isize)
                                         > answer.offset(size as isize))
                                     {
-                                        (*curr).rdata = malloc((*curr).size as libc::c_ulong);
+                                        (*curr).rdata = libc::malloc((*curr).size as usize);
                                         if ((*curr).rdata).is_null() {
                                             free_dns_rr(head);
                                             return 0 as *mut dns_rr;

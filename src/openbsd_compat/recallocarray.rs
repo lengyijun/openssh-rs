@@ -2,7 +2,7 @@ use ::libc;
 extern "C" {
 
     fn getpagesize() -> libc::c_int;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -66,7 +66,7 @@ pub unsafe extern "C" fn recallocarray(
             return ptr;
         }
     }
-    newptr = malloc(newsize);
+    newptr = libc::malloc(newsize as usize);
     if newptr.is_null() {
         return 0 as *mut libc::c_void;
     }

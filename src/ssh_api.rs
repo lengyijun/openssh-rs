@@ -14,7 +14,7 @@ extern "C" {
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn seed_rng();
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn sshpkt_ptr(_: *mut ssh, lenp: *mut size_t) -> *const u_char;
@@ -528,9 +528,9 @@ pub unsafe extern "C" fn ssh_add_hostkey(mut ssh: *mut ssh, mut key: *mut sshkey
         if r != 0 as libc::c_int {
             return r;
         }
-        k = malloc(::core::mem::size_of::<key_entry>() as libc::c_ulong) as *mut key_entry;
+        k = libc::malloc(::core::mem::size_of::<key_entry>() as usize) as *mut key_entry;
         if k.is_null() || {
-            k_prv = malloc(::core::mem::size_of::<key_entry>() as libc::c_ulong) as *mut key_entry;
+            k_prv = libc::malloc(::core::mem::size_of::<key_entry>() as usize) as *mut key_entry;
             k_prv.is_null()
         } {
             free(k as *mut libc::c_void);
@@ -549,7 +549,7 @@ pub unsafe extern "C" fn ssh_add_hostkey(mut ssh: *mut ssh, mut key: *mut sshkey
         (*ssh).public_keys.tqh_last = &mut (*k).next.tqe_next;
         r = 0 as libc::c_int;
     } else {
-        k = malloc(::core::mem::size_of::<key_entry>() as libc::c_ulong) as *mut key_entry;
+        k = libc::malloc(::core::mem::size_of::<key_entry>() as usize) as *mut key_entry;
         if k.is_null() {
             return -(2 as libc::c_int);
         }

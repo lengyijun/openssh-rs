@@ -62,7 +62,7 @@ extern "C" {
     fn EVP_PKEY_get1_EC_KEY(pkey: *mut EVP_PKEY) -> *mut ec_key_st;
     fn EVP_PKEY_new() -> *mut EVP_PKEY;
     fn EVP_PKEY_free(pkey: *mut EVP_PKEY);
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
@@ -1194,7 +1194,7 @@ unsafe extern "C" fn to_blob(
             *lenp = len;
         }
         if !blobp.is_null() {
-            *blobp = malloc(len) as *mut u_char;
+            *blobp = libc::malloc(len as usize) as *mut u_char;
             if (*blobp).is_null() {
                 ret = -(2 as libc::c_int);
                 current_block = 7890910541524280225;
@@ -2290,7 +2290,7 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
     {
         r = -(1 as libc::c_int);
     } else {
-        prekey = malloc((16 as libc::c_int * 1024 as libc::c_int) as libc::c_ulong) as *mut u_char;
+        prekey = libc::malloc(16 as usize) as *mut u_char;
         if prekey.is_null() {
             r = -(2 as libc::c_int);
         } else {
@@ -2348,7 +2348,7 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
                                 8858214262807371918 => {}
                                 _ => {
                                     enclen = sshbuf_len(prvbuf);
-                                    enc = malloc(enclen) as *mut u_char;
+                                    enc = libc::malloc(enclen as usize) as *mut u_char;
                                     if enc.is_null() {
                                         r = -(2 as libc::c_int);
                                     } else {
