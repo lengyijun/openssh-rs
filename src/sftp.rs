@@ -96,7 +96,6 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_longlong;
 
-    fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn qsort(__base: *mut libc::c_void, __nmemb: size_t, __size: size_t, __compar: __compar_fn_t);
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -635,7 +634,7 @@ static mut cmds: [CMD; 38] = [
     },
     {
         let mut init = CMD {
-            c: b"exit\0" as *const u8 as *const libc::c_char,
+            c: b"libc::exit\0" as *const u8 as *const libc::c_char,
             n: I_QUIT as libc::c_int,
             t: 0 as libc::c_int,
             t2: 0 as libc::c_int,
@@ -4224,7 +4223,7 @@ unsafe extern "C" fn usage() {
             as *const u8 as *const libc::c_char,
         __progname,
     );
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> libc::c_int {
     let mut r: libc::c_int = 0;
@@ -4759,7 +4758,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             );
         }
     }
-    exit(if err == 0 as libc::c_int {
+    libc::exit(if err == 0 as libc::c_int {
         0 as libc::c_int
     } else {
         1 as libc::c_int

@@ -14,7 +14,6 @@ extern "C" {
     fn getuid() -> __uid_t;
     fn pledge(promises: *const libc::c_char, paths: *mut *const libc::c_char) -> libc::c_int;
 
-    fn exit(_: libc::c_int) -> !;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
@@ -790,7 +789,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
         0o2 as libc::c_int,
     );
     if fd < 2 as libc::c_int {
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     if fd > 2 as libc::c_int {
         close(fd);

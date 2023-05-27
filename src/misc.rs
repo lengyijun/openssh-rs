@@ -113,7 +113,6 @@ extern "C" {
     fn dirname(__path: *mut libc::c_char) -> *mut libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
 
-    fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn realpath(__name: *const libc::c_char, __resolved: *mut libc::c_char) -> *mut libc::c_char;
     fn mktime(__tp: *mut tm) -> time_t;
@@ -2638,7 +2637,7 @@ pub unsafe extern "C" fn sanitise_stdfd() {
             b"Couldn't open /dev/null: %s\n\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     loop {
         dupfd += 1;
@@ -2654,7 +2653,7 @@ pub unsafe extern "C" fn sanitise_stdfd() {
                     b"dup2: %s\n\0" as *const u8 as *const libc::c_char,
                     strerror(*libc::__errno_location()),
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
         }
     }

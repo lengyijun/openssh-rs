@@ -104,7 +104,6 @@ extern "C" {
     fn endgrent();
     fn initgroups(__user: *const libc::c_char, __group: __gid_t) -> libc::c_int;
 
-    fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn mkdtemp(__template: *mut libc::c_char) -> *mut libc::c_char;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
@@ -2511,7 +2510,7 @@ unsafe extern "C" fn do_nologin(mut pw: *mut passwd) {
         }
         fclose(f);
     }
-    exit(254 as libc::c_int);
+    libc::exit(254 as libc::c_int);
 }
 unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut _uid: uid_t) {
     let mut cp: *const libc::c_char = 0 as *const libc::c_char;
@@ -2725,11 +2724,11 @@ pub unsafe extern "C" fn do_setusercontext(mut pw: *mut passwd) {
         }
         if setgid((*pw).pw_gid) < 0 as libc::c_int {
             perror(b"setgid\0" as *const u8 as *const libc::c_char);
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         if initgroups((*pw).pw_name, (*pw).pw_gid) < 0 as libc::c_int {
             perror(b"initgroups\0" as *const u8 as *const libc::c_char);
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         endgrent();
         platform_setusercontext_post_groups(pw);
@@ -2822,7 +2821,7 @@ unsafe extern "C" fn do_pwchange(mut s: *mut Session) {
                 as *const libc::c_char,
         );
     }
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 unsafe extern "C" fn child_close_fds(mut ssh: *mut ssh) {
     extern "C" {
@@ -2870,7 +2869,7 @@ pub unsafe extern "C" fn do_child(
         do_setusercontext(pw);
         child_close_fds(ssh);
         do_pwchange(s);
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     if options.use_pam == 0 {
         do_nologin(pw);
@@ -2897,7 +2896,7 @@ pub unsafe extern "C" fn do_child(
             );
         }
         if r != 0 {
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
     }
     closefrom(2 as libc::c_int + 1 as libc::c_int);
@@ -2918,7 +2917,7 @@ pub unsafe extern "C" fn do_child(
             b"This service allows sftp connections only.\n\0" as *const u8 as *const libc::c_char,
         );
         libc::fflush(0 as *mut libc::FILE);
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     } else if (*s).is_subsystem == 2 as libc::c_int {
         extern "C" {
             #[link_name = "BSDoptind"]
@@ -2958,7 +2957,7 @@ pub unsafe extern "C" fn do_child(
         BSDoptreset = 1 as libc::c_int;
         BSDoptind = BSDoptreset;
         __progname = argv[0 as libc::c_int as usize];
-        exit(sftp_server_main(i, argv.as_mut_ptr(), (*s).pw));
+        libc::exit(sftp_server_main(i, argv.as_mut_ptr(), (*s).pw));
     }
     libc::fflush(0 as *mut libc::FILE);
     shell0 = strrchr(shell, '/' as i32);
@@ -2981,7 +2980,7 @@ pub unsafe extern "C" fn do_child(
         {
             *libc::__errno_location() = 22 as libc::c_int;
             perror(shell);
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         argv[0 as libc::c_int as usize] = argv0.as_mut_ptr();
         argv[1 as libc::c_int as usize] = 0 as *mut libc::c_char;
@@ -2991,7 +2990,7 @@ pub unsafe extern "C" fn do_child(
             env as *const *mut libc::c_char,
         );
         perror(shell);
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     argv[0 as libc::c_int as usize] = shell0 as *mut libc::c_char;
     argv[1 as libc::c_int as usize] =
@@ -3004,7 +3003,7 @@ pub unsafe extern "C" fn do_child(
         env as *const *mut libc::c_char,
     );
     perror(shell);
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 pub unsafe extern "C" fn session_unused(mut id: libc::c_int) {
     crate::log::sshlog(
@@ -4444,7 +4443,7 @@ unsafe extern "C" fn session_exit_message(
         channel_request_start(
             ssh,
             (*s).chanid,
-            b"exit-status\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
+            b"libc::exit-status\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             0 as libc::c_int,
         );
         r = sshpkt_put_u32(
@@ -4458,7 +4457,7 @@ unsafe extern "C" fn session_exit_message(
             sshpkt_fatal(
                 ssh,
                 r,
-                b"%s: exit reply\0" as *const u8 as *const libc::c_char,
+                b"%s: libc::exit reply\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                     b"session_exit_message\0",
                 ))
@@ -4472,7 +4471,7 @@ unsafe extern "C" fn session_exit_message(
         channel_request_start(
             ssh,
             (*s).chanid,
-            b"exit-signal\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
+            b"libc::exit-signal\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             0 as libc::c_int,
         );
         r = sshpkt_put_cstring(
@@ -4513,7 +4512,7 @@ unsafe extern "C" fn session_exit_message(
             sshpkt_fatal(
                 ssh,
                 r,
-                b"%s: exit reply\0" as *const u8 as *const libc::c_char,
+                b"%s: libc::exit reply\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
                     b"session_exit_message\0",
                 ))

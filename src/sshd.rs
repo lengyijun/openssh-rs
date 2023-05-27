@@ -136,7 +136,6 @@ extern "C" {
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
     fn setgroups(__n: size_t, __groups: *const __gid_t) -> libc::c_int;
 
-    fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn setenv(
         __name: *const libc::c_char,
@@ -1387,7 +1386,7 @@ unsafe extern "C" fn sighup_restart() {
         *saved_argv.offset(0 as libc::c_int as isize),
         strerror(*libc::__errno_location()),
     );
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 unsafe extern "C" fn sigterm_handler(mut sig: libc::c_int) {
     ::core::ptr::write_volatile(&mut received_sigterm as *mut sig_atomic_t, sig);
@@ -1745,7 +1744,7 @@ unsafe extern "C" fn privsep_postauth(mut ssh: *mut ssh, mut authctxt: *mut Auth
             sshbuf_reset(loginmsg);
             monitor_clear_keystate(ssh, pmonitor);
             monitor_child_postauth(ssh, pmonitor);
-            exit(0 as libc::c_int);
+            libc::exit(0 as libc::c_int);
         }
         close((*pmonitor).m_sendfd);
         (*pmonitor).m_sendfd = -(1 as libc::c_int);
@@ -2307,7 +2306,7 @@ unsafe extern "C" fn usage() {
         b"usage: sshd [-46DdeGiqTtV] [-C connection_spec] [-c host_cert_file]\n            [-E log_file] [-f config_file] [-g login_grace_time]\n            [-h host_key_file] [-o option] [-p port] [-u len]\n\0"
             as *const u8 as *const libc::c_char,
     );
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 unsafe extern "C" fn send_rexec_state(mut fd: libc::c_int, mut conf: *mut sshbuf) {
     let mut m: *mut sshbuf = 0 as *mut sshbuf;
@@ -2906,7 +2905,7 @@ unsafe extern "C" fn server_accept_loop(
             if !(options.pid_file).is_null() {
                 unlink(options.pid_file);
             }
-            exit(if received_sigterm == 15 as libc::c_int {
+            libc::exit(if received_sigterm == 15 as libc::c_int {
                 0 as libc::c_int
             } else {
                 255 as libc::c_int
@@ -3682,7 +3681,7 @@ unsafe extern "C" fn print_config(mut ssh: *mut ssh, mut connection_info: *mut c
     (*connection_info).test = 1 as libc::c_int;
     parse_server_match_config(&mut options, &mut includes, connection_info);
     dump_config(&mut options);
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c_int {
     let mut current_block: u64;
@@ -3845,7 +3844,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         stderr,
                         b"too many ports.\n\0" as *const u8 as *const libc::c_char,
                     );
-                    exit(1 as libc::c_int);
+                    libc::exit(1 as libc::c_int);
                 }
                 let fresh6 = options.num_ports;
                 options.num_ports = (options.num_ports).wrapping_add(1);
@@ -3858,7 +3857,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         stderr,
                         b"Bad port number.\n\0" as *const u8 as *const libc::c_char,
                     );
-                    exit(1 as libc::c_int);
+                    libc::exit(1 as libc::c_int);
                 }
                 current_block_66 = 7178192492338286402;
             }
@@ -3869,7 +3868,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         stderr,
                         b"Invalid login grace time.\n\0" as *const u8 as *const libc::c_char,
                     );
-                    exit(1 as libc::c_int);
+                    libc::exit(1 as libc::c_int);
                 }
                 current_block_66 = 7178192492338286402;
             }
@@ -3897,7 +3896,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             67 => {
                 connection_info = get_connection_info(ssh, 0 as libc::c_int, 0 as libc::c_int);
                 if parse_server_match_testspec(connection_info, BSDoptarg) == -(1 as libc::c_int) {
-                    exit(1 as libc::c_int);
+                    libc::exit(1 as libc::c_int);
                 }
                 current_block_66 = 7178192492338286402;
             }
@@ -3913,7 +3912,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         stderr,
                         b"Invalid utmp length.\n\0" as *const u8 as *const libc::c_char,
                     );
-                    exit(1 as libc::c_int);
+                    libc::exit(1 as libc::c_int);
                 }
                 current_block_66 = 7178192492338286402;
             }
@@ -3929,7 +3928,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     &mut includes,
                 ) != 0 as libc::c_int
                 {
-                    exit(1 as libc::c_int);
+                    libc::exit(1 as libc::c_int);
                 }
                 libc::free(line as *mut libc::c_void);
                 current_block_66 = 7178192492338286402;
@@ -3941,7 +3940,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     b"OpenSSH_9.3\0" as *const u8 as *const libc::c_char,
                     OpenSSL_version(0 as libc::c_int),
                 );
-                exit(0 as libc::c_int);
+                libc::exit(0 as libc::c_int);
             }
             _ => {
                 usage();
@@ -4142,7 +4141,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             b"Extra argument %s.\n\0" as *const u8 as *const libc::c_char,
             *av.offset(BSDoptind as isize),
         );
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     crate::log::sshlog(
         b"sshd.c\0" as *const u8 as *const libc::c_char,
@@ -4451,7 +4450,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             0 as *const libc::c_char,
             b"sshd: no hostkeys available -- exiting.\0" as *const u8 as *const libc::c_char,
         );
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     sensitive_data.host_certificates = xcalloc(
         options.num_host_key_files as size_t,
@@ -4614,7 +4613,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         print_config(ssh, connection_info);
     }
     if test_flag != 0 {
-        exit(0 as libc::c_int);
+        libc::exit(0 as libc::c_int);
     }
     if setgroups(0 as libc::c_int as size_t, 0 as *const __gid_t) < 0 as libc::c_int {
         crate::log::sshlog(
@@ -5105,7 +5104,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             if use_privsep != 0 {
                 mm_send_keystate(ssh, pmonitor);
                 ssh_packet_clear_keys(ssh);
-                exit(0 as libc::c_int);
+                libc::exit(0 as libc::c_int);
             }
         }
         _ => {}
@@ -5154,7 +5153,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     if use_privsep != 0 {
         mm_terminate();
     }
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 pub unsafe extern "C" fn sshd_hostkey_sign(
     mut ssh: *mut ssh,

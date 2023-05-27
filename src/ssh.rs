@@ -70,7 +70,6 @@ extern "C" {
     fn gethostname(__name: *mut libc::c_char, __len: size_t) -> libc::c_int;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
 
-    fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn setenv(
         __name: *const libc::c_char,
@@ -1192,7 +1191,7 @@ unsafe extern "C" fn usage() {
         b"usage: ssh [-46AaCfGgKkMNnqsTtVvXxYy] [-B bind_interface]\n           [-b bind_address] [-c cipher_spec] [-D [bind_address:]port]\n           [-E log_file] [-e escape_char] [-F configfile] [-I pkcs11]\n           [-i identity_file] [-J [user@]host[:port]] [-L address]\n           [-l login_name] [-m mac_spec] [-O ctl_cmd] [-o option] [-p port]\n           [-Q query_option] [-R address] [-S ctl_path] [-W host:port]\n           [-w local_tun[:remote_tun]] destination [command [argument ...]]\n\0"
             as *const u8 as *const libc::c_char,
     );
-    exit(255 as libc::c_int);
+    libc::exit(255 as libc::c_int);
 }
 unsafe extern "C" fn tilde_expand_paths(mut paths: *mut *mut libc::c_char, mut num_paths: u_int) {
     let mut i: u_int = 0;
@@ -2175,7 +2174,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             b"No user exists for uid %lu\0" as *const u8 as *const libc::c_char,
             getuid() as u_long,
         );
-        exit(255 as libc::c_int);
+        libc::exit(255 as libc::c_int);
     }
     pw = pwcopy(pw);
     libc::umask(0o22 as libc::c_int as libc::c_uint | libc::umask(0o77 as libc::c_int as __mode_t));
@@ -2293,8 +2292,10 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         == 0 as libc::c_int
                     {
                         muxclient_command = 5 as libc::c_int as u_int;
-                    } else if strcmp(BSDoptarg, b"exit\0" as *const u8 as *const libc::c_char)
-                        == 0 as libc::c_int
+                    } else if strcmp(
+                        BSDoptarg,
+                        b"libc::exit\0" as *const u8 as *const libc::c_char,
+                    ) == 0 as libc::c_int
                     {
                         muxclient_command = 3 as libc::c_int as u_int;
                     } else if strcmp(BSDoptarg, b"stop\0" as *const u8 as *const libc::c_char)
@@ -2470,7 +2471,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     }
                     printf(b"%s\n\0" as *const u8 as *const libc::c_char, cp);
                     libc::free(cp as *mut libc::c_void);
-                    exit(0 as libc::c_int);
+                    libc::exit(0 as libc::c_int);
                 }
                 97 => {
                     options.forward_agent = 0 as libc::c_int;
@@ -2581,7 +2582,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         b"OpenSSH_9.3p1\0" as *const u8 as *const libc::c_char,
                         OpenSSL_version(0 as libc::c_int),
                     );
-                    exit(0 as libc::c_int);
+                    libc::exit(0 as libc::c_int);
                 }
                 119 => {
                     if options.tun_open == -(1 as libc::c_int) {
@@ -2594,7 +2595,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             b"Bad tun device '%s'\n\0" as *const u8 as *const libc::c_char,
                             BSDoptarg,
                         );
-                        exit(255 as libc::c_int);
+                        libc::exit(255 as libc::c_int);
                     }
                 }
                 87 => {
@@ -2635,7 +2636,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                                 as *const libc::c_char,
                             BSDoptarg,
                         );
-                        exit(255 as libc::c_int);
+                        libc::exit(255 as libc::c_int);
                     }
                     options.request_tty = 1 as libc::c_int;
                     options.session_type = 0 as libc::c_int;
@@ -2668,7 +2669,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             b"Bad escape character '%s'.\n\0" as *const u8 as *const libc::c_char,
                             BSDoptarg,
                         );
-                        exit(255 as libc::c_int);
+                        libc::exit(255 as libc::c_int);
                     }
                 }
                 99 => {
@@ -2687,7 +2688,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             b"Unknown cipher type '%s'\n\0" as *const u8 as *const libc::c_char,
                             BSDoptarg,
                         );
-                        exit(255 as libc::c_int);
+                        libc::exit(255 as libc::c_int);
                     }
                     libc::free(options.ciphers as *mut libc::c_void);
                     options.ciphers = xstrdup(BSDoptarg);
@@ -2702,7 +2703,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             b"Unknown mac type '%s'\n\0" as *const u8 as *const libc::c_char,
                             BSDoptarg,
                         );
-                        exit(255 as libc::c_int);
+                        libc::exit(255 as libc::c_int);
                     }
                 }
                 77 => {
@@ -2721,7 +2722,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                                 b"Bad port '%s'\n\0" as *const u8 as *const libc::c_char,
                                 BSDoptarg,
                             );
-                            exit(255 as libc::c_int);
+                            libc::exit(255 as libc::c_int);
                         }
                     }
                 }
@@ -2740,7 +2741,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                                 as *const libc::c_char,
                             BSDoptarg,
                         );
-                        exit(255 as libc::c_int);
+                        libc::exit(255 as libc::c_int);
                     }
                 }
                 82 => {
@@ -2756,7 +2757,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                                 as *const libc::c_char,
                             BSDoptarg,
                         );
-                        exit(255 as libc::c_int);
+                        libc::exit(255 as libc::c_int);
                     }
                 }
                 68 => {
@@ -2769,7 +2770,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                                 as *const libc::c_char,
                             BSDoptarg,
                         );
-                        exit(255 as libc::c_int);
+                        libc::exit(255 as libc::c_int);
                     }
                 }
                 67 => {
@@ -2819,7 +2820,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         2 as libc::c_int,
                     ) != 0 as libc::c_int
                     {
-                        exit(255 as libc::c_int);
+                        libc::exit(255 as libc::c_int);
                     }
                     libc::free(line as *mut libc::c_void);
                 }
@@ -3679,7 +3680,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     }
     if config_test != 0 {
         dump_client_config(&mut options, host);
-        exit(0 as libc::c_int);
+        libc::exit(0 as libc::c_int);
     }
     if !(options.sk_provider).is_null()
         && *options.sk_provider as libc::c_int == '$' as i32
@@ -3782,7 +3783,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 options.tcp_keep_alive,
             ) != 0 as libc::c_int
             {
-                exit(255 as libc::c_int);
+                libc::exit(255 as libc::c_int);
             }
             if !addrs.is_null() {
                 freeaddrinfo(addrs);

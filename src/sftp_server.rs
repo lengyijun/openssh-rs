@@ -82,7 +82,6 @@ extern "C" {
     fn getgrgid(__gid: __gid_t) -> *mut group;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
-    fn exit(_: libc::c_int) -> !;
 
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -4746,5 +4745,5 @@ unsafe extern "C" fn sftp_server_usage() {
         __progname,
         __progname,
     );
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }

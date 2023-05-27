@@ -22,7 +22,6 @@ extern "C" {
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
-    fn exit(_: libc::c_int) -> !;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -370,7 +369,7 @@ pub unsafe extern "C" fn log_init(
             b"Unrecognized internal syslog level code %d\n\0" as *const u8 as *const libc::c_char,
             level as libc::c_int,
         );
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     log_handler = None;
     log_handler_ctx = 0 as *mut libc::c_void;
@@ -422,7 +421,7 @@ pub unsafe extern "C" fn log_init(
                     as *const libc::c_char,
                 facility as libc::c_int,
             );
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
     }
     openlog(
@@ -472,7 +471,7 @@ pub unsafe extern "C" fn log_redirect_stderr_to(mut logfile: *const libc::c_char
             logfile,
             strerror(*libc::__errno_location()),
         );
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     log_stderr_fd = fd;
 }

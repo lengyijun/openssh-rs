@@ -92,7 +92,7 @@ extern "C" {
 
     fn reallocarray(__ptr: *mut libc::c_void, __nmemb: size_t, __size: size_t)
         -> *mut libc::c_void;
-    fn exit(_: libc::c_int) -> !;
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -381,7 +381,7 @@ unsafe extern "C" fn killchild(mut signo: libc::c_int) {
     if signo != 0 {
         _exit(1 as libc::c_int);
     }
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 unsafe extern "C" fn suspone(mut pid: libc::c_int, mut signo: libc::c_int) {
     let mut status: libc::c_int = 0;
@@ -445,7 +445,7 @@ unsafe extern "C" fn do_local_cmd(mut a: *mut arglist) -> libc::c_int {
             (*a).list as *const *mut libc::c_char,
         );
         perror(*((*a).list).offset(0 as libc::c_int as isize));
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     do_cmd_pid = pid;
     ssh_signal(
@@ -731,7 +731,7 @@ pub unsafe extern "C" fn do_cmd2(
         );
         execvp(ssh_program, args.list as *const *mut libc::c_char);
         perror(ssh_program);
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     } else if pid == -(1 as libc::c_int) {
         sshfatal(
             b"scp.c\0" as *const u8 as *const libc::c_char,
@@ -1132,7 +1132,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
         ) == -(1 as libc::c_int)
         {
             perror(b"pledge\0" as *const u8 as *const libc::c_char);
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
     }
     remin = 0 as libc::c_int;
@@ -1140,11 +1140,11 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
     if fflag != 0 {
         response();
         source(argc, argv);
-        exit((errs != 0 as libc::c_int) as libc::c_int);
+        libc::exit((errs != 0 as libc::c_int) as libc::c_int);
     }
     if tflag != 0 {
         sink(argc, argv, 0 as *const libc::c_char);
-        exit((errs != 0 as libc::c_int) as libc::c_int);
+        libc::exit((errs != 0 as libc::c_int) as libc::c_int);
     }
     if argc < 2 as libc::c_int {
         usage();
@@ -1210,7 +1210,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
             errs = 1 as libc::c_int;
         }
     }
-    exit((errs != 0 as libc::c_int) as libc::c_int);
+    libc::exit((errs != 0 as libc::c_int) as libc::c_int);
 }
 unsafe extern "C" fn scpio(mut _cnt: *mut libc::c_void, mut s: size_t) -> libc::c_int {
     let mut cnt: *mut off_t = _cnt as *mut off_t;
@@ -1931,7 +1931,7 @@ pub unsafe extern "C" fn toremote(
                                     &mut do_cmd_pid,
                                 ) < 0 as libc::c_int
                                 {
-                                    exit(1 as libc::c_int);
+                                    libc::exit(1 as libc::c_int);
                                 }
                                 libc::free(bp as *mut libc::c_void);
                                 xasprintf(
@@ -1948,7 +1948,7 @@ pub unsafe extern "C" fn toremote(
                                 if do_cmd2(thost, tuser, tport, bp, remin, remout)
                                     < 0 as libc::c_int
                                 {
-                                    exit(1 as libc::c_int);
+                                    libc::exit(1 as libc::c_int);
                                 }
                                 libc::free(bp as *mut libc::c_void);
                                 close(remin);
@@ -2150,10 +2150,10 @@ pub unsafe extern "C" fn toremote(
                                     &mut do_cmd_pid,
                                 ) < 0 as libc::c_int
                                 {
-                                    exit(1 as libc::c_int);
+                                    libc::exit(1 as libc::c_int);
                                 }
                                 if response() < 0 as libc::c_int {
-                                    exit(1 as libc::c_int);
+                                    libc::exit(1 as libc::c_int);
                                 }
                                 libc::free(bp as *mut libc::c_void);
                             }
@@ -3518,7 +3518,7 @@ pub unsafe extern "C" fn sink(
         }
         if argc != 1 as libc::c_int {
             run_err(b"ambiguous target\0" as *const u8 as *const libc::c_char);
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         targ = *argv;
         if targetshouldbedirectory != 0 {
@@ -3663,7 +3663,7 @@ pub unsafe extern "C" fn sink(
                         );
                     }
                     if buf[0 as libc::c_int as usize] as libc::c_int == '\u{2}' as i32 {
-                        exit(1 as libc::c_int);
+                        libc::exit(1 as libc::c_int);
                     }
                     errs += 1;
                     errs;
@@ -3866,7 +3866,7 @@ pub unsafe extern "C" fn sink(
                     } else if *cp as libc::c_int != 'C' as i32 && *cp as libc::c_int != 'D' as i32 {
                         if first != 0 {
                             run_err(b"%s\0" as *const u8 as *const libc::c_char, cp);
-                            exit(1 as libc::c_int);
+                            libc::exit(1 as libc::c_int);
                         }
                         why = b"expected control record\0" as *const u8 as *const libc::c_char
                             as *mut libc::c_char;
@@ -3951,7 +3951,7 @@ pub unsafe extern "C" fn sink(
                                             as *const libc::c_char,
                                         cp,
                                     );
-                                    exit(1 as libc::c_int);
+                                    libc::exit(1 as libc::c_int);
                                 }
                                 if npatterns > 0 as libc::c_int as libc::c_ulong {
                                     n = 0 as libc::c_int as size_t;
@@ -4174,7 +4174,7 @@ pub unsafe extern "C" fn sink(
                                                                     as *const libc::c_char
                                                             },
                                                         );
-                                                        exit(1 as libc::c_int);
+                                                        libc::exit(1 as libc::c_int);
                                                     }
                                                     amt = (amt as libc::c_ulong).wrapping_sub(j)
                                                         as libc::c_int
@@ -4420,7 +4420,7 @@ pub unsafe extern "C" fn sink(
         b"protocol error: %s\0" as *const u8 as *const libc::c_char,
         why,
     );
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 pub unsafe extern "C" fn throughlocal_sftp(
     mut from: *mut sftp_conn,
@@ -4745,7 +4745,7 @@ pub unsafe extern "C" fn response() -> libc::c_int {
     if resp as libc::c_int == 1 as libc::c_int {
         return -(1 as libc::c_int);
     }
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 pub unsafe extern "C" fn usage() {
     libc::fprintf(
@@ -4753,7 +4753,7 @@ pub unsafe extern "C" fn usage() {
         b"usage: scp [-346ABCOpqRrsTv] [-c cipher] [-D sftp_server_path] [-F ssh_config]\n           [-i identity_file] [-J destination] [-l limit] [-o ssh_option]\n           [-P port] [-S program] [-X sftp_option] source ... target\n\0"
             as *const u8 as *const libc::c_char,
     );
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 pub unsafe extern "C" fn run_err(mut fmt: *const libc::c_char, mut args_0: ...) {
     static mut fp: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
@@ -4964,7 +4964,7 @@ pub unsafe extern "C" fn lostconn(mut signo: libc::c_int) {
     if signo != 0 {
         _exit(1 as libc::c_int);
     } else {
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     };
 }
 pub unsafe extern "C" fn cleanup_exit(mut i: libc::c_int) -> ! {
@@ -4986,7 +4986,7 @@ pub unsafe extern "C" fn cleanup_exit(mut i: libc::c_int) -> ! {
     if do_cmd_pid2 > 0 as libc::c_int {
         waitpid(do_cmd_pid2, 0 as *mut libc::c_int, 0 as libc::c_int);
     }
-    exit(i);
+    libc::exit(i);
 }
 pub fn main() {
     let mut args_x: Vec<*mut libc::c_char> = Vec::new();

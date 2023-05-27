@@ -69,7 +69,6 @@ extern "C" {
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
 
-    fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -1049,7 +1048,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
             argv.as_mut_ptr() as *const *mut libc::c_char,
         );
         perror(argv[0 as libc::c_int as usize]);
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     if pid == -(1 as libc::c_int) {
         sshfatal(
@@ -1199,7 +1198,7 @@ unsafe extern "C" fn ssh_proxy_connect(
             argv.as_mut_ptr() as *const *mut libc::c_char,
         );
         perror(argv[0 as libc::c_int as usize]);
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     if pid == -(1 as libc::c_int) {
         sshfatal(

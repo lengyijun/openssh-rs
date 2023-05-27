@@ -95,7 +95,6 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_ulonglong;
 
-    fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn qsort(__base: *mut libc::c_void, __nmemb: size_t, __size: size_t, __compar: __compar_fn_t);
     fn time(__timer: *mut time_t) -> time_t;
@@ -1036,7 +1035,7 @@ unsafe extern "C" fn ask_filename(mut pw: *mut passwd, mut prompt: *const libc::
     ))
     .is_null()
     {
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     buf[strcspn(
         buf.as_mut_ptr(),
@@ -1180,7 +1179,7 @@ unsafe extern "C" fn do_convert_to_ssh2(mut pw: *mut passwd, mut k: *mut sshkey)
         b"---- END SSH2 PUBLIC KEY ----\0" as *const u8 as *const libc::c_char,
     );
     libc::free(b64 as *mut libc::c_void);
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn do_convert_to_pkcs8(mut k: *mut sshkey) {
     match sshkey_type_plain((*k).type_0) {
@@ -1248,7 +1247,7 @@ unsafe extern "C" fn do_convert_to_pkcs8(mut k: *mut sshkey) {
             );
         }
     }
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn do_convert_to_pem(mut k: *mut sshkey) {
     match sshkey_type_plain((*k).type_0) {
@@ -1314,7 +1313,7 @@ unsafe extern "C" fn do_convert_to_pem(mut k: *mut sshkey) {
             );
         }
     }
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn do_convert_to(mut pw: *mut passwd) {
     let mut k: *mut sshkey = 0 as *mut sshkey;
@@ -1398,7 +1397,7 @@ unsafe extern "C" fn do_convert_to(mut pw: *mut passwd) {
             );
         }
     }
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn buffer_get_bignum_bits(mut b: *mut sshbuf, mut value: *mut BIGNUM) {
     let mut bytes: u_int = 0;
@@ -2489,7 +2488,7 @@ unsafe extern "C" fn do_convert_from(mut pw: *mut passwd) {
         );
     }
     sshkey_free(k);
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn do_print_public(mut pw: *mut passwd) {
     let mut prv: *mut sshkey = 0 as *mut sshkey;
@@ -2579,7 +2578,7 @@ unsafe extern "C" fn do_print_public(mut pw: *mut passwd) {
     }
     sshkey_free(prv);
     libc::free(comment as *mut libc::c_void);
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn do_download(mut _pw: *mut passwd) {
     let mut keys: *mut *mut sshkey = 0 as *mut *mut sshkey;
@@ -2667,7 +2666,7 @@ unsafe extern "C" fn do_download(mut _pw: *mut passwd) {
     libc::free(comments as *mut libc::c_void);
     libc::free(keys as *mut libc::c_void);
     pkcs11_terminate();
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn try_read_key(mut cpp: *mut *mut libc::c_char) -> *mut sshkey {
     let mut ret: *mut sshkey = 0 as *mut sshkey;
@@ -2900,7 +2899,7 @@ unsafe extern "C" fn do_fingerprint(mut pw: *mut passwd) {
             libc::free(line as *mut libc::c_void);
             fclose(f);
             fingerprint_private(path);
-            exit(0 as libc::c_int);
+            libc::exit(0 as libc::c_int);
         }
         public = try_read_key(&mut cp);
         if public.is_null() {
@@ -2978,7 +2977,7 @@ unsafe extern "C" fn do_fingerprint(mut pw: *mut passwd) {
             path,
         );
     }
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
     let mut current_block: u64;
@@ -3791,7 +3790,7 @@ unsafe extern "C" fn do_known_hosts(
             );
             unlink(tmp.as_mut_ptr());
         }
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     } else if delete_host != 0 && ctx.found_key == 0 {
         crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -3856,7 +3855,7 @@ unsafe extern "C" fn do_known_hosts(
             );
             unlink(tmp.as_mut_ptr());
             unlink(old.as_mut_ptr());
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         printf(
             b"%s updated.\n\0" as *const u8 as *const libc::c_char,
@@ -3891,7 +3890,7 @@ unsafe extern "C" fn do_known_hosts(
             );
         }
     }
-    exit((find_host != 0 && ctx.found_key == 0) as libc::c_int);
+    libc::exit((find_host != 0 && ctx.found_key == 0) as libc::c_int);
 }
 unsafe extern "C" fn do_change_passphrase(mut pw: *mut passwd) {
     let mut comment: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -4024,7 +4023,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut passwd) {
             printf(
                 b"Pass phrases do not match.  Try again.\n\0" as *const u8 as *const libc::c_char,
             );
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         freezero(passphrase2 as *mut libc::c_void, strlen(passphrase2));
     }
@@ -4052,7 +4051,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut passwd) {
         freezero(passphrase1 as *mut libc::c_void, strlen(passphrase1));
         sshkey_free(private);
         libc::free(comment as *mut libc::c_void);
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     freezero(passphrase1 as *mut libc::c_void, strlen(passphrase1));
     sshkey_free(private);
@@ -4061,7 +4060,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut passwd) {
         b"Your identification has been saved with the new passphrase.\n\0" as *const u8
             as *const libc::c_char,
     );
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn do_print_resource_record(
     mut _pw: *mut passwd,
@@ -4325,7 +4324,7 @@ unsafe extern "C" fn do_change_comment(
         );
         explicit_bzero(passphrase as *mut libc::c_void, strlen(passphrase));
         sshkey_free(private);
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     if !comment.is_null() {
         printf(
@@ -4353,7 +4352,7 @@ unsafe extern "C" fn do_change_comment(
         {
             explicit_bzero(passphrase as *mut libc::c_void, strlen(passphrase));
             sshkey_free(private);
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         new_comment[strcspn(
             new_comment.as_mut_ptr(),
@@ -4365,7 +4364,7 @@ unsafe extern "C" fn do_change_comment(
         libc::free(passphrase as *mut libc::c_void);
         sshkey_free(private);
         libc::free(comment as *mut libc::c_void);
-        exit(0 as libc::c_int);
+        libc::exit(0 as libc::c_int);
     }
     r = sshkey_save_private(
         private,
@@ -4391,7 +4390,7 @@ unsafe extern "C" fn do_change_comment(
         freezero(passphrase as *mut libc::c_void, strlen(passphrase));
         sshkey_free(private);
         libc::free(comment as *mut libc::c_void);
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     freezero(passphrase as *mut libc::c_void, strlen(passphrase));
     r = sshkey_from_private(private, &mut public);
@@ -4437,7 +4436,7 @@ unsafe extern "C" fn do_change_comment(
     } else {
         printf(b"Comment removed\n\0" as *const u8 as *const libc::c_char);
     }
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn cert_ext_add(
     mut key: *const libc::c_char,
@@ -5176,7 +5175,7 @@ unsafe extern "C" fn do_ca_sign(
     }
     libc::free(ca_fp as *mut libc::c_void);
     pkcs11_terminate();
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn parse_relative_time(mut s: *const libc::c_char, mut now: time_t) -> u_int64_t {
     let mut mul: int64_t = 0;
@@ -5915,7 +5914,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut passwd) {
     libc::free(line as *mut libc::c_void);
     sshkey_free(key);
     fclose(f);
-    exit(if ok != 0 {
+    libc::exit(if ok != 0 {
         0 as libc::c_int
     } else {
         1 as libc::c_int
@@ -6723,7 +6722,7 @@ unsafe extern "C" fn do_check_krl(
         i;
     }
     ssh_krl_free(krl);
-    exit(ret);
+    libc::exit(ret);
 }
 unsafe extern "C" fn load_sign_key(
     mut keypath: *const libc::c_char,
@@ -8681,7 +8680,7 @@ unsafe extern "C" fn usage() {
         b"       ssh-keygen -F hostname [-lv] [-f known_hosts_file]\n       ssh-keygen -H [-f known_hosts_file]\n       ssh-keygen -K [-a rounds] [-w provider]\n       ssh-keygen -R hostname [-f known_hosts_file]\n       ssh-keygen -r hostname [-g] [-f input_keyfile]\n       ssh-keygen -M generate [-O option] output_file\n       ssh-keygen -M screen [-f input_file] [-O option] output_file\n       ssh-keygen -I certificate_identity -s ca_key [-hU] [-D pkcs11_provider]\n                  [-n principals] [-O option] [-V validity_interval]\n                  [-z serial_number] file ...\n       ssh-keygen -L [-f input_keyfile]\n       ssh-keygen -A [-a rounds] [-f prefix_path]\n       ssh-keygen -k -f krl_file [-u] [-s ca_public] [-z version_number]\n                  file ...\n       ssh-keygen -Q [-l] -f krl_file [file ...]\n       ssh-keygen -Y find-principals -s signature_file -f allowed_signers_file\n       ssh-keygen -Y match-principals -I signer_identity -f allowed_signers_file\n       ssh-keygen -Y check-novalidate -n namespace -s signature_file\n       ssh-keygen -Y sign -f key_file -n namespace file [-O option] ...\n       ssh-keygen -Y verify -f allowed_signers_file -I signer_identity\n                  -n namespace -s signature_file [-r krl_file] [-O option]\n\0"
             as *const u8 as *const libc::c_char,
     );
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> libc::c_int {
     let mut comment: [libc::c_char; 1024] = [0; 1024];
@@ -9126,7 +9125,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for find-principals:missing signature file\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             if have_identity == 0 {
                 crate::log::sshlog(
@@ -9139,7 +9138,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for find-principals:missing allowed keys file\0"
                         as *const u8 as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             return sig_find_principals(ca_key_path, identity_file.as_mut_ptr(), opts, nopts);
         } else if strncmp(
@@ -9159,7 +9158,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for match-principals:missing allowed keys file\0"
                         as *const u8 as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             if cert_key_id.is_null() {
                 crate::log::sshlog(
@@ -9172,7 +9171,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for match-principals: missing principal ID\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             return sig_match_principals(identity_file.as_mut_ptr(), cert_key_id, opts, nopts);
         } else if strncmp(
@@ -9192,7 +9191,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for sign: missing namespace\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             if have_identity == 0 {
                 crate::log::sshlog(
@@ -9205,7 +9204,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for sign: missing key\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             return sig_sign(
                 identity_file.as_mut_ptr(),
@@ -9233,7 +9232,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for check-novalidate: missing namespace\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             if ca_key_path.is_null() {
                 crate::log::sshlog(
@@ -9246,7 +9245,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for check-novalidate: missing signature file\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             return sig_verify(
                 ca_key_path,
@@ -9274,7 +9273,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for verify: missing namespace\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             if ca_key_path.is_null() {
                 crate::log::sshlog(
@@ -9287,7 +9286,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for verify: missing signature file\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             if have_identity == 0 {
                 crate::log::sshlog(
@@ -9300,7 +9299,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for sign: missing allowed keys file\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             if cert_key_id.is_null() {
                 crate::log::sshlog(
@@ -9313,7 +9312,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"Too few arguments for verify: missing principal identity\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             return sig_verify(
                 ca_key_path,
@@ -9514,7 +9513,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     strerror(*libc::__errno_location()),
                 );
             }
-            exit(0 as libc::c_int);
+            libc::exit(0 as libc::c_int);
         } else {
             n = n.wrapping_add(do_print_resource_record(
                 pw,
@@ -9572,7 +9571,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"no keys found.\0" as *const u8 as *const libc::c_char,
                 );
             }
-            exit(0 as libc::c_int);
+            libc::exit(0 as libc::c_int);
         }
     }
     if do_gen_candidates != 0 || do_screen_candidates != 0 {
@@ -9870,7 +9869,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     }
     hostfile_create_user_ssh_dir(identity_file.as_mut_ptr(), (quiet == 0) as libc::c_int);
     if confirm_overwrite(identity_file.as_mut_ptr()) == 0 {
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     passphrase = private_key_passphrase();
     if !identity_comment.is_null() {
@@ -9909,7 +9908,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             identity_file.as_mut_ptr(),
         );
         freezero(passphrase as *mut libc::c_void, strlen(passphrase));
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     freezero(passphrase as *mut libc::c_void, strlen(passphrase));
     sshkey_free(private);
@@ -9971,7 +9970,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     }
     sshbuf_free(attest);
     sshkey_free(public);
-    exit(0 as libc::c_int);
+    libc::exit(0 as libc::c_int);
 }
 pub fn main() {
     let mut args: Vec<*mut libc::c_char> = Vec::new();

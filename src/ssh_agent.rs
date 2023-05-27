@@ -92,7 +92,6 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
-    fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn setenv(
         __name: *const libc::c_char,
@@ -4685,7 +4684,7 @@ unsafe extern "C" fn usage() {
         b"usage: ssh-agent [-c | -s] [-Dd] [-a bind_address] [-E fingerprint_hash]\n                 [-O option] [-P allowed_providers] [-t life]\n       ssh-agent [-a bind_address] [-E fingerprint_hash] [-O option]\n                 [-P allowed_providers] [-t life] command [arg ...]\n       ssh-agent [-c | -s] -k\n\0"
             as *const u8 as *const libc::c_char,
     );
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c_int {
     let mut c_flag: libc::c_int = 0 as libc::c_int;
@@ -4889,7 +4888,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 b"%s not set, cannot kill agent\n\0" as *const u8 as *const libc::c_char,
                 b"SSH_AGENT_PID\0" as *const u8 as *const libc::c_char,
             );
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         pid = strtonum(
             pidstr,
@@ -4905,11 +4904,11 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 pidstr,
                 errstr,
             );
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         if kill(pid, 15 as libc::c_int) == -(1 as libc::c_int) {
             perror(b"kill\0" as *const u8 as *const libc::c_char);
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         format = (if c_flag != 0 {
             b"unsetenv %s;\n\0" as *const u8 as *const libc::c_char
@@ -4928,7 +4927,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             b"echo Agent pid %ld killed;\n\0" as *const u8 as *const libc::c_char,
             pid as libc::c_long,
         );
-        exit(0 as libc::c_int);
+        libc::exit(0 as libc::c_int);
     }
     if rlim.rlim_cur
         < (3 as libc::c_int
@@ -4970,7 +4969,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         );
         if (mkdtemp(socket_dir.as_mut_ptr())).is_null() {
             perror(b"mkdtemp: private socket dir\0" as *const u8 as *const libc::c_char);
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         libc::snprintf(
             socket_name.as_mut_ptr(),
@@ -5061,7 +5060,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     b"echo Agent pid %ld;\n\0" as *const u8 as *const libc::c_char,
                     pid as libc::c_long,
                 );
-                exit(0 as libc::c_int);
+                libc::exit(0 as libc::c_int);
             }
             if setenv(
                 b"SSH_AUTH_SOCK\0" as *const u8 as *const libc::c_char,
@@ -5075,14 +5074,14 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 ) == -(1 as libc::c_int)
             {
                 perror(b"setenv\0" as *const u8 as *const libc::c_char);
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
             execvp(
                 *av.offset(0 as libc::c_int as isize),
                 av as *const *mut libc::c_char,
             );
             perror(*av.offset(0 as libc::c_int as isize));
-            exit(1 as libc::c_int);
+            libc::exit(1 as libc::c_int);
         }
         log_init(
             __progname,

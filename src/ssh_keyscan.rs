@@ -75,7 +75,6 @@ extern "C" {
     fn getrlimit(__resource: __rlimit_resource_t, __rlimits: *mut rlimit) -> libc::c_int;
     fn setrlimit(__resource: __rlimit_resource_t, __rlimits: *const rlimit) -> libc::c_int;
 
-    fn exit(_: libc::c_int) -> !;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
@@ -1061,7 +1060,7 @@ unsafe extern "C" fn keygrab_ssh2(mut c: *mut con) {
             b"kex_setup: %s\n\0" as *const u8 as *const libc::c_char,
             ssh_err(r),
         );
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     (*(*(*c).c_ssh).kex).kex[KEX_DH_GRP1_SHA1 as libc::c_int as usize] =
         Some(kex_gen_client as unsafe extern "C" fn(*mut ssh) -> libc::c_int);
@@ -1934,7 +1933,7 @@ unsafe extern "C" fn usage() {
         b"usage: ssh-keyscan [-46cDHv] [-f file] [-O option] [-p port] [-T timeout]\n                   [-t type] [host | addrlist namelist]\n\0"
             as *const u8 as *const libc::c_char,
     );
-    exit(1 as libc::c_int);
+    libc::exit(1 as libc::c_int);
 }
 unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> libc::c_int {
     let mut debug_flag: libc::c_int = 0 as libc::c_int;
@@ -1990,7 +1989,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                         b"Bad port '%s'\n\0" as *const u8 as *const libc::c_char,
                         BSDoptarg,
                     );
-                    exit(1 as libc::c_int);
+                    libc::exit(1 as libc::c_int);
                 }
             }
             84 => {

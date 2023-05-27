@@ -47,7 +47,6 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strsignal(__sig: libc::c_int) -> *mut libc::c_char;
 
-    fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
@@ -3568,7 +3567,7 @@ pub unsafe extern "C" fn mux_exit_message(
         1 as libc::c_int,
         SYSLOG_LEVEL_DEBUG3,
         0 as *const libc::c_char,
-        b"channel %d: exit message, exitval %d\0" as *const u8 as *const libc::c_char,
+        b"channel %d: libc::exit message, exitval %d\0" as *const u8 as *const libc::c_char,
         (*c).self_0,
         exitval,
     );
@@ -5830,7 +5829,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
                         1 as libc::c_int,
                         SYSLOG_LEVEL_FATAL,
                         0 as *const libc::c_char,
-                        b"exit on unknown session: my id %u theirs %u\0" as *const u8
+                        b"libc::exit on unknown session: my id %u theirs %u\0" as *const u8
                             as *const libc::c_char,
                         sid,
                         esid,
@@ -5943,7 +5942,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG2,
             0 as *const libc::c_char,
-            b"Received exit status from master %d\0" as *const u8 as *const libc::c_char,
+            b"Received libc::exit status from master %d\0" as *const u8 as *const libc::c_char,
             exitval,
         );
     }
@@ -5954,7 +5953,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
             host,
         );
     }
-    exit(exitval as libc::c_int);
+    libc::exit(exitval as libc::c_int);
 }
 unsafe extern "C" fn mux_client_proxy(mut fd: libc::c_int) -> libc::c_int {
     let mut m: *mut sshbuf = 0 as *mut sshbuf;
@@ -6837,7 +6836,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
                 b"Master running (pid=%u)\r\n\0" as *const u8 as *const libc::c_char,
                 pid,
             );
-            exit(0 as libc::c_int);
+            libc::exit(0 as libc::c_int);
         }
         3 => {
             mux_client_request_terminate(sock);
@@ -6847,7 +6846,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
                     b"Exit request sent.\r\n\0" as *const u8 as *const libc::c_char,
                 );
             }
-            exit(0 as libc::c_int);
+            libc::exit(0 as libc::c_int);
         }
         5 => {
             if mux_client_forwards(sock, 0 as libc::c_int) != 0 as libc::c_int {
@@ -6862,7 +6861,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
                     b"master forward request failed\0" as *const u8 as *const libc::c_char,
                 );
             }
-            exit(0 as libc::c_int);
+            libc::exit(0 as libc::c_int);
         }
         1 => {
             if mux_client_forwards(sock, 0 as libc::c_int) != 0 as libc::c_int {
@@ -6883,7 +6882,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
         }
         4 => {
             mux_client_request_stdio_fwd(sock);
-            exit(0 as libc::c_int);
+            libc::exit(0 as libc::c_int);
         }
         6 => {
             mux_client_request_stop_listening(sock);
@@ -6893,7 +6892,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
                     b"Stop listening request sent.\r\n\0" as *const u8 as *const libc::c_char,
                 );
             }
-            exit(0 as libc::c_int);
+            libc::exit(0 as libc::c_int);
         }
         7 => {
             if mux_client_forwards(sock, 1 as libc::c_int) != 0 as libc::c_int {
@@ -6908,7 +6907,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
                     b"master cancel forward request failed\0" as *const u8 as *const libc::c_char,
                 );
             }
-            exit(0 as libc::c_int);
+            libc::exit(0 as libc::c_int);
         }
         8 => {
             mux_client_proxy(sock);

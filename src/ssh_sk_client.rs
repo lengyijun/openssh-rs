@@ -340,7 +340,7 @@ unsafe extern "C" fn reap_helper(mut pid: pid_t) -> libc::c_int {
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"helper exited with non-zero exit status\0" as *const u8 as *const libc::c_char,
+            b"helper exited with non-zero libc::exit status\0" as *const u8 as *const libc::c_char,
         );
         return -(27 as libc::c_int);
     }

@@ -53,7 +53,6 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn seed_rng();
 
-    fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -1892,7 +1891,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 b"Could not open a connection to your authentication agent.\n\0" as *const u8
                     as *const libc::c_char,
             );
-            exit(2 as libc::c_int);
+            libc::exit(2 as libc::c_int);
         }
         _ => {
             libc::fprintf(
@@ -1900,7 +1899,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 b"Error connecting to agent: %s\n\0" as *const u8 as *const libc::c_char,
                 ssh_err(r),
             );
-            exit(2 as libc::c_int);
+            libc::exit(2 as libc::c_int);
         }
     }
     skprovider = getenv(b"SSH_SK_PROVIDER\0" as *const u8 as *const libc::c_char);

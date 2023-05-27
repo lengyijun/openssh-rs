@@ -2,7 +2,7 @@ use ::libc;
 extern "C" {
     fn perror(__s: *const libc::c_char);
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn exit(_: libc::c_int) -> !;
+
 }
 #[no_mangle]
 pub unsafe extern "C" fn ssh_get_progname(mut _argv0: *mut libc::c_char) -> *mut libc::c_char {
@@ -15,7 +15,7 @@ pub unsafe extern "C" fn ssh_get_progname(mut _argv0: *mut libc::c_char) -> *mut
     q = strdup(p);
     if q.is_null() {
         perror(b"strdup\0" as *const u8 as *const libc::c_char);
-        exit(1 as libc::c_int);
+        libc::exit(1 as libc::c_int);
     }
     return q;
 }

@@ -24,7 +24,6 @@ extern "C" {
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn seed_rng();
 
-    fn exit(_: libc::c_int) -> !;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
@@ -834,7 +833,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"usage: %s [-v]\n\0" as *const u8 as *const libc::c_char,
                     __progname,
                 );
-                exit(1 as libc::c_int);
+                libc::exit(1 as libc::c_int);
             }
         }
     }

@@ -61,7 +61,6 @@ extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
-    fn exit(_: libc::c_int) -> !;
     fn mkdtemp(__template: *mut libc::c_char) -> *mut libc::c_char;
     fn system(__command: *const libc::c_char) -> libc::c_int;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -1154,7 +1153,7 @@ unsafe extern "C" fn set_control_persist_exit_time(mut ssh: *mut ssh) {
                 1 as libc::c_int,
                 SYSLOG_LEVEL_DEBUG2,
                 0 as *const libc::c_char,
-                b"cancel scheduled exit\0" as *const u8 as *const libc::c_char,
+                b"cancel scheduled libc::exit\0" as *const u8 as *const libc::c_char,
             );
         }
         control_persist_exit_time = 0 as libc::c_int as time_t;
@@ -1170,7 +1169,7 @@ unsafe extern "C" fn set_control_persist_exit_time(mut ssh: *mut ssh) {
             1 as libc::c_int,
             SYSLOG_LEVEL_DEBUG2,
             0 as *const libc::c_char,
-            b"schedule exit in %d seconds\0" as *const u8 as *const libc::c_char,
+            b"schedule libc::exit in %d seconds\0" as *const u8 as *const libc::c_char,
             options.control_persist_timeout,
         );
     }
@@ -3005,7 +3004,7 @@ unsafe extern "C" fn process_escapes(
                             );
                         } else {
                             if pid != 0 as libc::c_int {
-                                exit(0 as libc::c_int);
+                                libc::exit(0 as libc::c_int);
                             }
                             r = sshbuf_put_u8(bin, 4 as libc::c_int as u_char);
                             if r != 0 as libc::c_int {
@@ -4632,8 +4631,10 @@ unsafe extern "C" fn client_input_channel_req(
                 chan_rcvd_eow(ssh, c);
                 current_block = 17478428563724192186;
             }
-        } else if strcmp(rtype, b"exit-status\0" as *const u8 as *const libc::c_char)
-            == 0 as libc::c_int
+        } else if strcmp(
+            rtype,
+            b"libc::exit-status\0" as *const u8 as *const libc::c_char,
+        ) == 0 as libc::c_int
         {
             r = sshpkt_get_u32(ssh, &mut exitval);
             if r != 0 as libc::c_int {
@@ -4656,7 +4657,7 @@ unsafe extern "C" fn client_input_channel_req(
                         1 as libc::c_int,
                         SYSLOG_LEVEL_DEBUG1,
                         0 as *const libc::c_char,
-                        b"no sink for exit-status on channel %d\0" as *const u8
+                        b"no sink for libc::exit-status on channel %d\0" as *const u8
                             as *const libc::c_char,
                         id,
                     );
