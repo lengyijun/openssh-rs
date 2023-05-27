@@ -1,12 +1,9 @@
+use crate::openbsd_compat::vis::strnvis;
 use ::libc;
+
 extern "C" {
     static mut environ: *mut *mut libc::c_char;
-    fn strnvis(
-        _: *mut libc::c_char,
-        _: *const libc::c_char,
-        _: size_t,
-        _: libc::c_int,
-    ) -> libc::c_int;
+
     fn vsnprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,

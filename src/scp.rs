@@ -4,6 +4,7 @@ use crate::misc::arglist;
 use crate::misc::colon;
 use crate::misc::parse_uri;
 use crate::misc::parse_user_host_path;
+use crate::openbsd_compat::vis::strnvis;
 use crate::sftp_client::can_expand_path;
 use crate::sftp_client::crossload_dir;
 use crate::sftp_client::do_crossload;
@@ -54,12 +55,6 @@ extern "C" {
 
     fn __errno_location() -> *mut libc::c_int;
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
-    fn strnvis(
-        _: *mut libc::c_char,
-        _: *const libc::c_char,
-        _: size_t,
-        _: libc::c_int,
-    ) -> libc::c_int;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
