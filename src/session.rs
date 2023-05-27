@@ -32,12 +32,7 @@ extern "C" {
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
 
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn fgets(
         __s: *mut libc::c_char,
         __n: libc::c_int,
@@ -1725,30 +1720,30 @@ pub unsafe extern "C" fn do_exec(
         } else if (*s).is_subsystem != 0 {
             (*s).is_subsystem = 1 as libc::c_int;
         }
-        snprintf(
+        libc::snprintf(
             session_type.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"forced-command %s '%.900s'\0" as *const u8 as *const libc::c_char,
             forced,
             command,
         );
     } else if (*s).is_subsystem != 0 {
-        snprintf(
+        libc::snprintf(
             session_type.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"subsystem '%.900s'\0" as *const u8 as *const libc::c_char,
             (*s).subsys,
         );
     } else if command.is_null() {
-        snprintf(
+        libc::snprintf(
             session_type.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"shell\0" as *const u8 as *const libc::c_char,
         );
     } else {
-        snprintf(
+        libc::snprintf(
             session_type.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"command\0" as *const u8 as *const libc::c_char,
         );
     }
@@ -1912,9 +1907,9 @@ pub unsafe extern "C" fn check_quietlogin(
     if !command.is_null() {
         return 1 as libc::c_int;
     }
-    snprintf(
+    libc::snprintf(
         buf.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
         b"%.200s/.hushlogin\0" as *const u8 as *const libc::c_char,
         (*pw).pw_dir,
     );
@@ -2056,9 +2051,9 @@ unsafe extern "C" fn do_setup_env(
         );
     }
     if options.use_pam == 0 {
-        snprintf(
+        libc::snprintf(
             buf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
             b"%.200s/%.50s\0" as *const u8 as *const libc::c_char,
             b"/var/mail\0" as *const u8 as *const libc::c_char,
             (*pw).pw_name,
@@ -2143,9 +2138,9 @@ unsafe extern "C" fn do_setup_env(
         }
     }
     if options.permit_user_env != 0 {
-        snprintf(
+        libc::snprintf(
             buf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
             b"%.200s/%s/environment\0" as *const u8 as *const libc::c_char,
             (*pw).pw_dir,
             b".ssh\0" as *const u8 as *const libc::c_char,
@@ -2182,9 +2177,9 @@ unsafe extern "C" fn do_setup_env(
         i = i.wrapping_add(1);
         i;
     }
-    snprintf(
+    libc::snprintf(
         buf.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
         b"%.50s %d %d\0" as *const u8 as *const libc::c_char,
         ssh_remote_ipaddr(ssh),
         ssh_remote_port(ssh),
@@ -2197,9 +2192,9 @@ unsafe extern "C" fn do_setup_env(
         buf.as_mut_ptr(),
     );
     laddr = get_local_ipaddr(ssh_packet_get_connection_in(ssh));
-    snprintf(
+    libc::snprintf(
         buf.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
         b"%.50s %d %.50s %d\0" as *const u8 as *const libc::c_char,
         ssh_remote_ipaddr(ssh),
         ssh_remote_port(ssh),
@@ -2746,9 +2741,9 @@ pub unsafe extern "C" fn do_setusercontext(mut pw: *mut passwd) {
             ) != 0 as libc::c_int
         {
             tmp = tilde_expand_filename(options.chroot_directory, (*pw).pw_uid);
-            snprintf(
+            libc::snprintf(
                 uidstr.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
                 b"%llu\0" as *const u8 as *const libc::c_char,
                 (*pw).pw_uid as libc::c_ulonglong,
             );
@@ -4922,16 +4917,16 @@ pub unsafe extern "C" fn session_setup_x11fwd(
         );
     }
     if options.x11_use_localhost != 0 {
-        snprintf(
+        libc::snprintf(
             display.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 512]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 512]>() as usize,
             b"localhost:%u.%u\0" as *const u8 as *const libc::c_char,
             (*s).display_number,
             (*s).screen,
         );
-        snprintf(
+        libc::snprintf(
             auth_display.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 512]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 512]>() as usize,
             b"unix:%u.%u\0" as *const u8 as *const libc::c_char,
             (*s).display_number,
             (*s).screen,
@@ -4939,9 +4934,9 @@ pub unsafe extern "C" fn session_setup_x11fwd(
         (*s).display = xstrdup(display.as_mut_ptr());
         (*s).auth_display = xstrdup(auth_display.as_mut_ptr());
     } else {
-        snprintf(
+        libc::snprintf(
             display.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 512]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 512]>() as usize,
             b"%.400s:%u.%u\0" as *const u8 as *const libc::c_char,
             hostname.as_mut_ptr(),
             (*s).display_number,

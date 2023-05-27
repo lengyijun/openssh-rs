@@ -64,12 +64,7 @@ extern "C" {
         __flags: libc::c_int,
     ) -> libc::c_int;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn perror(__s: *const libc::c_char);
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
@@ -925,9 +920,9 @@ unsafe extern "C" fn expand_proxy_command(
     } else {
         host_arg
     };
-    snprintf(
+    libc::snprintf(
         strport.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
         b"%d\0" as *const u8 as *const libc::c_char,
         port,
     );
@@ -986,8 +981,8 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"Could not create libc::socketpair to communicate with proxy dialer: %.100s\0" as *const u8
-                as *const libc::c_char,
+            b"Could not create libc::socketpair to communicate with proxy dialer: %.100s\0"
+                as *const u8 as *const libc::c_char,
             strerror(*__errno_location()),
         );
     }
@@ -3290,10 +3285,9 @@ unsafe extern "C" fn check_host_key(
                                         && ip_status as libc::c_uint
                                             == HOST_NEW as libc::c_int as libc::c_uint
                                     {
-                                        snprintf(
+                                        libc::snprintf(
                                             hostline.as_mut_ptr(),
-                                            ::core::mem::size_of::<[libc::c_char; 1000]>()
-                                                as libc::c_ulong,
+                                            ::core::mem::size_of::<[libc::c_char; 1000]>() as usize,
                                             b"%s,%s\0" as *const u8 as *const libc::c_char,
                                             host,
                                             ip,
@@ -3865,9 +3859,9 @@ unsafe extern "C" fn check_host_key(
                 {
                     break;
                 }
-                snprintf(
+                libc::snprintf(
                     msg.as_mut_ptr(),
-                    ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+                    ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
                     b"Warning: the %s host key for '%.200s' differs from the key for the IP address '%.128s'\nOffending key for IP in %s:%lu\0"
                         as *const u8 as *const libc::c_char,
                     type_0,
@@ -3878,10 +3872,10 @@ unsafe extern "C" fn check_host_key(
                 );
                 if host_status as libc::c_uint == HOST_OK as libc::c_int as libc::c_uint {
                     len = strlen(msg.as_mut_ptr()) as libc::c_int;
-                    snprintf(
+                    libc::snprintf(
                         msg.as_mut_ptr().offset(len as isize),
                         (::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong)
-                            .wrapping_sub(len as libc::c_ulong),
+                            .wrapping_sub(len as libc::c_ulong) as usize,
                         b"\nMatching host key in %s:%lu\0" as *const u8 as *const libc::c_char,
                         (*host_found).file,
                         (*host_found).line,

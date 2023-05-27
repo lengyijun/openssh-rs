@@ -33,12 +33,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
@@ -706,9 +701,9 @@ unsafe extern "C" fn add_file(
             _ => {
                 if private.is_null() {
                     clear_pass();
-                    snprintf(
+                    libc::snprintf(
                         msg.as_mut_ptr(),
-                        ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+                        ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
                         b"Enter passphrase for %s%s: \0" as *const u8 as *const libc::c_char,
                         filename,
                         if confirm != 0 {
@@ -747,9 +742,9 @@ unsafe extern "C" fn add_file(
                             break;
                         } else {
                             clear_pass();
-                            snprintf(
+                            libc::snprintf(
                                 msg.as_mut_ptr(),
-                                ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+                                ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
                                 b"Bad passphrase, try again for %s%s: \0" as *const u8
                                     as *const libc::c_char,
                                 filename,
@@ -2251,9 +2246,9 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     } else {
                         i = 0 as libc::c_int;
                         while !(default_files[i as usize]).is_null() {
-                            snprintf(
+                            libc::snprintf(
                                 buf.as_mut_ptr(),
-                                ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
+                                ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
                                 b"%s/%s\0" as *const u8 as *const libc::c_char,
                                 (*pw).pw_dir,
                                 default_files[i as usize],

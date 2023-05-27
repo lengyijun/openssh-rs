@@ -1,12 +1,7 @@
 use ::libc;
 extern "C" {
     pub type sshbuf;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strmode(mode: libc::c_int, p: *mut libc::c_char);
     fn fmt_scaled(number: libc::c_longlong, result: *mut libc::c_char) -> libc::c_int;
@@ -322,18 +317,18 @@ pub unsafe extern "C" fn ls_file(
     strmode((*st).st_mode as libc::c_int, mode.as_mut_ptr());
     if remote != 0 {
         if user.is_null() {
-            snprintf(
+            libc::snprintf(
                 ubuf.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 12]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 12]>() as usize,
                 b"%u\0" as *const u8 as *const libc::c_char,
                 (*st).st_uid,
             );
             user = ubuf.as_mut_ptr();
         }
         if group.is_null() {
-            snprintf(
+            libc::snprintf(
                 gbuf.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 12]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 12]>() as usize,
                 b"%u\0" as *const u8 as *const libc::c_char,
                 (*st).st_gid,
             );
@@ -347,9 +342,9 @@ pub unsafe extern "C" fn ls_file(
     } else {
         user = user_from_uid((*st).st_uid, 0 as libc::c_int);
         group = group_from_gid((*st).st_gid, 0 as libc::c_int);
-        snprintf(
+        libc::snprintf(
             lc.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 8]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 8]>() as usize,
             b"%u\0" as *const u8 as *const libc::c_char,
             (*st).st_nlink as u_int,
         );
@@ -392,9 +387,9 @@ pub unsafe extern "C" fn ls_file(
     }) as libc::c_int;
     if si_units != 0 {
         fmt_scaled((*st).st_size as libc::c_longlong, sbuf.as_mut_ptr());
-        snprintf(
+        libc::snprintf(
             buf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"%s %3s %-*s %-*s %8s %s %s\0" as *const u8 as *const libc::c_char,
             mode.as_mut_ptr(),
             lc.as_mut_ptr(),
@@ -407,9 +402,9 @@ pub unsafe extern "C" fn ls_file(
             name,
         );
     } else {
-        snprintf(
+        libc::snprintf(
             buf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"%s %3s %-*s %-*s %8llu %s %s\0" as *const u8 as *const libc::c_char,
             mode.as_mut_ptr(),
             lc.as_mut_ptr(),

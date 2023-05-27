@@ -18,12 +18,7 @@ extern "C" {
     fn __errno_location() -> *mut libc::c_int;
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn free(_: *mut libc::c_void);
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
@@ -1686,15 +1681,15 @@ unsafe extern "C" fn match_principals_command(
                             b"sshkey_to_base64 failed\0" as *const u8 as *const libc::c_char,
                         );
                     } else {
-                        snprintf(
+                        libc::snprintf(
                             serial_s.as_mut_ptr(),
-                            ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+                            ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
                             b"%llu\0" as *const u8 as *const libc::c_char,
                             (*cert).serial as libc::c_ulonglong,
                         );
-                        snprintf(
+                        libc::snprintf(
                             uidstr.as_mut_ptr(),
-                            ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+                            ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
                             b"%llu\0" as *const u8 as *const libc::c_char,
                             (*user_pw).pw_uid as libc::c_ulonglong,
                         );
@@ -2179,9 +2174,9 @@ unsafe extern "C" fn user_key_command_allowed2(
                     options.authorized_keys_command,
                 );
             } else {
-                snprintf(
+                libc::snprintf(
                     uidstr.as_mut_ptr(),
-                    ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+                    ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
                     b"%llu\0" as *const u8 as *const libc::c_char,
                     (*user_pw).pw_uid as libc::c_ulonglong,
                 );

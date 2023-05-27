@@ -16,12 +16,7 @@ extern "C" {
     pub type ec_group_st;
     pub type ECDSA_SIG_st;
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -1248,9 +1243,9 @@ unsafe extern "C" fn pkcs11_login_slot(
             b"Deferring PIN entry to reader keypad.\0" as *const u8 as *const libc::c_char,
         );
     } else {
-        snprintf(
+        libc::snprintf(
             prompt.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"Enter PIN for '%s': \0" as *const u8 as *const libc::c_char,
             ((*si).token.label).as_mut_ptr(),
         );

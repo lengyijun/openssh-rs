@@ -42,12 +42,7 @@ extern "C" {
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn fgets(
         __s: *mut libc::c_char,
@@ -1314,9 +1309,9 @@ pub unsafe extern "C" fn client_x11_get_proto(
             10 as libc::c_int as libc::c_ulong,
         ) == 0 as libc::c_int
         {
-            r = snprintf(
+            r = libc::snprintf(
                 xdisplay.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 512]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 512]>() as usize,
                 b"unix:%s\0" as *const u8 as *const libc::c_char,
                 display.offset(10 as libc::c_int as isize),
             );
@@ -1361,9 +1356,9 @@ pub unsafe extern "C" fn client_x11_get_proto(
                 return -(1 as libc::c_int);
             }
             do_unlink = 1 as libc::c_int;
-            r = snprintf(
+            r = libc::snprintf(
                 xauthfile.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
                 b"%s/xauthfile\0" as *const u8 as *const libc::c_char,
                 xauthdir.as_mut_ptr(),
             );
@@ -1547,12 +1542,12 @@ pub unsafe extern "C" fn client_x11_get_proto(
         );
         i = 0 as libc::c_int as u_int;
         while (i as libc::c_ulong) < ::core::mem::size_of::<[u_int8_t; 16]>() as libc::c_ulong {
-            snprintf(
+            libc::snprintf(
                 data.as_mut_ptr()
                     .offset((2 as libc::c_int as libc::c_uint).wrapping_mul(i) as isize),
                 (::core::mem::size_of::<[libc::c_char; 512]>() as libc::c_ulong).wrapping_sub(
                     (2 as libc::c_int as libc::c_uint).wrapping_mul(i) as libc::c_ulong,
-                ),
+                ) as usize,
                 b"%02x\0" as *const u8 as *const libc::c_char,
                 rnd[i as usize] as libc::c_int,
             );
@@ -1874,16 +1869,16 @@ unsafe extern "C" fn client_status_confirm(
         );
     } else if type_0 == 100 as libc::c_int {
         if tochan != 0 {
-            snprintf(
+            libc::snprintf(
                 errmsg.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
                 b"%s request failed\r\n\0" as *const u8 as *const libc::c_char,
                 (*cr).request_type,
             );
         } else {
-            snprintf(
+            libc::snprintf(
                 errmsg.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
                 b"%s request failed on channel %d\0" as *const u8 as *const libc::c_char,
                 (*cr).request_type,
                 (*c).self_0,
@@ -3138,15 +3133,15 @@ unsafe extern "C" fn process_escapes(
                 13484060386966298149 => {}
                 _ => {
                     if ch as libc::c_int == 'Z' as i32 - 64 as libc::c_int {
-                        snprintf(
+                        libc::snprintf(
                             b.as_mut_ptr(),
-                            ::core::mem::size_of::<[libc::c_char; 16]>() as libc::c_ulong,
+                            ::core::mem::size_of::<[libc::c_char; 16]>() as usize,
                             b"^Z\0" as *const u8 as *const libc::c_char,
                         );
                     } else {
-                        snprintf(
+                        libc::snprintf(
                             b.as_mut_ptr(),
-                            ::core::mem::size_of::<[libc::c_char; 16]>() as libc::c_ulong,
+                            ::core::mem::size_of::<[libc::c_char; 16]>() as usize,
                             b"%c\0" as *const u8 as *const libc::c_char,
                             ch as libc::c_int,
                         );

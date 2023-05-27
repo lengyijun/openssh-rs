@@ -55,12 +55,7 @@ extern "C" {
         __servlen: socklen_t,
         __flags: libc::c_int,
     ) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn getpeereid(_: libc::c_int, _: *mut uid_t, _: *mut gid_t) -> libc::c_int;
@@ -3658,9 +3653,9 @@ unsafe extern "C" fn channel_post_x11_listener(mut ssh: *mut ssh, mut c: *mut Ch
     set_nodelay(newsock);
     remote_ipaddr = get_peer_ipaddr(newsock);
     remote_port = get_peer_port(newsock);
-    snprintf(
+    libc::snprintf(
         buf.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 16384]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 16384]>() as usize,
         b"X11 connection from %.200s port %d\0" as *const u8 as *const libc::c_char,
         remote_ipaddr,
         remote_port,
@@ -7983,9 +7978,9 @@ unsafe extern "C" fn channel_setup_fwd_listener_tcpip(
         0 as libc::c_int
     };
     hints.ai_socktype = SOCK_STREAM as libc::c_int;
-    snprintf(
+    libc::snprintf(
         strport.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
         b"%d\0" as *const u8 as *const libc::c_char,
         (*fwd).listen_port,
     );
@@ -9603,9 +9598,9 @@ unsafe extern "C" fn connect_to_helper(
         );
         hints.ai_family = (*(*ssh).chanctxt).IPv4or6;
         hints.ai_socktype = socktype;
-        snprintf(
+        libc::snprintf(
             strport.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
             b"%d\0" as *const u8 as *const libc::c_char,
             port,
         );
@@ -10218,9 +10213,9 @@ pub unsafe extern "C" fn x11_create_display_inet(
             0x1 as libc::c_int
         };
         hints.ai_socktype = SOCK_STREAM as libc::c_int;
-        snprintf(
+        libc::snprintf(
             strport.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
             b"%d\0" as *const u8 as *const libc::c_char,
             port as libc::c_int,
         );
@@ -10478,9 +10473,9 @@ unsafe extern "C" fn connect_local_xsocket_path(mut pathname: *const libc::c_cha
 }
 unsafe extern "C" fn connect_local_xsocket(mut dnr: u_int) -> libc::c_int {
     let mut buf: [libc::c_char; 1024] = [0; 1024];
-    snprintf(
+    libc::snprintf(
         buf.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
         b"/tmp/.X11-unix/X%u\0" as *const u8 as *const libc::c_char,
         dnr,
     );
@@ -10603,9 +10598,9 @@ pub unsafe extern "C" fn x11_connect_display(mut ssh: *mut ssh) -> libc::c_int {
     );
     hints.ai_family = (*(*ssh).chanctxt).IPv4or6;
     hints.ai_socktype = SOCK_STREAM as libc::c_int;
-    snprintf(
+    libc::snprintf(
         strport.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
         b"%u\0" as *const u8 as *const libc::c_char,
         (6000 as libc::c_int as libc::c_uint).wrapping_add(display_number),
     );

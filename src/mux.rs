@@ -39,12 +39,6 @@ extern "C" {
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
 
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
     fn link(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -1106,9 +1100,9 @@ unsafe extern "C" fn env_permitted(mut env: *const libc::c_char) -> libc::c_int 
     if cp.is_null() || cp == env as *mut libc::c_char {
         return 0 as libc::c_int;
     }
-    ret = snprintf(
+    ret = libc::snprintf(
         name.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
         b"%.*s\0" as *const u8 as *const libc::c_char,
         cp.offset_from(env) as libc::c_long as libc::c_int,
         env,

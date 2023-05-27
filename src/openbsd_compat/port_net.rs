@@ -22,12 +22,6 @@ extern "C" {
     fn bzero(_: *mut libc::c_void, _: libc::c_ulong);
     fn __errno_location() -> *mut libc::c_int;
 
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -509,9 +503,9 @@ pub unsafe extern "C" fn sys_tun_open(
             );
             current_block = 3387529812613067600;
         } else {
-            snprintf(
+            libc::snprintf(
                 (ifr.ifr_ifrn.ifrn_name).as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 16]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 16]>() as usize,
                 name,
                 tun,
             );

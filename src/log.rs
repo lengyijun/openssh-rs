@@ -14,12 +14,6 @@ extern "C" {
     fn getpid() -> __pid_t;
     static mut stderr: *mut libc::FILE;
 
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
     fn vsnprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -549,9 +543,9 @@ unsafe extern "C" fn do_log(
         }
     }
     if !txt.is_null() && log_handler.is_none() {
-        snprintf(
+        libc::snprintf(
             fmtbuf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             txt,
             fmt,
@@ -571,9 +565,9 @@ unsafe extern "C" fn do_log(
         );
     }
     if !suffix.is_null() {
-        snprintf(
+        libc::snprintf(
             fmtbuf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             msgbuf.as_mut_ptr(),
             suffix,
@@ -605,9 +599,9 @@ unsafe extern "C" fn do_log(
         );
         log_handler = tmp_handler;
     } else if log_on_stderr != 0 {
-        snprintf(
+        libc::snprintf(
             msgbuf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"%s%s%.*s\r\n\0" as *const u8 as *const libc::c_char,
             if log_on_stderr > 1 as libc::c_int {
                 progname
@@ -726,9 +720,9 @@ pub unsafe extern "C" fn sshlogv(
     let mut cp: *const libc::c_char = 0 as *const libc::c_char;
     let mut i: size_t = 0;
     cp = strrchr(file, '/' as i32);
-    snprintf(
+    libc::snprintf(
         tag.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 128]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 128]>() as usize,
         b"%.48s:%.48s():%d (pid=%ld)\0" as *const u8 as *const libc::c_char,
         if cp.is_null() {
             file
@@ -755,17 +749,17 @@ pub unsafe extern "C" fn sshlogv(
         }
     }
     if forced != 0 {
-        snprintf(
+        libc::snprintf(
             fmt2.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1152]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1152]>() as usize,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             tag.as_mut_ptr(),
             fmt,
         );
     } else if showfunc != 0 {
-        snprintf(
+        libc::snprintf(
             fmt2.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1152]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1152]>() as usize,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             func,
             fmt,

@@ -41,12 +41,7 @@ extern "C" {
         __flags: libc::c_int,
     ) -> libc::c_int;
     fn arc4random_uniform(_: uint32_t) -> uint32_t;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn vsnprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -1225,9 +1220,9 @@ pub unsafe extern "C" fn expand_authorized_keys(
     let mut uidstr: [libc::c_char; 32] = [0; 32];
     let mut ret: [libc::c_char; 4096] = [0; 4096];
     let mut i: libc::c_int = 0;
-    snprintf(
+    libc::snprintf(
         uidstr.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
         b"%llu\0" as *const u8 as *const libc::c_char,
         (*pw).pw_uid as libc::c_ulonglong,
     );
@@ -1244,9 +1239,9 @@ pub unsafe extern "C" fn expand_authorized_keys(
     if path_absolute(file) != 0 {
         return file;
     }
-    i = snprintf(
+    i = libc::snprintf(
         ret.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
         b"%s/%s\0" as *const u8 as *const libc::c_char,
         (*pw).pw_dir,
         file,
@@ -1855,15 +1850,15 @@ pub unsafe extern "C" fn auth_log_authopts(
     let mut i: size_t = 0;
     let mut msg: [libc::c_char; 1024] = [0; 1024];
     let mut buf: [libc::c_char; 64] = [0; 64];
-    snprintf(
+    libc::snprintf(
         buf.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 64]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 64]>() as usize,
         b"%d\0" as *const u8 as *const libc::c_char,
         (*opts).force_tun_device,
     );
-    snprintf(
+    libc::snprintf(
         msg.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
         b"key options:%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\0" as *const u8 as *const libc::c_char,
         if (*opts).permit_agent_forwarding_flag != 0 {
             b" agent-forwarding\0" as *const u8 as *const libc::c_char

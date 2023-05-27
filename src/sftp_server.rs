@@ -67,12 +67,7 @@ extern "C" {
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
 
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     static mut stderr: *mut libc::FILE;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn ssh_get_progname(_: *mut libc::c_char) -> *mut libc::c_char;
@@ -2779,9 +2774,9 @@ unsafe extern "C" fn process_readdir(mut id: u_int32_t) {
                     ::core::mem::size_of::<Stat>() as libc::c_ulong,
                 ) as *mut Stat;
             }
-            snprintf(
+            libc::snprintf(
                 pathname.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
                 b"%s%s%s\0" as *const u8 as *const libc::c_char,
                 path,
                 if strcmp(path, b"/\0" as *const u8 as *const libc::c_char) != 0 {

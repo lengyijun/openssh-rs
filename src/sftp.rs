@@ -69,12 +69,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn fgets(
         __s: *mut libc::c_char,
         __n: libc::c_int,
@@ -1074,9 +1069,9 @@ unsafe extern "C" fn local_do_ls(mut args: *const libc::c_char) {
             .wrapping_add(1 as libc::c_int as libc::c_ulong)
             as libc::c_int;
         let mut buf: *mut libc::c_char = xmalloc(len as size_t) as *mut libc::c_char;
-        snprintf(
+        libc::snprintf(
             buf,
-            len as libc::c_ulong,
+            len as usize,
             b"ls %s\0" as *const u8 as *const libc::c_char,
             args,
         );
@@ -2543,9 +2538,9 @@ unsafe extern "C" fn do_df(
             ::core::mem::size_of::<[libc::c_char; 16]>() as libc::c_ulong,
         );
     } else {
-        snprintf(
+        libc::snprintf(
             s_icapacity.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 16]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 16]>() as usize,
             b"%3llu%%\0" as *const u8 as *const libc::c_char,
             (100 as libc::c_int as libc::c_ulong)
                 .wrapping_mul((st.f_files).wrapping_sub(st.f_ffree))
@@ -2559,9 +2554,9 @@ unsafe extern "C" fn do_df(
             ::core::mem::size_of::<[libc::c_char; 16]>() as libc::c_ulong,
         );
     } else {
-        snprintf(
+        libc::snprintf(
             s_dcapacity.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 16]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 16]>() as usize,
             b"%3llu%%\0" as *const u8 as *const libc::c_char,
             (100 as libc::c_int as libc::c_ulong)
                 .wrapping_mul((st.f_blocks).wrapping_sub(st.f_bfree))
@@ -3954,9 +3949,9 @@ unsafe extern "C" fn interactive_loop(
                     dir,
                 );
             }
-            snprintf(
+            libc::snprintf(
                 cmd.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 2048]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 2048]>() as usize,
                 b"cd \"%s\"\0" as *const u8 as *const libc::c_char,
                 dir,
             );
@@ -3976,9 +3971,9 @@ unsafe extern "C" fn interactive_loop(
                 return -(1 as libc::c_int);
             }
         } else {
-            snprintf(
+            libc::snprintf(
                 cmd.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 2048]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 2048]>() as usize,
                 b"get%s %s%s%s\0" as *const u8 as *const libc::c_char,
                 if global_aflag != 0 {
                     b" -a\0" as *const u8 as *const libc::c_char

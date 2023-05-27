@@ -34,12 +34,7 @@ extern "C" {
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
@@ -2203,15 +2198,15 @@ unsafe extern "C" fn match_cfg_line(
                                 thishost.as_mut_ptr(),
                                 b".\0" as *const u8 as *const libc::c_char,
                             ) as usize] = '\0' as i32 as libc::c_char;
-                            snprintf(
+                            libc::snprintf(
                                 portstr.as_mut_ptr(),
-                                ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+                                ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
                                 b"%d\0" as *const u8 as *const libc::c_char,
                                 port,
                             );
-                            snprintf(
+                            libc::snprintf(
                                 uidstr.as_mut_ptr(),
-                                ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+                                ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
                                 b"%llu\0" as *const u8 as *const libc::c_char,
                                 (*pw).pw_uid as libc::c_ulonglong,
                             );
@@ -4088,9 +4083,9 @@ unsafe extern "C" fn process_config_line_depth(
                             current_block = 7482270440933722938;
                         }
                     } else {
-                        snprintf(
+                        libc::snprintf(
                             fwdarg.as_mut_ptr(),
-                            ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+                            ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
                             b"%s:%s\0" as *const u8 as *const libc::c_char,
                             arg,
                             arg2,
@@ -7761,9 +7756,9 @@ pub unsafe extern "C" fn dump_client_config(mut o: *mut Options, mut host: *cons
                 (*o).jump_host,
                 b"1234567890.\0" as *const u8 as *const libc::c_char,
             ) == strlen((*o).jump_host)) as libc::c_int;
-        snprintf(
+        libc::snprintf(
             buf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 8]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 8]>() as usize,
             b"%d\0" as *const u8 as *const libc::c_char,
             (*o).jump_port,
         );

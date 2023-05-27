@@ -22,12 +22,6 @@ extern "C" {
     fn __errno_location() -> *mut libc::c_int;
     static mut stderr: *mut libc::FILE;
 
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
     fn fputs(__s: *const libc::c_char, __stream: *mut libc::FILE) -> libc::c_int;
     fn fwrite(
         _: *const libc::c_void,
@@ -1359,9 +1353,9 @@ unsafe extern "C" fn fingerprint_hex(
     strlcat(retval, b":\0" as *const u8 as *const libc::c_char, rlen);
     i = 0 as libc::c_int as size_t;
     while i < dgst_raw_len {
-        snprintf(
+        libc::snprintf(
             hex.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 5]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 5]>() as usize,
             b"%s%02x\0" as *const u8 as *const libc::c_char,
             if i > 0 as libc::c_int as libc::c_ulong {
                 b":\0" as *const u8 as *const libc::c_char
@@ -1618,9 +1612,9 @@ unsafe extern "C" fn fingerprint_randomart(
         [((8 as libc::c_int + 1 as libc::c_int) / 2 as libc::c_int) as usize] =
         len.wrapping_sub(1 as libc::c_int as libc::c_ulong) as u_char;
     field[x as usize][y as usize] = len as u_char;
-    r = snprintf(
+    r = libc::snprintf(
         title.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 17]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 17]>() as usize,
         b"[%s %u]\0" as *const u8 as *const libc::c_char,
         sshkey_type(k),
         sshkey_size(k),
@@ -1628,9 +1622,9 @@ unsafe extern "C" fn fingerprint_randomart(
     if r < 0 as libc::c_int
         || r > ::core::mem::size_of::<[libc::c_char; 17]>() as libc::c_ulong as libc::c_int
     {
-        r = snprintf(
+        r = libc::snprintf(
             title.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 17]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 17]>() as usize,
             b"[%s]\0" as *const u8 as *const libc::c_char,
             sshkey_type(k),
         );
@@ -1640,9 +1634,9 @@ unsafe extern "C" fn fingerprint_randomart(
     } else {
         strlen(title.as_mut_ptr())
     };
-    r = snprintf(
+    r = libc::snprintf(
         hash.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 17]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 17]>() as usize,
         b"[%s]\0" as *const u8 as *const libc::c_char,
         alg,
     );
@@ -3532,23 +3526,23 @@ pub unsafe extern "C" fn sshkey_format_cert_validity(
         );
     }
     if (*cert).valid_after == 0 as libc::c_int as libc::c_ulong {
-        snprintf(
+        libc::snprintf(
             ret.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 128]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 128]>() as usize,
             b"before %s\0" as *const u8 as *const libc::c_char,
             to.as_mut_ptr(),
         );
     } else if (*cert).valid_before as libc::c_ulonglong == 0xffffffffffffffff as libc::c_ulonglong {
-        snprintf(
+        libc::snprintf(
             ret.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 128]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 128]>() as usize,
             b"after %s\0" as *const u8 as *const libc::c_char,
             from.as_mut_ptr(),
         );
     } else {
-        snprintf(
+        libc::snprintf(
             ret.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 128]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 128]>() as usize,
             b"from %s to %s\0" as *const u8 as *const libc::c_char,
             from.as_mut_ptr(),
             to.as_mut_ptr(),

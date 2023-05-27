@@ -5,12 +5,7 @@ extern "C" {
     fn alarm(__seconds: libc::c_uint) -> libc::c_uint;
     fn getpgrp() -> __pid_t;
     fn tcgetpgrp(__fd: libc::c_int) -> __pid_t;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
     fn free(_: *mut libc::c_void);
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -82,9 +77,9 @@ unsafe extern "C" fn format_rate(mut bytes: off_t) -> *const libc::c_char {
         i;
         bytes = (bytes + 512 as libc::c_int as libc::c_long) / 1024 as libc::c_int as libc::c_long;
     }
-    snprintf(
+    libc::snprintf(
         buf.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 68]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 68]>() as usize,
         b"%3lld.%1lld%c%s\0" as *const u8 as *const libc::c_char,
         (bytes + 5 as libc::c_int as libc::c_long) as libc::c_longlong
             / 100 as libc::c_int as libc::c_longlong,
@@ -111,9 +106,9 @@ unsafe extern "C" fn format_size(mut bytes: off_t) -> *const libc::c_char {
         i += 1;
         i;
     }
-    snprintf(
+    libc::snprintf(
         buf.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 42]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 42]>() as usize,
         b"%4lld%c%s\0" as *const u8 as *const libc::c_char,
         bytes as libc::c_longlong,
         unit[i as usize] as libc::c_int,

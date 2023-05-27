@@ -37,12 +37,6 @@ extern "C" {
     static mut stderr: *mut libc::FILE;
 
     fn vfprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ::core::ffi::VaList) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
 
     fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
@@ -1163,9 +1157,9 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
     remout = -(1 as libc::c_int);
     remin = remout;
     do_cmd_pid = -(1 as libc::c_int);
-    snprintf(
+    libc::snprintf(
         cmd.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 64]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 64]>() as usize,
         b"scp%s%s%s%s\0" as *const u8 as *const libc::c_char,
         if verbose_mode != 0 {
             b" -v\0" as *const u8 as *const libc::c_char
@@ -1235,9 +1229,9 @@ unsafe extern "C" fn do_times(
     mut sb: *const stat,
 ) -> libc::c_int {
     let mut buf: [libc::c_char; 60] = [0; 60];
-    snprintf(
+    libc::snprintf(
         buf.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 60]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 60]>() as usize,
         b"T%llu 0 %llu 0\n\0" as *const u8 as *const libc::c_char,
         (if (*sb).st_mtim.tv_sec < 0 as libc::c_int as libc::c_long {
             0 as libc::c_int as libc::c_long
@@ -2680,9 +2674,9 @@ pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc:
                         match current_block {
                             1443331007555087595 => {}
                             _ => {
-                                snprintf(
+                                libc::snprintf(
                                     buf.as_mut_ptr(),
-                                    ::core::mem::size_of::<[libc::c_char; 4224]>() as libc::c_ulong,
+                                    ::core::mem::size_of::<[libc::c_char; 4224]>() as usize,
                                     b"C%04o %lld %s\n\0" as *const u8 as *const libc::c_char,
                                     stb.st_mode
                                         & (0o4000 as libc::c_int
@@ -3012,9 +3006,9 @@ pub unsafe extern "C" fn rsource(mut name: *mut libc::c_char, mut statp: *mut st
             return;
         }
     }
-    snprintf(
+    libc::snprintf(
         path.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
         b"D%04o %d %.1024s\n\0" as *const u8 as *const libc::c_char,
         (*statp).st_mode
             & (0o4000 as libc::c_int
@@ -3081,9 +3075,9 @@ pub unsafe extern "C" fn rsource(mut name: *mut libc::c_char, mut statp: *mut st
                 ((*dp).d_name).as_mut_ptr(),
             );
         } else {
-            snprintf(
+            libc::snprintf(
                 path.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
                 b"%s/%s\0" as *const u8 as *const libc::c_char,
                 name,
                 ((*dp).d_name).as_mut_ptr(),
@@ -3999,9 +3993,9 @@ pub unsafe extern "C" fn sink(
                                         namebuf = xmalloc(need) as *mut libc::c_char;
                                         cursize = need;
                                     }
-                                    snprintf(
+                                    libc::snprintf(
                                         namebuf,
-                                        need,
+                                        need as usize,
                                         b"%s%s%s\0" as *const u8 as *const libc::c_char,
                                         targ,
                                         if strcmp(targ, b"/\0" as *const u8 as *const libc::c_char)

@@ -61,12 +61,6 @@ extern "C" {
     fn gai_strerror(__ecode: libc::c_int) -> *const libc::c_char;
     static mut stderr: *mut libc::FILE;
 
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
     fn vasprintf(
         __ptr: *mut *mut libc::c_char,
         __f: *const libc::c_char,
@@ -1388,27 +1382,27 @@ pub unsafe extern "C" fn fmt_timeframe(mut t: time_t) -> *const libc::c_char {
     day = week.wrapping_rem(7 as libc::c_int as libc::c_ulonglong) as libc::c_uint;
     week = week.wrapping_div(7 as libc::c_int as libc::c_ulonglong);
     if week > 0 as libc::c_int as libc::c_ulonglong {
-        snprintf(
+        libc::snprintf(
             buf,
-            9 as libc::c_int as libc::c_ulong,
+            9 as libc::c_int as usize,
             b"%02lluw%01ud%02uh\0" as *const u8 as *const libc::c_char,
             week,
             day,
             hrs,
         );
     } else if day > 0 as libc::c_int as libc::c_uint {
-        snprintf(
+        libc::snprintf(
             buf,
-            9 as libc::c_int as libc::c_ulong,
+            9 as libc::c_int as usize,
             b"%01ud%02uh%02um\0" as *const u8 as *const libc::c_char,
             day,
             hrs,
             min,
         );
     } else {
-        snprintf(
+        libc::snprintf(
             buf,
-            9 as libc::c_int as libc::c_ulong,
+            9 as libc::c_int as usize,
             b"%02u:%02u:%02u\0" as *const u8 as *const libc::c_char,
             hrs,
             min,
@@ -2684,9 +2678,9 @@ pub unsafe extern "C" fn tohex(mut vp: *const libc::c_void, mut l: size_t) -> *m
     r = xcalloc(1 as libc::c_int as size_t, hl) as *mut libc::c_char;
     i = 0 as libc::c_int as size_t;
     while i < l {
-        snprintf(
+        libc::snprintf(
             b.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 3]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 3]>() as usize,
             b"%02x\0" as *const u8 as *const libc::c_char,
             *p.offset(i as isize) as libc::c_int,
         );
@@ -2999,9 +2993,9 @@ pub unsafe extern "C" fn mktemp_proto(mut s: *mut libc::c_char, mut len: size_t)
     let mut r: libc::c_int = 0;
     tmpdir = getenv(b"TMPDIR\0" as *const u8 as *const libc::c_char);
     if !tmpdir.is_null() {
-        r = snprintf(
+        r = libc::snprintf(
             s,
-            len,
+            len as usize,
             b"%s/ssh-XXXXXXXXXXXX\0" as *const u8 as *const libc::c_char,
             tmpdir,
         );
@@ -3009,9 +3003,9 @@ pub unsafe extern "C" fn mktemp_proto(mut s: *mut libc::c_char, mut len: size_t)
             return;
         }
     }
-    r = snprintf(
+    r = libc::snprintf(
         s,
-        len,
+        len as usize,
         b"/tmp/ssh-XXXXXXXXXXXX\0" as *const u8 as *const libc::c_char,
     );
     if r < 0 as libc::c_int || r as size_t >= len {
@@ -3253,9 +3247,9 @@ pub unsafe extern "C" fn iptos2str(mut iptos: libc::c_int) -> *const libc::c_cha
         i += 1;
         i;
     }
-    snprintf(
+    libc::snprintf(
         iptos_str.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 5]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 5]>() as usize,
         b"0x%02x\0" as *const u8 as *const libc::c_char,
         iptos,
     );
@@ -3889,9 +3883,9 @@ pub unsafe extern "C" fn safe_path(
         __glibc_reserved: [0; 3],
     };
     if (realpath(name, buf.as_mut_ptr())).is_null() {
-        snprintf(
+        libc::snprintf(
             err,
-            errlen,
+            errlen as usize,
             b"realpath %s failed: %s\0" as *const u8 as *const libc::c_char,
             name,
             strerror(*__errno_location()),
@@ -3904,9 +3898,9 @@ pub unsafe extern "C" fn safe_path(
     if !((*stp).st_mode & 0o170000 as libc::c_int as libc::c_uint
         == 0o100000 as libc::c_int as libc::c_uint)
     {
-        snprintf(
+        libc::snprintf(
             err,
-            errlen,
+            errlen as usize,
             b"%s is not a regular file\0" as *const u8 as *const libc::c_char,
             buf.as_mut_ptr(),
         );
@@ -3915,9 +3909,9 @@ pub unsafe extern "C" fn safe_path(
     if platform_sys_dir_uid((*stp).st_uid) == 0 && (*stp).st_uid != uid
         || (*stp).st_mode & 0o22 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint
     {
-        snprintf(
+        libc::snprintf(
             err,
-            errlen,
+            errlen as usize,
             b"bad ownership or modes for file %s\0" as *const u8 as *const libc::c_char,
             buf.as_mut_ptr(),
         );
@@ -3926,9 +3920,9 @@ pub unsafe extern "C" fn safe_path(
     loop {
         cp = dirname(buf.as_mut_ptr());
         if cp.is_null() {
-            snprintf(
+            libc::snprintf(
                 err,
-                errlen,
+                errlen as usize,
                 b"dirname() failed\0" as *const u8 as *const libc::c_char,
             );
             return -(1 as libc::c_int);
@@ -3942,9 +3936,9 @@ pub unsafe extern "C" fn safe_path(
             || platform_sys_dir_uid(st.st_uid) == 0 && st.st_uid != uid
             || st.st_mode & 0o22 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint
         {
-            snprintf(
+            libc::snprintf(
                 err,
-                errlen,
+                errlen as usize,
                 b"bad ownership or modes for directory %s\0" as *const u8 as *const libc::c_char,
                 buf.as_mut_ptr(),
             );
@@ -3996,9 +3990,9 @@ pub unsafe extern "C" fn safe_path_fd(
         __glibc_reserved: [0; 3],
     };
     if fstat(fd, &mut st) == -(1 as libc::c_int) {
-        snprintf(
+        libc::snprintf(
             err,
-            errlen,
+            errlen as usize,
             b"cannot stat file %s: %s\0" as *const u8 as *const libc::c_char,
             file,
             strerror(*__errno_location()),
@@ -4102,12 +4096,12 @@ pub unsafe extern "C" fn child_set_env(
             .wrapping_add(strlen(value))
             .wrapping_add(1 as libc::c_int as libc::c_ulong),
     ) as *mut libc::c_char;
-    snprintf(
+    libc::snprintf(
         *env.offset(i as isize),
         (strlen(name))
             .wrapping_add(1 as libc::c_int as libc::c_ulong)
             .wrapping_add(strlen(value))
-            .wrapping_add(1 as libc::c_int as libc::c_ulong),
+            .wrapping_add(1 as libc::c_int as libc::c_ulong) as usize,
         b"%s=%s\0" as *const u8 as *const libc::c_char,
         name,
         value,
@@ -4141,9 +4135,9 @@ pub unsafe extern "C" fn valid_domain(
             & _ISdigit as libc::c_int as libc::c_ushort as libc::c_int
             == 0
     {
-        snprintf(
+        libc::snprintf(
             errbuf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
             b"domain name \"%.100s\" starts with invalid character\0" as *const u8
                 as *const libc::c_char,
             name,
@@ -4181,9 +4175,9 @@ pub unsafe extern "C" fn valid_domain(
                 *name.offset(i as isize) = c as libc::c_char;
             }
             if last as libc::c_int == '.' as i32 && c as libc::c_int == '.' as i32 {
-                snprintf(
+                libc::snprintf(
                     errbuf.as_mut_ptr(),
-                    ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+                    ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
                     b"domain name \"%.100s\" contains consecutive separators\0" as *const u8
                         as *const libc::c_char,
                     name,
@@ -4197,9 +4191,9 @@ pub unsafe extern "C" fn valid_domain(
                     == 0
                 && c as libc::c_int != '_' as i32
             {
-                snprintf(
+                libc::snprintf(
                     errbuf.as_mut_ptr(),
-                    ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+                    ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
                     b"domain name \"%.100s\" contains invalid characters\0" as *const u8
                         as *const libc::c_char,
                     name,
@@ -4320,9 +4314,9 @@ pub unsafe extern "C" fn parse_absolute_time(
     match l {
         8 => {
             fmt = b"%Y-%m-%d\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
-            snprintf(
+            libc::snprintf(
                 buf.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
                 b"%.4s-%.2s-%.2s\0" as *const u8 as *const libc::c_char,
                 s,
                 s.offset(4 as libc::c_int as isize),
@@ -4331,9 +4325,9 @@ pub unsafe extern "C" fn parse_absolute_time(
         }
         12 => {
             fmt = b"%Y-%m-%dT%H:%M\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
-            snprintf(
+            libc::snprintf(
                 buf.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
                 b"%.4s-%.2s-%.2sT%.2s:%.2s\0" as *const u8 as *const libc::c_char,
                 s,
                 s.offset(4 as libc::c_int as isize),
@@ -4344,9 +4338,9 @@ pub unsafe extern "C" fn parse_absolute_time(
         }
         14 => {
             fmt = b"%Y-%m-%dT%H:%M:%S\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
-            snprintf(
+            libc::snprintf(
                 buf.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
                 b"%.4s-%.2s-%.2sT%.2s:%.2s:%.2s\0" as *const u8 as *const libc::c_char,
                 s,
                 s.offset(4 as libc::c_int as isize),

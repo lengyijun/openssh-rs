@@ -57,12 +57,7 @@ extern "C" {
     static mut stderr: *mut libc::FILE;
 
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn setproctitle(fmt: *const libc::c_char, _: ...);
@@ -1331,9 +1326,9 @@ unsafe extern "C" fn resolve_host(
         name,
         port,
     );
-    snprintf(
+    libc::snprintf(
         strport.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
         b"%d\0" as *const u8 as *const libc::c_char,
         port,
     );
@@ -1430,9 +1425,9 @@ unsafe extern "C" fn is_addr(mut name: *const libc::c_char) -> libc::c_int {
     if is_addr_fast(name) != 0 {
         return 1 as libc::c_int;
     }
-    snprintf(
+    libc::snprintf(
         strport.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
         b"%u\0" as *const u8 as *const libc::c_char,
         default_ssh_port(),
     );
@@ -1481,9 +1476,9 @@ unsafe extern "C" fn resolve_addr(
     if port <= 0 as libc::c_int {
         port = default_ssh_port();
     }
-    snprintf(
+    libc::snprintf(
         strport.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
         b"%u\0" as *const u8 as *const libc::c_char,
         port,
     );
@@ -2001,9 +1996,9 @@ unsafe extern "C" fn process_config_files(
             );
         }
     } else {
-        r = snprintf(
+        r = libc::snprintf(
             buf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
             b"%s/%s\0" as *const u8 as *const libc::c_char,
             (*pw).pw_dir,
             b".ssh/config\0" as *const u8 as *const libc::c_char,
@@ -3168,9 +3163,9 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             );
         }
         options.proxy_use_fdpass = 0 as libc::c_int;
-        snprintf(
+        libc::snprintf(
             port_s.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 8]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 8]>() as usize,
             b"%d\0" as *const u8 as *const libc::c_char,
             options.jump_port,
         );

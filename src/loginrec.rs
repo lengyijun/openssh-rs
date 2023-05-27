@@ -41,12 +41,7 @@ extern "C" {
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn getpid() -> __pid_t;
     fn geteuid() -> __uid_t;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn free(_: *mut libc::c_void);
@@ -874,9 +869,9 @@ unsafe extern "C" fn lastlog_openseek(
     if st.st_mode & 0o170000 as libc::c_int as libc::c_uint
         == 0o40000 as libc::c_int as libc::c_uint
     {
-        snprintf(
+        libc::snprintf(
             lastlog_file.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"%s/%s\0" as *const u8 as *const libc::c_char,
             b"/var/log/lastlog\0" as *const u8 as *const libc::c_char,
             ((*li).username).as_mut_ptr(),

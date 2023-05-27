@@ -31,12 +31,7 @@ extern "C" {
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn vsnprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -3036,9 +3031,9 @@ pub unsafe extern "C" fn sshpkt_fmt_connection_id(
     mut s: *mut libc::c_char,
     mut l: size_t,
 ) {
-    snprintf(
+    libc::snprintf(
         s,
-        l,
+        l as usize,
         b"%.200s%s%s port %d\0" as *const u8 as *const libc::c_char,
         if !((*ssh).log_preamble).is_null() {
             (*ssh).log_preamble as *const libc::c_char

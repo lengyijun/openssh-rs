@@ -15,12 +15,6 @@ extern "C" {
 
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
 
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
     fn fscanf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn fgets(
         __s: *mut libc::c_char,
@@ -674,9 +668,9 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
     let mut r: libc::c_int = 0;
     let mut writeok: libc::c_int = 0;
     let mut closeok: libc::c_int = 0;
-    r = snprintf(
+    r = libc::snprintf(
         tmp.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
         b"%s.XXXXXXXXXX\0" as *const u8 as *const libc::c_char,
         cpfile,
     );
@@ -856,18 +850,18 @@ unsafe extern "C" fn fmt_time(mut seconds: time_t) -> *mut libc::c_char {
         / 60 as libc::c_int as libc::c_long
         / 24 as libc::c_int as libc::c_long) as libc::c_int;
     if day > 0 as libc::c_int {
-        snprintf(
+        libc::snprintf(
             buf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 128]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 128]>() as usize,
             b"%dd %d:%02d\0" as *const u8 as *const libc::c_char,
             day,
             hr,
             min,
         );
     } else {
-        snprintf(
+        libc::snprintf(
             buf.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 128]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 128]>() as usize,
             b"%d:%02d\0" as *const u8 as *const libc::c_char,
             hr,
             min,

@@ -14,12 +14,6 @@ extern "C" {
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
 
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
@@ -629,9 +623,9 @@ pub unsafe extern "C" fn auth_process_principals(
         }
         nonblank = nonblank.wrapping_add(1);
         nonblank;
-        snprintf(
+        libc::snprintf(
             loc.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
             b"%.200s:%lu\0" as *const u8 as *const libc::c_char,
             file,
             linenum,
@@ -1041,9 +1035,9 @@ pub unsafe extern "C" fn auth_check_authkeys_file(
         }
         nonblank = nonblank.wrapping_add(1);
         nonblank;
-        snprintf(
+        libc::snprintf(
             loc.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
             b"%.200s:%lu\0" as *const u8 as *const libc::c_char,
             file,
             linenum,

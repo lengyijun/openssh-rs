@@ -35,12 +35,6 @@ extern "C" {
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
 
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
 
     fn bind(__fd: libc::c_int, __addr: __CONST_SOCKADDR_ARG, __len: socklen_t) -> libc::c_int;
@@ -3489,14 +3483,12 @@ unsafe extern "C" fn check_ip_options(mut ssh: *mut ssh) {
         text[0 as libc::c_int as usize] = '\0' as i32 as libc::c_char;
         i = 0 as libc::c_int as socklen_t;
         while i < option_size {
-            snprintf(
-                text
-                    .as_mut_ptr()
+            libc::snprintf(
+                text.as_mut_ptr()
                     .offset(i.wrapping_mul(3 as libc::c_int as libc::c_uint) as isize),
                 (::core::mem::size_of::<[libc::c_char; 601]>() as libc::c_ulong)
-                    .wrapping_sub(
-                        i.wrapping_mul(3 as libc::c_int as libc::c_uint) as libc::c_ulong,
-                    ),
+                    .wrapping_sub(i.wrapping_mul(3 as libc::c_int as libc::c_uint) as libc::c_ulong)
+                    as usize,
                 b" %2.2x\0" as *const u8 as *const libc::c_char,
                 opts[i as usize] as libc::c_int,
             );

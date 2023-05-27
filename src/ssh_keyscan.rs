@@ -55,12 +55,6 @@ extern "C" {
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
 
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
@@ -1185,9 +1179,9 @@ unsafe extern "C" fn tcpconnect(mut host: *mut libc::c_char) -> libc::c_int {
     let mut strport: [libc::c_char; 32] = [0; 32];
     let mut gaierr: libc::c_int = 0;
     let mut s: libc::c_int = -(1 as libc::c_int);
-    snprintf(
+    libc::snprintf(
         strport.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 32]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 32]>() as usize,
         b"%d\0" as *const u8 as *const libc::c_char,
         ssh_port,
     );
@@ -1440,9 +1434,9 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
     let mut remote_version: [libc::c_char; 256] = [0; 256];
     let mut bufsiz: size_t = 0;
     let mut c: *mut con = &mut *fdcon.offset(s as isize) as *mut con;
-    n = snprintf(
+    n = libc::snprintf(
         buf.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
         b"SSH-%d.%d-OpenSSH-keyscan\r\n\0" as *const u8 as *const libc::c_char,
         2 as libc::c_int,
         0 as libc::c_int,
@@ -1457,7 +1451,7 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"snprintf: buffer too small\0" as *const u8 as *const libc::c_char,
+            b"libc::snprintf: buffer too small\0" as *const u8 as *const libc::c_char,
         );
         confree(s);
         return;

@@ -57,12 +57,7 @@ extern "C" {
     static mut stderr: *mut libc::FILE;
 
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn perror(__s: *const libc::c_char);
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
@@ -4974,9 +4969,9 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             perror(b"mkdtemp: private socket dir\0" as *const u8 as *const libc::c_char);
             exit(1 as libc::c_int);
         }
-        snprintf(
+        libc::snprintf(
             socket_name.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
             b"%s/agent.%ld\0" as *const u8 as *const libc::c_char,
             socket_dir.as_mut_ptr(),
             parent_pid as libc::c_long,
@@ -5035,9 +5030,9 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         }
         if pid != 0 as libc::c_int {
             close(sock);
-            snprintf(
+            libc::snprintf(
                 pidstrbuf.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 13]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 13]>() as usize,
                 b"%ld\0" as *const u8 as *const libc::c_char,
                 pid as libc::c_long,
             );

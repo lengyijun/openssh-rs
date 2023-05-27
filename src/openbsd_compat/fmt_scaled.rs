@@ -1,12 +1,7 @@
 use ::libc;
 extern "C" {
     fn __errno_location() -> *mut libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn llabs(_: libc::c_longlong) -> libc::c_longlong;
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
@@ -342,17 +337,17 @@ pub unsafe extern "C" fn fmt_scaled(
                 number;
             }
         }
-        snprintf(
+        libc::snprintf(
             result,
-            7 as libc::c_int as libc::c_ulong,
+            7 as libc::c_int as usize,
             b"%lld%c\0" as *const u8 as *const libc::c_char,
             number,
             scale_chars[unit as usize] as libc::c_int,
         );
     } else {
-        snprintf(
+        libc::snprintf(
             result,
-            7 as libc::c_int as libc::c_ulong,
+            7 as libc::c_int as usize,
             b"%lld.%1lld%c\0" as *const u8 as *const libc::c_char,
             number,
             fract,

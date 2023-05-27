@@ -5,12 +5,7 @@ extern "C" {
 
     fn sysconf(__name: libc::c_int) -> libc::c_long;
     fn getpid() -> __pid_t;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn close_range(__fd: libc::c_uint, __max_fd: libc::c_uint, __flags: libc::c_int)
         -> libc::c_int;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
@@ -281,9 +276,9 @@ pub unsafe extern "C" fn closefrom(mut lowfd: libc::c_int) {
     {
         return;
     }
-    len = snprintf(
+    len = libc::snprintf(
         fdpath.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
         b"/proc/%ld/fd\0" as *const u8 as *const libc::c_char,
         getpid() as libc::c_long,
     );

@@ -16,12 +16,7 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn setproctitle(fmt: *const libc::c_char, _: ...);
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn vasprintf(
         __ptr: *mut *mut libc::c_char,
         __f: *const libc::c_char,
@@ -765,9 +760,9 @@ unsafe extern "C" fn user_specific_delay(mut user: *const libc::c_char) -> libc:
     let mut len: size_t = ssh_digest_bytes(4 as libc::c_int);
     let mut hash: *mut u_char = xmalloc(len) as *mut u_char;
     let mut delay: libc::c_double = 0.;
-    snprintf(
+    libc::snprintf(
         b.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 512]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 512]>() as usize,
         b"%llu%s\0" as *const u8 as *const libc::c_char,
         options.timing_secret as libc::c_ulonglong,
         user,

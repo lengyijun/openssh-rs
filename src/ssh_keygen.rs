@@ -60,12 +60,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn fgetc(__stream: *mut libc::FILE) -> libc::c_int;
     fn fputc(__c: libc::c_int, __stream: *mut libc::FILE) -> libc::c_int;
     fn fgets(
@@ -1022,9 +1017,9 @@ unsafe extern "C" fn ask_filename(mut pw: *mut passwd, mut prompt: *const libc::
             }
         }
     }
-    snprintf(
+    libc::snprintf(
         identity_file.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
         b"%s/%s\0" as *const u8 as *const libc::c_char,
         (*pw).pw_dir,
         name,
@@ -1158,9 +1153,9 @@ unsafe extern "C" fn do_convert_to_ssh2(mut pw: *mut passwd, mut k: *mut sshkey)
             b"sshbuf_dtob64_string failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    snprintf(
+    libc::snprintf(
         comment.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 61]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 61]>() as usize,
         b"%u-bit %s, converted by %s@%s from OpenSSH\0" as *const u8 as *const libc::c_char,
         sshkey_size(k),
         sshkey_type(k),
@@ -3191,9 +3186,9 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                                 b"sshkey_from_private\0" as *const u8 as *const libc::c_char,
                             );
                         }
-                        snprintf(
+                        libc::snprintf(
                             comment.as_mut_ptr(),
-                            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+                            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
                             b"%s@%s\0" as *const u8 as *const libc::c_char,
                             (*pw).pw_name,
                             hostname.as_mut_ptr(),
@@ -9886,9 +9881,9 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
         );
     } else {
-        snprintf(
+        libc::snprintf(
             comment.as_mut_ptr(),
-            ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
+            ::core::mem::size_of::<[libc::c_char; 1024]>() as usize,
             b"%s@%s\0" as *const u8 as *const libc::c_char,
             (*pw).pw_name,
             hostname.as_mut_ptr(),

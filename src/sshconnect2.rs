@@ -30,12 +30,6 @@ extern "C" {
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
 
-    fn snprintf(
-        _: *mut libc::c_char,
-        _: libc::c_ulong,
-        _: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
@@ -2137,9 +2131,9 @@ unsafe extern "C" fn input_userauth_passwd_changereq(
                 r != 0 as libc::c_int
             })
         {
-            snprintf(
+            libc::snprintf(
                 prompt.as_mut_ptr(),
-                ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+                ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
                 b"Enter %.30s@%.128s's old password: \0" as *const u8 as *const libc::c_char,
                 (*authctxt).server_user,
                 host,
@@ -2154,9 +2148,9 @@ unsafe extern "C" fn input_userauth_passwd_changereq(
                         current_block = 15089075282327824602;
                         break;
                     }
-                    snprintf(
+                    libc::snprintf(
                         prompt.as_mut_ptr(),
-                        ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+                        ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
                         b"Enter %.30s@%.128s's new password: \0" as *const u8
                             as *const libc::c_char,
                         (*authctxt).server_user,
@@ -2168,9 +2162,9 @@ unsafe extern "C" fn input_userauth_passwd_changereq(
                         current_block = 9935336519555149225;
                         break;
                     } else {
-                        snprintf(
+                        libc::snprintf(
                             prompt.as_mut_ptr(),
-                            ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
+                            ::core::mem::size_of::<[libc::c_char; 256]>() as usize,
                             b"Retype %.30s@%.128s's new password: \0" as *const u8
                                 as *const libc::c_char,
                             (*authctxt).server_user,
@@ -3072,9 +3066,9 @@ unsafe extern "C" fn load_identity_file(mut id: *mut Identity) -> *mut sshkey {
         );
         return 0 as *mut sshkey;
     }
-    snprintf(
+    libc::snprintf(
         prompt.as_mut_ptr(),
-        ::core::mem::size_of::<[libc::c_char; 300]>() as libc::c_ulong,
+        ::core::mem::size_of::<[libc::c_char; 300]>() as usize,
         b"Enter passphrase for key '%.100s': \0" as *const u8 as *const libc::c_char,
         (*id).filename,
     );
