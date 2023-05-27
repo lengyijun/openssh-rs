@@ -49,7 +49,11 @@ extern "C" {
         _: ...
     ) -> libc::c_int;
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut libc::FILE) -> *mut libc::c_char;
+    fn fgets(
+        __s: *mut libc::c_char,
+        __n: libc::c_int,
+        __stream: *mut libc::FILE,
+    ) -> *mut libc::c_char;
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
     fn pclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn popen(__command: *const libc::c_char, __modes: *const libc::c_char) -> *mut libc::FILE;

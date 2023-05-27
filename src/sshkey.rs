@@ -1955,7 +1955,10 @@ pub unsafe extern "C" fn sshkey_format_text(
     free(uu as *mut libc::c_void);
     return r;
 }
-pub unsafe extern "C" fn sshkey_write(mut key: *const sshkey, mut f: *mut libc::FILE) -> libc::c_int {
+pub unsafe extern "C" fn sshkey_write(
+    mut key: *const sshkey,
+    mut f: *mut libc::FILE,
+) -> libc::c_int {
     let mut b: *mut sshbuf = 0 as *mut sshbuf;
     let mut r: libc::c_int = -(1 as libc::c_int);
     b = sshbuf_new();

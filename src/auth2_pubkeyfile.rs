@@ -10,7 +10,7 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    
+
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
 

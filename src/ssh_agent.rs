@@ -55,7 +55,7 @@ extern "C" {
     ) -> libc::c_int;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
-    
+
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(

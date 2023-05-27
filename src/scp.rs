@@ -19,9 +19,11 @@ use crate::sftp_client::remote_is_dir;
 use crate::sftp_client::sftp_conn;
 use crate::sftp_client::upload_dir;
 use crate::sftp_common::Attrib;
+use crate::utf8::fmprintf;
 use crate::utf8::msetlocale;
 use crate::utf8::snmprintf;
 use crate::utf8::vasnmprintf;
+use crate::utf8::vfmprintf;
 use ::libc;
 use libc::close;
 use libc::kill;
@@ -32,8 +34,7 @@ extern "C" {
     pub type _IO_marker;
     pub type __dirstream;
     static mut stderr: *mut libc::FILE;
-    
-    
+
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn vfprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ::core::ffi::VaList) -> libc::c_int;
     fn snprintf(
@@ -154,9 +155,6 @@ extern "C" {
     fn start_progress_meter(_: *const libc::c_char, _: off_t, _: *mut off_t);
     fn refresh_progress_meter(_: libc::c_int);
     fn stop_progress_meter();
-
-    fn fmprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn vfmprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ::core::ffi::VaList) -> libc::c_int;
 
     static mut __progname: *mut libc::c_char;
     fn remote_glob(

@@ -137,7 +137,11 @@ extern "C" {
         _: *const sshkey_cert,
         _: *mut *mut sshauthopt,
     ) -> libc::c_int;
-    fn auth_openprincipals(_: *const libc::c_char, _: *mut passwd, _: libc::c_int) -> *mut libc::FILE;
+    fn auth_openprincipals(
+        _: *const libc::c_char,
+        _: *mut passwd,
+        _: libc::c_int,
+    ) -> *mut libc::FILE;
     fn authorized_principals_file(_: *mut passwd) -> *mut libc::c_char;
     fn auth_openkeyfile(_: *const libc::c_char, _: *mut passwd, _: libc::c_int) -> *mut libc::FILE;
     fn expand_authorized_keys(_: *const libc::c_char, pw: *mut passwd) -> *mut libc::c_char;

@@ -1,5 +1,7 @@
+use crate::utf8::fmprintf;
 use ::libc;
 use libc::close;
+
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -27,7 +29,7 @@ extern "C" {
     fn fork() -> __pid_t;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
-    
+
     fn snprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -255,7 +257,7 @@ extern "C" {
         _: *mut *const hostkey_entry,
     ) -> libc::c_int;
     fn lookup_marker_in_hostkeys(_: *mut hostkeys, _: libc::c_int) -> libc::c_int;
-    fn fmprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn asmprintf(
         _: *mut *mut libc::c_char,
         _: size_t,

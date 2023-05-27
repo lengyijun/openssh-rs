@@ -12,9 +12,9 @@ extern "C" {
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    
+
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
-    
+
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn snprintf(
         _: *mut libc::c_char,
@@ -23,7 +23,11 @@ extern "C" {
         _: ...
     ) -> libc::c_int;
     fn fscanf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut libc::FILE) -> *mut libc::c_char;
+    fn fgets(
+        __s: *mut libc::c_char,
+        __n: libc::c_int,
+        __stream: *mut libc::FILE,
+    ) -> *mut libc::c_char;
     fn fseek(__stream: *mut libc::FILE, __off: libc::c_long, __whence: libc::c_int) -> libc::c_int;
     fn rewind(__stream: *mut libc::FILE);
     fn _ssh_mkstemp(_: *mut libc::c_char) -> libc::c_int;

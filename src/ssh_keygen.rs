@@ -49,9 +49,9 @@ extern "C" {
     static mut stderr: *mut libc::FILE;
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    
+
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
-    
+
     fn setvbuf(
         __stream: *mut libc::FILE,
         __buf: *mut libc::c_char,
@@ -68,7 +68,11 @@ extern "C" {
     ) -> libc::c_int;
     fn fgetc(__stream: *mut libc::FILE) -> libc::c_int;
     fn fputc(__c: libc::c_int, __stream: *mut libc::FILE) -> libc::c_int;
-    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut libc::FILE) -> *mut libc::c_char;
+    fn fgets(
+        __s: *mut libc::c_char,
+        __n: libc::c_int,
+        __stream: *mut libc::FILE,
+    ) -> *mut libc::c_char;
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
@@ -478,7 +482,12 @@ extern "C" {
     fn sshsk_free_resident_keys(srks: *mut *mut sshsk_resident_key, nsrks: size_t);
     fn cipher_by_name(_: *const libc::c_char) -> *const sshcipher;
     static mut __progname: *mut libc::c_char;
-    fn gen_candidates(_: *mut libc::FILE, _: u_int32_t, _: u_int32_t, _: *mut BIGNUM) -> libc::c_int;
+    fn gen_candidates(
+        _: *mut libc::FILE,
+        _: u_int32_t,
+        _: u_int32_t,
+        _: *mut BIGNUM,
+    ) -> libc::c_int;
     fn prime_test(
         _: *mut libc::FILE,
         _: *mut libc::FILE,

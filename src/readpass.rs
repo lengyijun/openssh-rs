@@ -24,7 +24,7 @@ extern "C" {
     fn fork() -> __pid_t;
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut stdout: *mut libc::FILE;
-    
+
     fn vsnprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,

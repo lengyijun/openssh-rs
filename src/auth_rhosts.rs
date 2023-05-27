@@ -17,9 +17,13 @@ extern "C" {
         __domain: *const libc::c_char,
     ) -> libc::c_int;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    
+
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut libc::FILE) -> *mut libc::c_char;
+    fn fgets(
+        __s: *mut libc::c_char,
+        __n: libc::c_int,
+        __stream: *mut libc::FILE,
+    ) -> *mut libc::c_char;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;

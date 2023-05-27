@@ -16,7 +16,7 @@ extern "C" {
 
     fn getuid() -> __uid_t;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    
+
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn asprintf(__ptr: *mut *mut libc::c_char, __fmt: *const libc::c_char, _: ...) -> libc::c_int;
     fn __getdelim(

@@ -28,7 +28,7 @@ extern "C" {
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
-    
+
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
     fn fprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
@@ -38,7 +38,11 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> libc::c_int;
-    fn fgets(__s: *mut libc::c_char, __n: libc::c_int, __stream: *mut libc::FILE) -> *mut libc::c_char;
+    fn fgets(
+        __s: *mut libc::c_char,
+        __n: libc::c_int,
+        __stream: *mut libc::FILE,
+    ) -> *mut libc::c_char;
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
