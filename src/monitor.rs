@@ -26,12 +26,7 @@ extern "C" {
     pub type sshcipher;
     pub type session_state;
     pub type bignum_st;
-    fn socketpair(
-        __domain: libc::c_int,
-        __type: libc::c_int,
-        __protocol: libc::c_int,
-        __fds: *mut libc::c_int,
-    ) -> libc::c_int;
+
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
     fn __errno_location() -> *mut libc::c_int;
@@ -4298,7 +4293,7 @@ pub unsafe extern "C" fn mm_get_keystate(mut _ssh: *mut ssh, mut pmonitor: *mut 
 }
 unsafe extern "C" fn monitor_openfds(mut mon: *mut monitor, mut do_logfds: libc::c_int) {
     let mut pair: [libc::c_int; 2] = [0; 2];
-    if socketpair(
+    if libc::socketpair(
         1 as libc::c_int,
         SOCK_STREAM as libc::c_int,
         0 as libc::c_int,
@@ -4313,7 +4308,7 @@ unsafe extern "C" fn monitor_openfds(mut mon: *mut monitor, mut do_logfds: libc:
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"socketpair: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
             strerror(*__errno_location()),
         );
     }

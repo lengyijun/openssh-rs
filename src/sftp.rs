@@ -23,12 +23,7 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
     pub type dirent;
-    fn socketpair(
-        __domain: libc::c_int,
-        __type: libc::c_int,
-        __protocol: libc::c_int,
-        __fds: *mut libc::c_int,
-    ) -> libc::c_int;
+
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
@@ -4127,7 +4122,7 @@ unsafe extern "C" fn connect_to_server(
     let mut c_in: libc::c_int = 0;
     let mut c_out: libc::c_int = 0;
     let mut inout: [libc::c_int; 2] = [0; 2];
-    if socketpair(
+    if libc::socketpair(
         1 as libc::c_int,
         SOCK_STREAM as libc::c_int,
         0 as libc::c_int,
@@ -4142,7 +4137,7 @@ unsafe extern "C" fn connect_to_server(
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"socketpair: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
             strerror(*__errno_location()),
         );
     }

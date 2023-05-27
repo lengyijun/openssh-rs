@@ -27,12 +27,7 @@ extern "C" {
     pub type sshcipher;
     pub type session_state;
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
-    fn socketpair(
-        __domain: libc::c_int,
-        __type: libc::c_int,
-        __protocol: libc::c_int,
-        __fds: *mut libc::c_int,
-    ) -> libc::c_int;
+
     fn bind(__fd: libc::c_int, __addr: __CONST_SOCKADDR_ARG, __len: socklen_t) -> libc::c_int;
     fn setsockopt(
         __fd: libc::c_int,
@@ -974,7 +969,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
     if shell.is_null() {
         shell = b"/bin/sh\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
     }
-    if socketpair(
+    if libc::socketpair(
         1 as libc::c_int,
         SOCK_STREAM as libc::c_int,
         0 as libc::c_int,
@@ -991,7 +986,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"Could not create socketpair to communicate with proxy dialer: %.100s\0" as *const u8
+            b"Could not create libc::socketpair to communicate with proxy dialer: %.100s\0" as *const u8
                 as *const libc::c_char,
             strerror(*__errno_location()),
         );

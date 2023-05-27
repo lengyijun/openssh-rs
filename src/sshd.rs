@@ -42,12 +42,7 @@ extern "C" {
         _: ...
     ) -> libc::c_int;
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
-    fn socketpair(
-        __domain: libc::c_int,
-        __type: libc::c_int,
-        __protocol: libc::c_int,
-        __fds: *mut libc::c_int,
-    ) -> libc::c_int;
+
     fn bind(__fd: libc::c_int, __addr: __CONST_SOCKADDR_ARG, __len: socklen_t) -> libc::c_int;
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
@@ -3255,7 +3250,7 @@ unsafe extern "C" fn server_accept_loop(
                     close(startup_p[0 as libc::c_int as usize]);
                     close(startup_p[1 as libc::c_int as usize]);
                 } else if rexec_flag != 0
-                    && socketpair(
+                    && libc::socketpair(
                         1 as libc::c_int,
                         SOCK_STREAM as libc::c_int,
                         0 as libc::c_int,
@@ -3272,7 +3267,7 @@ unsafe extern "C" fn server_accept_loop(
                         0 as libc::c_int,
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
-                        b"reexec socketpair: %s\0" as *const u8 as *const libc::c_char,
+                        b"reexec libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
                         strerror(*__errno_location()),
                     );
                     close(*newsock);

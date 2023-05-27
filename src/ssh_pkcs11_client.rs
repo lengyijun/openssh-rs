@@ -14,12 +14,7 @@ extern "C" {
     pub type ec_key_st;
     pub type ec_key_method_st;
     pub type ECDSA_SIG_st;
-    fn socketpair(
-        __domain: libc::c_int,
-        __type: libc::c_int,
-        __protocol: libc::c_int,
-        __fds: *mut libc::c_int,
-    ) -> libc::c_int;
+
     fn __errno_location() -> *mut libc::c_int;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
@@ -844,7 +839,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
         );
         return -(1 as libc::c_int);
     }
-    if socketpair(
+    if libc::socketpair(
         1 as libc::c_int,
         SOCK_STREAM as libc::c_int,
         0 as libc::c_int,
@@ -859,7 +854,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"socketpair: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
             strerror(*__errno_location()),
         );
         return -(1 as libc::c_int);

@@ -43,12 +43,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> libc::c_int;
-    fn socketpair(
-        __domain: libc::c_int,
-        __type: libc::c_int,
-        __protocol: libc::c_int,
-        __fds: *mut libc::c_int,
-    ) -> libc::c_int;
+
     fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
     fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
     fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
@@ -526,7 +521,7 @@ pub unsafe extern "C" fn do_cmd(
     if port == -(1 as libc::c_int) {
         port = sshport;
     }
-    if socketpair(
+    if libc::socketpair(
         1 as libc::c_int,
         SOCK_STREAM as libc::c_int,
         0 as libc::c_int,
@@ -540,7 +535,7 @@ pub unsafe extern "C" fn do_cmd(
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"socketpair: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
             strerror(*__errno_location()),
         );
     }
