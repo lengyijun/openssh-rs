@@ -48,7 +48,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ::core::ffi::VaList,
     ) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
+
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
@@ -768,7 +768,7 @@ pub unsafe extern "C" fn allowed_user(mut ssh: *mut ssh, mut pw: *mut passwd) ->
                 (*pw).pw_name,
                 shell,
             );
-            free(shell as *mut libc::c_void);
+            libc::free(shell as *mut libc::c_void);
             return 0 as libc::c_int;
         }
         if (st.st_mode & 0o170000 as libc::c_int as libc::c_uint
@@ -793,10 +793,10 @@ pub unsafe extern "C" fn allowed_user(mut ssh: *mut ssh, mut pw: *mut passwd) ->
                 (*pw).pw_name,
                 shell,
             );
-            free(shell as *mut libc::c_void);
+            libc::free(shell as *mut libc::c_void);
             return 0 as libc::c_int;
         }
-        free(shell as *mut libc::c_void);
+        libc::free(shell as *mut libc::c_void);
     }
     if options.num_deny_users > 0 as libc::c_int as libc::c_uint
         || options.num_allow_users > 0 as libc::c_int as libc::c_uint
@@ -1005,8 +1005,8 @@ unsafe extern "C" fn format_method_key(mut authctxt: *mut Authctxt) -> *mut libc
                 methinfo
             },
         );
-        free(fp as *mut libc::c_void);
-        free(cafp as *mut libc::c_void);
+        libc::free(fp as *mut libc::c_void);
+        libc::free(cafp as *mut libc::c_void);
     } else {
         fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
         xasprintf(
@@ -1029,7 +1029,7 @@ unsafe extern "C" fn format_method_key(mut authctxt: *mut Authctxt) -> *mut libc
                 methinfo
             },
         );
-        free(fp as *mut libc::c_void);
+        libc::free(fp as *mut libc::c_void);
     }
     return ret;
 }
@@ -1111,7 +1111,7 @@ pub unsafe extern "C" fn auth_log(
             b"\0" as *const u8 as *const libc::c_char
         },
     );
-    free(extra as *mut libc::c_void);
+    libc::free(extra as *mut libc::c_void);
     if authenticated == 0 as libc::c_int && !((*authctxt).postponed != 0 || partial != 0) {
         if strcmp(method, b"password\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
             || strncmp(
@@ -1262,7 +1262,7 @@ pub unsafe extern "C" fn expand_authorized_keys(
             b"expand_authorized_keys: path too long\0" as *const u8 as *const libc::c_char,
         );
     }
-    free(file as *mut libc::c_void);
+    libc::free(file as *mut libc::c_void);
     return xstrdup(ret.as_mut_ptr());
 }
 pub unsafe extern "C" fn authorized_principals_file(mut pw: *mut passwd) -> *mut libc::c_char {
@@ -1342,7 +1342,7 @@ pub unsafe extern "C" fn check_key_in_hostfiles(
             load_hostkeys(hostkeys, host, user_hostfile, 0 as libc::c_int as u_int);
             restore_uid();
         }
-        free(user_hostfile as *mut libc::c_void);
+        libc::free(user_hostfile as *mut libc::c_void);
     }
     host_status = check_key_in_hostkeys(hostkeys, key, &mut found);
     if host_status as libc::c_uint == HOST_REVOKED as libc::c_int as libc::c_uint {
@@ -1507,7 +1507,7 @@ pub unsafe extern "C" fn auth_key_is_revoked(mut key: *mut sshkey) -> libc::c_in
             }
         }
     }
-    free(fp as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
     return if r == 0 as libc::c_int {
         0 as libc::c_int
     } else {
@@ -1572,7 +1572,7 @@ pub unsafe extern "C" fn auth_debug_send(mut ssh: *mut ssh) {
             );
         }
         ssh_packet_send_debug(ssh, b"%s\0" as *const u8 as *const libc::c_char, msg);
-        free(msg as *mut libc::c_void);
+        libc::free(msg as *mut libc::c_void);
     }
 }
 pub unsafe extern "C" fn auth_debug_reset() {

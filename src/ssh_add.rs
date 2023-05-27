@@ -52,7 +52,7 @@ extern "C" {
     ) -> libc::c_longlong;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn seed_rng();
-    fn free(_: *mut libc::c_void);
+
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -516,7 +516,7 @@ unsafe extern "C" fn delete_stdin(
         }
     }
     sshkey_free(key);
-    free(line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn delete_file(
@@ -547,7 +547,7 @@ unsafe extern "C" fn delete_file(
         ret = 0 as libc::c_int;
     }
     if !(key_only != 0) {
-        free(comment as *mut libc::c_void);
+        libc::free(comment as *mut libc::c_void);
         comment = 0 as *mut libc::c_char;
         xasprintf(
             &mut certpath as *mut *mut libc::c_char,
@@ -592,8 +592,8 @@ unsafe extern "C" fn delete_file(
     }
     sshkey_free(cert);
     sshkey_free(public);
-    free(certpath as *mut libc::c_void);
-    free(comment as *mut libc::c_void);
+    libc::free(certpath as *mut libc::c_void);
+    libc::free(comment as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn delete_all(mut agent_fd: libc::c_int, mut qflag: libc::c_int) -> libc::c_int {
@@ -1077,8 +1077,8 @@ unsafe extern "C" fn add_file(
                                 }
                             }
                         }
-                        free(certpath as *mut libc::c_void);
-                        free(comment as *mut libc::c_void);
+                        libc::free(certpath as *mut libc::c_void);
+                        libc::free(comment as *mut libc::c_void);
                         sshkey_free(private);
                         return ret;
                     }
@@ -1152,7 +1152,7 @@ unsafe extern "C" fn update_card(
         );
         ret = -(1 as libc::c_int);
     }
-    free(pin as *mut libc::c_void);
+    libc::free(pin as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn test_key(
@@ -1234,7 +1234,7 @@ unsafe extern "C" fn test_key(
             ret = 0 as libc::c_int;
         }
     }
-    free(sig as *mut libc::c_void);
+    libc::free(sig as *mut libc::c_void);
     sshkey_free(key);
     return ret;
 }
@@ -1279,7 +1279,7 @@ unsafe extern "C" fn list_identities(
                 *((*idlist).comments).offset(i as isize),
                 sshkey_type(*((*idlist).keys).offset(i as isize)),
             );
-            free(fp as *mut libc::c_void);
+            libc::free(fp as *mut libc::c_void);
         } else {
             r = sshkey_write(*((*idlist).keys).offset(i as isize), stdout);
             if r != 0 as libc::c_int {
@@ -1452,7 +1452,7 @@ unsafe extern "C" fn load_resident_keys(
                 sshkey_type(key),
                 fp,
             );
-            free(fp as *mut libc::c_void);
+            libc::free(fp as *mut libc::c_void);
             ok = r;
         } else {
             if ok == 0 as libc::c_int {
@@ -1480,7 +1480,7 @@ unsafe extern "C" fn load_resident_keys(
                     );
                 }
             }
-            free(fp as *mut libc::c_void);
+            libc::free(fp as *mut libc::c_void);
         }
         i = i.wrapping_add(1);
         i;
@@ -1597,7 +1597,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
             );
         }
         (*dch).user = xstrdup(user);
-        free(os as *mut libc::c_void);
+        libc::free(os as *mut libc::c_void);
         return;
     }
     if hostkey_files.is_null() {
@@ -1633,7 +1633,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
             path,
         );
         load_hostkeys(hostkeys, host, path, 0 as libc::c_int as u_int);
-        free(path as *mut libc::c_void);
+        libc::free(path as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
@@ -1737,7 +1737,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
         );
     }
     free_hostkeys(hostkeys);
-    free(os as *mut libc::c_void);
+    libc::free(os as *mut libc::c_void);
 }
 unsafe extern "C" fn parse_dest_constraint(
     mut s: *const libc::c_char,
@@ -1833,7 +1833,7 @@ unsafe extern "C" fn parse_dest_constraint(
     *ndcp = (*ndcp).wrapping_add(1);
     let ref mut fresh4 = *(*dcp).offset(fresh3 as isize);
     *fresh4 = dc;
-    free(os as *mut libc::c_void);
+    libc::free(os as *mut libc::c_void);
 }
 unsafe extern "C" fn usage() {
     libc::fprintf(

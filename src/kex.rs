@@ -24,7 +24,7 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
@@ -568,7 +568,7 @@ pub unsafe extern "C" fn kex_alg_list(mut sep: libc::c_char) -> *mut libc::c_cha
                 .wrapping_add(2 as libc::c_int as libc::c_ulong),
         ) as *mut libc::c_char;
         if tmp.is_null() {
-            free(ret as *mut libc::c_void);
+            libc::free(ret as *mut libc::c_void);
             return 0 as *mut libc::c_char;
         }
         ret = tmp;
@@ -623,7 +623,7 @@ pub unsafe extern "C" fn kex_names_valid(mut names: *const libc::c_char) -> libc
                 b"Unsupported KEX algorithm \"%.100s\"\0" as *const u8 as *const libc::c_char,
                 p,
             );
-            free(s as *mut libc::c_void);
+            libc::free(s as *mut libc::c_void);
             return 0 as libc::c_int;
         }
         p = strsep(&mut cp, b",\0" as *const u8 as *const libc::c_char);
@@ -638,7 +638,7 @@ pub unsafe extern "C" fn kex_names_valid(mut names: *const libc::c_char) -> libc
         b"kex names ok: [%s]\0" as *const u8 as *const libc::c_char,
         names,
     );
-    free(s as *mut libc::c_void);
+    libc::free(s as *mut libc::c_void);
     return 1 as libc::c_int;
 }
 pub unsafe extern "C" fn kex_names_cat(
@@ -669,7 +669,7 @@ pub unsafe extern "C" fn kex_names_cat(
         ret = calloc(1 as libc::c_int as libc::c_ulong, len) as *mut libc::c_char;
         ret.is_null()
     } {
-        free(tmp as *mut libc::c_void);
+        libc::free(tmp as *mut libc::c_void);
         return 0 as *mut libc::c_char;
     }
     strlcpy(ret, a, len);
@@ -677,17 +677,17 @@ pub unsafe extern "C" fn kex_names_cat(
     while !p.is_null() && *p as libc::c_int != '\0' as i32 {
         m = match_list(ret, p, 0 as *mut u_int);
         if !m.is_null() {
-            free(m as *mut libc::c_void);
+            libc::free(m as *mut libc::c_void);
         } else if strlcat(ret, b",\0" as *const u8 as *const libc::c_char, len) >= len
             || strlcat(ret, p, len) >= len
         {
-            free(tmp as *mut libc::c_void);
-            free(ret as *mut libc::c_void);
+            libc::free(tmp as *mut libc::c_void);
+            libc::free(ret as *mut libc::c_void);
             return 0 as *mut libc::c_char;
         }
         p = strsep(&mut cp, b",\0" as *const u8 as *const libc::c_char);
     }
-    free(tmp as *mut libc::c_void);
+    libc::free(tmp as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn kex_assemble_names(
@@ -722,7 +722,7 @@ pub unsafe extern "C" fn kex_assemble_names(
             r = -(2 as libc::c_int);
             current_block = 7592391467544181933;
         } else {
-            free(list as *mut libc::c_void);
+            libc::free(list as *mut libc::c_void);
             list = tmp;
             current_block = 5783071609795492627;
         }
@@ -731,7 +731,7 @@ pub unsafe extern "C" fn kex_assemble_names(
         if (*listp).is_null() {
             r = -(2 as libc::c_int);
         } else {
-            free(list as *mut libc::c_void);
+            libc::free(list as *mut libc::c_void);
             return 0 as libc::c_int;
         }
         current_block = 7592391467544181933;
@@ -741,7 +741,7 @@ pub unsafe extern "C" fn kex_assemble_names(
             r = -(2 as libc::c_int);
             current_block = 7592391467544181933;
         } else {
-            free(list as *mut libc::c_void);
+            libc::free(list as *mut libc::c_void);
             list = tmp;
             current_block = 5783071609795492627;
         }
@@ -767,7 +767,7 @@ pub unsafe extern "C" fn kex_assemble_names(
                         current_block = 7592391467544181933;
                         break;
                     } else {
-                        free(matching as *mut libc::c_void);
+                        libc::free(matching as *mut libc::c_void);
                         matching = match_filter_allowlist(all, cp);
                         if matching.is_null() {
                             r = -(2 as libc::c_int);
@@ -780,7 +780,7 @@ pub unsafe extern "C" fn kex_assemble_names(
                                 current_block = 7592391467544181933;
                                 break;
                             } else {
-                                free(ret as *mut libc::c_void);
+                                libc::free(ret as *mut libc::c_void);
                                 ret = tmp;
                             }
                         }
@@ -802,10 +802,10 @@ pub unsafe extern "C" fn kex_assemble_names(
         }
         _ => {}
     }
-    free(matching as *mut libc::c_void);
-    free(opatterns as *mut libc::c_void);
-    free(list as *mut libc::c_void);
-    free(ret as *mut libc::c_void);
+    libc::free(matching as *mut libc::c_void);
+    libc::free(opatterns as *mut libc::c_void);
+    libc::free(list as *mut libc::c_void);
+    libc::free(ret as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn kex_proposal_populate_entries(
@@ -932,7 +932,7 @@ pub unsafe extern "C" fn kex_proposal_free_entries(mut prop: *mut *mut libc::c_c
     let mut i: u_int = 0;
     i = 0 as libc::c_int as u_int;
     while i < PROPOSAL_MAX as libc::c_int as libc::c_uint {
-        free(*prop.offset(i as isize) as *mut libc::c_void);
+        libc::free(*prop.offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
@@ -1119,11 +1119,11 @@ pub unsafe extern "C" fn kex_prop_free(mut proposal: *mut *mut libc::c_char) {
     }
     i = 0 as libc::c_int as u_int;
     while i < PROPOSAL_MAX as libc::c_int as libc::c_uint {
-        free(*proposal.offset(i as isize) as *mut libc::c_void);
+        libc::free(*proposal.offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free(proposal as *mut libc::c_void);
+    libc::free(proposal as *mut libc::c_void);
 }
 pub unsafe extern "C" fn kex_protocol_error(
     mut type_0: libc::c_int,
@@ -1241,7 +1241,7 @@ unsafe extern "C" fn kex_send_ext_info(mut ssh: *mut ssh) -> libc::c_int {
     } else {
         r = 0 as libc::c_int;
     }
-    free(algs as *mut libc::c_void);
+    libc::free(algs as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn kex_send_newkeys(mut ssh: *mut ssh) -> libc::c_int {
@@ -1348,7 +1348,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
         }
         r = sshpkt_get_string(ssh, &mut val, &mut vlen);
         if r != 0 as libc::c_int {
-            free(name as *mut libc::c_void);
+            libc::free(name as *mut libc::c_void);
             return r;
         }
         if strcmp(
@@ -1459,8 +1459,8 @@ pub unsafe extern "C" fn kex_input_ext_info(
                 name,
             );
         }
-        free(name as *mut libc::c_void);
-        free(val as *mut libc::c_void);
+        libc::free(name as *mut libc::c_void);
+        libc::free(val as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
@@ -1511,7 +1511,7 @@ unsafe extern "C" fn kex_input_newkeys(
     (*kex).flags &= !(0x2 as libc::c_int) as libc::c_uint;
     sshbuf_reset((*kex).peer);
     (*kex).flags &= !(0x1 as libc::c_int) as libc::c_uint;
-    free((*kex).name as *mut libc::c_void);
+    libc::free((*kex).name as *mut libc::c_void);
     (*kex).name = 0 as *mut libc::c_char;
     return 0 as libc::c_int;
 }
@@ -1761,7 +1761,7 @@ pub unsafe extern "C" fn kex_free_newkeys(mut newkeys: *mut newkeys) {
             (*newkeys).enc.key as *mut libc::c_void,
             (*newkeys).enc.key_len as size_t,
         );
-        free((*newkeys).enc.key as *mut libc::c_void);
+        libc::free((*newkeys).enc.key as *mut libc::c_void);
         (*newkeys).enc.key = 0 as *mut u_char;
     }
     if !((*newkeys).enc.iv).is_null() {
@@ -1769,15 +1769,15 @@ pub unsafe extern "C" fn kex_free_newkeys(mut newkeys: *mut newkeys) {
             (*newkeys).enc.iv as *mut libc::c_void,
             (*newkeys).enc.iv_len as size_t,
         );
-        free((*newkeys).enc.iv as *mut libc::c_void);
+        libc::free((*newkeys).enc.iv as *mut libc::c_void);
         (*newkeys).enc.iv = 0 as *mut u_char;
     }
-    free((*newkeys).enc.name as *mut libc::c_void);
+    libc::free((*newkeys).enc.name as *mut libc::c_void);
     explicit_bzero(
         &mut (*newkeys).enc as *mut sshenc as *mut libc::c_void,
         ::core::mem::size_of::<sshenc>() as libc::c_ulong,
     );
-    free((*newkeys).comp.name as *mut libc::c_void);
+    libc::free((*newkeys).comp.name as *mut libc::c_void);
     explicit_bzero(
         &mut (*newkeys).comp as *mut sshcomp as *mut libc::c_void,
         ::core::mem::size_of::<sshcomp>() as libc::c_ulong,
@@ -1788,10 +1788,10 @@ pub unsafe extern "C" fn kex_free_newkeys(mut newkeys: *mut newkeys) {
             (*newkeys).mac.key as *mut libc::c_void,
             (*newkeys).mac.key_len as size_t,
         );
-        free((*newkeys).mac.key as *mut libc::c_void);
+        libc::free((*newkeys).mac.key as *mut libc::c_void);
         (*newkeys).mac.key = 0 as *mut u_char;
     }
-    free((*newkeys).mac.name as *mut libc::c_void);
+    libc::free((*newkeys).mac.name as *mut libc::c_void);
     explicit_bzero(
         &mut (*newkeys).mac as *mut sshmac as *mut libc::c_void,
         ::core::mem::size_of::<sshmac>() as libc::c_ulong,
@@ -1823,10 +1823,10 @@ pub unsafe extern "C" fn kex_free(mut kex: *mut kex) {
     sshbuf_free((*kex).session_id);
     sshbuf_free((*kex).initial_sig);
     sshkey_free((*kex).initial_hostkey);
-    free((*kex).failed_choice as *mut libc::c_void);
-    free((*kex).hostkey_alg as *mut libc::c_void);
-    free((*kex).name as *mut libc::c_void);
-    free(kex as *mut libc::c_void);
+    libc::free((*kex).failed_choice as *mut libc::c_void);
+    libc::free((*kex).hostkey_alg as *mut libc::c_void);
+    libc::free((*kex).name as *mut libc::c_void);
+    libc::free(kex as *mut libc::c_void);
 }
 pub unsafe extern "C" fn kex_ready(
     mut ssh: *mut ssh,
@@ -1917,7 +1917,7 @@ unsafe extern "C" fn choose_enc(
             b"unsupported cipher %s\0" as *const u8 as *const libc::c_char,
             name,
         );
-        free(name as *mut libc::c_void);
+        libc::free(name as *mut libc::c_void);
         return -(1 as libc::c_int);
     }
     (*enc).name = name;
@@ -1950,7 +1950,7 @@ unsafe extern "C" fn choose_mac(
             b"unsupported MAC %s\0" as *const u8 as *const libc::c_char,
             name,
         );
-        free(name as *mut libc::c_void);
+        libc::free(name as *mut libc::c_void);
         return -(1 as libc::c_int);
     }
     (*mac).name = name;
@@ -1988,7 +1988,7 @@ unsafe extern "C" fn choose_comp(
             b"unsupported compression scheme %s\0" as *const u8 as *const libc::c_char,
             name,
         );
-        free(name as *mut libc::c_void);
+        libc::free(name as *mut libc::c_void);
         return -(1 as libc::c_int);
     }
     (*comp).name = name;
@@ -2042,7 +2042,7 @@ unsafe extern "C" fn choose_hostkeyalg(
     mut client: *mut libc::c_char,
     mut server: *mut libc::c_char,
 ) -> libc::c_int {
-    free((*k).hostkey_alg as *mut libc::c_void);
+    libc::free((*k).hostkey_alg as *mut libc::c_void);
     (*k).hostkey_alg = match_list(client, server, 0 as *mut u_int);
     crate::log::sshlog(
         b"kex.c\0" as *const u8 as *const libc::c_char,
@@ -2139,7 +2139,7 @@ unsafe extern "C" fn has_any_alg(
     if cp.is_null() {
         return 0 as libc::c_int;
     }
-    free(cp as *mut libc::c_void);
+    libc::free(cp as *mut libc::c_void);
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn kex_choose_conf(mut ssh: *mut ssh) -> libc::c_int {
@@ -2209,7 +2209,7 @@ unsafe extern "C" fn kex_choose_conf(mut ssh: *mut ssh) -> libc::c_int {
                 );
                 (*kex).ext_info_c =
                     (ext != 0 as *mut libc::c_void as *mut libc::c_char) as libc::c_int;
-                free(ext as *mut libc::c_void);
+                libc::free(ext as *mut libc::c_void);
             }
             if (*kex).server != 0 && (*kex).flags & 0x2 as libc::c_int as libc::c_uint != 0 {
                 if has_any_alg(
@@ -2537,7 +2537,7 @@ unsafe extern "C" fn derive_key(
             }
         }
     }
-    free(digest as *mut libc::c_void);
+    libc::free(digest as *mut libc::c_void);
     ssh_digest_free(hashctx);
     return r;
 }
@@ -2603,7 +2603,7 @@ pub unsafe extern "C" fn kex_derive_keys(
         if r != 0 as libc::c_int {
             j = 0 as libc::c_int as u_int;
             while j < i {
-                free(keys[j as usize] as *mut libc::c_void);
+                libc::free(keys[j as usize] as *mut libc::c_void);
                 j = j.wrapping_add(1);
                 j;
             }
@@ -3125,7 +3125,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                     as *const libc::c_char,
                                 cp,
                             );
-                            free(cp as *mut libc::c_void);
+                            libc::free(cp as *mut libc::c_void);
                             current_block = 14036831669631104504;
                             break;
                         } else {
@@ -3143,7 +3143,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                 n,
                                 cp,
                             );
-                            free(cp as *mut libc::c_void);
+                            libc::free(cp as *mut libc::c_void);
                             n = n.wrapping_add(1);
                             n;
                         }
@@ -3346,9 +3346,9 @@ pub unsafe extern "C" fn kex_exchange_identification(
             }
         }
     }
-    free(our_version_string as *mut libc::c_void);
-    free(peer_version_string as *mut libc::c_void);
-    free(remote_version as *mut libc::c_void);
+    libc::free(our_version_string as *mut libc::c_void);
+    libc::free(peer_version_string as *mut libc::c_void);
+    libc::free(remote_version as *mut libc::c_void);
     if r == -(24 as libc::c_int) {
         *libc::__errno_location() = oerrno;
     }

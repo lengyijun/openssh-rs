@@ -74,7 +74,7 @@ extern "C" {
     ) -> libc::c_int;
     fn getrlimit(__resource: __rlimit_resource_t, __rlimits: *mut rlimit) -> libc::c_int;
     fn setrlimit(__resource: __rlimit_resource_t, __rlimits: *const rlimit) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
+
     fn exit(_: libc::c_int) -> !;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -1055,7 +1055,7 @@ unsafe extern "C" fn keygrab_ssh2(mut c: *mut con) {
     }
     r = kex_setup((*c).c_ssh, myproposal.as_mut_ptr());
     if r != 0 as libc::c_int {
-        free((*c).c_ssh as *mut libc::c_void);
+        libc::free((*c).c_ssh as *mut libc::c_void);
         libc::fprintf(
             stderr,
             b"kex_setup: %s\n\0" as *const u8 as *const libc::c_char,
@@ -1134,8 +1134,8 @@ unsafe extern "C" fn keyprint_one(mut host: *const libc::c_char, mut key: *mut s
     if r >= 0 as libc::c_int && sshkey_write(key, stdout) == 0 as libc::c_int {
         fputs(b"\n\0" as *const u8 as *const libc::c_char, stdout);
     }
-    free(hashed as *mut libc::c_void);
-    free(hostport as *mut libc::c_void);
+    libc::free(hashed as *mut libc::c_void);
+    libc::free(hostport as *mut libc::c_void);
 }
 unsafe extern "C" fn keyprint(mut c: *mut con, mut key: *mut sshkey) {
     let mut hosts: *mut libc::c_char = if !((*c).c_output_name).is_null() {
@@ -1161,7 +1161,7 @@ unsafe extern "C" fn keyprint(mut c: *mut con, mut key: *mut sshkey) {
         }
         keyprint_one(host, key);
     }
-    free(ohosts as *mut libc::c_void);
+    libc::free(ohosts as *mut libc::c_void);
 }
 unsafe extern "C" fn tcpconnect(mut host: *mut libc::c_char) -> libc::c_int {
     let mut hints: addrinfo = addrinfo {
@@ -1281,7 +1281,7 @@ unsafe extern "C" fn conalloc(
     loop {
         name = xstrsep(&mut namelist, b",\0" as *const u8 as *const libc::c_char);
         if name.is_null() {
-            free(namebase as *mut libc::c_void);
+            libc::free(namebase as *mut libc::c_void);
             return -(1 as libc::c_int);
         }
         s = tcpconnect(name);
@@ -1363,20 +1363,20 @@ unsafe extern "C" fn confree(mut s: libc::c_int) {
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"confree: attempt to free bad fdno %d\0" as *const u8 as *const libc::c_char,
+            b"confree: attempt to libc::free bad fdno %d\0" as *const u8 as *const libc::c_char,
             s,
         );
     }
-    free((*fdcon.offset(s as isize)).c_namebase as *mut libc::c_void);
-    free((*fdcon.offset(s as isize)).c_output_name as *mut libc::c_void);
+    libc::free((*fdcon.offset(s as isize)).c_namebase as *mut libc::c_void);
+    libc::free((*fdcon.offset(s as isize)).c_output_name as *mut libc::c_void);
     if (*fdcon.offset(s as isize)).c_status as libc::c_int == 3 as libc::c_int {
-        free((*fdcon.offset(s as isize)).c_data as *mut libc::c_void);
+        libc::free((*fdcon.offset(s as isize)).c_data as *mut libc::c_void);
     }
     (*fdcon.offset(s as isize)).c_status = 0 as libc::c_int as u_char;
     (*fdcon.offset(s as isize)).c_keytype = 0 as libc::c_int;
     if !((*fdcon.offset(s as isize)).c_ssh).is_null() {
         ssh_packet_close((*fdcon.offset(s as isize)).c_ssh);
-        free((*fdcon.offset(s as isize)).c_ssh as *mut libc::c_void);
+        libc::free((*fdcon.offset(s as isize)).c_ssh as *mut libc::c_void);
         let ref mut fresh9 = (*fdcon.offset(s as isize)).c_ssh;
         *fresh9 = 0 as *mut ssh;
     } else {
@@ -2246,7 +2246,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         j += 1;
         j;
     }
-    free(line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     while BSDoptind < argc {
         let fresh21 = BSDoptind;
         BSDoptind = BSDoptind + 1;

@@ -348,7 +348,7 @@ pub unsafe extern "C" fn srclimit_check_allow(
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG3,
             0 as *const libc::c_char,
-            b"%s: no free slot\0" as *const u8 as *const libc::c_char,
+            b"%s: no libc::free slot\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"srclimit_check_allow\0"))
                 .as_ptr(),
         );

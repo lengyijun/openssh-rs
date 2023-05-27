@@ -51,7 +51,7 @@ extern "C" {
     ) -> libc::c_int;
     fn strtoul(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_ulong;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn time(__timer: *mut time_t) -> time_t;
     fn gmtime(__timer: *const time_t) -> *mut tm;
     fn ctime(__timer: *const time_t) -> *mut libc::c_char;
@@ -645,9 +645,9 @@ pub unsafe extern "C" fn gen_candidates(
         j;
     }
     time(&mut time_stop);
-    free(LargeSieve as *mut libc::c_void);
-    free(SmallSieve as *mut libc::c_void);
-    free(TinySieve as *mut libc::c_void);
+    libc::free(LargeSieve as *mut libc::c_void);
+    libc::free(SmallSieve as *mut libc::c_void);
+    libc::free(TinySieve as *mut libc::c_void);
     crate::log::sshlog(
         b"moduli.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"gen_candidates\0")).as_ptr(),
@@ -940,7 +940,7 @@ unsafe extern "C" fn print_progress(
         fmt_time(elapsed),
         eta_str,
     );
-    free(eta_str as *mut libc::c_void);
+    libc::free(eta_str as *mut libc::c_void);
 }
 pub unsafe extern "C" fn prime_test(
     mut in_0: *mut libc::FILE,
@@ -1519,7 +1519,7 @@ pub unsafe extern "C" fn prime_test(
         }
     }
     time(&mut time_stop);
-    free(lp as *mut libc::c_void);
+    libc::free(lp as *mut libc::c_void);
     BN_free(p);
     BN_free(q);
     if !checkpoint_file.is_null() {

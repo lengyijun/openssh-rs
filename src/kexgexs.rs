@@ -13,7 +13,7 @@ extern "C" {
     pub type session_state;
     pub type bignum_st;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn free(_: *mut libc::c_void);
+
     fn DH_get0_key(dh: *const DH, pub_key: *mut *const BIGNUM, priv_key: *mut *const BIGNUM);
     fn DH_get0_pqg(
         dh: *const DH,
@@ -605,6 +605,6 @@ unsafe extern "C" fn input_kex_dh_gex_init(
     BN_clear_free(dh_client_pub);
     sshbuf_free(shared_secret);
     sshbuf_free(server_host_key_blob);
-    free(signature as *mut libc::c_void);
+    libc::free(signature as *mut libc::c_void);
     return r;
 }

@@ -22,7 +22,7 @@ extern "C" {
     ) -> __ssize_t;
     fn ferror(__stream: *mut libc::FILE) -> libc::c_int;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
@@ -530,7 +530,7 @@ pub unsafe extern "C" fn sshsig_dearmor(
     }
     sshbuf_free(buf);
     sshbuf_free(sbuf);
-    free(b64 as *mut libc::c_void);
+    libc::free(b64 as *mut libc::c_void);
     return r;
 }
 unsafe extern "C" fn sshsig_wrap_sign(
@@ -728,7 +728,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
             }
         }
     }
-    free(sig as *mut libc::c_void);
+    libc::free(sig as *mut libc::c_void);
     sshbuf_free(blob);
     sshbuf_free(tosign);
     return r;
@@ -863,7 +863,7 @@ unsafe extern "C" fn sshsig_peek_hashalg(
             hashalg = 0 as *mut libc::c_char;
         }
     }
-    free(hashalg as *mut libc::c_void);
+    libc::free(hashalg as *mut libc::c_void);
     sshbuf_free(buf);
     return r;
 }
@@ -1152,9 +1152,9 @@ unsafe extern "C" fn sshsig_wrap_verify(
             }
         }
     }
-    free(got_namespace as *mut libc::c_void);
-    free(sigtype as *mut libc::c_void);
-    free(sig_hashalg as *mut libc::c_void);
+    libc::free(got_namespace as *mut libc::c_void);
+    libc::free(sigtype as *mut libc::c_void);
+    libc::free(sig_hashalg as *mut libc::c_void);
     sshbuf_free(buf);
     sshbuf_free(toverify);
     sshkey_free(key);
@@ -1367,7 +1367,7 @@ pub unsafe extern "C" fn sshsig_verifyb(
         }
     }
     sshbuf_free(b);
-    free(hashalg as *mut libc::c_void);
+    libc::free(hashalg as *mut libc::c_void);
     return r;
 }
 unsafe extern "C" fn hash_file(
@@ -1670,7 +1670,7 @@ pub unsafe extern "C" fn sshsig_verify_fd(
         }
     }
     sshbuf_free(b);
-    free(hashalg as *mut libc::c_void);
+    libc::free(hashalg as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn sshsigopt_parse(
@@ -1743,12 +1743,12 @@ pub unsafe extern "C" fn sshsigopt_parse(
                 if parse_absolute_time(opt, &mut (*ret).valid_after) != 0 as libc::c_int
                     || (*ret).valid_after == 0 as libc::c_int as libc::c_ulong
                 {
-                    free(opt as *mut libc::c_void);
+                    libc::free(opt as *mut libc::c_void);
                     errstr = b"invalid \"valid-after\" time\0" as *const u8 as *const libc::c_char;
                     current_block = 10058102262011668777;
                     break;
                 } else {
-                    free(opt as *mut libc::c_void);
+                    libc::free(opt as *mut libc::c_void);
                 }
             }
         } else if opt_match(
@@ -1769,12 +1769,12 @@ pub unsafe extern "C" fn sshsigopt_parse(
                 if parse_absolute_time(opt, &mut (*ret).valid_before) != 0 as libc::c_int
                     || (*ret).valid_before == 0 as libc::c_int as libc::c_ulong
                 {
-                    free(opt as *mut libc::c_void);
+                    libc::free(opt as *mut libc::c_void);
                     errstr = b"invalid \"valid-before\" time\0" as *const u8 as *const libc::c_char;
                     current_block = 10058102262011668777;
                     break;
                 } else {
-                    free(opt as *mut libc::c_void);
+                    libc::free(opt as *mut libc::c_void);
                 }
             }
         }
@@ -1824,8 +1824,8 @@ pub unsafe extern "C" fn sshsigopt_free(mut opts: *mut sshsigopt) {
     if opts.is_null() {
         return;
     }
-    free((*opts).namespaces as *mut libc::c_void);
-    free(opts as *mut libc::c_void);
+    libc::free((*opts).namespaces as *mut libc::c_void);
+    libc::free(opts as *mut libc::c_void);
 }
 unsafe extern "C" fn parse_principals_key_and_options(
     mut path: *const libc::c_char,
@@ -2069,7 +2069,7 @@ unsafe extern "C" fn parse_principals_key_and_options(
             }
         }
     }
-    free(principals as *mut libc::c_void);
+    libc::free(principals as *mut libc::c_void);
     sshsigopt_free(sigopts);
     sshkey_free(key);
     return r;
@@ -2209,7 +2209,7 @@ unsafe extern "C" fn cert_filter_principals(
         }
     }
     sshbuf_free(nprincipals);
-    free(oprincipals as *mut libc::c_void);
+    libc::free(oprincipals as *mut libc::c_void);
     return if success != 0 { 0 as libc::c_int } else { r };
 }
 unsafe extern "C" fn check_allowed_keys_line(
@@ -2439,7 +2439,7 @@ unsafe extern "C" fn check_allowed_keys_line(
         *principalsp = principals;
         principals = 0 as *mut libc::c_char;
     }
-    free(principals as *mut libc::c_void);
+    libc::free(principals as *mut libc::c_void);
     sshkey_free(found_key);
     sshsigopt_free(sigopts);
     return if success != 0 {
@@ -2494,7 +2494,7 @@ pub unsafe extern "C" fn sshsig_check_allowed_keys(
             verify_time,
             0 as *mut *mut libc::c_char,
         );
-        free(line as *mut libc::c_void);
+        libc::free(line as *mut libc::c_void);
         line = 0 as *mut libc::c_char;
         linesize = 0 as libc::c_int as size_t;
         if r == -(46 as libc::c_int) {
@@ -2507,7 +2507,7 @@ pub unsafe extern "C" fn sshsig_check_allowed_keys(
         return 0 as libc::c_int;
     }
     fclose(f);
-    free(line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn sshsig_find_principals(
@@ -2555,7 +2555,7 @@ pub unsafe extern "C" fn sshsig_find_principals(
             verify_time,
             principals,
         );
-        free(line as *mut libc::c_void);
+        libc::free(line as *mut libc::c_void);
         line = 0 as *mut libc::c_char;
         linesize = 0 as libc::c_int as size_t;
         if r == -(46 as libc::c_int) {
@@ -2567,7 +2567,7 @@ pub unsafe extern "C" fn sshsig_find_principals(
         fclose(f);
         return 0 as libc::c_int;
     }
-    free(line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     if ferror(f) != 0 as libc::c_int {
         oerrno = *libc::__errno_location();
         fclose(f);
@@ -2663,7 +2663,7 @@ pub unsafe extern "C" fn sshsig_match_principals(
             ) as *mut *mut libc::c_char;
             if tmp.is_null() {
                 ret = -(2 as libc::c_int);
-                free(found as *mut libc::c_void);
+                libc::free(found as *mut libc::c_void);
                 break;
             } else {
                 principals = tmp;
@@ -2671,7 +2671,7 @@ pub unsafe extern "C" fn sshsig_match_principals(
                 nprincipals = nprincipals.wrapping_add(1);
                 let ref mut fresh2 = *principals.offset(fresh1 as isize);
                 *fresh2 = found;
-                free(line as *mut libc::c_void);
+                libc::free(line as *mut libc::c_void);
                 line = 0 as *mut libc::c_char;
                 linesize = 0 as libc::c_int as size_t;
             }
@@ -2693,11 +2693,11 @@ pub unsafe extern "C" fn sshsig_match_principals(
     }
     i = 0 as libc::c_int as size_t;
     while i < nprincipals {
-        free(*principals.offset(i as isize) as *mut libc::c_void);
+        libc::free(*principals.offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free(principals as *mut libc::c_void);
+    libc::free(principals as *mut libc::c_void);
     *libc::__errno_location() = oerrno;
     return ret;
 }

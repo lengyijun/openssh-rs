@@ -91,7 +91,7 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn free(_: *mut libc::c_void);
+
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn setenv(
@@ -564,7 +564,7 @@ unsafe extern "C" fn close_socket(mut e: *mut SocketEntry) {
         i = i.wrapping_add(1);
         i;
     }
-    free((*e).session_ids as *mut libc::c_void);
+    libc::free((*e).session_ids as *mut libc::c_void);
     memset(
         e as *mut libc::c_void,
         '\0' as i32,
@@ -587,16 +587,16 @@ unsafe extern "C" fn free_dest_constraint_hop(mut dch: *mut dest_constraint_hop)
     if dch.is_null() {
         return;
     }
-    free((*dch).user as *mut libc::c_void);
-    free((*dch).hostname as *mut libc::c_void);
+    libc::free((*dch).user as *mut libc::c_void);
+    libc::free((*dch).hostname as *mut libc::c_void);
     i = 0 as libc::c_int as u_int;
     while i < (*dch).nkeys {
         sshkey_free(*((*dch).keys).offset(i as isize));
         i = i.wrapping_add(1);
         i;
     }
-    free((*dch).keys as *mut libc::c_void);
-    free((*dch).key_is_ca as *mut libc::c_void);
+    libc::free((*dch).keys as *mut libc::c_void);
+    libc::free((*dch).key_is_ca as *mut libc::c_void);
 }
 unsafe extern "C" fn free_dest_constraints(mut dcs: *mut dest_constraint, mut ndcs: size_t) {
     let mut i: size_t = 0;
@@ -607,15 +607,15 @@ unsafe extern "C" fn free_dest_constraints(mut dcs: *mut dest_constraint, mut nd
         i = i.wrapping_add(1);
         i;
     }
-    free(dcs as *mut libc::c_void);
+    libc::free(dcs as *mut libc::c_void);
 }
 unsafe extern "C" fn free_identity(mut id: *mut Identity) {
     sshkey_free((*id).key);
-    free((*id).provider as *mut libc::c_void);
-    free((*id).comment as *mut libc::c_void);
-    free((*id).sk_provider as *mut libc::c_void);
+    libc::free((*id).provider as *mut libc::c_void);
+    libc::free((*id).comment as *mut libc::c_void);
+    libc::free((*id).sk_provider as *mut libc::c_void);
     free_dest_constraints((*id).dest_constraints, (*id).ndest_constraints);
-    free(id as *mut libc::c_void);
+    libc::free(id as *mut libc::c_void);
 }
 unsafe extern "C" fn match_key_hop(
     mut tag: *const libc::c_char,
@@ -661,7 +661,7 @@ unsafe extern "C" fn match_key_hop(
         fp,
         (*dch).nkeys,
     );
-    free(fp as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
     i = 0 as libc::c_int as u_int;
     while i < (*dch).nkeys {
         if (*((*dch).keys).offset(i as isize)).is_null() {
@@ -703,7 +703,7 @@ unsafe extern "C" fn match_key_hop(
             sshkey_type(*((*dch).keys).offset(i as isize)),
             fp,
         );
-        free(fp as *mut libc::c_void);
+        libc::free(fp as *mut libc::c_void);
         if sshkey_is_cert(key) == 0 {
             if !(*((*dch).key_is_ca).offset(i as isize) != 0
                 || sshkey_equal(key, *((*dch).keys).offset(i as isize)) == 0)
@@ -1015,8 +1015,8 @@ unsafe extern "C" fn identity_permitted(
             sshkey_type((*hks).key),
             fp2,
         );
-        free(fp1 as *mut libc::c_void);
-        free(fp2 as *mut libc::c_void);
+        libc::free(fp1 as *mut libc::c_void);
+        libc::free(fp2 as *mut libc::c_void);
         hp = 0 as *mut *const libc::c_char;
         if i == ((*e).nsession_ids).wrapping_sub(1 as libc::c_int as libc::c_ulong) {
             hp = last_hostnamep;
@@ -1128,7 +1128,7 @@ unsafe extern "C" fn confirm_key(
     {
         ret = 0 as libc::c_int;
     }
-    free(p as *mut libc::c_void);
+    libc::free(p as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn send_status(mut e: *mut SocketEntry, mut success: libc::c_int) {
@@ -1446,10 +1446,10 @@ unsafe extern "C" fn parse_userauth_request(
     }
     sshbuf_free(b);
     sshbuf_free(sess_id);
-    free(user as *mut libc::c_void);
-    free(service as *mut libc::c_void);
-    free(method as *mut libc::c_void);
-    free(pkalg as *mut libc::c_void);
+    libc::free(user as *mut libc::c_void);
+    libc::free(service as *mut libc::c_void);
+    libc::free(method as *mut libc::c_void);
+    libc::free(pkalg as *mut libc::c_void);
     sshkey_free(mkey);
     sshkey_free(hostkey);
     return r;
@@ -2020,11 +2020,11 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
     sshbuf_free(msg);
     sshkey_free(key);
     sshkey_free(hostkey);
-    free(fp as *mut libc::c_void);
-    free(signature as *mut libc::c_void);
-    free(sig_dest as *mut libc::c_void);
-    free(user as *mut libc::c_void);
-    free(prompt as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
+    libc::free(signature as *mut libc::c_void);
+    libc::free(sig_dest as *mut libc::c_void);
+    libc::free(user as *mut libc::c_void);
+    libc::free(prompt as *mut libc::c_void);
     if !pin.is_null() {
         freezero(pin as *mut libc::c_void, strlen(pin));
     }
@@ -2241,11 +2241,11 @@ unsafe extern "C" fn parse_dest_constraint_hop(
         r = -(59 as libc::c_int);
     } else {
         if *(*dch).hostname as libc::c_int == '\0' as i32 {
-            free((*dch).hostname as *mut libc::c_void);
+            libc::free((*dch).hostname as *mut libc::c_void);
             (*dch).hostname = 0 as *mut libc::c_char;
         }
         if *(*dch).user as libc::c_int == '\0' as i32 {
-            free((*dch).user as *mut libc::c_void);
+            libc::free((*dch).user as *mut libc::c_void);
             (*dch).user = 0 as *mut libc::c_char;
         }
         loop {
@@ -2318,7 +2318,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
                 sshkey_type(k),
                 fp,
             );
-            free(fp as *mut libc::c_void);
+            libc::free(fp as *mut libc::c_void);
             let ref mut fresh0 = *((*dch).keys).offset((*dch).nkeys as isize);
             *fresh0 = k;
             *((*dch).key_is_ca).offset((*dch).nkeys as isize) =
@@ -2685,7 +2685,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
             }
         }
     }
-    free(ext_name as *mut libc::c_void);
+    libc::free(ext_name as *mut libc::c_void);
     sshbuf_free(b);
     return r;
 }
@@ -3012,7 +3012,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                 );
                 current_block = 12326576695480106577;
             } else {
-                free(sk_provider as *mut libc::c_void);
+                libc::free(sk_provider as *mut libc::c_void);
                 sk_provider = xstrdup(canonical_provider.as_mut_ptr());
                 if match_pattern_list(sk_provider, allowed_providers, 0 as libc::c_int)
                     != 1 as libc::c_int
@@ -3084,8 +3084,8 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                         current_block = 12326576695480106577;
                     } else {
                         sshkey_free((*id).key);
-                        free((*id).comment as *mut libc::c_void);
-                        free((*id).sk_provider as *mut libc::c_void);
+                        libc::free((*id).comment as *mut libc::c_void);
+                        libc::free((*id).sk_provider as *mut libc::c_void);
                         free_dest_constraints((*id).dest_constraints, (*id).ndest_constraints);
                         current_block = 7828949454673616476;
                     }
@@ -3140,7 +3140,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                                 },
                                 ndest_constraints,
                             );
-                            free(fp as *mut libc::c_void);
+                            libc::free(fp as *mut libc::c_void);
                             k = 0 as *mut sshkey;
                             comment = 0 as *mut libc::c_char;
                             sk_provider = 0 as *mut libc::c_char;
@@ -3153,8 +3153,8 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
             }
         }
     }
-    free(sk_provider as *mut libc::c_void);
-    free(comment as *mut libc::c_void);
+    libc::free(sk_provider as *mut libc::c_void);
+    libc::free(comment as *mut libc::c_void);
     sshkey_free(k);
     free_dest_constraints(dest_constraints, ndest_constraints);
     send_status(e, success);
@@ -3518,15 +3518,15 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
                 success = 1 as libc::c_int;
             }
             sshkey_free(*keys.offset(i as isize));
-            free(*comments.offset(i as isize) as *mut libc::c_void);
+            libc::free(*comments.offset(i as isize) as *mut libc::c_void);
             i += 1;
             i;
         }
     }
-    free(pin as *mut libc::c_void);
-    free(provider as *mut libc::c_void);
-    free(keys as *mut libc::c_void);
-    free(comments as *mut libc::c_void);
+    libc::free(pin as *mut libc::c_void);
+    libc::free(provider as *mut libc::c_void);
+    libc::free(keys as *mut libc::c_void);
+    libc::free(comments as *mut libc::c_void);
     free_dest_constraints(dest_constraints, ndest_constraints);
     send_status(e, success);
 }
@@ -3568,7 +3568,7 @@ unsafe extern "C" fn process_remove_smartcard_key(mut e: *mut SocketEntry) {
             b"parse\0" as *const u8 as *const libc::c_char,
         );
     } else {
-        free(pin as *mut libc::c_void);
+        libc::free(pin as *mut libc::c_void);
         if (realpath(provider, canonical_provider.as_mut_ptr())).is_null() {
             crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -3635,7 +3635,7 @@ unsafe extern "C" fn process_remove_smartcard_key(mut e: *mut SocketEntry) {
             }
         }
     }
-    free(provider as *mut libc::c_void);
+    libc::free(provider as *mut libc::c_void);
     send_status(e, success);
 }
 unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::c_int {
@@ -3885,7 +3885,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
             }
         }
     }
-    free(fp as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
     sshkey_free(key);
     sshbuf_free(sid);
     sshbuf_free(sig);
@@ -3941,7 +3941,7 @@ unsafe extern "C" fn process_extension(mut e: *mut SocketEntry) {
                 name,
             );
         }
-        free(name as *mut libc::c_void);
+        libc::free(name as *mut libc::c_void);
     }
     send_status(e, success);
 }

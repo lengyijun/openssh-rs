@@ -34,7 +34,7 @@ extern "C" {
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn setenv(
         __name: *const libc::c_char,
@@ -431,7 +431,7 @@ pub unsafe extern "C" fn ask_permission(
         {
             allowed = 1 as libc::c_int;
         }
-        free(p as *mut libc::c_void);
+        libc::free(p as *mut libc::c_void);
     }
     return allowed;
 }
@@ -527,7 +527,7 @@ pub unsafe extern "C" fn notify_start(
                     strerror(*libc::__errno_location()),
                 );
                 ssh_signal(17 as libc::c_int, osigchld);
-                free(prompt as *mut libc::c_void);
+                libc::free(prompt as *mut libc::c_void);
                 return 0 as *mut notifier_ctx;
             }
             if pid == 0 as libc::c_int {
@@ -602,7 +602,7 @@ pub unsafe extern "C" fn notify_start(
         }
         _ => {}
     }
-    free(prompt as *mut libc::c_void);
+    libc::free(prompt as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn notify_complete(
@@ -617,10 +617,10 @@ pub unsafe extern "C" fn notify_complete(
         args_0 = args.clone();
         xvasprintf(&mut msg, fmt, args_0.as_va_list());
         writemsg(msg);
-        free(msg as *mut libc::c_void);
+        libc::free(msg as *mut libc::c_void);
     }
     if ctx.is_null() || (*ctx).pid <= 0 as libc::c_int {
-        free(ctx as *mut libc::c_void);
+        libc::free(ctx as *mut libc::c_void);
         return;
     }
     kill((*ctx).pid, 15 as libc::c_int);
@@ -647,5 +647,5 @@ pub unsafe extern "C" fn notify_complete(
         );
     }
     ssh_signal(17 as libc::c_int, (*ctx).osigchld);
-    free(ctx as *mut libc::c_void);
+    libc::free(ctx as *mut libc::c_void);
 }

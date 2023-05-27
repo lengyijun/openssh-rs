@@ -135,7 +135,7 @@ extern "C" {
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
     fn setgroups(__n: size_t, __groups: *const __gid_t) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
+
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn setenv(
@@ -2065,7 +2065,7 @@ unsafe extern "C" fn notify_hostkeys(mut ssh: *mut ssh) {
                 sshkey_ssh_name(key),
                 fp,
             );
-            free(fp as *mut libc::c_void);
+            libc::free(fp as *mut libc::c_void);
             if nkeys == 0 as libc::c_int as libc::c_uint {
                 r = sshpkt_start(ssh, 80 as libc::c_int as u_char);
                 if r != 0 as libc::c_int
@@ -2285,8 +2285,8 @@ unsafe extern "C" fn drop_connection(
         laddr,
         get_local_port(sock),
     );
-    free(laddr as *mut libc::c_void);
-    free(raddr as *mut libc::c_void);
+    libc::free(laddr as *mut libc::c_void);
+    libc::free(raddr as *mut libc::c_void);
     write(
         sock,
         msg.as_ptr() as *const libc::c_void,
@@ -2554,7 +2554,7 @@ unsafe extern "C" fn recv_rexec_state(mut fd: libc::c_int, mut conf: *mut sshbuf
         *includes.tqh_last = item;
         includes.tqh_last = &mut (*item).entry.tqe_next;
     }
-    free(cp as *mut libc::c_void);
+    libc::free(cp as *mut libc::c_void);
     sshbuf_free(m);
     crate::log::sshlog(
         b"sshd.c\0" as *const u8 as *const libc::c_char,
@@ -2806,7 +2806,7 @@ unsafe extern "C" fn server_listen() {
     while i < options.num_listen_addrs {
         listen_on_addrs(&mut *(options.listen_addrs).offset(i as isize));
         freeaddrinfo((*(options.listen_addrs).offset(i as isize)).addrs);
-        free((*(options.listen_addrs).offset(i as isize)).rdomain as *mut libc::c_void);
+        libc::free((*(options.listen_addrs).offset(i as isize)).rdomain as *mut libc::c_void);
         memset(
             &mut *(options.listen_addrs).offset(i as isize) as *mut listenaddr as *mut libc::c_void,
             0 as libc::c_int,
@@ -2815,7 +2815,7 @@ unsafe extern "C" fn server_listen() {
         i = i.wrapping_add(1);
         i;
     }
-    free(options.listen_addrs as *mut libc::c_void);
+    libc::free(options.listen_addrs as *mut libc::c_void);
     options.listen_addrs = 0 as *mut listenaddr;
     options.num_listen_addrs = 0 as libc::c_int as u_int;
     if num_listen_socks == 0 {
@@ -3306,7 +3306,7 @@ unsafe extern "C" fn server_accept_loop(
                             send_rexec_state(*config_s.offset(0 as libc::c_int as isize), cfg);
                             close(*config_s.offset(0 as libc::c_int as isize));
                         }
-                        free(pfd as *mut libc::c_void);
+                        libc::free(pfd as *mut libc::c_void);
                         return;
                     }
                     platform_pre_fork();
@@ -3361,7 +3361,7 @@ unsafe extern "C" fn server_accept_loop(
                                 1 as libc::c_int as size_t,
                             );
                         }
-                        free(pfd as *mut libc::c_void);
+                        libc::free(pfd as *mut libc::c_void);
                         return;
                     }
                     platform_post_fork_parent(pid);
@@ -3931,7 +3931,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 {
                     exit(1 as libc::c_int);
                 }
-                free(line as *mut libc::c_void);
+                libc::free(line as *mut libc::c_void);
                 current_block_66 = 7178192492338286402;
             }
             86 => {
@@ -4432,7 +4432,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             sshkey_ssh_name(pubkey),
                             fp,
                         );
-                        free(fp as *mut libc::c_void);
+                        libc::free(fp as *mut libc::c_void);
                     }
                 }
             }
@@ -5025,7 +5025,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             b"\"\0" as *const u8 as *const libc::c_char
         },
     );
-    free(laddr as *mut libc::c_void);
+    libc::free(laddr as *mut libc::c_void);
     ssh_signal(
         14 as libc::c_int,
         Some(grace_alarm_handler as unsafe extern "C" fn(libc::c_int) -> ()),
@@ -5295,7 +5295,7 @@ unsafe extern "C" fn do_ssh2_kex(mut ssh: *mut ssh) {
         compression,
         hkalgs,
     );
-    free(hkalgs as *mut libc::c_void);
+    libc::free(hkalgs as *mut libc::c_void);
     r = kex_setup(ssh, myproposal.as_mut_ptr());
     if r != 0 as libc::c_int {
         sshfatal(

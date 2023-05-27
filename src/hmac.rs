@@ -4,7 +4,7 @@ extern "C" {
     pub type ssh_digest_ctx;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
@@ -164,7 +164,7 @@ pub unsafe extern "C" fn ssh_hmac_free(mut ctx: *mut ssh_hmac_ctx) {
         ssh_digest_free((*ctx).digest);
         if !((*ctx).buf).is_null() {
             explicit_bzero((*ctx).buf as *mut libc::c_void, (*ctx).buf_len);
-            free((*ctx).buf as *mut libc::c_void);
+            libc::free((*ctx).buf as *mut libc::c_void);
         }
         freezero(
             ctx as *mut libc::c_void,

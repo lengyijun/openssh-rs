@@ -22,7 +22,7 @@ extern "C" {
         _: libc::c_longlong,
         _: *mut *const libc::c_char,
     ) -> libc::c_longlong;
-    fn free(_: *mut libc::c_void);
+
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
@@ -454,7 +454,7 @@ pub unsafe extern "C" fn choose_dh(
             bestcount;
         }
     }
-    free(line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     line = 0 as *mut libc::c_char;
     linesize = 0 as libc::c_int as size_t;
     rewind(f);
@@ -491,7 +491,7 @@ pub unsafe extern "C" fn choose_dh(
         BN_clear_free(dhg.g);
         BN_clear_free(dhg.p);
     }
-    free(line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     line = 0 as *mut libc::c_char;
     fclose(f);
     if bestcount != which + 1 as libc::c_int {

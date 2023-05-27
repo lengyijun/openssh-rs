@@ -7,7 +7,6 @@ extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
-    fn free(_: *mut libc::c_void);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
@@ -129,7 +128,7 @@ pub unsafe extern "C" fn sftp_realpath(
     } else {
         if (getcwd(resolved, 4096 as libc::c_int as size_t)).is_null() {
             if mem_allocated != 0 {
-                free(resolved as *mut libc::c_void);
+                libc::free(resolved as *mut libc::c_void);
             } else {
                 strlcpy(
                     resolved,
@@ -342,7 +341,7 @@ pub unsafe extern "C" fn sftp_realpath(
         }
     }
     if mem_allocated != 0 {
-        free(resolved as *mut libc::c_void);
+        libc::free(resolved as *mut libc::c_void);
     }
     return 0 as *mut libc::c_char;
 }

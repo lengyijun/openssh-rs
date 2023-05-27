@@ -113,7 +113,6 @@ extern "C" {
     fn dirname(__path: *mut libc::c_char) -> *mut libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
 
-    fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn realpath(__name: *const libc::c_char, __resolved: *mut libc::c_char) -> *mut libc::c_char;
@@ -1261,7 +1260,7 @@ pub unsafe extern "C" fn a2tun(
         sp = xstrdup(s);
         ep = strchr(sp, ':' as i32);
         if ep.is_null() {
-            free(sp as *mut libc::c_void);
+            libc::free(sp as *mut libc::c_void);
             return a2tun(s, 0 as *mut libc::c_int);
         }
         *ep.offset(0 as libc::c_int as isize) = '\0' as i32 as libc::c_char;
@@ -1269,7 +1268,7 @@ pub unsafe extern "C" fn a2tun(
         ep;
         *remote = a2tun(ep, 0 as *mut libc::c_int);
         tun = a2tun(sp, 0 as *mut libc::c_int);
-        free(sp as *mut libc::c_void);
+        libc::free(sp as *mut libc::c_void);
         return if *remote == 0x7fffffff as libc::c_int - 1 as libc::c_int {
             *remote
         } else {
@@ -1601,10 +1600,10 @@ pub unsafe extern "C" fn parse_user_host_path(
         }
         ret = 0 as libc::c_int;
     }
-    free(sdup as *mut libc::c_void);
-    free(user as *mut libc::c_void);
-    free(host as *mut libc::c_void);
-    free(path as *mut libc::c_void);
+    libc::free(sdup as *mut libc::c_void);
+    libc::free(user as *mut libc::c_void);
+    libc::free(host as *mut libc::c_void);
+    libc::free(path as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn parse_user_host_port(
@@ -1688,9 +1687,9 @@ pub unsafe extern "C" fn parse_user_host_port(
         }
         _ => {}
     }
-    free(sdup as *mut libc::c_void);
-    free(user as *mut libc::c_void);
-    free(host as *mut libc::c_void);
+    libc::free(sdup as *mut libc::c_void);
+    libc::free(user as *mut libc::c_void);
+    libc::free(host as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn hexchar(mut s: *const libc::c_char) -> libc::c_int {
@@ -1754,7 +1753,7 @@ unsafe extern "C" fn urldecode(mut src: *const libc::c_char) -> *mut libc::c_cha
                         ch == -(1 as libc::c_int)
                     }
                 {
-                    free(ret as *mut libc::c_void);
+                    libc::free(ret as *mut libc::c_void);
                     return 0 as *mut libc::c_char;
                 }
                 let fresh5 = dst;
@@ -1910,10 +1909,10 @@ pub unsafe extern "C" fn parse_uri(
         }
         _ => {}
     }
-    free(uridup as *mut libc::c_void);
-    free(user as *mut libc::c_void);
-    free(host as *mut libc::c_void);
-    free(path as *mut libc::c_void);
+    libc::free(uridup as *mut libc::c_void);
+    libc::free(user as *mut libc::c_void);
+    libc::free(host as *mut libc::c_void);
+    libc::free(path as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn addargs(
@@ -2026,7 +2025,7 @@ pub unsafe extern "C" fn replacearg(
             (*args).num,
         );
     }
-    free(*((*args).list).offset(which as isize) as *mut libc::c_void);
+    libc::free(*((*args).list).offset(which as isize) as *mut libc::c_void);
     let ref mut fresh10 = *((*args).list).offset(which as isize);
     *fresh10 = cp;
 }
@@ -2038,11 +2037,11 @@ pub unsafe extern "C" fn freeargs(mut args: *mut arglist) {
     if !((*args).list).is_null() && (*args).num < (*args).nalloc {
         i = 0 as libc::c_int as u_int;
         while i < (*args).num {
-            free(*((*args).list).offset(i as isize) as *mut libc::c_void);
+            libc::free(*((*args).list).offset(i as isize) as *mut libc::c_void);
             i = i.wrapping_add(1);
             i;
         }
-        free((*args).list as *mut libc::c_void);
+        libc::free((*args).list as *mut libc::c_void);
     }
     (*args).num = 0 as libc::c_int as u_int;
     (*args).nalloc = (*args).num;
@@ -2184,8 +2183,8 @@ pub unsafe extern "C" fn tilde_expand(
         }
         _ => {}
     }
-    free(s as *mut libc::c_void);
-    free(ocopy as *mut libc::c_void);
+    libc::free(s as *mut libc::c_void);
+    libc::free(ocopy as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn tilde_expand_filename(
@@ -2407,7 +2406,7 @@ unsafe extern "C" fn vdollar_percent_expand(
                             );
                         }
                     }
-                    free(var as *mut libc::c_void);
+                    libc::free(var as *mut libc::c_void);
                     string = string.offset(len as isize);
                 }
             }
@@ -2702,7 +2701,7 @@ pub unsafe extern "C" fn xextendf(
     ap = args.clone();
     xvasprintf(&mut tmp1, fmt, ap.as_va_list());
     if (*sp).is_null() || **sp as libc::c_int == '\0' as i32 {
-        free(*sp as *mut libc::c_void);
+        libc::free(*sp as *mut libc::c_void);
         *sp = tmp1;
         return;
     }
@@ -2717,8 +2716,8 @@ pub unsafe extern "C" fn xextendf(
         },
         tmp1,
     );
-    free(tmp1 as *mut libc::c_void);
-    free(*sp as *mut libc::c_void);
+    libc::free(tmp1 as *mut libc::c_void);
+    libc::free(*sp as *mut libc::c_void);
     *sp = tmp2;
 }
 pub unsafe extern "C" fn get_u64(mut vp: *const libc::c_void) -> u_int64_t {
@@ -3616,11 +3615,11 @@ pub unsafe extern "C" fn argv_split(
     if argc != 0 as libc::c_int && !argv.is_null() {
         i = 0 as libc::c_int;
         while i < argc {
-            free(*argv.offset(i as isize) as *mut libc::c_void);
+            libc::free(*argv.offset(i as isize) as *mut libc::c_void);
             i += 1;
             i;
         }
-        free(argv as *mut libc::c_void);
+        libc::free(argv as *mut libc::c_void);
     }
     return r;
 }
@@ -3774,11 +3773,11 @@ pub unsafe extern "C" fn argv_free(mut av: *mut *mut libc::c_char, mut ac: libc:
     }
     i = 0 as libc::c_int;
     while i < ac {
-        free(*av.offset(i as isize) as *mut libc::c_void);
+        libc::free(*av.offset(i as isize) as *mut libc::c_void);
         i += 1;
         i;
     }
-    free(av as *mut libc::c_void);
+    libc::free(av as *mut libc::c_void);
 }
 pub unsafe extern "C" fn exited_cleanly(
     mut pid: pid_t,
@@ -4059,7 +4058,7 @@ pub unsafe extern "C" fn child_set_env(
         i;
     }
     if !(*env.offset(i as isize)).is_null() {
-        free(*env.offset(i as isize) as *mut libc::c_void);
+        libc::free(*env.offset(i as isize) as *mut libc::c_void);
     } else {
         envsize = *envsizep;
         if i >= envsize.wrapping_sub(1 as libc::c_int as libc::c_uint) {
@@ -4487,7 +4486,7 @@ pub unsafe extern "C" fn opt_dequote(
     }
     if *s as libc::c_int == '\0' as i32 {
         *errstrp = b"missing end quote\0" as *const u8 as *const libc::c_char;
-        free(ret as *mut libc::c_void);
+        libc::free(ret as *mut libc::c_void);
         return 0 as *mut libc::c_char;
     }
     *ret.offset(i as isize) = '\0' as i32 as libc::c_char;
@@ -5183,12 +5182,12 @@ pub unsafe extern "C" fn lookup_setenv_in_list(
     name = xstrdup(env);
     cp = strchr(name, '=' as i32);
     if cp.is_null() {
-        free(name as *mut libc::c_void);
+        libc::free(name as *mut libc::c_void);
         return 0 as *const libc::c_char;
     }
     *cp = '\0' as i32 as libc::c_char;
     ret = lookup_env_in_list(name, envs, nenvs);
-    free(name as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn ptimeout_init(mut pt: *mut timespec) {

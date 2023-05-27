@@ -6,7 +6,6 @@ extern "C" {
     pub type ec_key_st;
     fn freezero(_: *mut libc::c_void, _: size_t);
 
-    fn free(_: *mut libc::c_void);
     fn crypto_sign_ed25519(
         _: *mut libc::c_uchar,
         _: *mut libc::c_ulonglong,
@@ -539,7 +538,7 @@ unsafe extern "C" fn ssh_ed25519_verify(
         freezero(m as *mut libc::c_void, smlen as size_t);
     }
     sshbuf_free(b);
-    free(ktype as *mut libc::c_void);
+    libc::free(ktype as *mut libc::c_void);
     return r;
 }
 pub static mut sshkey_ed25519_funcs: sshkey_impl_funcs = unsafe {

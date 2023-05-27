@@ -26,7 +26,7 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn free(_: *mut libc::c_void);
+
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn EC_KEY_METHOD_get_sign(
         meth: *const EC_KEY_METHOD,
@@ -548,12 +548,12 @@ unsafe extern "C" fn rsa_encrypt(
                         );
                         ret = slen as libc::c_int;
                     }
-                    free(signature as *mut libc::c_void);
+                    libc::free(signature as *mut libc::c_void);
                 }
             }
         }
     }
-    free(blob as *mut libc::c_void);
+    libc::free(blob as *mut libc::c_void);
     sshkey_free(key);
     sshbuf_free(msg);
     return ret;
@@ -681,12 +681,12 @@ unsafe extern "C" fn ecdsa_do_sign(
                     }
                     cp = signature;
                     ret = d2i_ECDSA_SIG(0 as *mut *mut ECDSA_SIG, &mut cp, slen as libc::c_long);
-                    free(signature as *mut libc::c_void);
+                    libc::free(signature as *mut libc::c_void);
                 }
             }
         }
     }
-    free(blob as *mut libc::c_void);
+    libc::free(blob as *mut libc::c_void);
     sshkey_free(key);
     sshbuf_free(msg);
     return ret;
@@ -1047,9 +1047,9 @@ pub unsafe extern "C" fn pkcs11_add_provider(
                 let ref mut fresh1 = *(*labelsp).offset(i as isize);
                 *fresh1 = label;
             } else {
-                free(label as *mut libc::c_void);
+                libc::free(label as *mut libc::c_void);
             }
-            free(blob as *mut libc::c_void);
+            libc::free(blob as *mut libc::c_void);
             i = i.wrapping_add(1);
             i;
         }

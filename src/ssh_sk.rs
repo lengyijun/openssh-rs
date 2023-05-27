@@ -20,7 +20,7 @@ extern "C" {
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn EC_POINT_new(group: *const EC_GROUP) -> *mut EC_POINT;
     fn EC_POINT_free(point: *mut EC_POINT);
     fn EC_KEY_new_by_curve_name(nid: libc::c_int) -> *mut EC_KEY;
@@ -234,11 +234,11 @@ unsafe extern "C" fn sshsk_free(mut p: *mut sshsk_provider) {
     if p.is_null() {
         return;
     }
-    free((*p).path as *mut libc::c_void);
+    libc::free((*p).path as *mut libc::c_void);
     if !((*p).dlhandle).is_null() {
         dlclose((*p).dlhandle);
     }
-    free(p as *mut libc::c_void);
+    libc::free(p as *mut libc::c_void);
 }
 unsafe extern "C" fn sshsk_open(mut path: *const libc::c_char) -> *mut sshsk_provider {
     let mut ret: *mut sshsk_provider = 0 as *mut sshsk_provider;
@@ -854,13 +854,13 @@ unsafe extern "C" fn sshsk_free_options(mut opts: *mut *mut sk_option) {
     }
     i = 0 as libc::c_int as size_t;
     while !(*opts.offset(i as isize)).is_null() {
-        free((**opts.offset(i as isize)).name as *mut libc::c_void);
-        free((**opts.offset(i as isize)).value as *mut libc::c_void);
-        free(*opts.offset(i as isize) as *mut libc::c_void);
+        libc::free((**opts.offset(i as isize)).name as *mut libc::c_void);
+        libc::free((**opts.offset(i as isize)).value as *mut libc::c_void);
+        libc::free(*opts.offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free(opts as *mut libc::c_void);
+    libc::free(opts as *mut libc::c_void);
 }
 unsafe extern "C" fn sshsk_add_option(
     mut optsp: *mut *mut *mut sk_option,
@@ -1571,7 +1571,7 @@ unsafe extern "C" fn sshsk_free_sk_resident_keys(
     }
     i = 0 as libc::c_int as size_t;
     while i < nrks {
-        free((**rks.offset(i as isize)).application as *mut libc::c_void);
+        libc::free((**rks.offset(i as isize)).application as *mut libc::c_void);
         freezero(
             (**rks.offset(i as isize)).user_id as *mut libc::c_void,
             (**rks.offset(i as isize)).user_id_len,
@@ -1599,7 +1599,7 @@ unsafe extern "C" fn sshsk_free_sk_resident_keys(
         i = i.wrapping_add(1);
         i;
     }
-    free(rks as *mut libc::c_void);
+    libc::free(rks as *mut libc::c_void);
 }
 unsafe extern "C" fn sshsk_free_resident_key(mut srk: *mut sshsk_resident_key) {
     if srk.is_null() {
@@ -1607,7 +1607,7 @@ unsafe extern "C" fn sshsk_free_resident_key(mut srk: *mut sshsk_resident_key) {
     }
     sshkey_free((*srk).key);
     freezero((*srk).user_id as *mut libc::c_void, (*srk).user_id_len);
-    free(srk as *mut libc::c_void);
+    libc::free(srk as *mut libc::c_void);
 }
 pub unsafe extern "C" fn sshsk_free_resident_keys(
     mut srks: *mut *mut sshsk_resident_key,
@@ -1623,7 +1623,7 @@ pub unsafe extern "C" fn sshsk_free_resident_keys(
         i = i.wrapping_add(1);
         i;
     }
-    free(srks as *mut libc::c_void);
+    libc::free(srks as *mut libc::c_void);
 }
 pub unsafe extern "C" fn sshsk_load_resident(
     mut provider_path: *const libc::c_char,

@@ -19,7 +19,6 @@ extern "C" {
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
-    fn free(_: *mut libc::c_void);
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
@@ -721,7 +720,7 @@ unsafe extern "C" fn format_key(mut key: *const sshkey) -> *mut libc::c_char {
         sshkey_type(key),
         fp,
     );
-    free(fp as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn userauth_pubkey(
@@ -878,7 +877,7 @@ unsafe extern "C" fn userauth_pubkey(
             keystring,
         );
         sshbuf_free(pkbuf);
-        free(keystring as *mut libc::c_void);
+        libc::free(keystring as *mut libc::c_void);
     }
     pktype = sshkey_type_from_name(pkalg);
     if pktype == KEY_UNSPEC as libc::c_int {
@@ -1466,12 +1465,12 @@ unsafe extern "C" fn userauth_pubkey(
     sshauthopt_free(authopts);
     sshkey_free(key);
     sshkey_free(hostkey);
-    free(userstyle as *mut libc::c_void);
-    free(pkalg as *mut libc::c_void);
-    free(pkblob as *mut libc::c_void);
-    free(key_s as *mut libc::c_void);
-    free(ca_s as *mut libc::c_void);
-    free(sig as *mut libc::c_void);
+    libc::free(userstyle as *mut libc::c_void);
+    libc::free(pkalg as *mut libc::c_void);
+    libc::free(pkblob as *mut libc::c_void);
+    libc::free(key_s as *mut libc::c_void);
+    libc::free(ca_s as *mut libc::c_void);
+    libc::free(sig as *mut libc::c_void);
     sshkey_sig_details_free(sig_details);
     return authenticated;
 }
@@ -1735,7 +1734,7 @@ unsafe extern "C" fn match_principals_command(
                                     b"percent_expand failed\0" as *const u8 as *const libc::c_char,
                                 );
                             }
-                            free(*av.offset(i as isize) as *mut libc::c_void);
+                            libc::free(*av.offset(i as isize) as *mut libc::c_void);
                             let ref mut fresh0 = *av.offset(i as isize);
                             *fresh0 = tmp;
                             i += 1;
@@ -1788,20 +1787,20 @@ unsafe extern "C" fn match_principals_command(
     ssh_signal(17 as libc::c_int, osigchld);
     i = 0 as libc::c_int;
     while i < ac {
-        free(*av.offset(i as isize) as *mut libc::c_void);
+        libc::free(*av.offset(i as isize) as *mut libc::c_void);
         i += 1;
         i;
     }
-    free(av as *mut libc::c_void);
+    libc::free(av as *mut libc::c_void);
     if uid_swapped != 0 {
         restore_uid();
     }
-    free(command as *mut libc::c_void);
-    free(username as *mut libc::c_void);
-    free(ca_fp as *mut libc::c_void);
-    free(key_fp as *mut libc::c_void);
-    free(catext as *mut libc::c_void);
-    free(keytext as *mut libc::c_void);
+    libc::free(command as *mut libc::c_void);
+    libc::free(username as *mut libc::c_void);
+    libc::free(ca_fp as *mut libc::c_void);
+    libc::free(key_fp as *mut libc::c_void);
+    libc::free(catext as *mut libc::c_void);
+    libc::free(keytext as *mut libc::c_void);
     return found_principal;
 }
 unsafe extern "C" fn user_cert_trusted_ca(
@@ -2001,8 +2000,8 @@ unsafe extern "C" fn user_cert_trusted_ca(
     sshauthopt_free(principals_opts);
     sshauthopt_free(cert_opts);
     sshauthopt_free(final_opts);
-    free(principals_file as *mut libc::c_void);
-    free(ca_fp as *mut libc::c_void);
+    libc::free(principals_file as *mut libc::c_void);
+    libc::free(ca_fp as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn user_key_allowed2(
@@ -2212,7 +2211,7 @@ unsafe extern "C" fn user_key_command_allowed2(
                             b"percent_expand failed\0" as *const u8 as *const libc::c_char,
                         );
                     }
-                    free(*av.offset(i as isize) as *mut libc::c_void);
+                    libc::free(*av.offset(i as isize) as *mut libc::c_void);
                     let ref mut fresh1 = *av.offset(i as isize);
                     *fresh1 = tmp;
                     i += 1;
@@ -2229,7 +2228,7 @@ unsafe extern "C" fn user_key_command_allowed2(
                     *fresh2 = xstrdup((*user_pw).pw_name);
                     let ref mut fresh3 = *av.offset(2 as libc::c_int as isize);
                     *fresh3 = 0 as *mut libc::c_char;
-                    free(command as *mut libc::c_void);
+                    libc::free(command as *mut libc::c_void);
                     xasprintf(
                         &mut command as *mut *mut libc::c_char,
                         b"%s %s\0" as *const u8 as *const libc::c_char,
@@ -2282,18 +2281,18 @@ unsafe extern "C" fn user_key_command_allowed2(
     ssh_signal(17 as libc::c_int, osigchld);
     i = 0 as libc::c_int;
     while i < ac {
-        free(*av.offset(i as isize) as *mut libc::c_void);
+        libc::free(*av.offset(i as isize) as *mut libc::c_void);
         i += 1;
         i;
     }
-    free(av as *mut libc::c_void);
+    libc::free(av as *mut libc::c_void);
     if uid_swapped != 0 {
         restore_uid();
     }
-    free(command as *mut libc::c_void);
-    free(username as *mut libc::c_void);
-    free(key_fp as *mut libc::c_void);
-    free(keytext as *mut libc::c_void);
+    libc::free(command as *mut libc::c_void);
+    libc::free(username as *mut libc::c_void);
+    libc::free(key_fp as *mut libc::c_void);
+    libc::free(keytext as *mut libc::c_void);
     return found_key;
 }
 pub unsafe extern "C" fn user_key_allowed(
@@ -2327,7 +2326,7 @@ pub unsafe extern "C" fn user_key_allowed(
         {
             file = expand_authorized_keys(*(options.authorized_keys_files).offset(i as isize), pw);
             success = user_key_allowed2(pw, key, file, remote_ip, remote_host, &mut opts) as u_int;
-            free(file as *mut libc::c_void);
+            libc::free(file as *mut libc::c_void);
             if success == 0 {
                 sshauthopt_free(opts);
                 opts = 0 as *mut sshauthopt;

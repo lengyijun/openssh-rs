@@ -4,7 +4,7 @@ extern "C" {
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
@@ -87,7 +87,7 @@ pub unsafe extern "C" fn sshbuf_new() -> *mut sshbuf {
     (*ret).d = calloc(1 as libc::c_int as libc::c_ulong, (*ret).alloc) as *mut u_char;
     (*ret).cd = (*ret).d;
     if ((*ret).cd).is_null() {
-        free(ret as *mut libc::c_void);
+        libc::free(ret as *mut libc::c_void);
         return 0 as *mut sshbuf;
     }
     return ret;
@@ -167,7 +167,7 @@ pub unsafe extern "C" fn sshbuf_free(mut buf: *mut sshbuf) {
     (*buf).parent = 0 as *mut sshbuf;
     if (*buf).readonly == 0 {
         explicit_bzero((*buf).d as *mut libc::c_void, (*buf).alloc);
-        free((*buf).d as *mut libc::c_void);
+        libc::free((*buf).d as *mut libc::c_void);
     }
     freezero(
         buf as *mut libc::c_void,

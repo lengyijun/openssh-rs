@@ -26,7 +26,7 @@ extern "C" {
     fn isblank(_: libc::c_int) -> libc::c_int;
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn reallocarray(__ptr: *mut libc::c_void, __nmemb: size_t, __size: size_t)
         -> *mut libc::c_void;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
@@ -798,7 +798,7 @@ unsafe extern "C" fn glob0(
                 i = i.wrapping_add(1);
                 i;
             }
-            free(path_stat as *mut libc::c_void);
+            libc::free(path_stat as *mut libc::c_void);
         } else {
             qsort(
                 ((*pglob).gl_pathv)
@@ -1244,7 +1244,7 @@ unsafe extern "C" fn globextend(
                             copy = libc::malloc(len as usize) as *mut libc::c_char;
                             if !copy.is_null() {
                                 if g_Ctoc(path, copy, len) != 0 {
-                                    free(copy as *mut libc::c_void);
+                                    libc::free(copy as *mut libc::c_void);
                                     return -(1 as libc::c_int);
                                 }
                                 let fresh58 = (*pglob).gl_pathc;
@@ -1283,20 +1283,20 @@ unsafe extern "C" fn globextend(
     i = (*pglob).gl_offs;
     while i < newn.wrapping_sub(2 as libc::c_int as libc::c_ulong) {
         if !((*pglob).gl_pathv).is_null() && !(*((*pglob).gl_pathv).offset(i as isize)).is_null() {
-            free(*((*pglob).gl_pathv).offset(i as isize) as *mut libc::c_void);
+            libc::free(*((*pglob).gl_pathv).offset(i as isize) as *mut libc::c_void);
         }
         if (*pglob).gl_flags & 0x4000 as libc::c_int != 0 as libc::c_int
             && !((*pglob).gl_pathv).is_null()
             && !(*((*pglob).gl_pathv).offset(i as isize)).is_null()
         {
-            free(*((*pglob).gl_statv).offset(i as isize) as *mut libc::c_void);
+            libc::free(*((*pglob).gl_statv).offset(i as isize) as *mut libc::c_void);
         }
         i = i.wrapping_add(1);
         i;
     }
-    free((*pglob).gl_pathv as *mut libc::c_void);
+    libc::free((*pglob).gl_pathv as *mut libc::c_void);
     (*pglob).gl_pathv = 0 as *mut *mut libc::c_char;
-    free((*pglob).gl_statv as *mut libc::c_void);
+    libc::free((*pglob).gl_statv as *mut libc::c_void);
     (*pglob).gl_statv = 0 as *mut *mut stat;
     return -(1 as libc::c_int);
 }
@@ -1436,21 +1436,21 @@ pub unsafe extern "C" fn _ssh__compat_globfree(mut pglob: *mut _ssh_compat_glob_
             if !(fresh66 != 0) {
                 break;
             }
-            free(*pp as *mut libc::c_void);
+            libc::free(*pp as *mut libc::c_void);
             pp = pp.offset(1);
             pp;
         }
-        free((*pglob).gl_pathv as *mut libc::c_void);
+        libc::free((*pglob).gl_pathv as *mut libc::c_void);
         (*pglob).gl_pathv = 0 as *mut *mut libc::c_char;
     }
     if !((*pglob).gl_statv).is_null() {
         i = 0 as libc::c_int as size_t;
         while i < (*pglob).gl_pathc {
-            free(*((*pglob).gl_statv).offset(i as isize) as *mut libc::c_void);
+            libc::free(*((*pglob).gl_statv).offset(i as isize) as *mut libc::c_void);
             i = i.wrapping_add(1);
             i;
         }
-        free((*pglob).gl_statv as *mut libc::c_void);
+        libc::free((*pglob).gl_statv as *mut libc::c_void);
         (*pglob).gl_statv = 0 as *mut *mut stat;
     }
 }

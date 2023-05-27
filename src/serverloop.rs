@@ -73,7 +73,7 @@ extern "C" {
     fn ssh_packet_have_data_to_write(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_write_poll(_: *mut ssh) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
+
     fn ssh_packet_send_debug(_: *mut ssh, fmt: *const libc::c_char, _: ...);
     fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
     fn ssh_packet_process_read(_: *mut ssh, _: libc::c_int) -> libc::c_int;
@@ -1354,7 +1354,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
         }
     }
     collect_children(ssh);
-    free(pfd as *mut libc::c_void);
+    libc::free(pfd as *mut libc::c_void);
     channel_free_all(ssh);
     session_destroy_all(ssh, None);
 }
@@ -1499,8 +1499,8 @@ unsafe extern "C" fn server_request_direct_tcpip(
             }
         }
     }
-    free(originator as *mut libc::c_void);
-    free(target as *mut libc::c_void);
+    libc::free(originator as *mut libc::c_void);
+    libc::free(target as *mut libc::c_void);
     return c;
 }
 unsafe extern "C" fn server_request_direct_streamlocal(mut ssh: *mut ssh) -> *mut Channel {
@@ -1610,8 +1610,8 @@ unsafe extern "C" fn server_request_direct_streamlocal(mut ssh: *mut ssh) -> *mu
             );
         }
     }
-    free(originator as *mut libc::c_void);
-    free(target as *mut libc::c_void);
+    libc::free(originator as *mut libc::c_void);
+    libc::free(target as *mut libc::c_void);
     return c;
 }
 unsafe extern "C" fn server_request_tun(mut ssh: *mut ssh) -> *mut Channel {
@@ -1761,8 +1761,8 @@ unsafe extern "C" fn server_request_tun(mut ssh: *mut ssh) -> *mut Channel {
                         },
                         ifname,
                     );
-                    free(tmp as *mut libc::c_void);
-                    free(ifname as *mut libc::c_void);
+                    libc::free(tmp as *mut libc::c_void);
+                    libc::free(ifname as *mut libc::c_void);
                 }
             }
         }
@@ -1831,7 +1831,7 @@ unsafe extern "C" fn server_request_session(mut ssh: *mut ssh) -> *mut Channel {
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
-            b"session open failed, free channel %d\0" as *const u8 as *const libc::c_char,
+            b"session open failed, libc::free channel %d\0" as *const u8 as *const libc::c_char,
             (*c).self_0,
         );
         channel_free(ssh, c);
@@ -2035,7 +2035,7 @@ unsafe extern "C" fn server_input_channel_open(
             );
         }
     }
-    free(ctype as *mut libc::c_void);
+    libc::free(ctype as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn server_input_hostkeys_prove(
@@ -2150,7 +2150,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
                     break;
                 } else {
                     sshbuf_reset(sigbuf);
-                    free(sig as *mut libc::c_void);
+                    libc::free(sig as *mut libc::c_void);
                     sig = 0 as *mut u_char;
                     sigalg = 0 as *const libc::c_char;
                     if sshkey_type_plain((*key).type_0) == KEY_RSA as libc::c_int {
@@ -2241,7 +2241,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
         }
         _ => {}
     }
-    free(sig as *mut libc::c_void);
+    libc::free(sig as *mut libc::c_void);
     sshbuf_free(resp);
     sshbuf_free(sigbuf);
     sshkey_free(key);
@@ -2575,9 +2575,9 @@ unsafe extern "C" fn server_input_global_request(
             );
         }
     }
-    free(fwd.listen_host as *mut libc::c_void);
-    free(fwd.listen_path as *mut libc::c_void);
-    free(rtype as *mut libc::c_void);
+    libc::free(fwd.listen_host as *mut libc::c_void);
+    libc::free(fwd.listen_path as *mut libc::c_void);
+    libc::free(rtype as *mut libc::c_void);
     sshbuf_free(resp);
     return 0 as libc::c_int;
 }
@@ -2709,7 +2709,7 @@ unsafe extern "C" fn server_input_channel_req(
             );
         }
     }
-    free(rtype as *mut libc::c_void);
+    libc::free(rtype as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {

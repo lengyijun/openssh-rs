@@ -12,7 +12,7 @@ extern "C" {
     pub type sshcipher;
     pub type session_state;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn free(_: *mut libc::c_void);
+
     fn sshkey_verify(
         _: *const sshkey,
         _: *const u_char,
@@ -626,7 +626,7 @@ unsafe extern "C" fn input_kex_gen_reply(
         ::core::mem::size_of::<[u_char; 1763]>() as libc::c_ulong,
     );
     sshbuf_free(server_host_key_blob);
-    free(signature as *mut libc::c_void);
+    libc::free(signature as *mut libc::c_void);
     sshbuf_free(tmp);
     sshkey_free(server_host_key);
     sshbuf_free(server_blob);
@@ -806,7 +806,7 @@ unsafe extern "C" fn input_kex_gen_init(
         ::core::mem::size_of::<[u_char; 64]>() as libc::c_ulong,
     );
     sshbuf_free(server_host_key_blob);
-    free(signature as *mut libc::c_void);
+    libc::free(signature as *mut libc::c_void);
     sshbuf_free(shared_secret);
     sshbuf_free(client_pubkey);
     sshbuf_free(server_pubkey);

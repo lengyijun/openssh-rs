@@ -83,7 +83,7 @@ extern "C" {
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn exit(_: libc::c_int) -> !;
-    fn free(_: *mut libc::c_void);
+
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -773,7 +773,7 @@ unsafe extern "C" fn request_permitted(mut h: *const sftp_handler) -> libc::c_in
         result = match_list((*h).name, request_denylist, 0 as *mut u_int);
         !result.is_null()
     } {
-        free(result as *mut libc::c_void);
+        libc::free(result as *mut libc::c_void);
         crate::log::sshlog(
             b"sftp-server.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"request_permitted\0"))
@@ -791,7 +791,7 @@ unsafe extern "C" fn request_permitted(mut h: *const sftp_handler) -> libc::c_in
         result = match_list((*h).name, request_allowlist, 0 as *mut u_int);
         !result.is_null()
     } {
-        free(result as *mut libc::c_void);
+        libc::free(result as *mut libc::c_void);
         crate::log::sshlog(
             b"sftp-server.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"request_permitted\0"))
@@ -1091,11 +1091,11 @@ unsafe extern "C" fn handle_close(mut handle: libc::c_int) -> libc::c_int {
     let mut ret: libc::c_int = -(1 as libc::c_int);
     if handle_is_ok(handle, HANDLE_FILE as libc::c_int) != 0 {
         ret = close((*handles.offset(handle as isize)).fd);
-        free((*handles.offset(handle as isize)).name as *mut libc::c_void);
+        libc::free((*handles.offset(handle as isize)).name as *mut libc::c_void);
         handle_unused(handle);
     } else if handle_is_ok(handle, HANDLE_DIR as libc::c_int) != 0 {
         ret = closedir((*handles.offset(handle as isize)).dirp);
-        free((*handles.offset(handle as isize)).name as *mut libc::c_void);
+        libc::free((*handles.offset(handle as isize)).name as *mut libc::c_void);
         handle_unused(handle);
     } else {
         *libc::__errno_location() = 2 as libc::c_int;
@@ -1177,7 +1177,7 @@ unsafe extern "C" fn get_handle(mut queue: *mut sshbuf, mut hp: *mut libc::c_int
     if hlen < 256 as libc::c_int as libc::c_ulong {
         *hp = handle_from_string(handle, hlen as u_int);
     }
-    free(handle as *mut libc::c_void);
+    libc::free(handle as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn send_msg(mut m: *mut sshbuf) {
@@ -1393,7 +1393,7 @@ unsafe extern "C" fn send_handle(mut id: u_int32_t, mut handle: libc::c_int) {
         handle,
     );
     send_data_or_handle(102 as libc::c_int as libc::c_char, id, string, hlen);
-    free(string as *mut libc::c_void);
+    libc::free(string as *mut libc::c_void);
 }
 unsafe extern "C" fn send_names(mut id: u_int32_t, mut count: libc::c_int, mut stats: *const Stat) {
     let mut msg: *mut sshbuf = 0 as *mut sshbuf;
@@ -1876,7 +1876,7 @@ unsafe extern "C" fn process_open(mut id: u_int32_t) {
     if status != 0 as libc::c_int {
         send_status(id, status as u_int32_t);
     }
-    free(name as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
 }
 unsafe extern "C" fn process_close(mut id: u_int32_t) {
     let mut r: libc::c_int = 0;
@@ -2165,7 +2165,7 @@ unsafe extern "C" fn process_write(mut id: u_int32_t) {
         }
     }
     send_status(id, status as u_int32_t);
-    free(data as *mut libc::c_void);
+    libc::free(data as *mut libc::c_void);
 }
 unsafe extern "C" fn process_do_stat(mut id: u_int32_t, mut do_lstat: libc::c_int) {
     let mut a: Attrib = Attrib {
@@ -2264,7 +2264,7 @@ unsafe extern "C" fn process_do_stat(mut id: u_int32_t, mut do_lstat: libc::c_in
     if status != 0 as libc::c_int {
         send_status(id, status as u_int32_t);
     }
-    free(name as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
 }
 unsafe extern "C" fn process_stat(mut id: u_int32_t) {
     process_do_stat(id, 0 as libc::c_int);
@@ -2496,7 +2496,7 @@ unsafe extern "C" fn process_setstat(mut id: u_int32_t) {
         }
     }
     send_status(id, status as u_int32_t);
-    free(name as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
 }
 unsafe extern "C" fn process_fsetstat(mut id: u_int32_t) {
     let mut a: Attrib = Attrib {
@@ -2688,7 +2688,7 @@ unsafe extern "C" fn process_opendir(mut id: u_int32_t) {
     if status != 0 as libc::c_int {
         send_status(id, status as u_int32_t);
     }
-    free(path as *mut libc::c_void);
+    libc::free(path as *mut libc::c_void);
 }
 unsafe extern "C" fn process_readdir(mut id: u_int32_t) {
     let mut dirp: *mut DIR = 0 as *mut DIR;
@@ -2811,15 +2811,15 @@ unsafe extern "C" fn process_readdir(mut id: u_int32_t) {
             send_names(id, count, stats);
             i = 0 as libc::c_int;
             while i < count {
-                free((*stats.offset(i as isize)).name as *mut libc::c_void);
-                free((*stats.offset(i as isize)).long_name as *mut libc::c_void);
+                libc::free((*stats.offset(i as isize)).name as *mut libc::c_void);
+                libc::free((*stats.offset(i as isize)).long_name as *mut libc::c_void);
                 i += 1;
                 i;
             }
         } else {
             send_status(id, 1 as libc::c_int as u_int32_t);
         }
-        free(stats as *mut libc::c_void);
+        libc::free(stats as *mut libc::c_void);
     };
 }
 unsafe extern "C" fn process_remove(mut id: u_int32_t) {
@@ -2866,7 +2866,7 @@ unsafe extern "C" fn process_remove(mut id: u_int32_t) {
         0 as libc::c_int
     };
     send_status(id, status as u_int32_t);
-    free(name as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
 }
 unsafe extern "C" fn process_mkdir(mut id: u_int32_t) {
     let mut a: Attrib = Attrib {
@@ -2931,7 +2931,7 @@ unsafe extern "C" fn process_mkdir(mut id: u_int32_t) {
         0 as libc::c_int
     };
     send_status(id, status as u_int32_t);
-    free(name as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
 }
 unsafe extern "C" fn process_rmdir(mut id: u_int32_t) {
     let mut name: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -2977,7 +2977,7 @@ unsafe extern "C" fn process_rmdir(mut id: u_int32_t) {
         0 as libc::c_int
     };
     send_status(id, status as u_int32_t);
-    free(name as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
 }
 unsafe extern "C" fn process_realpath(mut id: u_int32_t) {
     let mut resolvedname: [libc::c_char; 4096] = [0; 4096];
@@ -2997,7 +2997,7 @@ unsafe extern "C" fn process_realpath(mut id: u_int32_t) {
         );
     }
     if *path.offset(0 as libc::c_int as isize) as libc::c_int == '\0' as i32 {
-        free(path as *mut libc::c_void);
+        libc::free(path as *mut libc::c_void);
         path = xstrdup(b".\0" as *const u8 as *const libc::c_char);
     }
     crate::log::sshlog(
@@ -3044,7 +3044,7 @@ unsafe extern "C" fn process_realpath(mut id: u_int32_t) {
         s.name = s.long_name;
         send_names(id, 1 as libc::c_int, &mut s);
     }
-    free(path as *mut libc::c_void);
+    libc::free(path as *mut libc::c_void);
 }
 unsafe extern "C" fn process_rename(mut id: u_int32_t) {
     let mut oldpath: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -3176,8 +3176,8 @@ unsafe extern "C" fn process_rename(mut id: u_int32_t) {
         }
     }
     send_status(id, status as u_int32_t);
-    free(oldpath as *mut libc::c_void);
-    free(newpath as *mut libc::c_void);
+    libc::free(oldpath as *mut libc::c_void);
+    libc::free(newpath as *mut libc::c_void);
 }
 unsafe extern "C" fn process_readlink(mut id: u_int32_t) {
     let mut r: libc::c_int = 0;
@@ -3248,7 +3248,7 @@ unsafe extern "C" fn process_readlink(mut id: u_int32_t) {
         s.name = s.long_name;
         send_names(id, 1 as libc::c_int, &mut s);
     }
-    free(path as *mut libc::c_void);
+    libc::free(path as *mut libc::c_void);
 }
 unsafe extern "C" fn process_symlink(mut id: u_int32_t) {
     let mut oldpath: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -3299,8 +3299,8 @@ unsafe extern "C" fn process_symlink(mut id: u_int32_t) {
         0 as libc::c_int
     };
     send_status(id, status as u_int32_t);
-    free(oldpath as *mut libc::c_void);
-    free(newpath as *mut libc::c_void);
+    libc::free(oldpath as *mut libc::c_void);
+    libc::free(newpath as *mut libc::c_void);
 }
 unsafe extern "C" fn process_extended_posix_rename(mut id: u_int32_t) {
     let mut oldpath: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -3359,8 +3359,8 @@ unsafe extern "C" fn process_extended_posix_rename(mut id: u_int32_t) {
         0 as libc::c_int
     };
     send_status(id, status as u_int32_t);
-    free(oldpath as *mut libc::c_void);
-    free(newpath as *mut libc::c_void);
+    libc::free(oldpath as *mut libc::c_void);
+    libc::free(newpath as *mut libc::c_void);
 }
 unsafe extern "C" fn process_extended_statvfs(mut id: u_int32_t) {
     let mut path: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -3424,7 +3424,7 @@ unsafe extern "C" fn process_extended_statvfs(mut id: u_int32_t) {
     } else {
         send_statvfs(id, &mut st);
     }
-    free(path as *mut libc::c_void);
+    libc::free(path as *mut libc::c_void);
 }
 unsafe extern "C" fn process_extended_fstatvfs(mut id: u_int32_t) {
     let mut r: libc::c_int = 0;
@@ -3539,8 +3539,8 @@ unsafe extern "C" fn process_extended_hardlink(mut id: u_int32_t) {
         0 as libc::c_int
     };
     send_status(id, status as u_int32_t);
-    free(oldpath as *mut libc::c_void);
-    free(newpath as *mut libc::c_void);
+    libc::free(oldpath as *mut libc::c_void);
+    libc::free(newpath as *mut libc::c_void);
 }
 unsafe extern "C" fn process_extended_fsync(mut id: u_int32_t) {
     let mut handle: libc::c_int = 0;
@@ -3731,7 +3731,7 @@ unsafe extern "C" fn process_extended_lsetstat(mut id: u_int32_t) {
         }
     }
     send_status(id, status as u_int32_t);
-    free(name as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
 }
 unsafe extern "C" fn process_extended_limits(mut id: u_int32_t) {
     let mut msg: *mut sshbuf = 0 as *mut sshbuf;
@@ -3878,12 +3878,12 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
             path,
         );
         if *path.offset(0 as libc::c_int as isize) as libc::c_int == '\0' as i32 {
-            free(path as *mut libc::c_void);
+            libc::free(path as *mut libc::c_void);
             path = xstrdup(b".\0" as *const u8 as *const libc::c_char);
             current_block = 17478428563724192186;
         } else if *path as libc::c_int == '~' as i32 {
             if strcmp(path, b"~\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
-                free(path as *mut libc::c_void);
+                libc::free(path as *mut libc::c_void);
                 path = xstrdup(cwd.as_mut_ptr());
                 current_block = 17478428563724192186;
             } else if strncmp(
@@ -3893,14 +3893,14 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
             ) == 0 as libc::c_int
             {
                 npath = xstrdup(path.offset(2 as libc::c_int as isize));
-                free(path as *mut libc::c_void);
+                libc::free(path as *mut libc::c_void);
                 xasprintf(
                     &mut path as *mut *mut libc::c_char,
                     b"%s/%s\0" as *const u8 as *const libc::c_char,
                     cwd.as_mut_ptr(),
                     npath,
                 );
-                free(npath as *mut libc::c_void);
+                libc::free(npath as *mut libc::c_void);
                 current_block = 17478428563724192186;
             } else if tilde_expand(path, (*pw).pw_uid, &mut npath) != 0 as libc::c_int {
                 send_status_errmsg(
@@ -3910,7 +3910,7 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
                 );
                 current_block = 813749795042461419;
             } else {
-                free(path as *mut libc::c_void);
+                libc::free(path as *mut libc::c_void);
                 path = npath;
                 current_block = 17478428563724192186;
             }
@@ -3922,7 +3922,7 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
                     cwd.as_mut_ptr(),
                     path,
                 );
-                free(path as *mut libc::c_void);
+                libc::free(path as *mut libc::c_void);
                 path = npath;
             }
             current_block = 17478428563724192186;
@@ -3957,7 +3957,7 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
             }
         }
     }
-    free(path as *mut libc::c_void);
+    libc::free(path as *mut libc::c_void);
 }
 unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
     let mut buf: [u_char; 65536] = [0; 65536];
@@ -4260,7 +4260,7 @@ unsafe extern "C" fn process_extended_home_directory(mut id: u_int32_t) {
         s.name = s.long_name;
         send_names(id, 1 as libc::c_int, &mut s);
     }
-    free(username as *mut libc::c_void);
+    libc::free(username as *mut libc::c_void);
 }
 unsafe extern "C" fn process_extended_get_users_groups_by_id(mut id: u_int32_t) {
     let mut user_pw: *mut passwd = 0 as *mut passwd;
@@ -4524,7 +4524,7 @@ unsafe extern "C" fn process_extended(mut id: u_int32_t) {
     } else {
         ((*exthand).handler).expect("non-null function pointer")(id);
     }
-    free(request as *mut libc::c_void);
+    libc::free(request as *mut libc::c_void);
 }
 unsafe extern "C" fn process() {
     let mut msg_len: u_int = 0;

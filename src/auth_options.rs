@@ -9,7 +9,7 @@ extern "C" {
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
@@ -173,11 +173,11 @@ unsafe extern "C" fn dup_strings(
         if (*fresh0).is_null() {
             j = 0 as libc::c_int as size_t;
             while j < i {
-                free(*dst.offset(j as isize) as *mut libc::c_void);
+                libc::free(*dst.offset(j as isize) as *mut libc::c_void);
                 j = j.wrapping_add(1);
                 j;
             }
-            free(dst as *mut libc::c_void);
+            libc::free(dst as *mut libc::c_void);
             return -(1 as libc::c_int);
         }
         i = i.wrapping_add(1);
@@ -346,7 +346,7 @@ unsafe extern "C" fn cert_option_list(
                                 b"Certificate has multiple force-command options\0" as *const u8
                                     as *const libc::c_char,
                             );
-                            free(command as *mut libc::c_void);
+                            libc::free(command as *mut libc::c_void);
                             current_block = 10905793257652027281;
                             break;
                         } else {
@@ -390,7 +390,7 @@ unsafe extern "C" fn cert_option_list(
                                 b"Certificate has multiple source-address options\0" as *const u8
                                     as *const libc::c_char,
                             );
-                            free(allowed as *mut libc::c_void);
+                            libc::free(allowed as *mut libc::c_void);
                             current_block = 10905793257652027281;
                             break;
                         } else if addr_match_cidr_list(0 as *const libc::c_char, allowed)
@@ -469,7 +469,7 @@ unsafe extern "C" fn cert_option_list(
                     current_block = 10905793257652027281;
                     break;
                 }
-                free(name as *mut libc::c_void);
+                libc::free(name as *mut libc::c_void);
                 name = 0 as *mut libc::c_char;
             }
         }
@@ -480,7 +480,7 @@ unsafe extern "C" fn cert_option_list(
             }
         }
     }
-    free(name as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
     sshbuf_free(data);
     sshbuf_free(c);
     return ret;
@@ -502,31 +502,31 @@ pub unsafe extern "C" fn sshauthopt_free(mut opts: *mut sshauthopt) {
     if opts.is_null() {
         return;
     }
-    free((*opts).cert_principals as *mut libc::c_void);
-    free((*opts).force_command as *mut libc::c_void);
-    free((*opts).required_from_host_cert as *mut libc::c_void);
-    free((*opts).required_from_host_keys as *mut libc::c_void);
+    libc::free((*opts).cert_principals as *mut libc::c_void);
+    libc::free((*opts).force_command as *mut libc::c_void);
+    libc::free((*opts).required_from_host_cert as *mut libc::c_void);
+    libc::free((*opts).required_from_host_keys as *mut libc::c_void);
     i = 0 as libc::c_int as size_t;
     while i < (*opts).nenv {
-        free(*((*opts).env).offset(i as isize) as *mut libc::c_void);
+        libc::free(*((*opts).env).offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free((*opts).env as *mut libc::c_void);
+    libc::free((*opts).env as *mut libc::c_void);
     i = 0 as libc::c_int as size_t;
     while i < (*opts).npermitopen {
-        free(*((*opts).permitopen).offset(i as isize) as *mut libc::c_void);
+        libc::free(*((*opts).permitopen).offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free((*opts).permitopen as *mut libc::c_void);
+    libc::free((*opts).permitopen as *mut libc::c_void);
     i = 0 as libc::c_int as size_t;
     while i < (*opts).npermitlisten {
-        free(*((*opts).permitlisten).offset(i as isize) as *mut libc::c_void);
+        libc::free(*((*opts).permitlisten).offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free((*opts).permitlisten as *mut libc::c_void);
+    libc::free((*opts).permitlisten as *mut libc::c_void);
     freezero(
         opts as *mut libc::c_void,
         ::core::mem::size_of::<sshauthopt>() as libc::c_ulong,
@@ -574,24 +574,24 @@ unsafe extern "C" fn handle_permit(
             opt,
         ) == -(1 as libc::c_int)
         {
-            free(opt as *mut libc::c_void);
+            libc::free(opt as *mut libc::c_void);
             *errstrp = b"memory allocation failed\0" as *const u8 as *const libc::c_char;
             return -(1 as libc::c_int);
         }
-        free(opt as *mut libc::c_void);
+        libc::free(opt as *mut libc::c_void);
         opt = tmp;
     }
     tmp = strdup(opt);
     if tmp.is_null() {
-        free(opt as *mut libc::c_void);
+        libc::free(opt as *mut libc::c_void);
         *errstrp = b"memory allocation failed\0" as *const u8 as *const libc::c_char;
         return -(1 as libc::c_int);
     }
     cp = tmp;
     host = hpdelim2(&mut cp, 0 as *mut libc::c_char);
     if host.is_null() || strlen(host) >= 1025 as libc::c_int as libc::c_ulong {
-        free(tmp as *mut libc::c_void);
-        free(opt as *mut libc::c_void);
+        libc::free(tmp as *mut libc::c_void);
+        libc::free(opt as *mut libc::c_void);
         *errstrp = b"invalid permission hostname\0" as *const u8 as *const libc::c_char;
         return -(1 as libc::c_int);
     }
@@ -599,12 +599,12 @@ unsafe extern "C" fn handle_permit(
         || strcmp(cp, b"*\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
             && crate::misc::a2port(cp) <= 0 as libc::c_int
     {
-        free(tmp as *mut libc::c_void);
-        free(opt as *mut libc::c_void);
+        libc::free(tmp as *mut libc::c_void);
+        libc::free(opt as *mut libc::c_void);
         *errstrp = b"invalid permission port\0" as *const u8 as *const libc::c_char;
         return -(1 as libc::c_int);
     }
-    free(tmp as *mut libc::c_void);
+    libc::free(tmp as *mut libc::c_void);
     permits = recallocarray(
         permits as *mut libc::c_void,
         npermits,
@@ -612,7 +612,7 @@ unsafe extern "C" fn handle_permit(
         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
     ) as *mut *mut libc::c_char;
     if permits.is_null() {
-        free(opt as *mut libc::c_void);
+        libc::free(opt as *mut libc::c_void);
         *errstrp = b"memory allocation failed\0" as *const u8 as *const libc::c_char;
         return -(1 as libc::c_int);
     }
@@ -812,13 +812,13 @@ pub unsafe extern "C" fn sshauthopt_parse(
                                                     || valid_before
                                                         == 0 as libc::c_int as libc::c_ulong
                                                 {
-                                                    free(opt as *mut libc::c_void);
+                                                    libc::free(opt as *mut libc::c_void);
                                                     errstr = b"invalid expires time\0" as *const u8
                                                         as *const libc::c_char;
                                                     current_block = 2182509200741687066;
                                                     break;
                                                 } else {
-                                                    free(opt as *mut libc::c_void);
+                                                    libc::free(opt as *mut libc::c_void);
                                                     if (*ret).valid_before
                                                         == 0 as libc::c_int as libc::c_ulong
                                                         || valid_before < (*ret).valid_before
@@ -848,7 +848,7 @@ pub unsafe extern "C" fn sshauthopt_parse(
                                                     }
                                                     tmp = strchr(opt, '=' as i32);
                                                     if tmp.is_null() {
-                                                        free(opt as *mut libc::c_void);
+                                                        libc::free(opt as *mut libc::c_void);
                                                         errstr = b"invalid environment string\0"
                                                             as *const u8
                                                             as *const libc::c_char;
@@ -857,7 +857,7 @@ pub unsafe extern "C" fn sshauthopt_parse(
                                                     } else {
                                                         cp = strdup(opt);
                                                         if cp.is_null() {
-                                                            free(opt as *mut libc::c_void);
+                                                            libc::free(opt as *mut libc::c_void);
                                                             current_block = 1642512663562863647;
                                                             break;
                                                         } else {
@@ -866,8 +866,10 @@ pub unsafe extern "C" fn sshauthopt_parse(
                                                             *cp.offset(l as isize) =
                                                                 '\0' as i32 as libc::c_char;
                                                             if valid_env_name(cp) == 0 {
-                                                                free(cp as *mut libc::c_void);
-                                                                free(opt as *mut libc::c_void);
+                                                                libc::free(cp as *mut libc::c_void);
+                                                                libc::free(
+                                                                    opt as *mut libc::c_void,
+                                                                );
                                                                 errstr =
                                                                     b"invalid environment string\0"
                                                                         as *const u8
@@ -894,7 +896,7 @@ pub unsafe extern "C" fn sshauthopt_parse(
                                                                     i = i.wrapping_add(1);
                                                                     i;
                                                                 }
-                                                                free(cp as *mut libc::c_void);
+                                                                libc::free(cp as *mut libc::c_void);
                                                                 if i >= (*ret).nenv {
                                                                     oarray = (*ret).env;
                                                                     (*ret).env = recallocarray(
@@ -913,7 +915,7 @@ pub unsafe extern "C" fn sshauthopt_parse(
                                                                     )
                                                                         as *mut *mut libc::c_char;
                                                                     if ((*ret).env).is_null() {
-                                                                        free(opt as *mut libc::c_void);
+                                                                        libc::free(opt as *mut libc::c_void);
                                                                         (*ret).env = oarray;
                                                                         current_block =
                                                                             1642512663562863647;
@@ -931,7 +933,9 @@ pub unsafe extern "C" fn sshauthopt_parse(
                                                                             0 as *mut libc::c_char;
                                                                     }
                                                                 }
-                                                                free(opt as *mut libc::c_void);
+                                                                libc::free(
+                                                                    opt as *mut libc::c_void,
+                                                                );
                                                             }
                                                         }
                                                     }
@@ -981,7 +985,7 @@ pub unsafe extern "C" fn sshauthopt_parse(
                                                 }
                                                 (*ret).force_tun_device =
                                                     a2tun(opt, 0 as *mut libc::c_int);
-                                                free(opt as *mut libc::c_void);
+                                                libc::free(opt as *mut libc::c_void);
                                                 if (*ret).force_tun_device
                                                     == 0x7fffffff as libc::c_int - 1 as libc::c_int
                                                 {
@@ -1497,11 +1501,11 @@ unsafe extern "C" fn deserialise_array(
     if !a.is_null() {
         i = 0 as libc::c_int as size_t;
         while i < n {
-            free(*a.offset(i as isize) as *mut libc::c_void);
+            libc::free(*a.offset(i as isize) as *mut libc::c_void);
             i = i.wrapping_add(1);
             i;
         }
-        free(a as *mut libc::c_void);
+        libc::free(a as *mut libc::c_void);
     }
     sshbuf_free(b);
     return r;

@@ -6,7 +6,7 @@ use ::libc;
 extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -122,7 +122,7 @@ unsafe extern "C" fn fudge_opendir(mut path: *const libc::c_char) -> *mut libc::
         ::core::mem::size_of::<SFTP_OPENDIR>() as libc::c_ulong,
     ) as *mut SFTP_OPENDIR;
     if do_readdir(cur.conn, path, &mut (*r).dir) != 0 {
-        free(r as *mut libc::c_void);
+        libc::free(r as *mut libc::c_void);
         return 0 as *mut libc::c_void;
     }
     (*r).offset = 0 as libc::c_int;
@@ -157,7 +157,7 @@ unsafe extern "C" fn fudge_readdir(mut od: *mut SFTP_OPENDIR) -> *mut dirent {
 }
 unsafe extern "C" fn fudge_closedir(mut od: *mut SFTP_OPENDIR) {
     free_sftp_dirents((*od).dir);
-    free(od as *mut libc::c_void);
+    libc::free(od as *mut libc::c_void);
 }
 unsafe extern "C" fn fudge_lstat(mut path: *const libc::c_char, mut st: *mut stat) -> libc::c_int {
     let mut a: *mut Attrib = 0 as *mut Attrib;

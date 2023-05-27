@@ -8,7 +8,7 @@ extern "C" {
         __groups: *mut __gid_t,
         __ngroups: *mut libc::c_int,
     ) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
+
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
@@ -323,7 +323,7 @@ pub unsafe extern "C" fn ga_init(mut user: *const libc::c_char, mut base: gid_t)
         i += 1;
         i;
     }
-    free(groups_bygid as *mut libc::c_void);
+    libc::free(groups_bygid as *mut libc::c_void);
     ngroups = j;
     return ngroups;
 }
@@ -376,12 +376,12 @@ pub unsafe extern "C" fn ga_free() {
     if ngroups > 0 as libc::c_int {
         i = 0 as libc::c_int;
         while i < ngroups {
-            free(*groups_byname.offset(i as isize) as *mut libc::c_void);
+            libc::free(*groups_byname.offset(i as isize) as *mut libc::c_void);
             i += 1;
             i;
         }
         ngroups = 0 as libc::c_int;
-        free(groups_byname as *mut libc::c_void);
+        libc::free(groups_byname as *mut libc::c_void);
         groups_byname = 0 as *mut *mut libc::c_char;
     }
 }

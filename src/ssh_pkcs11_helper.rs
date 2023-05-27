@@ -23,7 +23,7 @@ extern "C" {
     fn ssh_get_progname(_: *mut libc::c_char) -> *mut libc::c_char;
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn seed_rng();
-    fn free(_: *mut libc::c_void);
+
     fn exit(_: libc::c_int) -> !;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -267,10 +267,10 @@ unsafe extern "C" fn del_keys_by_name(mut name: *mut libc::c_char) {
                 pkcs11_keylist.tqh_last = (*ki).next.tqe_prev;
             }
             *(*ki).next.tqe_prev = (*ki).next.tqe_next;
-            free((*ki).providername as *mut libc::c_void);
-            free((*ki).label as *mut libc::c_void);
+            libc::free((*ki).providername as *mut libc::c_void);
+            libc::free((*ki).label as *mut libc::c_void);
             sshkey_free((*ki).key);
-            free(ki as *mut libc::c_void);
+            libc::free(ki as *mut libc::c_void);
         }
         ki = nxt;
     }
@@ -402,9 +402,9 @@ unsafe extern "C" fn process_add() {
                         b"compose key\0" as *const u8 as *const libc::c_char,
                     );
                 }
-                free(blob as *mut libc::c_void);
+                libc::free(blob as *mut libc::c_void);
                 add_key(*keys.offset(i as isize), name, *labels.offset(i as isize));
-                free(*labels.offset(i as isize) as *mut libc::c_void);
+                libc::free(*labels.offset(i as isize) as *mut libc::c_void);
             }
             i += 1;
             i;
@@ -427,10 +427,10 @@ unsafe extern "C" fn process_add() {
             );
         }
     }
-    free(labels as *mut libc::c_void);
-    free(keys as *mut libc::c_void);
-    free(pin as *mut libc::c_void);
-    free(name as *mut libc::c_void);
+    libc::free(labels as *mut libc::c_void);
+    libc::free(keys as *mut libc::c_void);
+    libc::free(pin as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
     send_msg(msg);
     sshbuf_free(msg);
 }
@@ -486,8 +486,8 @@ unsafe extern "C" fn process_del() {
             b"compose\0" as *const u8 as *const libc::c_char,
         );
     }
-    free(pin as *mut libc::c_void);
-    free(name as *mut libc::c_void);
+    libc::free(pin as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
     send_msg(msg);
     sshbuf_free(msg);
 }
@@ -643,9 +643,9 @@ unsafe extern "C" fn process_sign() {
             );
         }
     }
-    free(data as *mut libc::c_void);
-    free(blob as *mut libc::c_void);
-    free(signature as *mut libc::c_void);
+    libc::free(data as *mut libc::c_void);
+    libc::free(blob as *mut libc::c_void);
+    libc::free(signature as *mut libc::c_void);
     send_msg(msg);
     sshbuf_free(msg);
 }

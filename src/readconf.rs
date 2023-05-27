@@ -70,7 +70,7 @@ extern "C" {
     fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
-    fn free(_: *mut libc::c_void);
+
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn ciphers_valid(_: *const libc::c_char) -> libc::c_int;
     fn cipher_alg_list(_: libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -1524,7 +1524,7 @@ pub unsafe extern "C" fn kex_default_pk_alg() -> *const libc::c_char {
                 as *const u8 as *const libc::c_char,
             all_key,
         );
-        free(all_key as *mut libc::c_void);
+        libc::free(all_key as *mut libc::c_void);
     }
     return pkalgs;
 }
@@ -1624,29 +1624,45 @@ unsafe extern "C" fn clear_forwardings(mut options: *mut Options) {
     let mut i: libc::c_int = 0;
     i = 0 as libc::c_int;
     while i < (*options).num_local_forwards {
-        free((*((*options).local_forwards).offset(i as isize)).listen_host as *mut libc::c_void);
-        free((*((*options).local_forwards).offset(i as isize)).listen_path as *mut libc::c_void);
-        free((*((*options).local_forwards).offset(i as isize)).connect_host as *mut libc::c_void);
-        free((*((*options).local_forwards).offset(i as isize)).connect_path as *mut libc::c_void);
+        libc::free(
+            (*((*options).local_forwards).offset(i as isize)).listen_host as *mut libc::c_void,
+        );
+        libc::free(
+            (*((*options).local_forwards).offset(i as isize)).listen_path as *mut libc::c_void,
+        );
+        libc::free(
+            (*((*options).local_forwards).offset(i as isize)).connect_host as *mut libc::c_void,
+        );
+        libc::free(
+            (*((*options).local_forwards).offset(i as isize)).connect_path as *mut libc::c_void,
+        );
         i += 1;
         i;
     }
     if (*options).num_local_forwards > 0 as libc::c_int {
-        free((*options).local_forwards as *mut libc::c_void);
+        libc::free((*options).local_forwards as *mut libc::c_void);
         (*options).local_forwards = 0 as *mut Forward;
     }
     (*options).num_local_forwards = 0 as libc::c_int;
     i = 0 as libc::c_int;
     while i < (*options).num_remote_forwards {
-        free((*((*options).remote_forwards).offset(i as isize)).listen_host as *mut libc::c_void);
-        free((*((*options).remote_forwards).offset(i as isize)).listen_path as *mut libc::c_void);
-        free((*((*options).remote_forwards).offset(i as isize)).connect_host as *mut libc::c_void);
-        free((*((*options).remote_forwards).offset(i as isize)).connect_path as *mut libc::c_void);
+        libc::free(
+            (*((*options).remote_forwards).offset(i as isize)).listen_host as *mut libc::c_void,
+        );
+        libc::free(
+            (*((*options).remote_forwards).offset(i as isize)).listen_path as *mut libc::c_void,
+        );
+        libc::free(
+            (*((*options).remote_forwards).offset(i as isize)).connect_host as *mut libc::c_void,
+        );
+        libc::free(
+            (*((*options).remote_forwards).offset(i as isize)).connect_path as *mut libc::c_void,
+        );
         i += 1;
         i;
     }
     if (*options).num_remote_forwards > 0 as libc::c_int {
-        free((*options).remote_forwards as *mut libc::c_void);
+        libc::free((*options).remote_forwards as *mut libc::c_void);
         (*options).remote_forwards = 0 as *mut Forward;
     }
     (*options).num_remote_forwards = 0 as libc::c_int;
@@ -1758,7 +1774,7 @@ pub unsafe extern "C" fn add_identity_file(
                 b"ignoring duplicate key %s\0" as *const u8 as *const libc::c_char,
                 path,
             );
-            free(path as *mut libc::c_void);
+            libc::free(path as *mut libc::c_void);
             return;
         }
         i += 1;
@@ -2249,7 +2265,7 @@ unsafe extern "C" fn match_cfg_line(
                                 uidstr.as_mut_ptr(),
                                 0 as *mut libc::c_void as *mut libc::c_char,
                             );
-                            free(conn_hash_hex as *mut libc::c_void);
+                            libc::free(conn_hash_hex as *mut libc::c_void);
                             if result != 1 as libc::c_int {
                                 crate::log::sshlog(
                                     b"readconf.c\0" as *const u8 as *const libc::c_char,
@@ -2267,7 +2283,7 @@ unsafe extern "C" fn match_cfg_line(
                                     linenum,
                                     cmd,
                                 );
-                                free(cmd as *mut libc::c_void);
+                                libc::free(cmd as *mut libc::c_void);
                                 continue;
                             } else {
                                 r = execute_in_shell(cmd);
@@ -2290,7 +2306,7 @@ unsafe extern "C" fn match_cfg_line(
                                     );
                                 }
                                 criteria = xstrdup(cmd);
-                                free(cmd as *mut libc::c_void);
+                                libc::free(cmd as *mut libc::c_void);
                                 r = (r == 0 as libc::c_int) as libc::c_int;
                                 if r == (if negate != 0 {
                                     1 as libc::c_int
@@ -2342,7 +2358,7 @@ unsafe extern "C" fn match_cfg_line(
                             oattrib,
                             criteria,
                         );
-                        free(criteria as *mut libc::c_void);
+                        libc::free(criteria as *mut libc::c_void);
                     }
                 }
             }
@@ -2387,7 +2403,7 @@ unsafe extern "C" fn match_cfg_line(
         );
     }
     *condition = cp;
-    free(host as *mut libc::c_void);
+    libc::free(host as *mut libc::c_void);
     return result;
 }
 unsafe extern "C" fn rm_env(
@@ -2421,7 +2437,7 @@ unsafe extern "C" fn rm_env(
                 linenum,
                 *((*options).send_env).offset(i as isize),
             );
-            free(*((*options).send_env).offset(i as isize) as *mut libc::c_void);
+            libc::free(*((*options).send_env).offset(i as isize) as *mut libc::c_void);
             let ref mut fresh4 = *((*options).send_env).offset(i as isize);
             *fresh4 = 0 as *mut libc::c_char;
             j = i;
@@ -4175,7 +4191,7 @@ unsafe extern "C" fn process_config_line_depth(
                             keyword,
                             arg,
                         );
-                        free(arg2 as *mut libc::c_void);
+                        libc::free(arg2 as *mut libc::c_void);
                         current_block = 7482270440933722938;
                         break;
                     }
@@ -4232,7 +4248,7 @@ unsafe extern "C" fn process_config_line_depth(
                         arg2,
                     );
                 }
-                free(arg2 as *mut libc::c_void);
+                libc::free(arg2 as *mut libc::c_void);
                 i = i.wrapping_add(1);
                 i;
             }
@@ -4881,7 +4897,7 @@ unsafe extern "C" fn process_config_line_depth(
                                 linenum,
                                 arg2,
                             );
-                            free(arg2 as *mut libc::c_void);
+                            libc::free(arg2 as *mut libc::c_void);
                         } else if r != 0 as libc::c_int {
                             crate::log::sshlog(
                                 b"readconf.c\0" as *const u8 as *const libc::c_char,
@@ -4902,7 +4918,7 @@ unsafe extern "C" fn process_config_line_depth(
                             current_block = 7482270440933722938;
                             break;
                         } else {
-                            free(arg2 as *mut libc::c_void);
+                            libc::free(arg2 as *mut libc::c_void);
                             oactive = *activep;
                             i = 0 as libc::c_int as u_int;
                             while (i as libc::c_ulong) < gl.gl_pathc {
@@ -5873,7 +5889,7 @@ unsafe extern "C" fn process_config_line_depth(
                 );
                 current_block = 7482270440933722938;
             } else {
-                free(arg2 as *mut libc::c_void);
+                libc::free(arg2 as *mut libc::c_void);
                 if *arg.offset(0 as libc::c_int as isize) as libc::c_int == '$' as i32
                     && *arg.offset(1 as libc::c_int as isize) as libc::c_int != '{' as i32
                     && valid_env_name(arg.offset(1 as libc::c_int as isize)) == 0
@@ -6117,7 +6133,7 @@ unsafe extern "C" fn read_config_file_depth(
             bad_options;
         }
     }
-    free(line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     fclose(f);
     if bad_options > 0 as libc::c_int {
         sshfatal(
@@ -6718,35 +6734,35 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
                             );
                         } else {
                             if option_clear_or_none((*options).local_command) != 0 {
-                                free((*options).local_command as *mut libc::c_void);
+                                libc::free((*options).local_command as *mut libc::c_void);
                                 (*options).local_command = 0 as *mut libc::c_char;
                             }
                             if option_clear_or_none((*options).remote_command) != 0 {
-                                free((*options).remote_command as *mut libc::c_void);
+                                libc::free((*options).remote_command as *mut libc::c_void);
                                 (*options).remote_command = 0 as *mut libc::c_char;
                             }
                             if option_clear_or_none((*options).proxy_command) != 0 {
-                                free((*options).proxy_command as *mut libc::c_void);
+                                libc::free((*options).proxy_command as *mut libc::c_void);
                                 (*options).proxy_command = 0 as *mut libc::c_char;
                             }
                             if option_clear_or_none((*options).control_path) != 0 {
-                                free((*options).control_path as *mut libc::c_void);
+                                libc::free((*options).control_path as *mut libc::c_void);
                                 (*options).control_path = 0 as *mut libc::c_char;
                             }
                             if option_clear_or_none((*options).revoked_host_keys) != 0 {
-                                free((*options).revoked_host_keys as *mut libc::c_void);
+                                libc::free((*options).revoked_host_keys as *mut libc::c_void);
                                 (*options).revoked_host_keys = 0 as *mut libc::c_char;
                             }
                             if option_clear_or_none((*options).pkcs11_provider) != 0 {
-                                free((*options).pkcs11_provider as *mut libc::c_void);
+                                libc::free((*options).pkcs11_provider as *mut libc::c_void);
                                 (*options).pkcs11_provider = 0 as *mut libc::c_char;
                             }
                             if option_clear_or_none((*options).sk_provider) != 0 {
-                                free((*options).sk_provider as *mut libc::c_void);
+                                libc::free((*options).sk_provider as *mut libc::c_void);
                                 (*options).sk_provider = 0 as *mut libc::c_char;
                             }
                             if option_clear_or_none((*options).known_hosts_command) != 0 {
-                                free((*options).known_hosts_command as *mut libc::c_void);
+                                libc::free((*options).known_hosts_command as *mut libc::c_void);
                                 (*options).known_hosts_command = 0 as *mut libc::c_char;
                             }
                             if !((*options).jump_host).is_null()
@@ -6757,18 +6773,18 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
                                 && (*options).jump_port == 0 as libc::c_int
                                 && ((*options).jump_user).is_null()
                             {
-                                free((*options).jump_host as *mut libc::c_void);
+                                libc::free((*options).jump_host as *mut libc::c_void);
                                 (*options).jump_host = 0 as *mut libc::c_char;
                             }
                             if (*options).num_permitted_cnames == 1 as libc::c_int
                                 && config_has_permitted_cnames(options) == 0
                             {
-                                free(
+                                libc::free(
                                     (*options).permitted_cnames[0 as libc::c_int as usize]
                                         .source_list
                                         as *mut libc::c_void,
                                 );
-                                free(
+                                libc::free(
                                     (*options).permitted_cnames[0 as libc::c_int as usize]
                                         .target_list
                                         as *mut libc::c_void,
@@ -6787,16 +6803,16 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
             }
         }
     }
-    free(all_cipher as *mut libc::c_void);
-    free(all_mac as *mut libc::c_void);
-    free(all_kex as *mut libc::c_void);
-    free(all_key as *mut libc::c_void);
-    free(all_sig as *mut libc::c_void);
-    free(def_cipher as *mut libc::c_void);
-    free(def_mac as *mut libc::c_void);
-    free(def_kex as *mut libc::c_void);
-    free(def_key as *mut libc::c_void);
-    free(def_sig as *mut libc::c_void);
+    libc::free(all_cipher as *mut libc::c_void);
+    libc::free(all_mac as *mut libc::c_void);
+    libc::free(all_kex as *mut libc::c_void);
+    libc::free(all_key as *mut libc::c_void);
+    libc::free(all_sig as *mut libc::c_void);
+    libc::free(def_cipher as *mut libc::c_void);
+    libc::free(def_mac as *mut libc::c_void);
+    libc::free(def_kex as *mut libc::c_void);
+    libc::free(def_key as *mut libc::c_void);
+    libc::free(def_sig as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn free_options(mut o: *mut Options) {
@@ -6804,120 +6820,120 @@ pub unsafe extern "C" fn free_options(mut o: *mut Options) {
     if o.is_null() {
         return;
     }
-    free((*o).forward_agent_sock_path as *mut libc::c_void);
-    free((*o).xauth_location as *mut libc::c_void);
+    libc::free((*o).forward_agent_sock_path as *mut libc::c_void);
+    libc::free((*o).xauth_location as *mut libc::c_void);
     let mut _i: u_int = 0;
     _i = 0 as libc::c_int as u_int;
     while _i < (*o).num_log_verbose {
-        free(*((*o).log_verbose).offset(_i as isize) as *mut libc::c_void);
+        libc::free(*((*o).log_verbose).offset(_i as isize) as *mut libc::c_void);
         _i = _i.wrapping_add(1);
         _i;
     }
-    free((*o).log_verbose as *mut libc::c_void);
-    free((*o).ciphers as *mut libc::c_void);
-    free((*o).macs as *mut libc::c_void);
-    free((*o).hostkeyalgorithms as *mut libc::c_void);
-    free((*o).kex_algorithms as *mut libc::c_void);
-    free((*o).ca_sign_algorithms as *mut libc::c_void);
-    free((*o).hostname as *mut libc::c_void);
-    free((*o).host_key_alias as *mut libc::c_void);
-    free((*o).proxy_command as *mut libc::c_void);
-    free((*o).user as *mut libc::c_void);
+    libc::free((*o).log_verbose as *mut libc::c_void);
+    libc::free((*o).ciphers as *mut libc::c_void);
+    libc::free((*o).macs as *mut libc::c_void);
+    libc::free((*o).hostkeyalgorithms as *mut libc::c_void);
+    libc::free((*o).kex_algorithms as *mut libc::c_void);
+    libc::free((*o).ca_sign_algorithms as *mut libc::c_void);
+    libc::free((*o).hostname as *mut libc::c_void);
+    libc::free((*o).host_key_alias as *mut libc::c_void);
+    libc::free((*o).proxy_command as *mut libc::c_void);
+    libc::free((*o).user as *mut libc::c_void);
     let mut _i_0: u_int = 0;
     _i_0 = 0 as libc::c_int as u_int;
     while _i_0 < (*o).num_system_hostfiles {
-        free((*o).system_hostfiles[_i_0 as usize] as *mut libc::c_void);
+        libc::free((*o).system_hostfiles[_i_0 as usize] as *mut libc::c_void);
         _i_0 = _i_0.wrapping_add(1);
         _i_0;
     }
     let mut _i_1: u_int = 0;
     _i_1 = 0 as libc::c_int as u_int;
     while _i_1 < (*o).num_user_hostfiles {
-        free((*o).user_hostfiles[_i_1 as usize] as *mut libc::c_void);
+        libc::free((*o).user_hostfiles[_i_1 as usize] as *mut libc::c_void);
         _i_1 = _i_1.wrapping_add(1);
         _i_1;
     }
-    free((*o).preferred_authentications as *mut libc::c_void);
-    free((*o).bind_address as *mut libc::c_void);
-    free((*o).bind_interface as *mut libc::c_void);
-    free((*o).pkcs11_provider as *mut libc::c_void);
-    free((*o).sk_provider as *mut libc::c_void);
+    libc::free((*o).preferred_authentications as *mut libc::c_void);
+    libc::free((*o).bind_address as *mut libc::c_void);
+    libc::free((*o).bind_interface as *mut libc::c_void);
+    libc::free((*o).pkcs11_provider as *mut libc::c_void);
+    libc::free((*o).sk_provider as *mut libc::c_void);
     i = 0 as libc::c_int;
     while i < (*o).num_identity_files {
-        free((*o).identity_files[i as usize] as *mut libc::c_void);
+        libc::free((*o).identity_files[i as usize] as *mut libc::c_void);
         sshkey_free((*o).identity_keys[i as usize]);
         i += 1;
         i;
     }
     i = 0 as libc::c_int;
     while i < (*o).num_certificate_files {
-        free((*o).certificate_files[i as usize] as *mut libc::c_void);
+        libc::free((*o).certificate_files[i as usize] as *mut libc::c_void);
         sshkey_free((*o).certificates[i as usize]);
         i += 1;
         i;
     }
-    free((*o).identity_agent as *mut libc::c_void);
+    libc::free((*o).identity_agent as *mut libc::c_void);
     i = 0 as libc::c_int;
     while i < (*o).num_local_forwards {
-        free((*((*o).local_forwards).offset(i as isize)).listen_host as *mut libc::c_void);
-        free((*((*o).local_forwards).offset(i as isize)).listen_path as *mut libc::c_void);
-        free((*((*o).local_forwards).offset(i as isize)).connect_host as *mut libc::c_void);
-        free((*((*o).local_forwards).offset(i as isize)).connect_path as *mut libc::c_void);
+        libc::free((*((*o).local_forwards).offset(i as isize)).listen_host as *mut libc::c_void);
+        libc::free((*((*o).local_forwards).offset(i as isize)).listen_path as *mut libc::c_void);
+        libc::free((*((*o).local_forwards).offset(i as isize)).connect_host as *mut libc::c_void);
+        libc::free((*((*o).local_forwards).offset(i as isize)).connect_path as *mut libc::c_void);
         i += 1;
         i;
     }
-    free((*o).local_forwards as *mut libc::c_void);
+    libc::free((*o).local_forwards as *mut libc::c_void);
     i = 0 as libc::c_int;
     while i < (*o).num_remote_forwards {
-        free((*((*o).remote_forwards).offset(i as isize)).listen_host as *mut libc::c_void);
-        free((*((*o).remote_forwards).offset(i as isize)).listen_path as *mut libc::c_void);
-        free((*((*o).remote_forwards).offset(i as isize)).connect_host as *mut libc::c_void);
-        free((*((*o).remote_forwards).offset(i as isize)).connect_path as *mut libc::c_void);
+        libc::free((*((*o).remote_forwards).offset(i as isize)).listen_host as *mut libc::c_void);
+        libc::free((*((*o).remote_forwards).offset(i as isize)).listen_path as *mut libc::c_void);
+        libc::free((*((*o).remote_forwards).offset(i as isize)).connect_host as *mut libc::c_void);
+        libc::free((*((*o).remote_forwards).offset(i as isize)).connect_path as *mut libc::c_void);
         i += 1;
         i;
     }
-    free((*o).remote_forwards as *mut libc::c_void);
-    free((*o).stdio_forward_host as *mut libc::c_void);
+    libc::free((*o).remote_forwards as *mut libc::c_void);
+    libc::free((*o).stdio_forward_host as *mut libc::c_void);
     let mut _i_2: u_int = 0;
     _i_2 = 0 as libc::c_int as u_int;
     while _i_2 < (*o).num_send_env {
-        free(*((*o).send_env).offset(_i_2 as isize) as *mut libc::c_void);
+        libc::free(*((*o).send_env).offset(_i_2 as isize) as *mut libc::c_void);
         _i_2 = _i_2.wrapping_add(1);
         _i_2;
     }
-    free((*o).send_env as *mut libc::c_void);
+    libc::free((*o).send_env as *mut libc::c_void);
     let mut _i_3: u_int = 0;
     _i_3 = 0 as libc::c_int as u_int;
     while _i_3 < (*o).num_setenv {
-        free(*((*o).setenv).offset(_i_3 as isize) as *mut libc::c_void);
+        libc::free(*((*o).setenv).offset(_i_3 as isize) as *mut libc::c_void);
         _i_3 = _i_3.wrapping_add(1);
         _i_3;
     }
-    free((*o).setenv as *mut libc::c_void);
-    free((*o).control_path as *mut libc::c_void);
-    free((*o).local_command as *mut libc::c_void);
-    free((*o).remote_command as *mut libc::c_void);
+    libc::free((*o).setenv as *mut libc::c_void);
+    libc::free((*o).control_path as *mut libc::c_void);
+    libc::free((*o).local_command as *mut libc::c_void);
+    libc::free((*o).remote_command as *mut libc::c_void);
     let mut _i_4: libc::c_int = 0;
     _i_4 = 0 as libc::c_int;
     while _i_4 < (*o).num_canonical_domains {
-        free((*o).canonical_domains[_i_4 as usize] as *mut libc::c_void);
+        libc::free((*o).canonical_domains[_i_4 as usize] as *mut libc::c_void);
         _i_4 += 1;
         _i_4;
     }
     i = 0 as libc::c_int;
     while i < (*o).num_permitted_cnames {
-        free((*o).permitted_cnames[i as usize].source_list as *mut libc::c_void);
-        free((*o).permitted_cnames[i as usize].target_list as *mut libc::c_void);
+        libc::free((*o).permitted_cnames[i as usize].source_list as *mut libc::c_void);
+        libc::free((*o).permitted_cnames[i as usize].target_list as *mut libc::c_void);
         i += 1;
         i;
     }
-    free((*o).revoked_host_keys as *mut libc::c_void);
-    free((*o).hostbased_accepted_algos as *mut libc::c_void);
-    free((*o).pubkey_accepted_algos as *mut libc::c_void);
-    free((*o).jump_user as *mut libc::c_void);
-    free((*o).jump_host as *mut libc::c_void);
-    free((*o).jump_extra as *mut libc::c_void);
-    free((*o).ignored_unknown as *mut libc::c_void);
+    libc::free((*o).revoked_host_keys as *mut libc::c_void);
+    libc::free((*o).hostbased_accepted_algos as *mut libc::c_void);
+    libc::free((*o).pubkey_accepted_algos as *mut libc::c_void);
+    libc::free((*o).jump_user as *mut libc::c_void);
+    libc::free((*o).jump_host as *mut libc::c_void);
+    libc::free((*o).jump_extra as *mut libc::c_void);
+    libc::free((*o).ignored_unknown as *mut libc::c_void);
     explicit_bzero(
         o as *mut libc::c_void,
         ::core::mem::size_of::<Options>() as libc::c_ulong,
@@ -7103,7 +7119,7 @@ pub unsafe extern "C" fn parse_forward(
             i = 0 as libc::c_int;
         }
     }
-    free(p as *mut libc::c_void);
+    libc::free(p as *mut libc::c_void);
     if dynamicfwd != 0 {
         if !(i == 1 as libc::c_int || i == 2 as libc::c_int) {
             current_block = 741112630038433975;
@@ -7160,13 +7176,13 @@ pub unsafe extern "C" fn parse_forward(
         }
         _ => {}
     }
-    free((*fwd).connect_host as *mut libc::c_void);
+    libc::free((*fwd).connect_host as *mut libc::c_void);
     (*fwd).connect_host = 0 as *mut libc::c_char;
-    free((*fwd).connect_path as *mut libc::c_void);
+    libc::free((*fwd).connect_path as *mut libc::c_void);
     (*fwd).connect_path = 0 as *mut libc::c_char;
-    free((*fwd).listen_host as *mut libc::c_void);
+    libc::free((*fwd).listen_host as *mut libc::c_void);
     (*fwd).listen_host = 0 as *mut libc::c_char;
-    free((*fwd).listen_path as *mut libc::c_void);
+    libc::free((*fwd).listen_path as *mut libc::c_void);
     (*fwd).listen_path = 0 as *mut libc::c_char;
     return 0 as libc::c_int;
 }
@@ -7268,9 +7284,9 @@ pub unsafe extern "C" fn parse_jump(
         }
         _ => {}
     }
-    free(orig as *mut libc::c_void);
-    free(user as *mut libc::c_void);
-    free(host as *mut libc::c_void);
+    libc::free(orig as *mut libc::c_void);
+    libc::free(user as *mut libc::c_void);
+    libc::free(host as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn parse_ssh_uri(
@@ -7308,9 +7324,9 @@ pub unsafe extern "C" fn parse_ssh_uri(
             *portp = port;
         }
     }
-    free(user as *mut libc::c_void);
-    free(host as *mut libc::c_void);
-    free(path as *mut libc::c_void);
+    libc::free(user as *mut libc::c_void);
+    libc::free(host as *mut libc::c_void);
+    libc::free(path as *mut libc::c_void);
     return r;
 }
 unsafe extern "C" fn fmt_multistate_int(
@@ -7523,7 +7539,7 @@ pub unsafe extern "C" fn dump_client_config(mut o: *mut Options, mut host: *cons
             b"expand HostKeyAlgorithms\0" as *const u8 as *const libc::c_char,
         );
     }
-    free(all_key as *mut libc::c_void);
+    libc::free(all_key as *mut libc::c_void);
     dump_cfg_string(oHost, (*o).host_arg);
     dump_cfg_string(oUser, (*o).user);
     dump_cfg_string(oHostname, host);

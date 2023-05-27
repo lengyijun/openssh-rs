@@ -65,7 +65,7 @@ extern "C" {
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn time(__timer: *mut time_t) -> time_t;
     fn BIO_new(type_0: *const BIO_METHOD) -> *mut BIO;
     fn BIO_free(a: *mut BIO) -> libc::c_int;
@@ -718,7 +718,7 @@ pub unsafe extern "C" fn sshkey_alg_list(
                             .wrapping_add(2 as libc::c_int as libc::c_ulong),
                     ) as *mut libc::c_char;
                     if tmp.is_null() {
-                        free(ret as *mut libc::c_void);
+                        libc::free(ret as *mut libc::c_void);
                         return 0 as *mut libc::c_char;
                     }
                     ret = tmp;
@@ -786,14 +786,14 @@ pub unsafe extern "C" fn sshkey_names_valid2(
             match current_block_11 {
                 735147466149431745 => {}
                 _ => {
-                    free(s as *mut libc::c_void);
+                    libc::free(s as *mut libc::c_void);
                     return 0 as libc::c_int;
                 }
             }
         }
         p = strsep(&mut cp, b",\0" as *const u8 as *const libc::c_char);
     }
-    free(s as *mut libc::c_void);
+    libc::free(s as *mut libc::c_void);
     return 1 as libc::c_int;
 }
 pub unsafe extern "C" fn sshkey_size(mut k: *const sshkey) -> u_int {
@@ -910,16 +910,16 @@ unsafe extern "C" fn cert_free(mut cert: *mut sshkey_cert) {
     sshbuf_free((*cert).certblob);
     sshbuf_free((*cert).critical);
     sshbuf_free((*cert).extensions);
-    free((*cert).key_id as *mut libc::c_void);
+    libc::free((*cert).key_id as *mut libc::c_void);
     i = 0 as libc::c_int as u_int;
     while i < (*cert).nprincipals {
-        free(*((*cert).principals).offset(i as isize) as *mut libc::c_void);
+        libc::free(*((*cert).principals).offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free((*cert).principals as *mut libc::c_void);
+    libc::free((*cert).principals as *mut libc::c_void);
     sshkey_free((*cert).signature_key);
-    free((*cert).signature_type as *mut libc::c_void);
+    libc::free((*cert).signature_type as *mut libc::c_void);
     freezero(
         cert as *mut libc::c_void,
         ::core::mem::size_of::<sshkey_cert>() as libc::c_ulong,
@@ -974,7 +974,7 @@ pub unsafe extern "C" fn sshkey_new(mut type_0: libc::c_int) -> *mut sshkey {
     (*k).ecdsa_nid = -(1 as libc::c_int);
     if !impl_0.is_null() && ((*(*impl_0).funcs).alloc).is_some() {
         if ((*(*impl_0).funcs).alloc).expect("non-null function pointer")(k) != 0 as libc::c_int {
-            free(k as *mut libc::c_void);
+            libc::free(k as *mut libc::c_void);
             return 0 as *mut sshkey;
         }
     }
@@ -988,7 +988,7 @@ pub unsafe extern "C" fn sshkey_new(mut type_0: libc::c_int) -> *mut sshkey {
     return k;
 }
 pub unsafe extern "C" fn sshkey_sk_cleanup(mut k: *mut sshkey) {
-    free((*k).sk_application as *mut libc::c_void);
+    libc::free((*k).sk_application as *mut libc::c_void);
     sshbuf_free((*k).sk_key_handle);
     sshbuf_free((*k).sk_reserved);
     (*k).sk_application = 0 as *mut libc::c_char;
@@ -1287,7 +1287,7 @@ pub unsafe extern "C" fn sshkey_fingerprint_raw(
             }
         }
     }
-    free(ret as *mut libc::c_void);
+    libc::free(ret as *mut libc::c_void);
     if !blob.is_null() {
         freezero(blob as *mut libc::c_void, blob_len);
     }
@@ -1864,11 +1864,11 @@ pub unsafe extern "C" fn sshkey_read(
     }
     r = sshbuf_b64tod(blob, blobcopy);
     if r != 0 as libc::c_int {
-        free(blobcopy as *mut libc::c_void);
+        libc::free(blobcopy as *mut libc::c_void);
         sshbuf_free(blob);
         return r;
     }
-    free(blobcopy as *mut libc::c_void);
+    libc::free(blobcopy as *mut libc::c_void);
     r = sshkey_fromb(blob, &mut k);
     if r != 0 as libc::c_int {
         sshbuf_free(blob);
@@ -1925,7 +1925,7 @@ pub unsafe extern "C" fn sshkey_to_base64(
         }
     }
     sshbuf_free(b);
-    free(uu as *mut libc::c_void);
+    libc::free(uu as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn sshkey_format_text(
@@ -1946,7 +1946,7 @@ pub unsafe extern "C" fn sshkey_format_text(
             r = 0 as libc::c_int;
         }
     }
-    free(uu as *mut libc::c_void);
+    libc::free(uu as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn sshkey_write(
@@ -2656,7 +2656,7 @@ unsafe extern "C" fn cert_parse(
                         )
                             as *mut *mut libc::c_char;
                         if ((*(*key).cert).principals).is_null() {
-                            free(principal as *mut libc::c_void);
+                            libc::free(principal as *mut libc::c_void);
                             (*(*key).cert).principals = oprincipals;
                             ret = -(2 as libc::c_int);
                             current_block = 15747115717569190648;
@@ -2787,7 +2787,7 @@ unsafe extern "C" fn cert_parse(
     sshbuf_free(crit);
     sshbuf_free(exts);
     sshbuf_free(principals);
-    free(sig as *mut libc::c_void);
+    libc::free(sig as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn sshkey_deserialize_sk(
@@ -2877,7 +2877,7 @@ unsafe extern "C" fn sshkey_from_blob_internal(
     }
     sshbuf_free(copy);
     sshkey_free(key);
-    free(ktype as *mut libc::c_void);
+    libc::free(ktype as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn sshkey_from_blob(
@@ -2938,7 +2938,7 @@ pub unsafe extern "C" fn sshkey_get_sigtype(
         }
         r = 0 as libc::c_int;
     }
-    free(sigtype as *mut libc::c_void);
+    libc::free(sigtype as *mut libc::c_void);
     sshbuf_free(b);
     return r;
 }
@@ -3008,7 +3008,7 @@ pub unsafe extern "C" fn sshkey_check_sigtype(
         return r;
     }
     r = (strcmp(expected_alg, sigtype) == 0 as libc::c_int) as libc::c_int;
-    free(sigtype as *mut libc::c_void);
+    libc::free(sigtype as *mut libc::c_void);
     return if r != 0 {
         0 as libc::c_int
     } else {
@@ -3305,9 +3305,9 @@ pub unsafe extern "C" fn sshkey_certify_custom(
     if ret != 0 as libc::c_int {
         sshbuf_reset(cert);
     }
-    free(sig_blob as *mut libc::c_void);
-    free(ca_blob as *mut libc::c_void);
-    free(sigtype as *mut libc::c_void);
+    libc::free(sig_blob as *mut libc::c_void);
+    libc::free(ca_blob as *mut libc::c_void);
+    libc::free(sigtype as *mut libc::c_void);
     sshbuf_free(principals);
     return ret;
 }
@@ -3754,10 +3754,10 @@ pub unsafe extern "C" fn sshkey_private_deserialize(
             }
         }
     }
-    free(tname as *mut libc::c_void);
+    libc::free(tname as *mut libc::c_void);
     sshkey_free(k);
-    free(expect_sk_application as *mut libc::c_void);
-    free(expect_ed25519_pk as *mut libc::c_void);
+    libc::free(expect_sk_application as *mut libc::c_void);
+    libc::free(expect_ed25519_pk as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn sshkey_ec_validate_public(
@@ -4536,16 +4536,16 @@ unsafe extern "C" fn private2_decrypt(
         }
     }
     cipher_free(ciphercontext);
-    free(ciphername as *mut libc::c_void);
-    free(kdfname as *mut libc::c_void);
+    libc::free(ciphername as *mut libc::c_void);
+    libc::free(kdfname as *mut libc::c_void);
     sshkey_free(pubkey);
     if !salt.is_null() {
         explicit_bzero(salt as *mut libc::c_void, slen);
-        free(salt as *mut libc::c_void);
+        libc::free(salt as *mut libc::c_void);
     }
     if !key.is_null() {
         explicit_bzero(key as *mut libc::c_void, keylen.wrapping_add(ivlen));
-        free(key as *mut libc::c_void);
+        libc::free(key as *mut libc::c_void);
     }
     sshbuf_free(kdf);
     sshbuf_free(decrypted);
@@ -4604,7 +4604,7 @@ unsafe extern "C" fn sshkey_parse_private2(
             }
         }
     }
-    free(comment as *mut libc::c_void);
+    libc::free(comment as *mut libc::c_void);
     sshbuf_free(decoded);
     sshbuf_free(decrypted);
     sshkey_free(k);

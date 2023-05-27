@@ -4,7 +4,7 @@ extern "C" {
     pub type sshkey;
     pub type kex;
     pub type session_state;
-    fn free(_: *mut libc::c_void);
+
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_get_cstring(
         ssh: *mut ssh,
@@ -325,8 +325,8 @@ unsafe extern "C" fn userauth_kbdint(
     if options.kbd_interactive_authentication != 0 {
         authenticated = auth2_challenge(ssh, devs);
     }
-    free(devs as *mut libc::c_void);
-    free(lang as *mut libc::c_void);
+    libc::free(devs as *mut libc::c_void);
+    libc::free(lang as *mut libc::c_void);
     return authenticated;
 }
 pub static mut method_kbdint: Authmethod = Authmethod {

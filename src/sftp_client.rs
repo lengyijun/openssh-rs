@@ -31,7 +31,6 @@ extern "C" {
     fn closedir(__dirp: *mut DIR) -> libc::c_int;
     fn readdir(__dirp: *mut DIR) -> *mut dirent;
 
-    fn free(_: *mut libc::c_void);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -1339,7 +1338,7 @@ pub unsafe extern "C" fn do_init(
             type_0 as libc::c_int,
         );
         sshbuf_free(msg);
-        free(ret as *mut libc::c_void);
+        libc::free(ret as *mut libc::c_void);
         return 0 as *mut sftp_conn;
     }
     r = sshbuf_get_u32(msg, &mut (*ret).version);
@@ -1518,8 +1517,8 @@ pub unsafe extern "C" fn do_init(
                 name,
             );
         }
-        free(name as *mut libc::c_void);
-        free(value as *mut libc::c_void);
+        libc::free(name as *mut libc::c_void);
+        libc::free(value as *mut libc::c_void);
     }
     sshbuf_free(msg);
     if (*ret).exts & 0x40 as libc::c_int as libc::c_uint != 0 {
@@ -2178,8 +2177,8 @@ unsafe extern "C" fn do_lsreaddir(
                         ssh_err(r),
                         b"couldn't decode attrib\0" as *const u8 as *const libc::c_char,
                     );
-                    free(filename as *mut libc::c_void);
-                    free(longname as *mut libc::c_void);
+                    libc::free(filename as *mut libc::c_void);
+                    libc::free(longname as *mut libc::c_void);
                     current_block = 12100910119561751479;
                     break 's_76;
                 } else {
@@ -2227,8 +2226,8 @@ unsafe extern "C" fn do_lsreaddir(
                         let ref mut fresh8 = *(*dir).offset(ents as isize);
                         *fresh8 = 0 as *mut SFTP_DIRENT;
                     }
-                    free(filename as *mut libc::c_void);
-                    free(longname as *mut libc::c_void);
+                    libc::free(filename as *mut libc::c_void);
+                    libc::free(longname as *mut libc::c_void);
                     i = i.wrapping_add(1);
                     i;
                 }
@@ -2243,7 +2242,7 @@ unsafe extern "C" fn do_lsreaddir(
     }
     sshbuf_free(msg);
     do_close(conn, handle, handle_len as u_int);
-    free(handle as *mut libc::c_void);
+    libc::free(handle as *mut libc::c_void);
     if status != 0 as libc::c_int && !dir.is_null() {
         free_sftp_dirents(*dir);
         *dir = 0 as *mut *mut SFTP_DIRENT;
@@ -2275,13 +2274,13 @@ pub unsafe extern "C" fn free_sftp_dirents(mut s: *mut *mut SFTP_DIRENT) {
     }
     i = 0 as libc::c_int;
     while !(*s.offset(i as isize)).is_null() {
-        free((**s.offset(i as isize)).filename as *mut libc::c_void);
-        free((**s.offset(i as isize)).longname as *mut libc::c_void);
-        free(*s.offset(i as isize) as *mut libc::c_void);
+        libc::free((**s.offset(i as isize)).filename as *mut libc::c_void);
+        libc::free((**s.offset(i as isize)).longname as *mut libc::c_void);
+        libc::free(*s.offset(i as isize) as *mut libc::c_void);
         i += 1;
         i;
     }
-    free(s as *mut libc::c_void);
+    libc::free(s as *mut libc::c_void);
 }
 pub unsafe extern "C" fn do_rm(
     mut conn: *mut sftp_conn,
@@ -2777,7 +2776,7 @@ unsafe extern "C" fn do_realpath_expand(
                 errmsg as *const libc::c_char
             },
         );
-        free(errmsg as *mut libc::c_void);
+        libc::free(errmsg as *mut libc::c_void);
         sshbuf_free(msg);
         return 0 as *mut libc::c_char;
     } else if type_0 as libc::c_int != 104 as libc::c_int {
@@ -2856,7 +2855,7 @@ unsafe extern "C" fn do_realpath_expand(
         path,
         filename,
     );
-    free(longname as *mut libc::c_void);
+    libc::free(longname as *mut libc::c_void);
     sshbuf_free(msg);
     return filename;
 }
@@ -3083,7 +3082,7 @@ pub unsafe extern "C" fn do_copy(
     );
     if new_handle.is_null() {
         sshbuf_free(msg);
-        free(old_handle as *mut libc::c_void);
+        libc::free(old_handle as *mut libc::c_void);
         return -(1 as libc::c_int);
     }
     let fresh19 = (*conn).msg_id;
@@ -3162,8 +3161,8 @@ pub unsafe extern "C" fn do_copy(
     sshbuf_free(msg);
     do_close(conn, old_handle, old_handle_len as u_int);
     do_close(conn, new_handle, new_handle_len as u_int);
-    free(old_handle as *mut libc::c_void);
-    free(new_handle as *mut libc::c_void);
+    libc::free(old_handle as *mut libc::c_void);
+    libc::free(new_handle as *mut libc::c_void);
     return if status == 0 as libc::c_int as libc::c_uint {
         0 as libc::c_int
     } else {
@@ -4353,7 +4352,7 @@ pub unsafe extern "C" fn do_download(
                                 requests.tqh_last = (*req).tq.tqe_prev;
                             }
                             *(*req).tq.tqe_prev = (*req).tq.tqe_next;
-                            free(req as *mut libc::c_void);
+                            libc::free(req as *mut libc::c_void);
                             num_req = num_req.wrapping_sub(1);
                             num_req;
                         }
@@ -4457,7 +4456,7 @@ pub unsafe extern "C" fn do_download(
                             }
                             progress_counter = (progress_counter as libc::c_ulong).wrapping_add(len)
                                 as off_t as off_t;
-                            free(data as *mut libc::c_void);
+                            libc::free(data as *mut libc::c_void);
                             if len == (*req).len {
                                 if !((*req).tq.tqe_next).is_null() {
                                     (*(*req).tq.tqe_next).tq.tqe_prev = (*req).tq.tqe_prev;
@@ -4465,7 +4464,7 @@ pub unsafe extern "C" fn do_download(
                                     requests.tqh_last = (*req).tq.tqe_prev;
                                 }
                                 *(*req).tq.tqe_prev = (*req).tq.tqe_next;
-                                free(req as *mut libc::c_void);
+                                libc::free(req as *mut libc::c_void);
                                 num_req = num_req.wrapping_sub(1);
                                 num_req;
                             } else {
@@ -4763,7 +4762,7 @@ pub unsafe extern "C" fn do_download(
                 }
                 close(local_fd);
                 sshbuf_free(msg);
-                free(handle as *mut libc::c_void);
+                libc::free(handle as *mut libc::c_void);
                 return if status == 0 as libc::c_int as libc::c_uint {
                     0 as libc::c_int
                 } else {
@@ -4773,7 +4772,7 @@ pub unsafe extern "C" fn do_download(
         }
     }
     do_close(conn, handle, handle_len as u_int);
-    free(handle as *mut libc::c_void);
+    libc::free(handle as *mut libc::c_void);
     if local_fd != -(1 as libc::c_int) {
         close(local_fd);
     }
@@ -4915,8 +4914,8 @@ unsafe extern "C" fn download_dir_internal(
     }
     i = 0 as libc::c_int;
     while !(*dir_entries.offset(i as isize)).is_null() && interrupted == 0 {
-        free(new_dst as *mut libc::c_void);
-        free(new_src as *mut libc::c_void);
+        libc::free(new_dst as *mut libc::c_void);
+        libc::free(new_src as *mut libc::c_void);
         filename = (**dir_entries.offset(i as isize)).filename;
         new_dst = path_append(dst, filename);
         new_src = path_append(src, filename);
@@ -5004,8 +5003,8 @@ unsafe extern "C" fn download_dir_internal(
         i += 1;
         i;
     }
-    free(new_dst as *mut libc::c_void);
-    free(new_src as *mut libc::c_void);
+    libc::free(new_dst as *mut libc::c_void);
+    libc::free(new_src as *mut libc::c_void);
     if preserve_flag != 0 {
         if (*dirattrib).flags & 0x8 as libc::c_int as libc::c_uint != 0 {
             let mut tv: [timeval; 2] = [timeval {
@@ -5107,7 +5106,7 @@ pub unsafe extern "C" fn download_dir(
         follow_link_flag,
         inplace_flag,
     );
-    free(src_canon as *mut libc::c_void);
+    libc::free(src_canon as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn do_upload(
@@ -5546,7 +5545,7 @@ pub unsafe extern "C" fn do_upload(
                     );
                     reordered = 1 as libc::c_int as u_int;
                 }
-                free(ack as *mut libc::c_void);
+                libc::free(ack as *mut libc::c_void);
             }
             offset += len as libc::c_long;
             if offset < 0 as libc::c_int as libc::c_long {
@@ -5567,7 +5566,7 @@ pub unsafe extern "C" fn do_upload(
     if showprogress != 0 {
         stop_progress_meter();
     }
-    free(data as *mut libc::c_void);
+    libc::free(data as *mut libc::c_void);
     if status == 0 as libc::c_int as libc::c_uint && interrupted == 0 {
         highwater = maxack;
     }
@@ -5626,7 +5625,7 @@ pub unsafe extern "C" fn do_upload(
     if do_close(conn, handle, handle_len as u_int) != 0 as libc::c_int {
         status = 4 as libc::c_int as u_int;
     }
-    free(handle as *mut libc::c_void);
+    libc::free(handle as *mut libc::c_void);
     return if status == 0 as libc::c_int as libc::c_uint {
         0 as libc::c_int
     } else {
@@ -5806,8 +5805,8 @@ unsafe extern "C" fn upload_dir_internal(
         if (*dp).d_ino == 0 as libc::c_int as libc::c_ulong {
             continue;
         }
-        free(new_dst as *mut libc::c_void);
-        free(new_src as *mut libc::c_void);
+        libc::free(new_dst as *mut libc::c_void);
+        libc::free(new_src as *mut libc::c_void);
         filename = ((*dp).d_name).as_mut_ptr();
         new_dst = path_append(dst, filename);
         new_src = path_append(src, filename);
@@ -5898,8 +5897,8 @@ unsafe extern "C" fn upload_dir_internal(
             );
         }
     }
-    free(new_dst as *mut libc::c_void);
-    free(new_src as *mut libc::c_void);
+    libc::free(new_dst as *mut libc::c_void);
+    libc::free(new_src as *mut libc::c_void);
     do_setstat(conn, dst, &mut a);
     closedir(dirp);
     return ret;
@@ -5943,7 +5942,7 @@ pub unsafe extern "C" fn upload_dir(
         follow_link_flag,
         inplace_flag,
     );
-    free(dst_canon as *mut libc::c_void);
+    libc::free(dst_canon as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn handle_dest_replies(
@@ -6362,7 +6361,7 @@ pub unsafe extern "C" fn do_crossload(
                     requests.tqh_last = (*req).tq.tqe_prev;
                 }
                 *(*req).tq.tqe_prev = (*req).tq.tqe_next;
-                free(req as *mut libc::c_void);
+                libc::free(req as *mut libc::c_void);
                 num_req = num_req.wrapping_sub(1);
                 num_req;
             }
@@ -6467,7 +6466,7 @@ pub unsafe extern "C" fn do_crossload(
                 num_upload_req;
                 progress_counter =
                     (progress_counter as libc::c_ulong).wrapping_add(len) as off_t as off_t;
-                free(data as *mut libc::c_void);
+                libc::free(data as *mut libc::c_void);
                 if len == (*req).len {
                     if !((*req).tq.tqe_next).is_null() {
                         (*(*req).tq.tqe_next).tq.tqe_prev = (*req).tq.tqe_prev;
@@ -6475,7 +6474,7 @@ pub unsafe extern "C" fn do_crossload(
                         requests.tqh_last = (*req).tq.tqe_prev;
                     }
                     *(*req).tq.tqe_prev = (*req).tq.tqe_next;
-                    free(req as *mut libc::c_void);
+                    libc::free(req as *mut libc::c_void);
                     num_req = num_req.wrapping_sub(1);
                     num_req;
                 } else {
@@ -6603,7 +6602,7 @@ pub unsafe extern "C" fn do_crossload(
             to_path,
         );
         do_close(to, to_handle, to_handle_len as u_int);
-        free(to_handle as *mut libc::c_void);
+        libc::free(to_handle as *mut libc::c_void);
         if send_open(
             to,
             to_path,
@@ -6678,8 +6677,8 @@ pub unsafe extern "C" fn do_crossload(
         }
     }
     sshbuf_free(msg);
-    free(from_handle as *mut libc::c_void);
-    free(to_handle as *mut libc::c_void);
+    libc::free(from_handle as *mut libc::c_void);
+    libc::free(to_handle as *mut libc::c_void);
     return if status == 0 as libc::c_int as libc::c_uint {
         0 as libc::c_int
     } else {
@@ -6850,8 +6849,8 @@ unsafe extern "C" fn crossload_dir_internal(
     }
     i = 0 as libc::c_int;
     while !(*dir_entries.offset(i as isize)).is_null() && interrupted == 0 {
-        free(new_from_path as *mut libc::c_void);
-        free(new_to_path as *mut libc::c_void);
+        libc::free(new_from_path as *mut libc::c_void);
+        libc::free(new_to_path as *mut libc::c_void);
         filename = (**dir_entries.offset(i as isize)).filename;
         new_from_path = path_append(from_path, filename);
         new_to_path = path_append(to_path, filename);
@@ -6935,8 +6934,8 @@ unsafe extern "C" fn crossload_dir_internal(
         i += 1;
         i;
     }
-    free(new_to_path as *mut libc::c_void);
-    free(new_from_path as *mut libc::c_void);
+    libc::free(new_to_path as *mut libc::c_void);
+    libc::free(new_from_path as *mut libc::c_void);
     do_setstat(to, to_path, &mut curdir);
     free_sftp_dirents(dir_entries);
     return ret;
@@ -6979,7 +6978,7 @@ pub unsafe extern "C" fn crossload_dir(
         print_flag,
         follow_link_flag,
     );
-    free(from_path_canon as *mut libc::c_void);
+    libc::free(from_path_canon as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn can_get_users_groups_by_id(mut conn: *mut sftp_conn) -> libc::c_int {
@@ -7199,7 +7198,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
                 errmsg as *const libc::c_char
             },
         );
-        free(errmsg as *mut libc::c_void);
+        libc::free(errmsg as *mut libc::c_void);
         sshbuf_free(msg);
         sshbuf_free(uidbuf);
         sshbuf_free(gidbuf);
@@ -7266,7 +7265,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
                 );
             }
             if *name as libc::c_int == '\0' as i32 {
-                free(name as *mut libc::c_void);
+                libc::free(name as *mut libc::c_void);
                 name = 0 as *mut libc::c_char;
             }
             let ref mut fresh33 = *usernames.offset(i as isize);
@@ -7298,7 +7297,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
                 );
             }
             if *name as libc::c_int == '\0' as i32 {
-                free(name as *mut libc::c_void);
+                libc::free(name as *mut libc::c_void);
                 name = 0 as *mut libc::c_char;
             }
             let ref mut fresh34 = *groupnames.offset(i as isize);
@@ -7369,7 +7368,7 @@ pub unsafe extern "C" fn make_absolute(
     let mut abs_str: *mut libc::c_char = 0 as *mut libc::c_char;
     if !p.is_null() && path_absolute(p) == 0 {
         abs_str = path_append(pwd, p);
-        free(p as *mut libc::c_void);
+        libc::free(p as *mut libc::c_void);
         return abs_str;
     } else {
         return p;

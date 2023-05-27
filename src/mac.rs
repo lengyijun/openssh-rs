@@ -4,7 +4,7 @@ extern "C" {
     pub type umac_ctx;
     fn timingsafe_bcmp(_: *const libc::c_void, _: *const libc::c_void, _: size_t) -> libc::c_int;
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
@@ -304,7 +304,7 @@ pub unsafe extern "C" fn mac_alg_list(mut sep: libc::c_char) -> *mut libc::c_cha
                 .wrapping_add(2 as libc::c_int as libc::c_ulong),
         ) as *mut libc::c_char;
         if tmp.is_null() {
-            free(ret as *mut libc::c_void);
+            libc::free(ret as *mut libc::c_void);
             return 0 as *mut libc::c_char;
         }
         ret = tmp;
@@ -550,11 +550,11 @@ pub unsafe extern "C" fn mac_valid(mut names: *const libc::c_char) -> libc::c_in
     p = strsep(&mut cp, b",\0" as *const u8 as *const libc::c_char);
     while !p.is_null() && *p as libc::c_int != '\0' as i32 {
         if mac_setup(0 as *mut sshmac, p) < 0 as libc::c_int {
-            free(maclist as *mut libc::c_void);
+            libc::free(maclist as *mut libc::c_void);
             return 0 as libc::c_int;
         }
         p = strsep(&mut cp, b",\0" as *const u8 as *const libc::c_char);
     }
-    free(maclist as *mut libc::c_void);
+    libc::free(maclist as *mut libc::c_void);
     return 1 as libc::c_int;
 }

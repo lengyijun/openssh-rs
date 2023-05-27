@@ -28,7 +28,7 @@ extern "C" {
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn free(_: *mut libc::c_void);
+
     fn temporarily_use_uid(_: *mut passwd);
     fn restore_uid();
 
@@ -554,7 +554,7 @@ pub unsafe extern "C" fn auth_rhosts2(
             rhosts_files[rhosts_file_index as usize],
         );
         r = stat(path, &mut st);
-        free(path as *mut libc::c_void);
+        libc::free(path as *mut libc::c_void);
         if r >= 0 as libc::c_int {
             break;
         }
@@ -696,7 +696,7 @@ pub unsafe extern "C" fn auth_rhosts2(
                 path,
                 strerror(*libc::__errno_location()),
             );
-            free(path as *mut libc::c_void);
+            libc::free(path as *mut libc::c_void);
         } else if options.strict_modes != 0
             && (st.st_uid != 0 as libc::c_int as libc::c_uint && st.st_uid != (*pw).pw_uid
                 || st.st_mode & 0o22 as libc::c_int as libc::c_uint
@@ -719,7 +719,7 @@ pub unsafe extern "C" fn auth_rhosts2(
                 b"Bad file modes for %.200s\0" as *const u8 as *const libc::c_char,
                 path,
             );
-            free(path as *mut libc::c_void);
+            libc::free(path as *mut libc::c_void);
         } else if options.ignore_rhosts == 1 as libc::c_int
             || options.ignore_rhosts == 2 as libc::c_int
                 && strcmp(
@@ -732,7 +732,7 @@ pub unsafe extern "C" fn auth_rhosts2(
                     as *const libc::c_char,
                 rhosts_files[rhosts_file_index as usize],
             );
-            free(path as *mut libc::c_void);
+            libc::free(path as *mut libc::c_void);
         } else {
             if check_rhosts_file(path, hostname, ipaddr, client_user, (*pw).pw_name) != 0 {
                 auth_debug_add(
@@ -748,10 +748,10 @@ pub unsafe extern "C" fn auth_rhosts2(
                     client_user,
                     (*pw).pw_name,
                 );
-                free(path as *mut libc::c_void);
+                libc::free(path as *mut libc::c_void);
                 return 1 as libc::c_int;
             }
-            free(path as *mut libc::c_void);
+            libc::free(path as *mut libc::c_void);
         }
         rhosts_file_index = rhosts_file_index.wrapping_add(1);
         rhosts_file_index;

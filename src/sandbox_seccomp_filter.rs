@@ -4,7 +4,7 @@ extern "C" {
 
     fn setrlimit(__resource: __rlimit_resource_t, __rlimits: *const rlimit) -> libc::c_int;
     fn prctl(__option: libc::c_int, _: ...) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
+
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn sshfatal(
@@ -259,7 +259,7 @@ pub unsafe extern "C" fn ssh_sandbox_child(mut _box_0: *mut ssh_sandbox) {
     }
 }
 pub unsafe extern "C" fn ssh_sandbox_parent_finish(mut box_0: *mut ssh_sandbox) {
-    free(box_0 as *mut libc::c_void);
+    libc::free(box_0 as *mut libc::c_void);
     crate::log::sshlog(
         b"sandbox-seccomp-filter.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(b"ssh_sandbox_parent_finish\0"))

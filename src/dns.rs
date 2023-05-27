@@ -26,7 +26,7 @@ extern "C" {
     fn timingsafe_bcmp(_: *const libc::c_void, _: *const libc::c_void, _: size_t) -> libc::c_int;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn sshkey_fingerprint_raw(
@@ -504,7 +504,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
                     0 as *const libc::c_char,
                     b"Error calculating key fingerprint.\0" as *const u8 as *const libc::c_char,
                 );
-                free(dnskey_digest as *mut libc::c_void);
+                libc::free(dnskey_digest as *mut libc::c_void);
                 freerrset(fingerprints);
                 return -(1 as libc::c_int);
             }
@@ -550,8 +550,8 @@ pub unsafe extern "C" fn verify_host_key_dns(
                     *flags |= 0x8 as libc::c_int;
                 }
             }
-            free(dnskey_digest as *mut libc::c_void);
-            free(hostkey_digest as *mut libc::c_void);
+            libc::free(dnskey_digest as *mut libc::c_void);
+            libc::free(hostkey_digest as *mut libc::c_void);
         }
         counter = counter.wrapping_add(1);
         counter;
@@ -659,7 +659,7 @@ pub unsafe extern "C" fn export_dns_rr(
                     i;
                 }
                 libc::fprintf(f, b"\n\0" as *const u8 as *const libc::c_char);
-                free(rdata_digest as *mut libc::c_void);
+                libc::free(rdata_digest as *mut libc::c_void);
                 success = 1 as libc::c_int;
             }
         }

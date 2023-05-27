@@ -13,7 +13,7 @@ extern "C" {
     fn setresuid(__ruid: __uid_t, __euid: __uid_t, __suid: __uid_t) -> libc::c_int;
     fn setresgid(__rgid: __gid_t, __egid: __gid_t, __sgid: __gid_t) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn free(_: *mut libc::c_void);
+
     fn setgroups(__n: size_t, __groups: *const __gid_t) -> libc::c_int;
     fn initgroups(__user: *const libc::c_char, __group: __gid_t) -> libc::c_int;
 
@@ -125,7 +125,7 @@ pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut passwd) {
             );
         }
     } else {
-        free(saved_egroups as *mut libc::c_void);
+        libc::free(saved_egroups as *mut libc::c_void);
         saved_egroups = 0 as *mut gid_t;
     }
     if user_groupslen == -(1 as libc::c_int) || user_groups_uid != (*pw).pw_uid {
@@ -183,7 +183,7 @@ pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut passwd) {
                 );
             }
         } else {
-            free(user_groups as *mut libc::c_void);
+            libc::free(user_groups as *mut libc::c_void);
             user_groups = 0 as *mut gid_t;
         }
         user_groups_uid = (*pw).pw_uid;

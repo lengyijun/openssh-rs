@@ -14,7 +14,7 @@ extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
@@ -1926,7 +1926,7 @@ unsafe extern "C" fn revoked_certs_free(mut rc: *mut revoked_certs) {
         1 as libc::c_int != 0
     } {
         revoked_serial_tree_RB_REMOVE(&mut (*rc).revoked_serials, rs);
-        free(rs as *mut libc::c_void);
+        libc::free(rs as *mut libc::c_void);
         rs = trs;
     }
     rki = revoked_key_id_tree_RB_MINMAX(&mut (*rc).revoked_key_ids, -(1 as libc::c_int));
@@ -1935,8 +1935,8 @@ unsafe extern "C" fn revoked_certs_free(mut rc: *mut revoked_certs) {
         1 as libc::c_int != 0
     } {
         revoked_key_id_tree_RB_REMOVE(&mut (*rc).revoked_key_ids, rki);
-        free((*rki).key_id as *mut libc::c_void);
-        free(rki as *mut libc::c_void);
+        libc::free((*rki).key_id as *mut libc::c_void);
+        libc::free(rki as *mut libc::c_void);
         rki = trki;
     }
     sshkey_free((*rc).ca_key);
@@ -1949,15 +1949,15 @@ pub unsafe extern "C" fn ssh_krl_free(mut krl: *mut ssh_krl) {
     if krl.is_null() {
         return;
     }
-    free((*krl).comment as *mut libc::c_void);
+    libc::free((*krl).comment as *mut libc::c_void);
     rb = revoked_blob_tree_RB_MINMAX(&mut (*krl).revoked_keys, -(1 as libc::c_int));
     while !rb.is_null() && {
         trb = revoked_blob_tree_RB_NEXT(rb);
         1 as libc::c_int != 0
     } {
         revoked_blob_tree_RB_REMOVE(&mut (*krl).revoked_keys, rb);
-        free((*rb).blob as *mut libc::c_void);
-        free(rb as *mut libc::c_void);
+        libc::free((*rb).blob as *mut libc::c_void);
+        libc::free(rb as *mut libc::c_void);
         rb = trb;
     }
     rb = revoked_blob_tree_RB_MINMAX(&mut (*krl).revoked_sha1s, -(1 as libc::c_int));
@@ -1966,8 +1966,8 @@ pub unsafe extern "C" fn ssh_krl_free(mut krl: *mut ssh_krl) {
         1 as libc::c_int != 0
     } {
         revoked_blob_tree_RB_REMOVE(&mut (*krl).revoked_sha1s, rb);
-        free((*rb).blob as *mut libc::c_void);
-        free(rb as *mut libc::c_void);
+        libc::free((*rb).blob as *mut libc::c_void);
+        libc::free(rb as *mut libc::c_void);
         rb = trb;
     }
     rb = revoked_blob_tree_RB_MINMAX(&mut (*krl).revoked_sha256s, -(1 as libc::c_int));
@@ -1976,8 +1976,8 @@ pub unsafe extern "C" fn ssh_krl_free(mut krl: *mut ssh_krl) {
         1 as libc::c_int != 0
     } {
         revoked_blob_tree_RB_REMOVE(&mut (*krl).revoked_sha256s, rb);
-        free((*rb).blob as *mut libc::c_void);
-        free(rb as *mut libc::c_void);
+        libc::free((*rb).blob as *mut libc::c_void);
+        libc::free(rb as *mut libc::c_void);
         rb = trb;
     }
     rc = (*krl).revoked_certs.tqh_first;
@@ -1994,7 +1994,7 @@ pub unsafe extern "C" fn ssh_krl_free(mut krl: *mut ssh_krl) {
         revoked_certs_free(rc);
         rc = trc;
     }
-    free(krl as *mut libc::c_void);
+    libc::free(krl as *mut libc::c_void);
 }
 pub unsafe extern "C" fn ssh_krl_set_version(mut krl: *mut ssh_krl, mut version: u_int64_t) {
     (*krl).krl_version = version;
@@ -2003,7 +2003,7 @@ pub unsafe extern "C" fn ssh_krl_set_comment(
     mut krl: *mut ssh_krl,
     mut comment: *const libc::c_char,
 ) -> libc::c_int {
-    free((*krl).comment as *mut libc::c_void);
+    libc::free((*krl).comment as *mut libc::c_void);
     (*krl).comment = strdup(comment);
     if ((*krl).comment).is_null() {
         return -(2 as libc::c_int);
@@ -2042,7 +2042,7 @@ unsafe extern "C" fn revoked_certs_for_ca_key(
     } else {
         r = sshkey_from_private(ca_key, &mut (*rc).ca_key);
         if r != 0 as libc::c_int {
-            free(rc as *mut libc::c_void);
+            libc::free(rc as *mut libc::c_void);
             return r;
         }
     }
@@ -2094,7 +2094,7 @@ unsafe extern "C" fn insert_serial_range(
         );
         ers = revoked_serial_tree_RB_INSERT(rt, irs);
         if !ers.is_null() {
-            free(irs as *mut libc::c_void);
+            libc::free(irs as *mut libc::c_void);
             return -(1 as libc::c_int);
         }
         ers = irs;
@@ -2120,7 +2120,7 @@ unsafe extern "C" fn insert_serial_range(
             (*ers).lo = (*crs).lo;
         }
         revoked_serial_tree_RB_REMOVE(rt, crs);
-        free(crs as *mut libc::c_void);
+        libc::free(crs as *mut libc::c_void);
     }
     loop {
         crs = revoked_serial_tree_RB_NEXT(ers);
@@ -2136,7 +2136,7 @@ unsafe extern "C" fn insert_serial_range(
             (*ers).hi = (*crs).hi;
         }
         revoked_serial_tree_RB_REMOVE(rt, crs);
-        free(crs as *mut libc::c_void);
+        libc::free(crs as *mut libc::c_void);
     }
     return 0 as libc::c_int;
 }
@@ -2185,13 +2185,13 @@ pub unsafe extern "C" fn ssh_krl_revoke_cert_by_key_id(
         (*rki).key_id = strdup(key_id);
         ((*rki).key_id).is_null()
     } {
-        free(rki as *mut libc::c_void);
+        libc::free(rki as *mut libc::c_void);
         return -(2 as libc::c_int);
     }
     erki = revoked_key_id_tree_RB_INSERT(&mut (*rc).revoked_key_ids, rki);
     if !erki.is_null() {
-        free((*rki).key_id as *mut libc::c_void);
-        free(rki as *mut libc::c_void);
+        libc::free((*rki).key_id as *mut libc::c_void);
+        libc::free(rki as *mut libc::c_void);
     }
     return 0 as libc::c_int;
 }
@@ -2235,8 +2235,8 @@ unsafe extern "C" fn revoke_blob(
     (*rb).len = len;
     erb = revoked_blob_tree_RB_INSERT(rbt, rb);
     if !erb.is_null() {
-        free((*rb).blob as *mut libc::c_void);
-        free(rb as *mut libc::c_void);
+        libc::free((*rb).blob as *mut libc::c_void);
+        libc::free(rb as *mut libc::c_void);
     }
     return 0 as libc::c_int;
 }
@@ -2280,7 +2280,7 @@ unsafe extern "C" fn revoke_by_hash(
     memcpy(blob as *mut libc::c_void, p as *const libc::c_void, len);
     r = revoke_blob(target, blob, len);
     if r != 0 as libc::c_int {
-        free(blob as *mut libc::c_void);
+        libc::free(blob as *mut libc::c_void);
         return r;
     }
     return 0 as libc::c_int;
@@ -2475,11 +2475,11 @@ unsafe extern "C" fn put_bitmap(mut buf: *mut sshbuf, mut bitmap: *mut bitmap) -
         return -(2 as libc::c_int);
     }
     if bitmap_to_string(bitmap, blob as *mut libc::c_void, len) != 0 as libc::c_int {
-        free(blob as *mut libc::c_void);
+        libc::free(blob as *mut libc::c_void);
         return -(1 as libc::c_int);
     }
     r = sshbuf_put_bignum2_bytes(buf, blob as *const libc::c_void, len);
-    free(blob as *mut libc::c_void);
+    libc::free(blob as *mut libc::c_void);
     return r;
 }
 unsafe extern "C" fn revoked_certs_generate(
@@ -3033,7 +3033,7 @@ pub unsafe extern "C" fn ssh_krl_to_blob(
             }
         }
     }
-    free(sblob as *mut libc::c_void);
+    libc::free(sblob as *mut libc::c_void);
     sshbuf_free(sect);
     return r;
 }
@@ -3214,7 +3214,7 @@ unsafe extern "C" fn parse_revoked_certs(
                                 current_block = 5485510540846724406;
                                 break 's_36;
                             }
-                            free(key_id as *mut libc::c_void);
+                            libc::free(key_id as *mut libc::c_void);
                             key_id = 0 as *mut libc::c_char;
                         }
                     }
@@ -3269,7 +3269,7 @@ unsafe extern "C" fn parse_revoked_certs(
     if !bitmap.is_null() {
         bitmap_free(bitmap);
     }
-    free(key_id as *mut libc::c_void);
+    libc::free(key_id as *mut libc::c_void);
     sshkey_free(ca_key);
     sshbuf_free(subsect);
     return r;
@@ -3298,12 +3298,12 @@ unsafe extern "C" fn blob_section(
                 0 as *const libc::c_char,
                 b"bad length\0" as *const u8 as *const libc::c_char,
             );
-            free(rdata as *mut libc::c_void);
+            libc::free(rdata as *mut libc::c_void);
             return -(4 as libc::c_int);
         }
         r = revoke_blob(target_tree, rdata, rlen);
         if r != 0 as libc::c_int {
-            free(rdata as *mut libc::c_void);
+            libc::free(rdata as *mut libc::c_void);
             return r;
         }
     }
@@ -3848,7 +3848,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
         i = i.wrapping_add(1);
         i;
     }
-    free(ca_used as *mut libc::c_void);
+    libc::free(ca_used as *mut libc::c_void);
     sshkey_free(key);
     sshbuf_free(copy);
     sshbuf_free(sect);
@@ -3929,7 +3929,7 @@ unsafe extern "C" fn is_key_revoked(mut krl: *mut ssh_krl, mut key: *const sshke
         return r;
     }
     erb = revoked_blob_tree_RB_FIND(&mut (*krl).revoked_sha1s, &mut rb);
-    free(rb.blob as *mut libc::c_void);
+    libc::free(rb.blob as *mut libc::c_void);
     if !erb.is_null() {
         return -(51 as libc::c_int);
     }
@@ -3943,7 +3943,7 @@ unsafe extern "C" fn is_key_revoked(mut krl: *mut ssh_krl, mut key: *const sshke
         return r;
     }
     erb = revoked_blob_tree_RB_FIND(&mut (*krl).revoked_sha256s, &mut rb);
-    free(rb.blob as *mut libc::c_void);
+    libc::free(rb.blob as *mut libc::c_void);
     if !erb.is_null() {
         return -(51 as libc::c_int);
     }
@@ -3957,7 +3957,7 @@ unsafe extern "C" fn is_key_revoked(mut krl: *mut ssh_krl, mut key: *const sshke
         return r;
     }
     erb = revoked_blob_tree_RB_FIND(&mut (*krl).revoked_keys, &mut rb);
-    free(rb.blob as *mut libc::c_void);
+    libc::free(rb.blob as *mut libc::c_void);
     if !erb.is_null() {
         return -(51 as libc::c_int);
     }
@@ -4097,7 +4097,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
             b"# Comment: %s\n\0" as *const u8 as *const libc::c_char,
             fp,
         );
-        free(fp as *mut libc::c_void);
+        libc::free(fp as *mut libc::c_void);
     }
     fputc('\n' as i32, f);
     rb = revoked_blob_tree_RB_MINMAX(&mut (*krl).revoked_keys, -(1 as libc::c_int));
@@ -4135,8 +4135,8 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
                     fp,
                     sshkey_ssh_name(key),
                 );
-                free(fp as *mut libc::c_void);
-                free(key as *mut libc::c_void);
+                libc::free(fp as *mut libc::c_void);
+                libc::free(key as *mut libc::c_void);
             }
         }
         rb = revoked_blob_tree_RB_NEXT(rb);
@@ -4149,7 +4149,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
             b"hash: SHA256:%s\n\0" as *const u8 as *const libc::c_char,
             fp,
         );
-        free(fp as *mut libc::c_void);
+        libc::free(fp as *mut libc::c_void);
         rb = revoked_blob_tree_RB_NEXT(rb);
     }
     rb = revoked_blob_tree_RB_MINMAX(&mut (*krl).revoked_sha1s, -(1 as libc::c_int));
@@ -4160,7 +4160,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
             b"# hash SHA1:%s\n\0" as *const u8 as *const libc::c_char,
             fp,
         );
-        free(fp as *mut libc::c_void);
+        libc::free(fp as *mut libc::c_void);
         rb = revoked_blob_tree_RB_NEXT(rb);
     }
     let mut current_block_52: u64;
@@ -4192,7 +4192,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
                     sshkey_ssh_name((*rc).ca_key),
                     fp,
                 );
-                free(fp as *mut libc::c_void);
+                libc::free(fp as *mut libc::c_void);
                 current_block_52 = 8180496224585318153;
             }
         }
@@ -4228,7 +4228,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
                         (*rki).key_id,
                     );
                     libc::fprintf(f, b"id: %s\n\0" as *const u8 as *const libc::c_char, fp);
-                    free(fp as *mut libc::c_void);
+                    libc::free(fp as *mut libc::c_void);
                     rki = revoked_key_id_tree_RB_NEXT(rki);
                 }
             }

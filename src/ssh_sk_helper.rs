@@ -21,7 +21,7 @@ extern "C" {
     static mut stderr: *mut libc::FILE;
 
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn free(_: *mut libc::c_void);
+
     fn exit(_: libc::c_int) -> !;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
@@ -232,7 +232,7 @@ unsafe extern "C" fn reply_error(
         __progname,
         msg,
     );
-    free(msg as *mut libc::c_void);
+    libc::free(msg as *mut libc::c_void);
     if r >= 0 as libc::c_int {
         sshfatal(
             b"ssh-sk-helper.c\0" as *const u8 as *const libc::c_char,
@@ -278,7 +278,7 @@ unsafe extern "C" fn null_empty(mut s: *mut *mut libc::c_char) {
     if s.is_null() || (*s).is_null() || **s as libc::c_int != '\0' as i32 {
         return;
     }
-    free(*s as *mut libc::c_void);
+    libc::free(*s as *mut libc::c_void);
     *s = 0 as *mut libc::c_char;
 }
 unsafe extern "C" fn process_sign(mut req: *mut sshbuf) -> *mut sshbuf {
@@ -431,7 +431,7 @@ unsafe extern "C" fn process_sign(mut req: *mut sshbuf) -> *mut sshbuf {
     }
     sshkey_free(key);
     sshbuf_free(kbuf);
-    free(provider as *mut libc::c_void);
+    libc::free(provider as *mut libc::c_void);
     if !sig.is_null() {
         freezero(sig as *mut libc::c_void, siglen);
     }
@@ -623,8 +623,8 @@ unsafe extern "C" fn process_enroll(mut req: *mut sshbuf) -> *mut sshbuf {
     sshbuf_free(kbuf);
     sshbuf_free(attest);
     sshbuf_free(challenge);
-    free(provider as *mut libc::c_void);
-    free(application as *mut libc::c_void);
+    libc::free(provider as *mut libc::c_void);
+    libc::free(application as *mut libc::c_void);
     if !pin.is_null() {
         freezero(pin as *mut libc::c_void, strlen(pin));
     }
@@ -808,8 +808,8 @@ unsafe extern "C" fn process_load_resident(mut req: *mut sshbuf) -> *mut sshbuf 
     }
     sshsk_free_resident_keys(srks, nsrks);
     sshbuf_free(kbuf);
-    free(provider as *mut libc::c_void);
-    free(device as *mut libc::c_void);
+    libc::free(provider as *mut libc::c_void);
+    libc::free(device as *mut libc::c_void);
     if !pin.is_null() {
         freezero(pin as *mut libc::c_void, strlen(pin));
     }

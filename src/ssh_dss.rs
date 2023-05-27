@@ -9,7 +9,6 @@ extern "C" {
     pub type DSA_SIG_st;
     fn freezero(_: *mut libc::c_void, _: size_t);
 
-    fn free(_: *mut libc::c_void);
     fn BN_num_bits(a: *const BIGNUM) -> libc::c_int;
     fn BN_new() -> *mut BIGNUM;
     fn BN_clear_free(a: *mut BIGNUM);
@@ -714,7 +713,7 @@ unsafe extern "C" fn ssh_dss_verify(
     BN_clear_free(sig_r);
     BN_clear_free(sig_s);
     sshbuf_free(b);
-    free(ktype as *mut libc::c_void);
+    libc::free(ktype as *mut libc::c_void);
     if !sigblob.is_null() {
         freezero(sigblob as *mut libc::c_void, len);
     }

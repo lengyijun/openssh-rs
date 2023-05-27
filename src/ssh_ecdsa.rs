@@ -10,7 +10,6 @@ extern "C" {
     pub type ec_point_st;
     pub type ECDSA_SIG_st;
 
-    fn free(_: *mut libc::c_void);
     fn BN_clear_free(a: *mut BIGNUM);
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -377,7 +376,7 @@ unsafe extern "C" fn ssh_ecdsa_deserialize_public(
             }
         }
     }
-    free(curve as *mut libc::c_void);
+    libc::free(curve as *mut libc::c_void);
     if r != 0 as libc::c_int {
         EC_KEY_free((*key).ecdsa);
         (*key).ecdsa = 0 as *mut EC_KEY;
@@ -622,7 +621,7 @@ unsafe extern "C" fn ssh_ecdsa_verify(
     ECDSA_SIG_free(esig);
     BN_clear_free(sig_r);
     BN_clear_free(sig_s);
-    free(ktype as *mut libc::c_void);
+    libc::free(ktype as *mut libc::c_void);
     return ret;
 }
 pub static mut sshkey_ecdsa_funcs: sshkey_impl_funcs = unsafe {

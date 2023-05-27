@@ -20,7 +20,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
 }
@@ -496,11 +496,11 @@ pub unsafe extern "C" fn freerrset(mut rrset: *mut rrsetinfo) {
             if ((*((*rrset).rri_rdatas).offset(i as isize)).rdi_data).is_null() {
                 break;
             }
-            free((*((*rrset).rri_rdatas).offset(i as isize)).rdi_data as *mut libc::c_void);
+            libc::free((*((*rrset).rri_rdatas).offset(i as isize)).rdi_data as *mut libc::c_void);
             i = i.wrapping_add(1);
             i;
         }
-        free((*rrset).rri_rdatas as *mut libc::c_void);
+        libc::free((*rrset).rri_rdatas as *mut libc::c_void);
     }
     if !((*rrset).rri_sigs).is_null() {
         i = 0 as libc::c_int as u_int16_t;
@@ -508,16 +508,16 @@ pub unsafe extern "C" fn freerrset(mut rrset: *mut rrsetinfo) {
             if ((*((*rrset).rri_sigs).offset(i as isize)).rdi_data).is_null() {
                 break;
             }
-            free((*((*rrset).rri_sigs).offset(i as isize)).rdi_data as *mut libc::c_void);
+            libc::free((*((*rrset).rri_sigs).offset(i as isize)).rdi_data as *mut libc::c_void);
             i = i.wrapping_add(1);
             i;
         }
-        free((*rrset).rri_sigs as *mut libc::c_void);
+        libc::free((*rrset).rri_sigs as *mut libc::c_void);
     }
     if !((*rrset).rri_name).is_null() {
-        free((*rrset).rri_name as *mut libc::c_void);
+        libc::free((*rrset).rri_name as *mut libc::c_void);
     }
-    free(rrset as *mut libc::c_void);
+    libc::free(rrset as *mut libc::c_void);
 }
 unsafe extern "C" fn parse_dns_response(
     mut answer: *const u_char,
@@ -762,23 +762,23 @@ unsafe extern "C" fn free_dns_query(mut p: *mut dns_query) {
         return;
     }
     if !((*p).name).is_null() {
-        free((*p).name as *mut libc::c_void);
+        libc::free((*p).name as *mut libc::c_void);
     }
     free_dns_query((*p).next);
-    free(p as *mut libc::c_void);
+    libc::free(p as *mut libc::c_void);
 }
 unsafe extern "C" fn free_dns_rr(mut p: *mut dns_rr) {
     if p.is_null() {
         return;
     }
     if !((*p).name).is_null() {
-        free((*p).name as *mut libc::c_void);
+        libc::free((*p).name as *mut libc::c_void);
     }
     if !((*p).rdata).is_null() {
-        free((*p).rdata);
+        libc::free((*p).rdata);
     }
     free_dns_rr((*p).next);
-    free(p as *mut libc::c_void);
+    libc::free(p as *mut libc::c_void);
 }
 unsafe extern "C" fn free_dns_response(mut p: *mut dns_response) {
     if p.is_null() {
@@ -788,7 +788,7 @@ unsafe extern "C" fn free_dns_response(mut p: *mut dns_response) {
     free_dns_rr((*p).answer);
     free_dns_rr((*p).authority);
     free_dns_rr((*p).additional);
-    free(p as *mut libc::c_void);
+    libc::free(p as *mut libc::c_void);
 }
 unsafe extern "C" fn count_dns_rr(
     mut p: *mut dns_rr,

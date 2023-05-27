@@ -95,7 +95,7 @@ extern "C" {
         _: *mut *mut libc::c_char,
         _: libc::c_int,
     ) -> libc::c_longlong;
-    fn free(_: *mut libc::c_void);
+
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn qsort(__base: *mut libc::c_void, __nmemb: size_t, __size: size_t, __compar: __compar_fn_t);
@@ -1074,7 +1074,7 @@ unsafe extern "C" fn local_do_ls(mut args: *const libc::c_char) {
             args,
         );
         local_do_shell(buf);
-        free(buf as *mut libc::c_void);
+        libc::free(buf as *mut libc::c_void);
     };
 }
 unsafe extern "C" fn path_strip(
@@ -1586,7 +1586,7 @@ unsafe extern "C" fn make_absolute_pwd_glob(
         return escpwd;
     }
     ret = make_absolute(p, escpwd);
-    free(escpwd as *mut libc::c_void);
+    libc::free(escpwd as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn process_get(
@@ -1698,7 +1698,7 @@ unsafe extern "C" fn process_get(
                     tmp,
                     strerror(*libc::__errno_location()),
                 );
-                free(tmp as *mut libc::c_void);
+                libc::free(tmp as *mut libc::c_void);
                 err = -(1 as libc::c_int);
                 break;
             } else {
@@ -1713,7 +1713,7 @@ unsafe extern "C" fn process_get(
                 } else {
                     abs_dst = xstrdup(filename);
                 }
-                free(tmp as *mut libc::c_void);
+                libc::free(tmp as *mut libc::c_void);
                 resume |= global_aflag;
                 if quiet == 0 && resume != 0 {
                     mprintf(
@@ -1759,14 +1759,14 @@ unsafe extern "C" fn process_get(
                 {
                     err = -(1 as libc::c_int);
                 }
-                free(abs_dst as *mut libc::c_void);
+                libc::free(abs_dst as *mut libc::c_void);
                 abs_dst = 0 as *mut libc::c_char;
                 i += 1;
                 i;
             }
         }
     }
-    free(abs_src as *mut libc::c_void);
+    libc::free(abs_src as *mut libc::c_void);
     _ssh__compat_globfree(&mut g);
     return err;
 }
@@ -1914,11 +1914,11 @@ unsafe extern "C" fn process_put(
                             tmp,
                             strerror(*libc::__errno_location()),
                         );
-                        free(tmp as *mut libc::c_void);
+                        libc::free(tmp as *mut libc::c_void);
                         err = -(1 as libc::c_int);
                         break;
                     } else {
-                        free(abs_dst as *mut libc::c_void);
+                        libc::free(abs_dst as *mut libc::c_void);
                         abs_dst = 0 as *mut libc::c_char;
                         if g.gl_matchc == 1 as libc::c_int as libc::c_ulong && !tmp_dst.is_null() {
                             if dst_is_dir != 0 {
@@ -1931,7 +1931,7 @@ unsafe extern "C" fn process_put(
                         } else {
                             abs_dst = make_absolute(xstrdup(filename), pwd);
                         }
-                        free(tmp as *mut libc::c_void);
+                        libc::free(tmp as *mut libc::c_void);
                         resume |= global_aflag;
                         if quiet == 0 && resume != 0 {
                             mprintf(
@@ -1983,8 +1983,8 @@ unsafe extern "C" fn process_put(
             }
         }
     }
-    free(abs_dst as *mut libc::c_void);
-    free(tmp_dst as *mut libc::c_void);
+    libc::free(abs_dst as *mut libc::c_void);
+    libc::free(tmp_dst as *mut libc::c_void);
     _ssh__compat_globfree(&mut g);
     return err;
 }
@@ -2076,7 +2076,7 @@ unsafe extern "C" fn do_ls_dir(
         }
         tmp = path_strip(path, strip_path);
         m = (m as libc::c_ulong).wrapping_add(strlen(tmp)) as u_int as u_int;
-        free(tmp as *mut libc::c_void);
+        libc::free(tmp as *mut libc::c_void);
         if ioctl(
             fileno(stdin),
             0x5413 as libc::c_int as libc::c_ulong,
@@ -2129,7 +2129,7 @@ unsafe extern "C" fn do_ls_dir(
         {
             tmp_0 = path_append(path, (**d.offset(n as isize)).filename);
             fname = path_strip(tmp_0, strip_path);
-            free(tmp_0 as *mut libc::c_void);
+            libc::free(tmp_0 as *mut libc::c_void);
             if lflag & 0x1 as libc::c_int != 0 {
                 if lflag & (0x4 as libc::c_int | 0x100 as libc::c_int) != 0 as libc::c_int
                     || can_get_users_groups_by_id(conn) != 0
@@ -2176,7 +2176,7 @@ unsafe extern "C" fn do_ls_dir(
                         rgroup_name(sb.st_gid),
                     );
                     mprintf(b"%s\n\0" as *const u8 as *const libc::c_char, lname);
-                    free(lname as *mut libc::c_void);
+                    libc::free(lname as *mut libc::c_void);
                 } else {
                     mprintf(
                         b"%s\n\0" as *const u8 as *const libc::c_char,
@@ -2197,7 +2197,7 @@ unsafe extern "C" fn do_ls_dir(
                     c;
                 }
             }
-            free(fname as *mut libc::c_void);
+            libc::free(fname as *mut libc::c_void);
         }
         n += 1;
         n;
@@ -2452,7 +2452,7 @@ unsafe extern "C" fn do_globbed_ls(
                         b"no stat information for %s\0" as *const u8 as *const libc::c_char,
                         fname,
                     );
-                    free(fname as *mut libc::c_void);
+                    libc::free(fname as *mut libc::c_void);
                     current_block_55 = 9853141518545631134;
                 } else {
                     lname = ls_file(
@@ -2464,7 +2464,7 @@ unsafe extern "C" fn do_globbed_ls(
                         rgroup_name((**(g.gl_statv).offset(i as isize)).st_gid),
                     );
                     mprintf(b"%s\n\0" as *const u8 as *const libc::c_char, lname);
-                    free(lname as *mut libc::c_void);
+                    libc::free(lname as *mut libc::c_void);
                     current_block_55 = 313581471991351815;
                 }
             } else {
@@ -2484,7 +2484,7 @@ unsafe extern "C" fn do_globbed_ls(
             }
             match current_block_55 {
                 313581471991351815 => {
-                    free(fname as *mut libc::c_void);
+                    libc::free(fname as *mut libc::c_void);
                 }
                 _ => {}
             }
@@ -2498,7 +2498,7 @@ unsafe extern "C" fn do_globbed_ls(
     if g.gl_pathc != 0 {
         _ssh__compat_globfree(&mut g);
     }
-    free(indices as *mut libc::c_void);
+    libc::free(indices as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn do_df(
@@ -3507,7 +3507,7 @@ unsafe extern "C" fn parse_dispatch_command(
             } else {
                 aa = do_stat(conn, tmp, 0 as libc::c_int);
                 if aa.is_null() {
-                    free(tmp as *mut libc::c_void);
+                    libc::free(tmp as *mut libc::c_void);
                     err = 1 as libc::c_int;
                 } else if (*aa).flags & 0x4 as libc::c_int as libc::c_uint == 0 {
                     crate::log::sshlog(
@@ -3523,7 +3523,7 @@ unsafe extern "C" fn parse_dispatch_command(
                         b"Can't change directory: Can't check target\0" as *const u8
                             as *const libc::c_char,
                     );
-                    free(tmp as *mut libc::c_void);
+                    libc::free(tmp as *mut libc::c_void);
                     err = 1 as libc::c_int;
                 } else if !((*aa).perm & 0o170000 as libc::c_int as libc::c_uint
                     == 0o40000 as libc::c_int as libc::c_uint)
@@ -3542,10 +3542,10 @@ unsafe extern "C" fn parse_dispatch_command(
                             as *const libc::c_char,
                         tmp,
                     );
-                    free(tmp as *mut libc::c_void);
+                    libc::free(tmp as *mut libc::c_void);
                     err = 1 as libc::c_int;
                 } else {
-                    free(*pwd as *mut libc::c_void);
+                    libc::free(*pwd as *mut libc::c_void);
                     *pwd = tmp;
                 }
             }
@@ -3577,7 +3577,7 @@ unsafe extern "C" fn parse_dispatch_command(
                 path1 = xstrdup(b"~\0" as *const u8 as *const libc::c_char);
             }
             tmp = tilde_expand_filename(path1, getuid());
-            free(path1 as *mut libc::c_void);
+            libc::free(path1 as *mut libc::c_void);
             path1 = tmp;
             if chdir(path1) == -(1 as libc::c_int) {
                 crate::log::sshlog(
@@ -3902,8 +3902,8 @@ unsafe extern "C" fn parse_dispatch_command(
     if g.gl_pathc != 0 {
         _ssh__compat_globfree(&mut g);
     }
-    free(path1 as *mut libc::c_void);
-    free(path2 as *mut libc::c_void);
+    libc::free(path1 as *mut libc::c_void);
+    libc::free(path2 as *mut libc::c_void);
     if err_abort != 0 && err != 0 as libc::c_int {
         return -(1 as libc::c_int);
     } else if cmdnum == I_QUIT as libc::c_int {
@@ -3962,10 +3962,10 @@ unsafe extern "C" fn interactive_loop(
                 0 as libc::c_int,
             ) != 0 as libc::c_int
             {
-                free(dir as *mut libc::c_void);
-                free(startdir as *mut libc::c_void);
-                free(remote_path as *mut libc::c_void);
-                free(conn as *mut libc::c_void);
+                libc::free(dir as *mut libc::c_void);
+                libc::free(startdir as *mut libc::c_void);
+                libc::free(remote_path as *mut libc::c_void);
+                libc::free(conn as *mut libc::c_void);
                 return -(1 as libc::c_int);
             }
         } else {
@@ -3998,13 +3998,13 @@ unsafe extern "C" fn interactive_loop(
                 1 as libc::c_int,
                 0 as libc::c_int,
             );
-            free(dir as *mut libc::c_void);
-            free(startdir as *mut libc::c_void);
-            free(remote_path as *mut libc::c_void);
-            free(conn as *mut libc::c_void);
+            libc::free(dir as *mut libc::c_void);
+            libc::free(startdir as *mut libc::c_void);
+            libc::free(remote_path as *mut libc::c_void);
+            libc::free(conn as *mut libc::c_void);
             return err;
         }
-        free(dir as *mut libc::c_void);
+        libc::free(dir as *mut libc::c_void);
     }
     setvbuf(
         stdout,
@@ -4097,9 +4097,9 @@ unsafe extern "C" fn interactive_loop(
         }
     }
     ssh_signal(17 as libc::c_int, None);
-    free(remote_path as *mut libc::c_void);
-    free(startdir as *mut libc::c_void);
-    free(conn as *mut libc::c_void);
+    libc::free(remote_path as *mut libc::c_void);
+    libc::free(startdir as *mut libc::c_void);
+    libc::free(conn as *mut libc::c_void);
     return if err >= 0 as libc::c_int {
         0 as libc::c_int
     } else {

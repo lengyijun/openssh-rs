@@ -18,7 +18,7 @@ extern "C" {
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
@@ -862,7 +862,7 @@ unsafe extern "C" fn sshsk_free_resident_key(mut srk: *mut sshsk_resident_key) {
     }
     sshkey_free((*srk).key);
     freezero((*srk).user_id as *mut libc::c_void, (*srk).user_id_len);
-    free(srk as *mut libc::c_void);
+    libc::free(srk as *mut libc::c_void);
 }
 pub unsafe extern "C" fn sshsk_free_resident_keys(
     mut srks: *mut *mut sshsk_resident_key,
@@ -878,7 +878,7 @@ pub unsafe extern "C" fn sshsk_free_resident_keys(
         i = i.wrapping_add(1);
         i;
     }
-    free(srks as *mut libc::c_void);
+    libc::free(srks as *mut libc::c_void);
 }
 pub unsafe extern "C" fn sshsk_load_resident(
     mut provider_path: *const libc::c_char,

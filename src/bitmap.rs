@@ -3,7 +3,7 @@ extern "C" {
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -31,7 +31,7 @@ pub unsafe extern "C" fn bitmap_new() -> *mut bitmap {
         ::core::mem::size_of::<u_int>() as libc::c_ulong,
     ) as *mut u_int;
     if ((*ret).d).is_null() {
-        free(ret as *mut libc::c_void);
+        libc::free(ret as *mut libc::c_void);
         return 0 as *mut bitmap;
     }
     (*ret).len = 1 as libc::c_int as size_t;
@@ -41,10 +41,10 @@ pub unsafe extern "C" fn bitmap_new() -> *mut bitmap {
 pub unsafe extern "C" fn bitmap_free(mut b: *mut bitmap) {
     if !b.is_null() && !((*b).d).is_null() {
         bitmap_zero(b);
-        free((*b).d as *mut libc::c_void);
+        libc::free((*b).d as *mut libc::c_void);
         (*b).d = 0 as *mut u_int;
     }
-    free(b as *mut libc::c_void);
+    libc::free(b as *mut libc::c_void);
 }
 pub unsafe extern "C" fn bitmap_zero(mut b: *mut bitmap) {
     memset(

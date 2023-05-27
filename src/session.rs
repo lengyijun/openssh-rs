@@ -103,7 +103,7 @@ extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn endgrent();
     fn initgroups(__user: *const libc::c_char, __group: __gid_t) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
+
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn mkdtemp(__template: *mut libc::c_char) -> *mut libc::c_char;
@@ -1069,7 +1069,7 @@ unsafe extern "C" fn auth_input_request_forwarding(
             strerror(*libc::__errno_location()),
         );
         restore_uid();
-        free(auth_sock_dir as *mut libc::c_void);
+        libc::free(auth_sock_dir as *mut libc::c_void);
         auth_sock_dir = 0 as *mut libc::c_char;
     } else {
         xasprintf(
@@ -1098,12 +1098,12 @@ unsafe extern "C" fn auth_input_request_forwarding(
             return 1 as libc::c_int;
         }
     }
-    free(auth_sock_name as *mut libc::c_void);
+    libc::free(auth_sock_name as *mut libc::c_void);
     if !auth_sock_dir.is_null() {
         temporarily_use_uid(pw);
         rmdir(auth_sock_dir);
         restore_uid();
-        free(auth_sock_dir as *mut libc::c_void);
+        libc::free(auth_sock_dir as *mut libc::c_void);
     }
     if sock != -(1 as libc::c_int) {
         close(sock);
@@ -1205,7 +1205,7 @@ unsafe extern "C" fn prepare_auth_info_file(mut pw: *mut passwd, mut info: *mut 
         if fd != -(1 as libc::c_int) {
             close(fd);
         }
-        free(auth_info_file as *mut libc::c_void);
+        libc::free(auth_info_file as *mut libc::c_void);
         auth_info_file = 0 as *mut libc::c_char;
     }
     restore_uid();
@@ -1266,7 +1266,7 @@ unsafe extern "C" fn set_fwdpermit_from_authopts(mut ssh: *mut ssh, mut _opts: *
                 host,
                 port,
             );
-            free(tmp as *mut libc::c_void);
+            libc::free(tmp as *mut libc::c_void);
             i = i.wrapping_add(1);
             i;
         }
@@ -1311,7 +1311,7 @@ unsafe extern "C" fn set_fwdpermit_from_authopts(mut ssh: *mut ssh, mut _opts: *
                 );
             }
             channel_add_permission(ssh, 0x101 as libc::c_int, 1 as libc::c_int, host, port);
-            free(tmp as *mut libc::c_void);
+            libc::free(tmp as *mut libc::c_void);
             i = i.wrapping_add(1);
             i;
         }
@@ -1981,7 +1981,7 @@ unsafe extern "C" fn read_environment_file(
             child_set_env(env, envsize, cp, value);
         }
     }
-    free(line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     fclose(f);
 }
 unsafe extern "C" fn do_setup_env(
@@ -2132,7 +2132,7 @@ unsafe extern "C" fn do_setup_env(
                     );
                 }
             }
-            free(ocp as *mut libc::c_void);
+            libc::free(ocp as *mut libc::c_void);
             n = n.wrapping_add(1);
             n;
         }
@@ -2173,7 +2173,7 @@ unsafe extern "C" fn do_setup_env(
         value = value.offset(1);
         *fresh1 = '\0' as i32 as libc::c_char;
         child_set_env(&mut env, &mut envsize, cp, value);
-        free(cp as *mut libc::c_void);
+        libc::free(cp as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
@@ -2201,7 +2201,7 @@ unsafe extern "C" fn do_setup_env(
         laddr,
         ssh_local_port(ssh),
     );
-    free(laddr as *mut libc::c_void);
+    libc::free(laddr as *mut libc::c_void);
     child_set_env(
         &mut env,
         &mut envsize,
@@ -2445,8 +2445,8 @@ unsafe extern "C" fn do_rc_files(
             );
         }
     }
-    free(cmd as *mut libc::c_void);
-    free(user_rc as *mut libc::c_void);
+    libc::free(cmd as *mut libc::c_void);
+    libc::free(user_rc as *mut libc::c_void);
 }
 unsafe extern "C" fn do_nologin(mut pw: *mut passwd) {
     let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
@@ -2758,9 +2758,9 @@ pub unsafe extern "C" fn do_setusercontext(mut pw: *mut passwd) {
                 0 as *mut libc::c_void as *mut libc::c_char,
             );
             safely_chroot(chroot_path, (*pw).pw_uid);
-            free(tmp as *mut libc::c_void);
-            free(chroot_path as *mut libc::c_void);
-            free(options.chroot_directory as *mut libc::c_void);
+            libc::free(tmp as *mut libc::c_void);
+            libc::free(chroot_path as *mut libc::c_void);
+            libc::free(options.chroot_directory as *mut libc::c_void);
             options.chroot_directory = 0 as *mut libc::c_char;
             in_chroot = 1 as libc::c_int;
         }
@@ -3459,7 +3459,7 @@ unsafe extern "C" fn session_pty_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
         );
     }
     if strcmp((*s).term, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
-        free((*s).term as *mut libc::c_void);
+        libc::free((*s).term as *mut libc::c_void);
         (*s).term = 0 as *mut libc::c_char;
     }
     crate::log::sshlog(
@@ -3487,7 +3487,7 @@ unsafe extern "C" fn session_pty_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
         )
     } == 0
     {
-        free((*s).term as *mut libc::c_void);
+        libc::free((*s).term as *mut libc::c_void);
         (*s).term = 0 as *mut libc::c_char;
         (*s).ptyfd = -(1 as libc::c_int);
         (*s).ttyfd = -(1 as libc::c_int);
@@ -3651,7 +3651,7 @@ unsafe extern "C" fn session_subsystem_req(mut ssh: *mut ssh, mut s: *mut Sessio
                 options.subsystem_name[i as usize],
             );
             channel_set_xtype(ssh, (*s).chanid, type_0);
-            free(type_0 as *mut libc::c_void);
+            libc::free(type_0 as *mut libc::c_void);
             success = (do_exec(ssh, s, cmd) == 0 as libc::c_int) as libc::c_int;
             break;
         } else {
@@ -3739,8 +3739,8 @@ unsafe extern "C" fn session_x11_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
         );
     }
     if success == 0 {
-        free((*s).auth_proto as *mut libc::c_void);
-        free((*s).auth_data as *mut libc::c_void);
+        libc::free((*s).auth_proto as *mut libc::c_void);
+        libc::free((*s).auth_data as *mut libc::c_void);
         (*s).auth_proto = 0 as *mut libc::c_char;
         (*s).auth_data = 0 as *mut libc::c_char;
     }
@@ -3788,7 +3788,7 @@ unsafe extern "C" fn session_exec_req(mut ssh: *mut ssh, mut s: *mut Session) ->
         b"session:command\0" as *const u8 as *const libc::c_char,
     );
     success = (do_exec(ssh, s, command) == 0 as libc::c_int) as libc::c_int as u_int;
-    free(command as *mut libc::c_void);
+    libc::free(command as *mut libc::c_void);
     return success as libc::c_int;
 }
 unsafe extern "C" fn session_break_req(mut ssh: *mut ssh, mut s: *mut Session) -> libc::c_int {
@@ -3897,8 +3897,8 @@ unsafe extern "C" fn session_env_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
             name,
         );
     }
-    free(name as *mut libc::c_void);
-    free(val as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
+    libc::free(val as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn name2sig(mut name: *mut libc::c_char) -> libc::c_int {
@@ -4048,7 +4048,7 @@ unsafe extern "C" fn session_signal_req(mut ssh: *mut ssh, mut s: *mut Session) 
             }
         }
     }
-    free(signame as *mut libc::c_void);
+    libc::free(signame as *mut libc::c_void);
     return success;
 }
 unsafe extern "C" fn session_auth_agent_req(mut ssh: *mut ssh, mut s: *mut Session) -> libc::c_int {
@@ -4394,15 +4394,15 @@ unsafe extern "C" fn session_close_single_x11(
         i = i.wrapping_add(1);
         i;
     }
-    free((*s).x11_chanids as *mut libc::c_void);
+    libc::free((*s).x11_chanids as *mut libc::c_void);
     (*s).x11_chanids = 0 as *mut libc::c_int;
-    free((*s).display as *mut libc::c_void);
+    libc::free((*s).display as *mut libc::c_void);
     (*s).display = 0 as *mut libc::c_char;
-    free((*s).auth_proto as *mut libc::c_void);
+    libc::free((*s).auth_proto as *mut libc::c_void);
     (*s).auth_proto = 0 as *mut libc::c_char;
-    free((*s).auth_data as *mut libc::c_void);
+    libc::free((*s).auth_data as *mut libc::c_void);
     (*s).auth_data = 0 as *mut libc::c_char;
-    free((*s).auth_display as *mut libc::c_void);
+    libc::free((*s).auth_display as *mut libc::c_void);
     (*s).auth_display = 0 as *mut libc::c_char;
 }
 unsafe extern "C" fn session_exit_message(
@@ -4574,22 +4574,22 @@ pub unsafe extern "C" fn session_close(mut ssh: *mut ssh, mut s: *mut Session) {
     if (*s).ttyfd != -(1 as libc::c_int) {
         session_pty_cleanup(s);
     }
-    free((*s).term as *mut libc::c_void);
-    free((*s).display as *mut libc::c_void);
-    free((*s).x11_chanids as *mut libc::c_void);
-    free((*s).auth_display as *mut libc::c_void);
-    free((*s).auth_data as *mut libc::c_void);
-    free((*s).auth_proto as *mut libc::c_void);
-    free((*s).subsys as *mut libc::c_void);
+    libc::free((*s).term as *mut libc::c_void);
+    libc::free((*s).display as *mut libc::c_void);
+    libc::free((*s).x11_chanids as *mut libc::c_void);
+    libc::free((*s).auth_display as *mut libc::c_void);
+    libc::free((*s).auth_data as *mut libc::c_void);
+    libc::free((*s).auth_proto as *mut libc::c_void);
+    libc::free((*s).subsys as *mut libc::c_void);
     if !((*s).env).is_null() {
         i = 0 as libc::c_int as u_int;
         while i < (*s).num_env {
-            free((*((*s).env).offset(i as isize)).name as *mut libc::c_void);
-            free((*((*s).env).offset(i as isize)).val as *mut libc::c_void);
+            libc::free((*((*s).env).offset(i as isize)).name as *mut libc::c_void);
+            libc::free((*((*s).env).offset(i as isize)).val as *mut libc::c_void);
             i = i.wrapping_add(1);
             i;
         }
-        free((*s).env as *mut libc::c_void);
+        libc::free((*s).env as *mut libc::c_void);
     }
     session_proctitle(s);
     session_unused((*s).self_0);
@@ -4979,7 +4979,7 @@ pub unsafe extern "C" fn do_cleanup(mut ssh: *mut ssh, mut authctxt: *mut Authct
         temporarily_use_uid((*authctxt).pw);
         unlink(auth_info_file);
         restore_uid();
-        free(auth_info_file as *mut libc::c_void);
+        libc::free(auth_info_file as *mut libc::c_void);
         auth_info_file = 0 as *mut libc::c_char;
     }
     if use_privsep == 0 || mm_is_monitor() != 0 {

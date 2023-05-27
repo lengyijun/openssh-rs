@@ -30,7 +30,6 @@ extern "C" {
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
     fn nanosleep(__requested_time: *const timespec, __remaining: *mut timespec) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
 
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
@@ -575,7 +574,7 @@ pub unsafe extern "C" fn auth2_read_banner() -> *mut libc::c_char {
     );
     close(fd);
     if n != len {
-        free(banner as *mut libc::c_void);
+        libc::free(banner as *mut libc::c_void);
         return 0 as *mut libc::c_char;
     }
     *banner.offset(n as isize) = '\0' as i32 as libc::c_char;
@@ -638,7 +637,7 @@ unsafe extern "C" fn userauth_banner(mut ssh: *mut ssh) {
     if !banner.is_null() {
         userauth_send_banner(ssh, banner);
     }
-    free(banner as *mut libc::c_void);
+    libc::free(banner as *mut libc::c_void);
 }
 pub unsafe extern "C" fn do_authentication2(mut ssh: *mut ssh) {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
@@ -752,7 +751,7 @@ unsafe extern "C" fn input_service_request(
             );
         }
     }
-    free(service as *mut libc::c_void);
+    libc::free(service as *mut libc::c_void);
     return r;
 }
 unsafe extern "C" fn user_specific_delay(mut user: *const libc::c_char) -> libc::c_double {
@@ -1039,9 +1038,9 @@ unsafe extern "C" fn input_userauth_request(
         userauth_finish(ssh, authenticated, method, 0 as *const libc::c_char);
         r = 0 as libc::c_int;
     }
-    free(service as *mut libc::c_void);
-    free(user as *mut libc::c_void);
-    free(method as *mut libc::c_void);
+    libc::free(service as *mut libc::c_void);
+    libc::free(user as *mut libc::c_void);
+    libc::free(method as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn userauth_finish(
@@ -1212,7 +1211,7 @@ pub unsafe extern "C" fn userauth_finish(
                 b"send failure packet\0" as *const u8 as *const libc::c_char,
             );
         }
-        free(methods as *mut libc::c_void);
+        libc::free(methods as *mut libc::c_void);
     };
 }
 pub unsafe extern "C" fn auth2_method_allowed(
@@ -1490,7 +1489,7 @@ pub unsafe extern "C" fn auth2_methods_valid(
         }
         _ => {}
     }
-    free(omethods as *mut libc::c_void);
+    libc::free(omethods as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn auth2_setup_methods_lists(mut authctxt: *mut Authctxt) -> libc::c_int {
@@ -1501,7 +1500,7 @@ pub unsafe extern "C" fn auth2_setup_methods_lists(mut authctxt: *mut Authctxt) 
             b"any\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
     {
-        free(*(options.auth_methods).offset(0 as libc::c_int as isize) as *mut libc::c_void);
+        libc::free(*(options.auth_methods).offset(0 as libc::c_int as isize) as *mut libc::c_void);
         let ref mut fresh2 = *(options.auth_methods).offset(0 as libc::c_int as isize);
         *fresh2 = 0 as *mut libc::c_char;
         options.num_auth_methods = 0 as libc::c_int as u_int;
@@ -1636,7 +1635,7 @@ unsafe extern "C" fn remove_method(
         p;
     }
     *methods = xstrdup(p);
-    free(omethods as *mut libc::c_void);
+    libc::free(omethods as *mut libc::c_void);
     return 1 as libc::c_int;
 }
 pub unsafe extern "C" fn auth2_update_methods_lists(
@@ -1722,7 +1721,7 @@ pub unsafe extern "C" fn auth2_update_methods_lists(
 }
 pub unsafe extern "C" fn auth2_authctxt_reset_info(mut authctxt: *mut Authctxt) {
     sshkey_free((*authctxt).auth_method_key);
-    free((*authctxt).auth_method_info as *mut libc::c_void);
+    libc::free((*authctxt).auth_method_info as *mut libc::c_void);
     (*authctxt).auth_method_key = 0 as *mut sshkey;
     (*authctxt).auth_method_info = 0 as *mut libc::c_char;
 }
@@ -1733,7 +1732,7 @@ pub unsafe extern "C" fn auth2_record_info(
 ) {
     let mut ap: ::core::ffi::VaListImpl;
     let mut i: libc::c_int = 0;
-    free((*authctxt).auth_method_info as *mut libc::c_void);
+    libc::free((*authctxt).auth_method_info as *mut libc::c_void);
     (*authctxt).auth_method_info = 0 as *mut libc::c_char;
     ap = args.clone();
     i = vasprintf(&mut (*authctxt).auth_method_info, fmt, ap.as_va_list());
@@ -1847,7 +1846,7 @@ pub unsafe extern "C" fn auth2_key_already_used(
                     fp as *const libc::c_char
                 },
             );
-            free(fp as *mut libc::c_void);
+            libc::free(fp as *mut libc::c_void);
             return 1 as libc::c_int;
         }
         i = i.wrapping_add(1);

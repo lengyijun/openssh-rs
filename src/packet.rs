@@ -50,7 +50,7 @@ extern "C" {
     ) -> libc::c_int;
     fn arc4random() -> uint32_t;
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
-    fn free(_: *mut libc::c_void);
+
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
@@ -684,14 +684,14 @@ pub unsafe extern "C" fn ssh_alloc_session_state() -> *mut ssh {
     {
         if !ssh.is_null() {
             kex_free((*ssh).kex);
-            free(ssh as *mut libc::c_void);
+            libc::free(ssh as *mut libc::c_void);
         }
         if !state.is_null() {
             sshbuf_free((*state).input);
             sshbuf_free((*state).output);
             sshbuf_free((*state).incoming_packet);
             sshbuf_free((*state).outgoing_packet);
-            free(state as *mut libc::c_void);
+            libc::free(state as *mut libc::c_void);
         }
         return 0 as *mut ssh;
     } else {
@@ -803,7 +803,7 @@ pub unsafe extern "C" fn ssh_packet_set_connection(
             ssh_err(r),
             b"cipher_init failed\0" as *const u8 as *const libc::c_char,
         );
-        free(ssh as *mut libc::c_void);
+        libc::free(ssh as *mut libc::c_void);
         return 0 as *mut ssh;
     }
     (*state).newkeys[MODE_OUT as libc::c_int as usize] = 0 as *mut newkeys;
@@ -844,7 +844,7 @@ pub unsafe extern "C" fn ssh_packet_set_log_preamble(
 ) -> libc::c_int {
     let mut args_0: ::core::ffi::VaListImpl;
     let mut r: libc::c_int = 0;
-    free((*ssh).log_preamble as *mut libc::c_void);
+    libc::free((*ssh).log_preamble as *mut libc::c_void);
     if fmt.is_null() {
         (*ssh).log_preamble = 0 as *mut libc::c_char;
     } else {
@@ -1159,11 +1159,11 @@ unsafe extern "C" fn ssh_packet_close_internal(mut ssh: *mut ssh, mut do_close: 
     (*state).receive_context = 0 as *mut sshcipher_ctx;
     (*state).send_context = (*state).receive_context;
     if do_close != 0 {
-        free((*ssh).local_ipaddr as *mut libc::c_void);
+        libc::free((*ssh).local_ipaddr as *mut libc::c_void);
         (*ssh).local_ipaddr = 0 as *mut libc::c_char;
-        free((*ssh).remote_ipaddr as *mut libc::c_void);
+        libc::free((*ssh).remote_ipaddr as *mut libc::c_void);
         (*ssh).remote_ipaddr = 0 as *mut libc::c_char;
-        free((*ssh).state as *mut libc::c_void);
+        libc::free((*ssh).state as *mut libc::c_void);
         (*ssh).state = 0 as *mut session_state;
         kex_free((*ssh).kex);
         (*ssh).kex = 0 as *mut kex;
@@ -2029,7 +2029,7 @@ pub unsafe extern "C" fn ssh_packet_send2(mut ssh: *mut ssh) -> libc::c_int {
                 0 as libc::c_int,
                 ::core::mem::size_of::<packet>() as libc::c_ulong,
             );
-            free(p as *mut libc::c_void);
+            libc::free(p as *mut libc::c_void);
             r = ssh_packet_send2_wrapped(ssh);
             if r != 0 as libc::c_int {
                 return r;
@@ -2821,7 +2821,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll_seqnr(
                         r != 0 as libc::c_int
                     }
                 {
-                    free(msg as *mut libc::c_void);
+                    libc::free(msg as *mut libc::c_void);
                     return r;
                 }
                 crate::log::sshlog(
@@ -2837,7 +2837,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll_seqnr(
                     b"Remote: %.900s\0" as *const u8 as *const libc::c_char,
                     msg,
                 );
-                free(msg as *mut libc::c_void);
+                libc::free(msg as *mut libc::c_void);
             }
             1 => {
                 r = sshpkt_get_u32(ssh, &mut reason);
@@ -2870,7 +2870,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll_seqnr(
                     reason,
                     msg,
                 );
-                free(msg as *mut libc::c_void);
+                libc::free(msg as *mut libc::c_void);
                 return -(29 as libc::c_int);
             }
             3 => {
@@ -3883,7 +3883,7 @@ unsafe extern "C" fn newkeys_from_blob(
             }
         }
     }
-    free(newkey as *mut libc::c_void);
+    libc::free(newkey as *mut libc::c_void);
     sshbuf_free(b);
     return r;
 }

@@ -13,7 +13,7 @@ extern "C" {
         -> *mut libc::c_char;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn chachapoly_get_length(
         cpctx: *mut chachapoly_ctx,
         plenp: *mut u_int,
@@ -294,7 +294,7 @@ pub unsafe extern "C" fn cipher_alg_list(
                         .wrapping_add(2 as libc::c_int as libc::c_ulong),
                 ) as *mut libc::c_char;
                 if tmp.is_null() {
-                    free(ret as *mut libc::c_void);
+                    libc::free(ret as *mut libc::c_void);
                     return 0 as *mut libc::c_char;
                 }
                 ret = tmp;
@@ -384,12 +384,12 @@ pub unsafe extern "C" fn ciphers_valid(mut names: *const libc::c_char) -> libc::
             || (*c).flags & ((1 as libc::c_int) << 3 as libc::c_int) as libc::c_uint
                 != 0 as libc::c_int as libc::c_uint
         {
-            free(cipher_list as *mut libc::c_void);
+            libc::free(cipher_list as *mut libc::c_void);
             return 0 as libc::c_int;
         }
         p = strsep(&mut cp, b",\0" as *const u8 as *const libc::c_char);
     }
-    free(cipher_list as *mut libc::c_void);
+    libc::free(cipher_list as *mut libc::c_void);
     return 1 as libc::c_int;
 }
 pub unsafe extern "C" fn cipher_warning_message(

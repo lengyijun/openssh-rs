@@ -11,7 +11,7 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
 
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn BN_set_flags(b: *mut BIGNUM, n: libc::c_int);
     fn BN_value_one() -> *const BIGNUM;
     fn BN_CTX_new() -> *mut BN_CTX;
@@ -966,7 +966,7 @@ unsafe extern "C" fn ssh_rsa_verify(
         }
     }
     freezero(sigblob as *mut libc::c_void, len);
-    free(sigtype as *mut libc::c_void);
+    libc::free(sigtype as *mut libc::c_void);
     sshbuf_free(b);
     explicit_bzero(
         digest.as_mut_ptr() as *mut libc::c_void,

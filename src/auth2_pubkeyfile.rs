@@ -20,7 +20,6 @@ extern "C" {
         __stream: *mut libc::FILE,
     ) -> __ssize_t;
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
 
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -481,7 +480,7 @@ unsafe extern "C" fn match_principals_option(
                     as *const libc::c_char,
                 result,
             );
-            free(result as *mut libc::c_void);
+            libc::free(result as *mut libc::c_void);
             return 1 as libc::c_int;
         }
         i = i.wrapping_add(1);
@@ -646,7 +645,7 @@ pub unsafe extern "C" fn auth_process_principals(
         nonblank,
         linenum,
     );
-    free(line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     return found_principal as libc::c_int;
 }
 pub unsafe extern "C" fn auth_check_authkey_line(
@@ -995,7 +994,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
             }
         }
     }
-    free(fp as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
     sshauthopt_free(keyopts);
     sshauthopt_free(certopts);
     sshauthopt_free(finalopts);
@@ -1054,7 +1053,7 @@ pub unsafe extern "C" fn auth_check_authkeys_file(
             found_key = 1 as libc::c_int;
         }
     }
-    free(line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     crate::log::sshlog(
         b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"auth_check_authkeys_file\0"))

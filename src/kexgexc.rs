@@ -12,7 +12,7 @@ extern "C" {
     pub type sshcipher;
     pub type session_state;
     pub type bignum_st;
-    fn free(_: *mut libc::c_void);
+
     fn BN_num_bits(a: *const BIGNUM) -> libc::c_int;
     fn BN_clear_free(a: *mut BIGNUM);
     fn DH_get0_key(dh: *const DH, pub_key: *mut *const BIGNUM, priv_key: *mut *const BIGNUM);
@@ -641,6 +641,6 @@ unsafe extern "C" fn input_kex_dh_gex_reply(
     sshkey_free(server_host_key);
     sshbuf_free(tmp);
     sshbuf_free(server_host_key_blob);
-    free(signature as *mut libc::c_void);
+    libc::free(signature as *mut libc::c_void);
     return r;
 }

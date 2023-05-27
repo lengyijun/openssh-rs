@@ -4,7 +4,7 @@ extern "C" {
     fn getpagesize() -> libc::c_int;
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
@@ -81,6 +81,6 @@ pub unsafe extern "C" fn recallocarray(
         memcpy(newptr, ptr, newsize);
     }
     explicit_bzero(ptr, oldsize);
-    free(ptr);
+    libc::free(ptr);
     return newptr;
 }

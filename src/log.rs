@@ -22,7 +22,6 @@ extern "C" {
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
-    fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -350,11 +349,11 @@ pub unsafe extern "C" fn log_verbose_reset() {
     let mut i: size_t = 0;
     i = 0 as libc::c_int as size_t;
     while i < nlog_verbose {
-        free(*log_verbose.offset(i as isize) as *mut libc::c_void);
+        libc::free(*log_verbose.offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free(log_verbose as *mut libc::c_void);
+    libc::free(log_verbose as *mut libc::c_void);
     log_verbose = 0 as *mut *mut libc::c_char;
     nlog_verbose = 0 as libc::c_int as size_t;
 }

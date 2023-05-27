@@ -90,7 +90,6 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_ulonglong;
 
-    fn free(_: *mut libc::c_void);
     fn reallocarray(__ptr: *mut libc::c_void, __nmemb: size_t, __size: size_t)
         -> *mut libc::c_void;
     fn exit(_: libc::c_int) -> !;
@@ -1426,7 +1425,7 @@ unsafe extern "C" fn emit_expansion(
     }
     *cp.offset(o as isize) = '\0' as i32 as libc::c_char;
     if append(cp, patternsp, npatternsp) != 0 as libc::c_int {
-        free(cp as *mut libc::c_void);
+        libc::free(cp as *mut libc::c_void);
         return -(1 as libc::c_int);
     }
     return 0 as libc::c_int;
@@ -1542,7 +1541,7 @@ unsafe extern "C" fn brace_expand(
         return -(1 as libc::c_int);
     }
     if append(cp, &mut active, &mut nactive) != 0 as libc::c_int {
-        free(cp as *mut libc::c_void);
+        libc::free(cp as *mut libc::c_void);
         return -(1 as libc::c_int);
     }
     loop {
@@ -1556,7 +1555,7 @@ unsafe extern "C" fn brace_expand(
         if brace_expand_one(cp, &mut active, &mut nactive, &mut expanded, &mut invalid)
             == -(1 as libc::c_int)
         {
-            free(cp as *mut libc::c_void);
+            libc::free(cp as *mut libc::c_void);
             current_block = 13913881577436039028;
             break;
         } else {
@@ -1574,7 +1573,7 @@ unsafe extern "C" fn brace_expand(
                 );
             }
             if expanded != 0 {
-                free(cp as *mut libc::c_void);
+                libc::free(cp as *mut libc::c_void);
             } else {
                 cp2 = strrchr(cp, '/' as i32);
                 if !cp2.is_null() {
@@ -1585,11 +1584,11 @@ unsafe extern "C" fn brace_expand(
                     cp2 = cp;
                 }
                 if append(xstrdup(cp2), &mut done, &mut ndone) != 0 as libc::c_int {
-                    free(cp as *mut libc::c_void);
+                    libc::free(cp as *mut libc::c_void);
                     current_block = 13913881577436039028;
                     break;
                 } else {
-                    free(cp as *mut libc::c_void);
+                    libc::free(cp as *mut libc::c_void);
                 }
             }
         }
@@ -1606,18 +1605,18 @@ unsafe extern "C" fn brace_expand(
     }
     i = 0 as libc::c_int as size_t;
     while i < nactive {
-        free(*active.offset(i as isize) as *mut libc::c_void);
+        libc::free(*active.offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free(active as *mut libc::c_void);
+    libc::free(active as *mut libc::c_void);
     i = 0 as libc::c_int as size_t;
     while i < ndone {
-        free(*done.offset(i as isize) as *mut libc::c_void);
+        libc::free(*done.offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free(done as *mut libc::c_void);
+    libc::free(done as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn do_sftp_connect(
@@ -1775,9 +1774,9 @@ pub unsafe extern "C" fn toremote(
             _ => {
                 i = 0 as libc::c_int;
                 while i < argc - 1 as libc::c_int {
-                    free(suser as *mut libc::c_void);
-                    free(host as *mut libc::c_void);
-                    free(src as *mut libc::c_void);
+                    libc::free(suser as *mut libc::c_void);
+                    libc::free(host as *mut libc::c_void);
+                    libc::free(src as *mut libc::c_void);
                     r = parse_scp_uri(
                         *argv.offset(i as isize),
                         &mut suser,
@@ -1934,7 +1933,7 @@ pub unsafe extern "C" fn toremote(
                                 {
                                     exit(1 as libc::c_int);
                                 }
-                                free(bp as *mut libc::c_void);
+                                libc::free(bp as *mut libc::c_void);
                                 xasprintf(
                                     &mut bp as *mut *mut libc::c_char,
                                     b"%s -t %s%s\0" as *const u8 as *const libc::c_char,
@@ -1951,7 +1950,7 @@ pub unsafe extern "C" fn toremote(
                                 {
                                     exit(1 as libc::c_int);
                                 }
-                                free(bp as *mut libc::c_void);
+                                libc::free(bp as *mut libc::c_void);
                                 close(remin);
                                 close(remout);
                                 remout = -(1 as libc::c_int);
@@ -2156,7 +2155,7 @@ pub unsafe extern "C" fn toremote(
                                 if response() < 0 as libc::c_int {
                                     exit(1 as libc::c_int);
                                 }
-                                free(bp as *mut libc::c_void);
+                                libc::free(bp as *mut libc::c_void);
                             }
                             source(1 as libc::c_int, argv.offset(i as isize));
                         }
@@ -2168,14 +2167,14 @@ pub unsafe extern "C" fn toremote(
         }
     }
     if mode as libc::c_uint == MODE_SFTP as libc::c_int as libc::c_uint {
-        free(conn as *mut libc::c_void);
+        libc::free(conn as *mut libc::c_void);
     }
-    free(tuser as *mut libc::c_void);
-    free(thost as *mut libc::c_void);
-    free(targ as *mut libc::c_void);
-    free(suser as *mut libc::c_void);
-    free(host as *mut libc::c_void);
-    free(src as *mut libc::c_void);
+    libc::free(tuser as *mut libc::c_void);
+    libc::free(thost as *mut libc::c_void);
+    libc::free(targ as *mut libc::c_void);
+    libc::free(suser as *mut libc::c_void);
+    libc::free(host as *mut libc::c_void);
+    libc::free(src as *mut libc::c_void);
 }
 pub unsafe extern "C" fn tolocal(
     mut argc: libc::c_int,
@@ -2204,9 +2203,9 @@ pub unsafe extern "C" fn tolocal(
     alist.list = 0 as *mut *mut libc::c_char;
     i = 0 as libc::c_int;
     while i < argc - 1 as libc::c_int {
-        free(suser as *mut libc::c_void);
-        free(host as *mut libc::c_void);
-        free(src as *mut libc::c_void);
+        libc::free(suser as *mut libc::c_void);
+        libc::free(host as *mut libc::c_void);
+        libc::free(src as *mut libc::c_void);
         r = parse_scp_uri(
             *argv.offset(i as isize),
             &mut suser,
@@ -2296,7 +2295,7 @@ pub unsafe extern "C" fn tolocal(
                         src,
                         conn,
                     );
-                    free(conn as *mut libc::c_void);
+                    libc::free(conn as *mut libc::c_void);
                     close(remin);
                     close(remout);
                     remout = -(1 as libc::c_int);
@@ -2326,11 +2325,11 @@ pub unsafe extern "C" fn tolocal(
                     &mut do_cmd_pid,
                 ) < 0 as libc::c_int
                 {
-                    free(bp as *mut libc::c_void);
+                    libc::free(bp as *mut libc::c_void);
                     errs += 1;
                     errs;
                 } else {
-                    free(bp as *mut libc::c_void);
+                    libc::free(bp as *mut libc::c_void);
                     sink(
                         1 as libc::c_int,
                         argv.offset(argc as isize)
@@ -2346,9 +2345,9 @@ pub unsafe extern "C" fn tolocal(
         i += 1;
         i;
     }
-    free(suser as *mut libc::c_void);
-    free(host as *mut libc::c_void);
-    free(src as *mut libc::c_void);
+    libc::free(suser as *mut libc::c_void);
+    libc::free(host as *mut libc::c_void);
+    libc::free(src as *mut libc::c_void);
 }
 unsafe extern "C" fn prepare_remote_path(
     mut conn: *mut sftp_conn,
@@ -2567,8 +2566,8 @@ pub unsafe extern "C" fn source_sftp(
         );
         errs = 1 as libc::c_int;
     }
-    free(abs_dst as *mut libc::c_void);
-    free(target as *mut libc::c_void);
+    libc::free(abs_dst as *mut libc::c_void);
+    libc::free(target as *mut libc::c_void);
 }
 pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) {
     let mut current_block: u64;
@@ -3402,9 +3401,9 @@ pub unsafe extern "C" fn sink_sftp(
                                     {
                                         err = -(1 as libc::c_int);
                                     }
-                                    free(abs_dst as *mut libc::c_void);
+                                    libc::free(abs_dst as *mut libc::c_void);
                                     abs_dst = 0 as *mut libc::c_char;
-                                    free(tmp as *mut libc::c_void);
+                                    libc::free(tmp as *mut libc::c_void);
                                     tmp = 0 as *mut libc::c_char;
                                     i += 1;
                                     i;
@@ -3416,8 +3415,8 @@ pub unsafe extern "C" fn sink_sftp(
             }
         }
     }
-    free(abs_src as *mut libc::c_void);
-    free(tmp as *mut libc::c_void);
+    libc::free(abs_src as *mut libc::c_void);
+    libc::free(tmp as *mut libc::c_void);
     _ssh__compat_globfree(&mut g);
     if err == -(1 as libc::c_int) {
         errs = 1 as libc::c_int;
@@ -3987,7 +3986,7 @@ pub unsafe extern "C" fn sink(
                                         .wrapping_add(strlen(cp))
                                         .wrapping_add(250 as libc::c_int as libc::c_ulong);
                                     if need > cursize {
-                                        free(namebuf as *mut libc::c_void);
+                                        libc::free(namebuf as *mut libc::c_void);
                                         namebuf = xmalloc(need) as *mut libc::c_char;
                                         cursize = need;
                                     }
@@ -4066,7 +4065,7 @@ pub unsafe extern "C" fn sink(
                                                         mode,
                                                     );
                                                 }
-                                                free(
+                                                libc::free(
                                                     vect[0 as libc::c_int as usize]
                                                         as *mut libc::c_void,
                                                 );
@@ -4401,22 +4400,22 @@ pub unsafe extern "C" fn sink(
             _ => {
                 n = 0 as libc::c_int as size_t;
                 while n < npatterns {
-                    free(*patterns.offset(n as isize) as *mut libc::c_void);
+                    libc::free(*patterns.offset(n as isize) as *mut libc::c_void);
                     n = n.wrapping_add(1);
                     n;
                 }
-                free(patterns as *mut libc::c_void);
+                libc::free(patterns as *mut libc::c_void);
                 return;
             }
         }
     }
     n = 0 as libc::c_int as size_t;
     while n < npatterns {
-        free(*patterns.offset(n as isize) as *mut libc::c_void);
+        libc::free(*patterns.offset(n as isize) as *mut libc::c_void);
         n = n.wrapping_add(1);
         n;
     }
-    free(patterns as *mut libc::c_void);
+    libc::free(patterns as *mut libc::c_void);
     run_err(
         b"protocol error: %s\0" as *const u8 as *const libc::c_char,
         why,
@@ -4651,9 +4650,9 @@ pub unsafe extern "C" fn throughlocal_sftp(
                             {
                                 err = -(1 as libc::c_int);
                             }
-                            free(abs_dst as *mut libc::c_void);
+                            libc::free(abs_dst as *mut libc::c_void);
                             abs_dst = 0 as *mut libc::c_char;
-                            free(tmp as *mut libc::c_void);
+                            libc::free(tmp as *mut libc::c_void);
                             tmp = 0 as *mut libc::c_char;
                             i += 1;
                             i;
@@ -4663,10 +4662,10 @@ pub unsafe extern "C" fn throughlocal_sftp(
             }
         }
     }
-    free(abs_src as *mut libc::c_void);
-    free(abs_dst as *mut libc::c_void);
-    free(target as *mut libc::c_void);
-    free(tmp as *mut libc::c_void);
+    libc::free(abs_src as *mut libc::c_void);
+    libc::free(abs_dst as *mut libc::c_void);
+    libc::free(target as *mut libc::c_void);
+    libc::free(tmp as *mut libc::c_void);
     _ssh__compat_globfree(&mut g);
     if err == -(1 as libc::c_int) {
         errs = 1 as libc::c_int;
@@ -4792,7 +4791,7 @@ pub unsafe extern "C" fn note_err(mut fmt: *const libc::c_char, mut args_0: ...)
             return 0 as libc::c_int;
         }
         run_err(b"%s\0" as *const u8 as *const libc::c_char, emsg);
-        free(emsg as *mut libc::c_void);
+        libc::free(emsg as *mut libc::c_void);
         emsg = 0 as *mut libc::c_char;
         return -(1 as libc::c_int);
     }

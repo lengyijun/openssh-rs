@@ -54,7 +54,7 @@ extern "C" {
         valp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
+
     fn sshbuf_put_u8(buf: *mut sshbuf, val: u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut sshbuf, valp: *mut u_char) -> libc::c_int;
@@ -1063,11 +1063,11 @@ unsafe extern "C" fn order_hostkeyalgs(
             );
         }
     }
-    free(best as *mut libc::c_void);
-    free(first as *mut libc::c_void);
-    free(last as *mut libc::c_void);
-    free(hostname as *mut libc::c_void);
-    free(oavail as *mut libc::c_void);
+    libc::free(best as *mut libc::c_void);
+    libc::free(first as *mut libc::c_void);
+    libc::free(last as *mut libc::c_void);
+    libc::free(hostname as *mut libc::c_void);
+    libc::free(oavail as *mut libc::c_void);
     free_hostkeys(hostkeys);
     return ret;
 }
@@ -1124,7 +1124,7 @@ pub unsafe extern "C" fn ssh_kex2(
             b"kex_assemble_namelist\0" as *const u8 as *const libc::c_char,
         );
     }
-    free(all_key as *mut libc::c_void);
+    libc::free(all_key as *mut libc::c_void);
     s = kex_names_cat(
         options.kex_algorithms,
         b"ext-info-c\0" as *const u8 as *const libc::c_char,
@@ -1156,7 +1156,7 @@ pub unsafe extern "C" fn ssh_kex2(
             options.hostkeyalgorithms
         },
     );
-    free(hkalgs as *mut libc::c_void);
+    libc::free(hkalgs as *mut libc::c_void);
     r = kex_setup(ssh, myproposal.as_mut_ptr());
     if r != 0 as libc::c_int {
         sshfatal(
@@ -1197,7 +1197,7 @@ pub unsafe extern "C" fn ssh_kex2(
         DISPATCH_BLOCK as libc::c_int,
         &mut (*(*ssh).kex).done as *mut sig_atomic_t as *mut sig_atomic_t,
     );
-    free(myproposal[PROPOSAL_KEX_ALGS as libc::c_int as usize] as *mut libc::c_void);
+    libc::free(myproposal[PROPOSAL_KEX_ALGS as libc::c_int as usize] as *mut libc::c_void);
     myproposal[PROPOSAL_KEX_ALGS as libc::c_int as usize] =
         compat_kex_proposal(ssh, options.kex_algorithms);
     r = kex_prop2buf((*(*ssh).kex).my, myproposal.as_mut_ptr());
@@ -1419,7 +1419,7 @@ unsafe extern "C" fn input_userauth_service_accept(
                 b"service_accept: %s\0" as *const u8 as *const libc::c_char,
                 reply,
             );
-            free(reply as *mut libc::c_void);
+            libc::free(reply as *mut libc::c_void);
             current_block = 6873731126896040597;
         }
     } else {
@@ -1521,12 +1521,12 @@ pub unsafe extern "C" fn userauth(mut ssh: *mut ssh, mut authlist: *mut libc::c_
     if !((*authctxt).method).is_null() && ((*(*authctxt).method).cleanup).is_some() {
         ((*(*authctxt).method).cleanup).expect("non-null function pointer")(ssh);
     }
-    free((*authctxt).methoddata);
+    libc::free((*authctxt).methoddata);
     (*authctxt).methoddata = 0 as *mut libc::c_void;
     if authlist.is_null() {
         authlist = (*authctxt).authlist;
     } else {
-        free((*authctxt).authlist as *mut libc::c_void);
+        libc::free((*authctxt).authlist as *mut libc::c_void);
         (*authctxt).authlist = authlist;
     }
     loop {
@@ -1625,7 +1625,7 @@ unsafe extern "C" fn input_userauth_banner(
         }
         r = 0 as libc::c_int;
     }
-    free(msg as *mut libc::c_void);
+    libc::free(msg as *mut libc::c_void);
     return r;
 }
 unsafe extern "C" fn input_userauth_success(
@@ -1648,12 +1648,12 @@ unsafe extern "C" fn input_userauth_success(
             b"no authentication context\0" as *const u8 as *const libc::c_char,
         );
     }
-    free((*authctxt).authlist as *mut libc::c_void);
+    libc::free((*authctxt).authlist as *mut libc::c_void);
     (*authctxt).authlist = 0 as *mut libc::c_char;
     if !((*authctxt).method).is_null() && ((*(*authctxt).method).cleanup).is_some() {
         ((*(*authctxt).method).cleanup).expect("non-null function pointer")(ssh);
     }
-    free((*authctxt).methoddata);
+    libc::free((*authctxt).methoddata);
     (*authctxt).methoddata = 0 as *mut libc::c_void;
     (*authctxt).success = 1 as libc::c_int;
     return 0 as libc::c_int;
@@ -1718,7 +1718,7 @@ unsafe extern "C" fn input_userauth_failure(
         userauth(ssh, authlist);
         authlist = 0 as *mut libc::c_char;
     }
-    free(authlist as *mut libc::c_void);
+    libc::free(authlist as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn format_identity(mut id: *mut Identity) -> *mut libc::c_char {
@@ -1766,7 +1766,7 @@ unsafe extern "C" fn format_identity(mut id: *mut Identity) -> *mut libc::c_char
             b"\0" as *const u8 as *const libc::c_char
         },
     );
-    free(fp as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn input_userauth_pk_ok(
@@ -1911,10 +1911,10 @@ unsafe extern "C" fn input_userauth_pk_ok(
         }
     }
     sshkey_free(key);
-    free(ident as *mut libc::c_void);
-    free(fp as *mut libc::c_void);
-    free(pkalg as *mut libc::c_void);
-    free(pkblob as *mut libc::c_void);
+    libc::free(ident as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
+    libc::free(pkalg as *mut libc::c_void);
+    libc::free(pkblob as *mut libc::c_void);
     if r == 0 as libc::c_int && sent == 0 as libc::c_int {
         userauth(ssh, 0 as *mut libc::c_char);
     }
@@ -2031,7 +2031,7 @@ unsafe extern "C" fn userauth_passwd(mut ssh: *mut ssh) -> libc::c_int {
             b"send packet\0" as *const u8 as *const libc::c_char,
         );
     }
-    free(prompt as *mut libc::c_void);
+    libc::free(prompt as *mut libc::c_void);
     if !password.is_null() {
         freezero(password as *mut libc::c_void, strlen(password));
     }
@@ -2227,8 +2227,8 @@ unsafe extern "C" fn input_userauth_passwd_changereq(
     if !password.is_null() {
         freezero(password as *mut libc::c_void, strlen(password));
     }
-    free(info as *mut libc::c_void);
-    free(lang as *mut libc::c_void);
+    libc::free(info as *mut libc::c_void);
+    libc::free(lang as *mut libc::c_void);
     return r;
 }
 unsafe extern "C" fn key_sig_algorithm(
@@ -2270,12 +2270,12 @@ unsafe extern "C" fn key_sig_algorithm(
         if !tmp.is_null() {
             alg = xstrdup(cp);
         }
-        free(tmp as *mut libc::c_void);
+        libc::free(tmp as *mut libc::c_void);
         if !alg.is_null() {
             break;
         }
     }
-    free(oallowed as *mut libc::c_void);
+    libc::free(oallowed as *mut libc::c_void);
     return alg;
 }
 unsafe extern "C" fn identity_sign(
@@ -2345,7 +2345,7 @@ unsafe extern "C" fn identity_sign(
     loop {
         match current_block {
             7499137372788269677 => {
-                free(prompt as *mut libc::c_void);
+                libc::free(prompt as *mut libc::c_void);
                 break;
             }
             _ => {
@@ -2375,7 +2375,7 @@ unsafe extern "C" fn identity_sign(
                         sshkey_type(sign_key),
                         fp,
                     );
-                    free(fp as *mut libc::c_void);
+                    libc::free(fp as *mut libc::c_void);
                 }
                 r = sshkey_sign(
                     sign_key,
@@ -2609,7 +2609,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
             current_block = 9859671972921157070;
             break;
         }
-        free(alg as *mut libc::c_void);
+        libc::free(alg as *mut libc::c_void);
         slen = 0 as libc::c_int as size_t;
         signature = 0 as *mut u_char;
         alg = key_sig_algorithm(
@@ -2913,8 +2913,8 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
         }
         _ => {}
     }
-    free(fp as *mut libc::c_void);
-    free(alg as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
+    libc::free(alg as *mut libc::c_void);
     sshbuf_free(b);
     freezero(signature as *mut libc::c_void, slen);
     return sent;
@@ -3008,8 +3008,8 @@ unsafe extern "C" fn send_pubkey_test(mut ssh: *mut ssh, mut id: *mut Identity) 
             sent = 1 as libc::c_int;
         }
     }
-    free(alg as *mut libc::c_void);
-    free(blob as *mut libc::c_void);
+    libc::free(alg as *mut libc::c_void);
+    libc::free(blob as *mut libc::c_void);
     return sent;
 }
 unsafe extern "C" fn load_identity_file(mut id: *mut Identity) -> *mut sshkey {
@@ -3090,7 +3090,7 @@ unsafe extern "C" fn load_identity_file(mut id: *mut Identity) -> *mut sshkey {
                     0 as *const libc::c_char,
                     b"no passphrase given, try next key\0" as *const u8 as *const libc::c_char,
                 );
-                free(passphrase as *mut libc::c_void);
+                libc::free(passphrase as *mut libc::c_void);
                 break;
             }
         }
@@ -3219,7 +3219,7 @@ unsafe extern "C" fn load_identity_file(mut id: *mut Identity) -> *mut sshkey {
         if i > 0 as libc::c_int {
             freezero(passphrase as *mut libc::c_void, strlen(passphrase));
         }
-        free(comment as *mut libc::c_void);
+        libc::free(comment as *mut libc::c_void);
         if !private.is_null() || quit != 0 {
             break;
         }
@@ -3649,7 +3649,7 @@ unsafe extern "C" fn pubkey_prepare(mut ssh: *mut ssh, mut authctxt: *mut Authct
             }
             *(*id).next.tqe_prev = (*id).next.tqe_next;
             sshkey_free((*id).key);
-            free((*id).filename as *mut libc::c_void);
+            libc::free((*id).filename as *mut libc::c_void);
             memset(
                 id as *mut libc::c_void,
                 0 as libc::c_int,
@@ -3675,7 +3675,7 @@ unsafe extern "C" fn pubkey_prepare(mut ssh: *mut ssh, mut authctxt: *mut Authct
             b"Will attempt key: %s\0" as *const u8 as *const libc::c_char,
             ident,
         );
-        free(ident as *mut libc::c_void);
+        libc::free(ident as *mut libc::c_void);
         id = id2;
     }
     crate::log::sshlog(
@@ -3704,8 +3704,8 @@ unsafe extern "C" fn pubkey_cleanup(mut ssh: *mut ssh) {
         }
         *(*id).next.tqe_prev = (*id).next.tqe_next;
         sshkey_free((*id).key);
-        free((*id).filename as *mut libc::c_void);
-        free(id as *mut libc::c_void);
+        libc::free((*id).filename as *mut libc::c_void);
+        libc::free(id as *mut libc::c_void);
         id = (*authctxt).keys.tqh_first;
     }
 }
@@ -3758,7 +3758,7 @@ unsafe extern "C" fn userauth_pubkey(mut ssh: *mut ssh) -> libc::c_int {
                     b"Offering public key: %s\0" as *const u8 as *const libc::c_char,
                     ident,
                 );
-                free(ident as *mut libc::c_void);
+                libc::free(ident as *mut libc::c_void);
                 sent = send_pubkey_test(ssh, id);
             }
         } else {
@@ -4037,8 +4037,8 @@ unsafe extern "C" fn input_userauth_info_req(
                         break;
                     }
                     freezero(response as *mut libc::c_void, strlen(response));
-                    free(prompt as *mut libc::c_void);
-                    free(display_prompt as *mut libc::c_void);
+                    libc::free(prompt as *mut libc::c_void);
+                    libc::free(display_prompt as *mut libc::c_void);
                     prompt = 0 as *mut libc::c_char;
                     response = prompt;
                     display_prompt = response;
@@ -4063,11 +4063,11 @@ unsafe extern "C" fn input_userauth_info_req(
     if !response.is_null() {
         freezero(response as *mut libc::c_void, strlen(response));
     }
-    free(prompt as *mut libc::c_void);
-    free(display_prompt as *mut libc::c_void);
-    free(name as *mut libc::c_void);
-    free(inst as *mut libc::c_void);
-    free(lang as *mut libc::c_void);
+    libc::free(prompt as *mut libc::c_void);
+    libc::free(display_prompt as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
+    libc::free(inst as *mut libc::c_void);
+    libc::free(lang as *mut libc::c_void);
     return r;
 }
 unsafe extern "C" fn ssh_keysign(
@@ -4510,7 +4510,7 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
         (*authctxt).active_ktype = 0 as *const libc::c_char;
     }
     if private.is_null() {
-        free((*authctxt).oktypes as *mut libc::c_void);
+        libc::free((*authctxt).oktypes as *mut libc::c_void);
         (*authctxt).ktypes = 0 as *mut libc::c_char;
         (*authctxt).oktypes = (*authctxt).ktypes;
         (*authctxt).active_ktype = 0 as *const libc::c_char;
@@ -4779,10 +4779,10 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
     if !sig.is_null() {
         freezero(sig as *mut libc::c_void, siglen);
     }
-    free(keyblob as *mut libc::c_void);
-    free(lname as *mut libc::c_void);
-    free(fp as *mut libc::c_void);
-    free(chost as *mut libc::c_void);
+    libc::free(keyblob as *mut libc::c_void);
+    libc::free(lname as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
+    libc::free(chost as *mut libc::c_void);
     sshkey_free(private);
     sshbuf_free(b);
     return success;
@@ -4849,7 +4849,7 @@ unsafe extern "C" fn authmethod_get(mut authlist: *mut libc::c_char) -> *mut Aut
             b"start over, passed a different list %s\0" as *const u8 as *const libc::c_char,
             authlist,
         );
-        free(supported as *mut libc::c_void);
+        libc::free(supported as *mut libc::c_void);
         supported = xstrdup(authlist);
         preferred = options.preferred_authentications;
         crate::log::sshlog(
@@ -4930,10 +4930,10 @@ unsafe extern "C" fn authmethod_get(mut authlist: *mut libc::c_char) -> *mut Aut
                 b"Next authentication method: %s\0" as *const u8 as *const libc::c_char,
                 name,
             );
-            free(name as *mut libc::c_void);
+            libc::free(name as *mut libc::c_void);
             return current;
         }
-        free(name as *mut libc::c_void);
+        libc::free(name as *mut libc::c_void);
     }
 }
 unsafe extern "C" fn authmethods_get() -> *mut libc::c_char {

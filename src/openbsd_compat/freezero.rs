@@ -1,6 +1,6 @@
 use ::libc;
 extern "C" {
-    fn free(_: *mut libc::c_void);
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 }
 pub type size_t = libc::c_ulong;
@@ -10,5 +10,5 @@ pub unsafe extern "C" fn freezero(mut ptr: *mut libc::c_void, mut sz: size_t) {
         return;
     }
     explicit_bzero(ptr, sz);
-    free(ptr);
+    libc::free(ptr);
 }

@@ -27,7 +27,7 @@ extern "C" {
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn sshbuf_get_string_direct(
         buf: *mut sshbuf,
@@ -520,7 +520,7 @@ unsafe extern "C" fn deserialise_identity2(
             r = 0 as libc::c_int;
         }
     }
-    free(comment as *mut libc::c_void);
+    libc::free(comment as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn ssh_fetch_identitylist(
@@ -640,14 +640,14 @@ pub unsafe extern "C" fn ssh_free_identitylist(mut idl: *mut ssh_identitylist) {
             sshkey_free(*((*idl).keys).offset(i as isize));
         }
         if !((*idl).comments).is_null() {
-            free(*((*idl).comments).offset(i as isize) as *mut libc::c_void);
+            libc::free(*((*idl).comments).offset(i as isize) as *mut libc::c_void);
         }
         i = i.wrapping_add(1);
         i;
     }
-    free((*idl).keys as *mut libc::c_void);
-    free((*idl).comments as *mut libc::c_void);
-    free(idl as *mut libc::c_void);
+    libc::free((*idl).keys as *mut libc::c_void);
+    libc::free((*idl).comments as *mut libc::c_void);
+    libc::free(idl as *mut libc::c_void);
 }
 pub unsafe extern "C" fn ssh_agent_has_key(
     mut sock: libc::c_int,

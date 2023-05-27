@@ -7,7 +7,7 @@ extern "C" {
     fn tcgetpgrp(__fd: libc::c_int) -> __pid_t;
 
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn xextendf(
@@ -285,8 +285,8 @@ pub unsafe extern "C" fn refresh_progress_meter(mut force_update: libc::c_int) {
             strlen(obuf),
         );
     }
-    free(buf as *mut libc::c_void);
-    free(obuf as *mut libc::c_void);
+    libc::free(buf as *mut libc::c_void);
+    libc::free(obuf as *mut libc::c_void);
 }
 unsafe extern "C" fn sig_alarm(mut _ignore: libc::c_int) {
     ::core::ptr::write_volatile(&mut alarm_fired as *mut sig_atomic_t, 1 as libc::c_int);

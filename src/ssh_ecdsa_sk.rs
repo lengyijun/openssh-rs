@@ -7,7 +7,7 @@ extern "C" {
     pub type ec_key_st;
     pub type ECDSA_SIG_st;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn BN_clear_free(a: *mut BIGNUM);
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
@@ -669,14 +669,14 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
     sshkey_sig_details_free(details);
     sshbuf_free(webauthn_wrapper);
     sshbuf_free(webauthn_exts);
-    free(webauthn_origin as *mut libc::c_void);
+    libc::free(webauthn_origin as *mut libc::c_void);
     sshbuf_free(original_signed);
     sshbuf_free(sigbuf);
     sshbuf_free(b);
     ECDSA_SIG_free(esig);
     BN_clear_free(sig_r);
     BN_clear_free(sig_s);
-    free(ktype as *mut libc::c_void);
+    libc::free(ktype as *mut libc::c_void);
     return ret;
 }
 static mut sshkey_ecdsa_sk_funcs: sshkey_impl_funcs = unsafe {

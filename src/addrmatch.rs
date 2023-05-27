@@ -6,7 +6,7 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
-    fn free(_: *mut libc::c_void);
+
     fn addr_pton(p: *const libc::c_char, n: *mut xaddr) -> libc::c_int;
     fn addr_pton_cidr(p: *const libc::c_char, n: *mut xaddr, l: *mut u_int) -> libc::c_int;
     fn addr_netmatch(host: *const xaddr, net: *const xaddr, masklen: u_int) -> libc::c_int;
@@ -165,7 +165,7 @@ pub unsafe extern "C" fn addr_match_list(
             }
         }
     }
-    free(o as *mut libc::c_void);
+    libc::free(o as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn addr_match_cidr_list(
@@ -314,6 +314,6 @@ pub unsafe extern "C" fn addr_match_cidr_list(
             }
         }
     }
-    free(o as *mut libc::c_void);
+    libc::free(o as *mut libc::c_void);
     return ret;
 }

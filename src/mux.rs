@@ -46,7 +46,7 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strsignal(__sig: libc::c_int) -> *mut libc::c_char;
-    fn free(_: *mut libc::c_void);
+
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
@@ -1254,7 +1254,7 @@ unsafe extern "C" fn mux_master_process_hello(
             name,
             value_len,
         );
-        free(name as *mut libc::c_void);
+        libc::free(name as *mut libc::c_void);
     }
     (*state).hello_rcvd = 1 as libc::c_int;
     return 0 as libc::c_int;
@@ -1377,7 +1377,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                 break;
             }
             if env_permitted(cp) == 0 {
-                free(cp as *mut libc::c_void);
+                libc::free(cp as *mut libc::c_void);
             } else {
                 (*cctx).env = xreallocarray(
                     (*cctx).env as *mut libc::c_void,
@@ -1466,7 +1466,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                         b"sshbuf_put\0" as *const u8 as *const libc::c_char,
                     );
                 }
-                free(cmd as *mut libc::c_void);
+                libc::free(cmd as *mut libc::c_void);
                 cmd = 0 as *mut libc::c_char;
                 i = 0 as libc::c_int as u_int;
                 while i < 3 as libc::c_int as libc::c_uint {
@@ -1494,14 +1494,14 @@ unsafe extern "C" fn mux_master_process_new_session(
                         }
                         j = 0 as libc::c_int as u_int;
                         while j < env_len {
-                            free(*((*cctx).env).offset(j as isize) as *mut libc::c_void);
+                            libc::free(*((*cctx).env).offset(j as isize) as *mut libc::c_void);
                             j = j.wrapping_add(1);
                             j;
                         }
-                        free((*cctx).env as *mut libc::c_void);
-                        free((*cctx).term as *mut libc::c_void);
+                        libc::free((*cctx).env as *mut libc::c_void);
+                        libc::free((*cctx).term as *mut libc::c_void);
                         sshbuf_free((*cctx).cmd);
-                        free(cctx as *mut libc::c_void);
+                        libc::free(cctx as *mut libc::c_void);
                         reply_error(
                             reply,
                             0x80000003 as libc::c_uint,
@@ -1709,32 +1709,32 @@ unsafe extern "C" fn mux_master_process_new_session(
                 close(new_fd[0 as libc::c_int as usize]);
                 close(new_fd[1 as libc::c_int as usize]);
                 close(new_fd[2 as libc::c_int as usize]);
-                free((*cctx).term as *mut libc::c_void);
+                libc::free((*cctx).term as *mut libc::c_void);
                 if env_len != 0 as libc::c_int as libc::c_uint {
                     i = 0 as libc::c_int as u_int;
                     while i < env_len {
-                        free(*((*cctx).env).offset(i as isize) as *mut libc::c_void);
+                        libc::free(*((*cctx).env).offset(i as isize) as *mut libc::c_void);
                         i = i.wrapping_add(1);
                         i;
                     }
-                    free((*cctx).env as *mut libc::c_void);
+                    libc::free((*cctx).env as *mut libc::c_void);
                 }
                 sshbuf_free((*cctx).cmd);
-                free(cctx as *mut libc::c_void);
+                libc::free(cctx as *mut libc::c_void);
                 return 0 as libc::c_int;
             }
         }
     }
-    free(cmd as *mut libc::c_void);
+    libc::free(cmd as *mut libc::c_void);
     j = 0 as libc::c_int as u_int;
     while j < env_len {
-        free(*((*cctx).env).offset(j as isize) as *mut libc::c_void);
+        libc::free(*((*cctx).env).offset(j as isize) as *mut libc::c_void);
         j = j.wrapping_add(1);
         j;
     }
-    free((*cctx).env as *mut libc::c_void);
-    free((*cctx).term as *mut libc::c_void);
-    free(cctx as *mut libc::c_void);
+    libc::free((*cctx).env as *mut libc::c_void);
+    libc::free((*cctx).term as *mut libc::c_void);
+    libc::free(cctx as *mut libc::c_void);
     crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 31], &[libc::c_char; 31]>(
@@ -2160,10 +2160,10 @@ unsafe extern "C" fn mux_confirm_remote_forward(
                 },
                 (*rfwd).connect_port,
             );
-            free((*rfwd).listen_host as *mut libc::c_void);
-            free((*rfwd).listen_path as *mut libc::c_void);
-            free((*rfwd).connect_host as *mut libc::c_void);
-            free((*rfwd).connect_path as *mut libc::c_void);
+            libc::free((*rfwd).listen_host as *mut libc::c_void);
+            libc::free((*rfwd).listen_path as *mut libc::c_void);
+            libc::free((*rfwd).connect_host as *mut libc::c_void);
+            libc::free((*rfwd).connect_path as *mut libc::c_void);
             memset(
                 rfwd as *mut libc::c_void,
                 0 as libc::c_int,
@@ -2188,7 +2188,7 @@ unsafe extern "C" fn mux_confirm_remote_forward(
                 failmsg,
             );
             reply_error(out, 0x80000003 as libc::c_uint, (*fctx).rid, failmsg);
-            free(failmsg as *mut libc::c_void);
+            libc::free(failmsg as *mut libc::c_void);
         }
         _ => {}
     }
@@ -2294,11 +2294,11 @@ unsafe extern "C" fn mux_master_process_open_fwd(
         ret = -(1 as libc::c_int);
     } else {
         if *listen_addr as libc::c_int == '\0' as i32 {
-            free(listen_addr as *mut libc::c_void);
+            libc::free(listen_addr as *mut libc::c_void);
             listen_addr = 0 as *mut libc::c_char;
         }
         if *connect_addr as libc::c_int == '\0' as i32 {
-            free(connect_addr as *mut libc::c_void);
+            libc::free(connect_addr as *mut libc::c_void);
             connect_addr = 0 as *mut libc::c_char;
         }
         memset(
@@ -2656,8 +2656,8 @@ unsafe extern "C" fn mux_master_process_open_fwd(
         match current_block {
             5412649325144431251 => {}
             _ => {
-                free(listen_addr as *mut libc::c_void);
-                free(connect_addr as *mut libc::c_void);
+                libc::free(listen_addr as *mut libc::c_void);
+                libc::free(connect_addr as *mut libc::c_void);
                 reply_error(
                     reply,
                     0x80000003 as libc::c_uint,
@@ -2668,12 +2668,12 @@ unsafe extern "C" fn mux_master_process_open_fwd(
             }
         }
     }
-    free(fwd_desc as *mut libc::c_void);
+    libc::free(fwd_desc as *mut libc::c_void);
     if freefwd != 0 {
-        free(fwd.listen_host as *mut libc::c_void);
-        free(fwd.listen_path as *mut libc::c_void);
-        free(fwd.connect_host as *mut libc::c_void);
-        free(fwd.connect_path as *mut libc::c_void);
+        libc::free(fwd.listen_host as *mut libc::c_void);
+        libc::free(fwd.listen_path as *mut libc::c_void);
+        libc::free(fwd.connect_host as *mut libc::c_void);
+        libc::free(fwd.connect_path as *mut libc::c_void);
     }
     return ret;
 }
@@ -2746,11 +2746,11 @@ unsafe extern "C" fn mux_master_process_close_fwd(
         ret = -(1 as libc::c_int);
     } else {
         if *listen_addr as libc::c_int == '\0' as i32 {
-            free(listen_addr as *mut libc::c_void);
+            libc::free(listen_addr as *mut libc::c_void);
             listen_addr = 0 as *mut libc::c_char;
         }
         if *connect_addr as libc::c_int == '\0' as i32 {
-            free(connect_addr as *mut libc::c_void);
+            libc::free(connect_addr as *mut libc::c_void);
             connect_addr = 0 as *mut libc::c_char;
         }
         memset(
@@ -2833,10 +2833,10 @@ unsafe extern "C" fn mux_master_process_close_fwd(
             reply_error(reply, 0x80000003 as libc::c_uint, rid, error_reason);
         } else {
             reply_ok(reply, rid);
-            free((*found_fwd).listen_host as *mut libc::c_void);
-            free((*found_fwd).listen_path as *mut libc::c_void);
-            free((*found_fwd).connect_host as *mut libc::c_void);
-            free((*found_fwd).connect_path as *mut libc::c_void);
+            libc::free((*found_fwd).listen_host as *mut libc::c_void);
+            libc::free((*found_fwd).listen_path as *mut libc::c_void);
+            libc::free((*found_fwd).connect_host as *mut libc::c_void);
+            libc::free((*found_fwd).connect_path as *mut libc::c_void);
             (*found_fwd).connect_host = 0 as *mut libc::c_char;
             (*found_fwd).listen_host = (*found_fwd).connect_host;
             (*found_fwd).connect_path = 0 as *mut libc::c_char;
@@ -2845,9 +2845,9 @@ unsafe extern "C" fn mux_master_process_close_fwd(
             (*found_fwd).listen_port = (*found_fwd).connect_port;
         }
     }
-    free(fwd_desc as *mut libc::c_void);
-    free(listen_addr as *mut libc::c_void);
-    free(connect_addr as *mut libc::c_void);
+    libc::free(fwd_desc as *mut libc::c_void);
+    libc::free(listen_addr as *mut libc::c_void);
+    libc::free(connect_addr as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn mux_master_process_stdio_fwd(
@@ -2877,7 +2877,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
             r != 0 as libc::c_int
         }
     {
-        free(chost as *mut libc::c_void);
+        libc::free(chost as *mut libc::c_void);
         crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
@@ -2930,7 +2930,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
                 j = j.wrapping_add(1);
                 j;
             }
-            free(chost as *mut libc::c_void);
+            libc::free(chost as *mut libc::c_void);
             reply_error(
                 reply,
                 0x80000003 as libc::c_uint,
@@ -3020,7 +3020,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
                     new_fd[1 as libc::c_int as usize],
                     2 as libc::c_int,
                 );
-                free(chost as *mut libc::c_void);
+                libc::free(chost as *mut libc::c_void);
                 (*nc).ctl_chan = (*c).self_0;
                 (*c).remote_id = (*nc).self_0 as uint32_t;
                 (*c).have_remote_id = 1 as libc::c_int;
@@ -3078,7 +3078,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
     }
     close(new_fd[0 as libc::c_int as usize]);
     close(new_fd[1 as libc::c_int as usize]);
-    free(chost as *mut libc::c_void);
+    libc::free(chost as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn mux_stdio_confirm(
@@ -3226,7 +3226,7 @@ unsafe extern "C" fn mux_stdio_confirm(
     }
     (*cc).mux_pause = 0 as libc::c_int;
     (*c).open_confirm_ctx = 0 as *mut libc::c_void;
-    free(cctx as *mut libc::c_void);
+    libc::free(cctx as *mut libc::c_void);
 }
 unsafe extern "C" fn mux_master_process_stop_listening(
     mut ssh: *mut ssh,
@@ -3279,7 +3279,7 @@ unsafe extern "C" fn mux_master_process_stop_listening(
     if !mux_listener_channel.is_null() {
         channel_free(ssh, mux_listener_channel);
         client_stop_mux();
-        free(options.control_path as *mut libc::c_void);
+        libc::free(options.control_path as *mut libc::c_void);
         options.control_path = 0 as *mut libc::c_char;
         mux_listener_channel = 0 as *mut Channel;
         muxserver_sock = -(1 as libc::c_int);
@@ -3808,7 +3808,7 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
         unlink(options.control_path);
     } else {
         unlink(options.control_path);
-        free(options.control_path as *mut libc::c_void);
+        libc::free(options.control_path as *mut libc::c_void);
         options.control_path = orig_control_path;
         set_nonblock(muxserver_sock);
         mux_listener_channel = channel_new(
@@ -3844,8 +3844,8 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
         close(muxserver_sock);
         muxserver_sock = -(1 as libc::c_int);
     }
-    free(orig_control_path as *mut libc::c_void);
-    free(options.control_path as *mut libc::c_void);
+    libc::free(orig_control_path as *mut libc::c_void);
+    libc::free(options.control_path as *mut libc::c_void);
     options.control_path = 0 as *mut libc::c_char;
     options.control_master = 0 as libc::c_int;
 }
@@ -4090,17 +4090,17 @@ unsafe extern "C" fn mux_session_confirm(
     (*cc).mux_pause = 0 as libc::c_int;
     (*c).open_confirm_ctx = 0 as *mut libc::c_void;
     sshbuf_free((*cctx).cmd);
-    free((*cctx).term as *mut libc::c_void);
+    libc::free((*cctx).term as *mut libc::c_void);
     if !((*cctx).env).is_null() {
         i = 0 as libc::c_int;
         while !(*((*cctx).env).offset(i as isize)).is_null() {
-            free(*((*cctx).env).offset(i as isize) as *mut libc::c_void);
+            libc::free(*((*cctx).env).offset(i as isize) as *mut libc::c_void);
             i += 1;
             i;
         }
-        free((*cctx).env as *mut libc::c_void);
+        libc::free((*cctx).env as *mut libc::c_void);
     }
-    free(cctx as *mut libc::c_void);
+    libc::free(cctx as *mut libc::c_void);
 }
 unsafe extern "C" fn control_client_sighandler(mut signo: libc::c_int) {
     ::core::ptr::write_volatile(&mut muxclient_terminate as *mut sig_atomic_t, signo);
@@ -4539,7 +4539,7 @@ unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_i
                                     as *const libc::c_char,
                                 name,
                             );
-                            free(name as *mut libc::c_void);
+                            libc::free(name as *mut libc::c_void);
                         }
                     }
                     match current_block {
@@ -4965,7 +4965,7 @@ unsafe extern "C" fn mux_client_forward(
         },
         fwd_desc,
     );
-    free(fwd_desc as *mut libc::c_void);
+    libc::free(fwd_desc as *mut libc::c_void);
     type_0 = (if cancel_flag != 0 {
         0x10000007 as libc::c_int
     } else {

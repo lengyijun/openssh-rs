@@ -24,7 +24,6 @@ extern "C" {
     fn setlocale(__category: libc::c_int, __locale: *const libc::c_char) -> *mut libc::c_char;
     fn __ctype_get_mb_cur_max() -> size_t;
 
-    fn free(_: *mut libc::c_void);
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn mbtowc(__pwc: *mut wchar_t, __s: *const libc::c_char, __n: size_t) -> libc::c_int;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -505,7 +504,7 @@ pub unsafe extern "C" fn vasnmprintf(
         sz = (strlen(src)).wrapping_add(1 as libc::c_int as libc::c_ulong);
         dst = libc::malloc(sz as usize) as *mut libc::c_char;
         if dst.is_null() {
-            free(src as *mut libc::c_void);
+            libc::free(src as *mut libc::c_void);
             ret = -(1 as libc::c_int);
         } else {
             if maxsz > 2147483647 as libc::c_int as libc::c_ulong {
@@ -622,7 +621,7 @@ pub unsafe extern "C" fn vasnmprintf(
                     }
                 }
             }
-            free(src as *mut libc::c_void);
+            libc::free(src as *mut libc::c_void);
             *dp = '\0' as i32 as libc::c_char;
             *str = dst;
             if !wp.is_null() {
@@ -659,7 +658,7 @@ pub unsafe extern "C" fn snmprintf(
     ret = vasnmprintf(&mut cp, sz, wp, fmt, ap.as_va_list());
     if !cp.is_null() {
         strlcpy(str, cp, sz);
-        free(cp as *mut libc::c_void);
+        libc::free(cp as *mut libc::c_void);
     } else {
         *str = '\0' as i32 as libc::c_char;
     }
@@ -694,13 +693,13 @@ pub unsafe extern "C" fn vfmprintf(
         ap.as_va_list(),
     );
     if ret < 0 as libc::c_int {
-        free(str as *mut libc::c_void);
+        libc::free(str as *mut libc::c_void);
         return -(1 as libc::c_int);
     }
     if fputs(str, stream) == -(1 as libc::c_int) {
         ret = -(1 as libc::c_int);
     }
-    free(str as *mut libc::c_void);
+    libc::free(str as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn fmprintf(

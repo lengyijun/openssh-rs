@@ -41,7 +41,7 @@ extern "C" {
         in_0: *mut *const libc::c_uchar,
         len: libc::c_long,
     ) -> *mut ASN1_OCTET_STRING;
-    fn free(_: *mut libc::c_void);
+
     fn EVP_PKEY_get_base_id(pkey: *const EVP_PKEY) -> libc::c_int;
     fn EVP_PKEY_get0_RSA(pkey: *const EVP_PKEY) -> *const rsa_st;
     fn EVP_PKEY_get0_EC_KEY(pkey: *const EVP_PKEY) -> *const ec_key_st;
@@ -1026,10 +1026,10 @@ unsafe extern "C" fn pkcs11_provider_unref(mut p: *mut pkcs11_provider) {
                 (*p).name,
             );
         }
-        free((*p).name as *mut libc::c_void);
-        free((*p).slotlist as *mut libc::c_void);
-        free((*p).slotinfo as *mut libc::c_void);
-        free(p as *mut libc::c_void);
+        libc::free((*p).name as *mut libc::c_void);
+        libc::free((*p).slotlist as *mut libc::c_void);
+        libc::free((*p).slotinfo as *mut libc::c_void);
+        libc::free(p as *mut libc::c_void);
     }
 }
 pub unsafe extern "C" fn pkcs11_terminate() {
@@ -1122,8 +1122,8 @@ unsafe extern "C" fn pkcs11_k11_free(
     if !((*k11).provider).is_null() {
         pkcs11_provider_unref((*k11).provider);
     }
-    free((*k11).keyid as *mut libc::c_void);
-    free(k11 as *mut libc::c_void);
+    libc::free((*k11).keyid as *mut libc::c_void);
+    libc::free(k11 as *mut libc::c_void);
 }
 unsafe extern "C" fn pkcs11_find(
     mut p: *mut pkcs11_provider,
@@ -1907,7 +1907,7 @@ unsafe extern "C" fn ecdsa_do_sign(
     }
     BN_free(r);
     BN_free(s);
-    free(sig as *mut libc::c_void);
+    libc::free(sig as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn pkcs11_ecdsa_start_wrapper() -> libc::c_int {
@@ -2363,7 +2363,7 @@ unsafe extern "C" fn pkcs11_fetch_ecdsa_pubkey(
     }
     i = 0 as libc::c_int;
     while i < 3 as libc::c_int {
-        free(key_attr[i as usize].pValue);
+        libc::free(key_attr[i as usize].pValue);
         i += 1;
         i;
     }
@@ -2563,7 +2563,7 @@ unsafe extern "C" fn pkcs11_fetch_rsa_pubkey(
     }
     i = 0 as libc::c_int;
     while i < 3 as libc::c_int {
-        free(key_attr[i as usize].pValue);
+        libc::free(key_attr[i as usize].pValue);
         i += 1;
         i;
     }
@@ -2874,7 +2874,7 @@ unsafe extern "C" fn pkcs11_fetch_x509_pubkey(
     }
     i = 0 as libc::c_int;
     while i < 3 as libc::c_int {
-        free(cert_attr[i as usize].pValue);
+        libc::free(cert_attr[i as usize].pValue);
         i += 1;
         i;
     }
@@ -2882,7 +2882,7 @@ unsafe extern "C" fn pkcs11_fetch_x509_pubkey(
     RSA_free(rsa);
     EC_KEY_free(ec);
     if key.is_null() {
-        free(subject as *mut libc::c_void);
+        libc::free(subject as *mut libc::c_void);
         return -(1 as libc::c_int);
     }
     *keyp = key;
@@ -2923,7 +2923,7 @@ unsafe extern "C" fn note_key(
         sshkey_type(key),
         fp,
     );
-    free(fp as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
 }
 unsafe extern "C" fn pkcs11_fetch_certs(
     mut p: *mut pkcs11_provider,
@@ -3869,10 +3869,10 @@ unsafe extern "C" fn pkcs11_register_provider(
         );
     }
     if !p.is_null() {
-        free((*p).name as *mut libc::c_void);
-        free((*p).slotlist as *mut libc::c_void);
-        free((*p).slotinfo as *mut libc::c_void);
-        free(p as *mut libc::c_void);
+        libc::free((*p).name as *mut libc::c_void);
+        libc::free((*p).slotlist as *mut libc::c_void);
+        libc::free((*p).slotinfo as *mut libc::c_void);
+        libc::free(p as *mut libc::c_void);
     }
     if !handle.is_null() {
         dlclose(handle);

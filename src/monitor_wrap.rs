@@ -24,7 +24,7 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn free(_: *mut libc::c_void);
+
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn dh_new_group(_: *mut BIGNUM, _: *mut BIGNUM) -> *mut DH;
@@ -2037,7 +2037,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
     }
     process_permitopen(ssh, &mut options);
     process_channel_timeouts(ssh, &mut options);
-    free(newopts as *mut libc::c_void);
+    libc::free(newopts as *mut libc::c_void);
     sshbuf_free(m);
     return pw;
 }
@@ -2086,7 +2086,7 @@ pub unsafe extern "C" fn mm_auth2_read_banner() -> *mut libc::c_char {
     }
     sshbuf_free(m);
     if strlen(banner) == 0 as libc::c_int as libc::c_ulong {
-        free(banner as *mut libc::c_void);
+        libc::free(banner as *mut libc::c_void);
         banner = 0 as *mut libc::c_char;
     }
     return banner;
@@ -2667,7 +2667,7 @@ pub unsafe extern "C" fn mm_pty_allocate(
     }
     sshbuf_free(m);
     strlcpy(namebuf, p, namebuflen);
-    free(p as *mut libc::c_void);
+    libc::free(p as *mut libc::c_void);
     r = sshbuf_put(loginmsg, msg as *const libc::c_void, strlen(msg));
     if r != 0 as libc::c_int {
         sshfatal(
@@ -2681,7 +2681,7 @@ pub unsafe extern "C" fn mm_pty_allocate(
             b"put loginmsg\0" as *const u8 as *const libc::c_char,
         );
     }
-    free(msg as *mut libc::c_void);
+    libc::free(msg as *mut libc::c_void);
     *ptyfd = mm_receive_fd((*pmonitor).m_recvfd);
     if *ptyfd == -(1 as libc::c_int) || {
         *ttyfd = mm_receive_fd((*pmonitor).m_recvfd);

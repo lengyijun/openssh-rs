@@ -40,7 +40,6 @@ extern "C" {
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
 
-    fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -1419,7 +1418,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
         msg,
     );
     sshbuf_free(logmsg);
-    free(msg as *mut libc::c_void);
+    libc::free(msg as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn monitor_read(
@@ -1590,9 +1589,9 @@ unsafe extern "C" fn monitor_allowed_key(
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn monitor_reset_key_state() {
-    free(key_blob as *mut libc::c_void);
-    free(hostbased_cuser as *mut libc::c_void);
-    free(hostbased_chost as *mut libc::c_void);
+    libc::free(key_blob as *mut libc::c_void);
+    libc::free(hostbased_cuser as *mut libc::c_void);
+    libc::free(hostbased_chost as *mut libc::c_void);
     sshauthopt_free(key_opts);
     key_blob = 0 as *mut u_char;
     key_bloblen = 0 as libc::c_int as size_t;
@@ -1978,9 +1977,9 @@ pub unsafe extern "C" fn mm_answer_sign(
             b"assemble\0" as *const u8 as *const libc::c_char,
         );
     }
-    free(alg as *mut libc::c_void);
-    free(p as *mut libc::c_void);
-    free(signature as *mut libc::c_void);
+    libc::free(alg as *mut libc::c_void);
+    libc::free(p as *mut libc::c_void);
+    libc::free(signature as *mut libc::c_void);
     mm_request_send(sock, MONITOR_ANS_SIGN, m);
     monitor_permit(mon_dispatch, MONITOR_REQ_PWNAM, 1 as libc::c_int);
     return 0 as libc::c_int;
@@ -2701,7 +2700,7 @@ pub unsafe extern "C" fn mm_answer_auth2_read_banner(
         );
     }
     mm_request_send(sock, MONITOR_ANS_AUTH2_READ_BANNER, m);
-    free(banner as *mut libc::c_void);
+    libc::free(banner as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn mm_answer_authserv(
@@ -2740,7 +2739,7 @@ pub unsafe extern "C" fn mm_answer_authserv(
         (*authctxt).style,
     );
     if strlen((*authctxt).style) == 0 as libc::c_int as libc::c_ulong {
-        free((*authctxt).style as *mut libc::c_void);
+        libc::free((*authctxt).style as *mut libc::c_void);
         (*authctxt).style = 0 as *mut libc::c_char;
     }
     return 0 as libc::c_int;
@@ -2779,7 +2778,7 @@ unsafe extern "C" fn key_base_type_match(
             list,
         );
     }
-    free(ol as *mut libc::c_void);
+    libc::free(ol as *mut libc::c_void);
     return found;
 }
 pub unsafe extern "C" fn mm_answer_authpassword(
@@ -3044,8 +3043,8 @@ pub unsafe extern "C" fn mm_answer_keyallowed(
             auth_method,
             0 as *const libc::c_char,
         );
-        free(cuser as *mut libc::c_void);
-        free(chost as *mut libc::c_void);
+        libc::free(cuser as *mut libc::c_void);
+        libc::free(chost as *mut libc::c_void);
     }
     sshkey_free(key);
     sshbuf_reset(m);
@@ -3238,8 +3237,8 @@ unsafe extern "C" fn monitor_valid_userblob(
         fail += 1;
         fail;
     }
-    free(userstyle as *mut libc::c_void);
-    free(cp as *mut libc::c_void);
+    libc::free(userstyle as *mut libc::c_void);
+    libc::free(cp as *mut libc::c_void);
     r = sshbuf_get_string_direct(b, 0 as *mut *const u_char, 0 as *mut size_t);
     if r != 0 as libc::c_int || {
         r = sshbuf_get_cstring(b, &mut cp, 0 as *mut size_t);
@@ -3270,7 +3269,7 @@ unsafe extern "C" fn monitor_valid_userblob(
             fail;
         }
     }
-    free(cp as *mut libc::c_void);
+    libc::free(cp as *mut libc::c_void);
     r = sshbuf_get_u8(b, &mut type_0);
     if r != 0 as libc::c_int {
         sshfatal(
@@ -3461,8 +3460,8 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
         fail += 1;
         fail;
     }
-    free(userstyle as *mut libc::c_void);
-    free(cp as *mut libc::c_void);
+    libc::free(userstyle as *mut libc::c_void);
+    libc::free(cp as *mut libc::c_void);
     r = sshbuf_get_string_direct(b, 0 as *mut *const u_char, 0 as *mut size_t);
     if r != 0 as libc::c_int || {
         r = sshbuf_get_cstring(b, &mut cp, 0 as *mut size_t);
@@ -3485,7 +3484,7 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
         fail += 1;
         fail;
     }
-    free(cp as *mut libc::c_void);
+    libc::free(cp as *mut libc::c_void);
     r = sshbuf_get_string_direct(b, 0 as *mut *const u_char, 0 as *mut size_t);
     if r != 0 as libc::c_int || {
         r = sshbuf_get_string_direct(b, 0 as *mut *const u_char, 0 as *mut size_t);
@@ -3531,7 +3530,7 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
         fail += 1;
         fail;
     }
-    free(cp as *mut libc::c_void);
+    libc::free(cp as *mut libc::c_void);
     r = sshbuf_get_cstring(b, &mut cp, 0 as *mut size_t);
     if r != 0 as libc::c_int {
         sshfatal(
@@ -3551,7 +3550,7 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
         fail += 1;
         fail;
     }
-    free(cp as *mut libc::c_void);
+    libc::free(cp as *mut libc::c_void);
     if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
         fail += 1;
         fail;
@@ -3622,7 +3621,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
         );
     }
     if *sigalg as libc::c_int == '\0' as i32 {
-        free(sigalg as *mut libc::c_void);
+        libc::free(sigalg as *mut libc::c_void);
         sigalg = 0 as *mut libc::c_char;
     }
     r = sshkey_from_blob(blob, bloblen, &mut key);
@@ -3846,8 +3845,8 @@ pub unsafe extern "C" fn mm_answer_keyverify(
     }
     sshkey_sig_details_free(sig_details);
     mm_request_send(sock, MONITOR_ANS_KEYVERIFY, m);
-    free(sigalg as *mut libc::c_void);
-    free(fp as *mut libc::c_void);
+    libc::free(sigalg as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
     sshkey_free(key);
     return (ret == 0 as libc::c_int) as libc::c_int;
 }
@@ -4123,7 +4122,7 @@ pub unsafe extern "C" fn mm_answer_pty_cleanup(
         mm_session_close(s);
     }
     sshbuf_reset(m);
-    free(tty as *mut libc::c_void);
+    libc::free(tty as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn monitor_clear_keystate(mut ssh: *mut ssh, mut _pmonitor: *mut monitor) {

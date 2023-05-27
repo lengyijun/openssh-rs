@@ -44,7 +44,6 @@ extern "C" {
 
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn free(_: *mut libc::c_void);
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -484,7 +483,7 @@ pub unsafe extern "C" fn login_alloc_entry(
     return newli;
 }
 pub unsafe extern "C" fn login_free_entry(mut li: *mut logininfo) {
-    free(li as *mut libc::c_void);
+    libc::free(li as *mut libc::c_void);
 }
 pub unsafe extern "C" fn login_init_entry(
     mut li: *mut logininfo,
@@ -751,7 +750,7 @@ unsafe extern "C" fn syslogin_perform_login(mut li: *mut logininfo) -> libc::c_i
     ut = xmalloc(::core::mem::size_of::<utmp>() as libc::c_ulong) as *mut utmp;
     construct_utmp(li, ut);
     login(ut);
-    free(ut as *mut libc::c_void);
+    libc::free(ut as *mut libc::c_void);
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn syslogin_perform_logout(mut li: *mut logininfo) -> libc::c_int {

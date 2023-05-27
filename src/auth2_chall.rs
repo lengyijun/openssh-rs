@@ -9,7 +9,7 @@ extern "C" {
     pub type kex;
     pub type session_state;
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn free(_: *mut libc::c_void);
+
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -330,7 +330,7 @@ unsafe extern "C" fn kbdint_free(mut kbdintctxt: *mut KbdintAuthctxt) {
     if !((*kbdintctxt).device).is_null() {
         kbdint_reset_device(kbdintctxt);
     }
-    free((*kbdintctxt).devices as *mut libc::c_void);
+    libc::free((*kbdintctxt).devices as *mut libc::c_void);
     freezero(
         kbdintctxt as *mut libc::c_void,
         ::core::mem::size_of::<KbdintAuthctxt>() as libc::c_ulong,
@@ -384,7 +384,7 @@ unsafe extern "C" fn kbdint_next_device(
         } else {
             0 as *mut libc::c_char
         };
-        free(t as *mut libc::c_void);
+        libc::free(t as *mut libc::c_void);
         crate::log::sshlog(
             b"auth2-chall.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"kbdint_next_device\0"))
@@ -604,14 +604,14 @@ unsafe extern "C" fn send_userauth_info_request(mut ssh: *mut ssh) -> libc::c_in
     }
     i = 0 as libc::c_int as u_int;
     while i < (*kbdintctxt).nreq {
-        free(*prompts.offset(i as isize) as *mut libc::c_void);
+        libc::free(*prompts.offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free(prompts as *mut libc::c_void);
-    free(echo_on as *mut libc::c_void);
-    free(name as *mut libc::c_void);
-    free(instr as *mut libc::c_void);
+    libc::free(prompts as *mut libc::c_void);
+    libc::free(echo_on as *mut libc::c_void);
+    libc::free(name as *mut libc::c_void);
+    libc::free(instr as *mut libc::c_void);
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn input_userauth_info_response(
@@ -767,11 +767,11 @@ unsafe extern "C" fn input_userauth_info_response(
             *response.offset(i as isize) as *mut libc::c_void,
             strlen(*response.offset(i as isize)),
         );
-        free(*response.offset(i as isize) as *mut libc::c_void);
+        libc::free(*response.offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free(response as *mut libc::c_void);
+    libc::free(response as *mut libc::c_void);
     match res {
         0 => {
             authenticated = if (*authctxt).valid != 0 {

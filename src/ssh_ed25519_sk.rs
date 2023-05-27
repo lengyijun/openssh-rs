@@ -7,7 +7,7 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn crypto_sign_ed25519_open(
         _: *mut libc::c_uchar,
         _: *mut libc::c_ulonglong,
@@ -452,7 +452,7 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
     sshkey_sig_details_free(details);
     sshbuf_free(b);
     sshbuf_free(encoded);
-    free(ktype as *mut libc::c_void);
+    libc::free(ktype as *mut libc::c_void);
     return r;
 }
 static mut sshkey_ed25519_sk_funcs: sshkey_impl_funcs = unsafe {

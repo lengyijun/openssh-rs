@@ -4,7 +4,7 @@ extern "C" {
     pub type sshkey;
     pub type kex;
     pub type session_state;
-    fn free(_: *mut libc::c_void);
+
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshfatal(
@@ -373,7 +373,7 @@ pub unsafe extern "C" fn compat_kex_proposal(
                 b"match_filter_denylist failed\0" as *const u8 as *const libc::c_char,
             );
         }
-        free(cp as *mut libc::c_void);
+        libc::free(cp as *mut libc::c_void);
         cp = cp2;
     }
     if cp.is_null() || *cp as libc::c_int == '\0' as i32 {

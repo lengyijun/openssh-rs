@@ -70,7 +70,6 @@ extern "C" {
     fn gethostname(__name: *mut libc::c_char, __len: size_t) -> libc::c_int;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
 
-    fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn setenv(
@@ -1201,7 +1200,7 @@ unsafe extern "C" fn tilde_expand_paths(mut paths: *mut *mut libc::c_char, mut n
     i = 0 as libc::c_int as u_int;
     while i < num_paths {
         cp = tilde_expand_filename(*paths.offset(i as isize), getuid());
-        free(*paths.offset(i as isize) as *mut libc::c_void);
+        libc::free(*paths.offset(i as isize) as *mut libc::c_void);
         let ref mut fresh0 = *paths.offset(i as isize);
         *fresh0 = cp;
         i = i.wrapping_add(1);
@@ -1635,7 +1634,7 @@ unsafe extern "C" fn check_follow_cname(
                 *namep,
                 cname,
             );
-            free(*namep as *mut libc::c_void);
+            libc::free(*namep as *mut libc::c_void);
             *namep = xstrdup(cname);
             return 1 as libc::c_int;
         }
@@ -1687,7 +1686,7 @@ unsafe extern "C" fn resolve_canonicalize(
                 *hostp,
                 newname.as_mut_ptr(),
             );
-            free(*hostp as *mut libc::c_void);
+            libc::free(*hostp as *mut libc::c_void);
             *hostp = xstrdup(newname.as_mut_ptr());
         }
         return addrs;
@@ -1739,7 +1738,7 @@ unsafe extern "C" fn resolve_canonicalize(
         if !addrs.is_null() {
             current_block = 8954165352696300745;
         } else {
-            free(fullhost as *mut libc::c_void);
+            libc::free(fullhost as *mut libc::c_void);
             current_block = 17524704725112814263;
         }
     } else {
@@ -1816,7 +1815,7 @@ unsafe extern "C" fn resolve_canonicalize(
                 current_block = 8954165352696300745;
                 break;
             }
-            free(fullhost as *mut libc::c_void);
+            libc::free(fullhost as *mut libc::c_void);
             i += 1;
             i;
         }
@@ -1875,7 +1874,7 @@ unsafe extern "C" fn resolve_canonicalize(
                     fullhost,
                 );
             }
-            free(*hostp as *mut libc::c_void);
+            libc::free(*hostp as *mut libc::c_void);
             *hostp = fullhost;
             return addrs;
         }
@@ -1906,7 +1905,7 @@ unsafe extern "C" fn check_load(
                     message,
                     path,
                 );
-                free(*k as *mut libc::c_void);
+                libc::free(*k as *mut libc::c_void);
                 *k = 0 as *mut sshkey;
             }
             current_block_6 = 13513818773234778473;
@@ -2057,18 +2056,18 @@ unsafe extern "C" fn ssh_conn_info_free(mut cinfo: *mut ssh_conn_info) {
     if cinfo.is_null() {
         return;
     }
-    free((*cinfo).conn_hash_hex as *mut libc::c_void);
-    free((*cinfo).shorthost as *mut libc::c_void);
-    free((*cinfo).uidstr as *mut libc::c_void);
-    free((*cinfo).keyalias as *mut libc::c_void);
-    free((*cinfo).thishost as *mut libc::c_void);
-    free((*cinfo).host_arg as *mut libc::c_void);
-    free((*cinfo).portstr as *mut libc::c_void);
-    free((*cinfo).remhost as *mut libc::c_void);
-    free((*cinfo).remuser as *mut libc::c_void);
-    free((*cinfo).homedir as *mut libc::c_void);
-    free((*cinfo).locuser as *mut libc::c_void);
-    free(cinfo as *mut libc::c_void);
+    libc::free((*cinfo).conn_hash_hex as *mut libc::c_void);
+    libc::free((*cinfo).shorthost as *mut libc::c_void);
+    libc::free((*cinfo).uidstr as *mut libc::c_void);
+    libc::free((*cinfo).keyalias as *mut libc::c_void);
+    libc::free((*cinfo).thishost as *mut libc::c_void);
+    libc::free((*cinfo).host_arg as *mut libc::c_void);
+    libc::free((*cinfo).portstr as *mut libc::c_void);
+    libc::free((*cinfo).remhost as *mut libc::c_void);
+    libc::free((*cinfo).remuser as *mut libc::c_void);
+    libc::free((*cinfo).homedir as *mut libc::c_void);
+    libc::free((*cinfo).locuser as *mut libc::c_void);
+    libc::free(cinfo as *mut libc::c_void);
 }
 unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c_int {
     let mut current_block: u64;
@@ -2470,7 +2469,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         );
                     }
                     printf(b"%s\n\0" as *const u8 as *const libc::c_char, cp);
-                    free(cp as *mut libc::c_void);
+                    libc::free(cp as *mut libc::c_void);
                     exit(0 as libc::c_int);
                 }
                 97 => {
@@ -2504,10 +2503,10 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             1 as libc::c_int,
                         );
                     }
-                    free(p as *mut libc::c_void);
+                    libc::free(p as *mut libc::c_void);
                 }
                 73 => {
-                    free(options.pkcs11_provider as *mut libc::c_void);
+                    libc::free(options.pkcs11_provider as *mut libc::c_void);
                     options.pkcs11_provider = xstrdup(BSDoptarg);
                 }
                 74 => {
@@ -2628,7 +2627,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     if parse_forward(&mut fwd, BSDoptarg, 1 as libc::c_int, 0 as libc::c_int) != 0 {
                         options.stdio_forward_host = fwd.listen_host;
                         options.stdio_forward_port = fwd.listen_port;
-                        free(fwd.connect_host as *mut libc::c_void);
+                        libc::free(fwd.connect_host as *mut libc::c_void);
                     } else {
                         libc::fprintf(
                             stderr,
@@ -2690,12 +2689,12 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         );
                         exit(255 as libc::c_int);
                     }
-                    free(options.ciphers as *mut libc::c_void);
+                    libc::free(options.ciphers as *mut libc::c_void);
                     options.ciphers = xstrdup(BSDoptarg);
                 }
                 109 => {
                     if mac_valid(BSDoptarg) != 0 {
-                        free(options.macs as *mut libc::c_void);
+                        libc::free(options.macs as *mut libc::c_void);
                         options.macs = xstrdup(BSDoptarg);
                     } else {
                         libc::fprintf(
@@ -2822,7 +2821,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     {
                         exit(255 as libc::c_int);
                     }
-                    free(line as *mut libc::c_void);
+                    libc::free(line as *mut libc::c_void);
                 }
                 115 => {
                     if options.session_type != -(1 as libc::c_int)
@@ -2843,7 +2842,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     options.session_type = 1 as libc::c_int;
                 }
                 83 => {
-                    free(options.control_path as *mut libc::c_void);
+                    libc::free(options.control_path as *mut libc::c_void);
                     options.control_path = xstrdup(BSDoptarg);
                 }
                 98 => {
@@ -2884,7 +2883,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     options.user = tuser;
                     tuser = 0 as *mut libc::c_char;
                 }
-                free(tuser as *mut libc::c_void);
+                libc::free(tuser as *mut libc::c_void);
                 if options.port == -(1 as libc::c_int) && tport != -(1 as libc::c_int) {
                     options.port = tport;
                 }
@@ -2904,7 +2903,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     cp = cp.offset(1);
                     *fresh3 = '\0' as i32 as libc::c_char;
                     host = xstrdup(cp);
-                    free(p as *mut libc::c_void);
+                    libc::free(p as *mut libc::c_void);
                 } else {
                     host = p;
                 }
@@ -3040,9 +3039,9 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             host,
             0 as *mut libc::c_void as *mut libc::c_char,
         );
-        free(host as *mut libc::c_void);
+        libc::free(host as *mut libc::c_void);
         host = cp;
-        free(options.hostname as *mut libc::c_void);
+        libc::free(options.hostname as *mut libc::c_void);
         options.hostname = xstrdup(host);
     }
     was_addr = is_addr(host);
@@ -3096,7 +3095,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             0 as *const libc::c_char,
             b"re-parsing configuration\0" as *const u8 as *const libc::c_char,
         );
-        free(options.hostname as *mut libc::c_void);
+        libc::free(options.hostname as *mut libc::c_void);
         options.hostname = xstrdup(host);
         process_config_files(
             options.host_arg,
@@ -3452,7 +3451,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             b"expanded RemoteCommand: %s\0" as *const u8 as *const libc::c_char,
             options.remote_command,
         );
-        free(cp as *mut libc::c_void);
+        libc::free(cp as *mut libc::c_void);
         r = sshbuf_put(
             command,
             options.remote_command as *const libc::c_void,
@@ -3472,29 +3471,29 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     }
     if !(options.control_path).is_null() {
         cp = tilde_expand_filename(options.control_path, getuid());
-        free(options.control_path as *mut libc::c_void);
+        libc::free(options.control_path as *mut libc::c_void);
         options.control_path = default_client_percent_dollar_expand(cp, cinfo);
-        free(cp as *mut libc::c_void);
+        libc::free(cp as *mut libc::c_void);
     }
     if !(options.identity_agent).is_null() {
         p = tilde_expand_filename(options.identity_agent, getuid());
         cp = default_client_percent_dollar_expand(p, cinfo);
-        free(p as *mut libc::c_void);
-        free(options.identity_agent as *mut libc::c_void);
+        libc::free(p as *mut libc::c_void);
+        libc::free(options.identity_agent as *mut libc::c_void);
         options.identity_agent = cp;
     }
     if !(options.revoked_host_keys).is_null() {
         p = tilde_expand_filename(options.revoked_host_keys, getuid());
         cp = default_client_percent_dollar_expand(p, cinfo);
-        free(p as *mut libc::c_void);
-        free(options.revoked_host_keys as *mut libc::c_void);
+        libc::free(p as *mut libc::c_void);
+        libc::free(options.revoked_host_keys as *mut libc::c_void);
         options.revoked_host_keys = cp;
     }
     if !(options.forward_agent_sock_path).is_null() {
         p = tilde_expand_filename(options.forward_agent_sock_path, getuid());
         cp = default_client_percent_dollar_expand(p, cinfo);
-        free(p as *mut libc::c_void);
-        free(options.forward_agent_sock_path as *mut libc::c_void);
+        libc::free(p as *mut libc::c_void);
+        libc::free(options.forward_agent_sock_path as *mut libc::c_void);
         options.forward_agent_sock_path = cp;
         if stat(options.forward_agent_sock_path, &mut st) != 0 as libc::c_int {
             crate::log::sshlog(
@@ -3532,7 +3531,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     as *const libc::c_char,
             );
         }
-        free(options.system_hostfiles[0 as libc::c_int as usize] as *mut libc::c_void);
+        libc::free(options.system_hostfiles[0 as libc::c_int as usize] as *mut libc::c_void);
         options.system_hostfiles[0 as libc::c_int as usize] = 0 as *mut libc::c_char;
         options.num_system_hostfiles = 0 as libc::c_int as u_int;
     }
@@ -3554,7 +3553,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     as *const libc::c_char,
             );
         }
-        free(options.user_hostfiles[0 as libc::c_int as usize] as *mut libc::c_void);
+        libc::free(options.user_hostfiles[0 as libc::c_int as usize] as *mut libc::c_void);
         options.user_hostfiles[0 as libc::c_int as usize] = 0 as *mut libc::c_char;
         options.num_user_hostfiles = 0 as libc::c_int as u_int;
     }
@@ -3577,8 +3576,8 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     p,
                 );
             }
-            free(options.user_hostfiles[j as usize] as *mut libc::c_void);
-            free(cp as *mut libc::c_void);
+            libc::free(options.user_hostfiles[j as usize] as *mut libc::c_void);
+            libc::free(cp as *mut libc::c_void);
             options.user_hostfiles[j as usize] = p;
         }
         j = j.wrapping_add(1);
@@ -3605,7 +3604,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     p,
                 );
             }
-            free(cp as *mut libc::c_void);
+            libc::free(cp as *mut libc::c_void);
         }
         if !((*(options.local_forwards).offset(i as isize)).connect_path).is_null() {
             cp = (*(options.local_forwards).offset(i as isize)).connect_path;
@@ -3626,7 +3625,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     p,
                 );
             }
-            free(cp as *mut libc::c_void);
+            libc::free(cp as *mut libc::c_void);
         }
         i += 1;
         i;
@@ -3652,7 +3651,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     p,
                 );
             }
-            free(cp as *mut libc::c_void);
+            libc::free(cp as *mut libc::c_void);
         }
         if !((*(options.remote_forwards).offset(i as isize)).connect_path).is_null() {
             cp = (*(options.remote_forwards).offset(i as isize)).connect_path;
@@ -3673,7 +3672,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     p,
                 );
             }
-            free(cp as *mut libc::c_void);
+            libc::free(cp as *mut libc::c_void);
         }
         i += 1;
         i;
@@ -3699,7 +3698,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     as *const libc::c_char,
                 options.sk_provider,
             );
-            free(options.sk_provider as *mut libc::c_void);
+            libc::free(options.sk_provider as *mut libc::c_void);
             options.sk_provider = 0 as *mut libc::c_char;
         } else {
             crate::log::sshlog(
@@ -3713,7 +3712,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 options.sk_provider,
                 cp,
             );
-            free(options.sk_provider as *mut libc::c_void);
+            libc::free(options.sk_provider as *mut libc::c_void);
             options.sk_provider = xstrdup(cp);
         }
     }
@@ -4346,7 +4345,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     } else {
                         options.forward_agent = 0 as libc::c_int;
                     }
-                    free(cp as *mut libc::c_void);
+                    libc::free(cp as *mut libc::c_void);
                 } else {
                     forward_agent_sock_path = cp;
                 }
@@ -4395,11 +4394,11 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     i += 1;
                     i;
                 }
-                free(sensitive_data.keys as *mut libc::c_void);
+                libc::free(sensitive_data.keys as *mut libc::c_void);
             }
             i = 0 as libc::c_int;
             while i < options.num_identity_files {
-                free(options.identity_files[i as usize] as *mut libc::c_void);
+                libc::free(options.identity_files[i as usize] as *mut libc::c_void);
                 options.identity_files[i as usize] = 0 as *mut libc::c_char;
                 if !(options.identity_keys[i as usize]).is_null() {
                     sshkey_free(options.identity_keys[i as usize]);
@@ -4410,7 +4409,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             }
             i = 0 as libc::c_int;
             while i < options.num_certificate_files {
-                free(options.certificate_files[i as usize] as *mut libc::c_void);
+                libc::free(options.certificate_files[i as usize] as *mut libc::c_void);
                 options.certificate_files[i as usize] = 0 as *mut libc::c_char;
                 i += 1;
                 i;
@@ -5005,7 +5004,7 @@ unsafe extern "C" fn ssh_init_forward_permissions(
             );
         }
         channel_add_permission(ssh, 0x100 as libc::c_int, where_0, addr, port);
-        free(oarg as *mut libc::c_void);
+        libc::free(oarg as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
@@ -5517,7 +5516,7 @@ unsafe extern "C" fn ssh_session2(
             b"expanded LocalCommand: %s\0" as *const u8 as *const libc::c_char,
             options.local_command,
         );
-        free(cp as *mut libc::c_void);
+        libc::free(cp as *mut libc::c_void);
     }
     if ssh_packet_get_mux(ssh) == 0 {
         muxserver_listen(ssh);
@@ -5701,7 +5700,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
         while i < nkeys {
             if n_ids >= 100 as libc::c_int as libc::c_uint {
                 sshkey_free(*keys.offset(i as isize));
-                free(*comments.offset(i as isize) as *mut libc::c_void);
+                libc::free(*comments.offset(i as isize) as *mut libc::c_void);
             } else {
                 identity_keys[n_ids as usize] = *keys.offset(i as isize);
                 identity_files[n_ids as usize] = *comments.offset(i as isize);
@@ -5711,8 +5710,8 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
             i += 1;
             i;
         }
-        free(keys as *mut libc::c_void);
-        free(comments as *mut libc::c_void);
+        libc::free(keys as *mut libc::c_void);
+        libc::free(comments as *mut libc::c_void);
     }
     i = 0 as libc::c_int;
     while i < options.num_identity_files {
@@ -5722,12 +5721,12 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
                 b"none\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
-            free(options.identity_files[i as usize] as *mut libc::c_void);
+            libc::free(options.identity_files[i as usize] as *mut libc::c_void);
             options.identity_files[i as usize] = 0 as *mut libc::c_char;
         } else {
             cp = tilde_expand_filename(options.identity_files[i as usize], getuid());
             filename = default_client_percent_dollar_expand(cp, cinfo);
-            free(cp as *mut libc::c_void);
+            libc::free(cp as *mut libc::c_void);
             check_load(
                 sshkey_load_public(filename, &mut public, 0 as *mut *mut libc::c_char),
                 &mut public,
@@ -5752,7 +5751,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
                     -(1 as libc::c_int)
                 },
             );
-            free(options.identity_files[i as usize] as *mut libc::c_void);
+            libc::free(options.identity_files[i as usize] as *mut libc::c_void);
             identity_files[n_ids as usize] = filename;
             identity_keys[n_ids as usize] = public;
             identity_file_userprovided[n_ids as usize] =
@@ -5790,7 +5789,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
                         },
                     );
                     if public.is_null() {
-                        free(cp as *mut libc::c_void);
+                        libc::free(cp as *mut libc::c_void);
                     } else if sshkey_is_cert(public) == 0 {
                         crate::log::sshlog(
                             b"ssh.c\0" as *const u8 as *const libc::c_char,
@@ -5808,7 +5807,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
                             sshkey_type(public),
                         );
                         sshkey_free(public);
-                        free(cp as *mut libc::c_void);
+                        libc::free(cp as *mut libc::c_void);
                     } else {
                         identity_files[n_ids as usize] = xstrdup(filename);
                         identity_keys[n_ids as usize] = public;
@@ -5841,7 +5840,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
     while i < options.num_certificate_files {
         cp = tilde_expand_filename(options.certificate_files[i as usize], getuid());
         filename = default_client_percent_dollar_expand(cp, cinfo);
-        free(cp as *mut libc::c_void);
+        libc::free(cp as *mut libc::c_void);
         check_load(
             sshkey_load_public(filename, &mut public, 0 as *mut *mut libc::c_char),
             &mut public,
@@ -5866,10 +5865,10 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
                 -(1 as libc::c_int)
             },
         );
-        free(options.certificate_files[i as usize] as *mut libc::c_void);
+        libc::free(options.certificate_files[i as usize] as *mut libc::c_void);
         options.certificate_files[i as usize] = 0 as *mut libc::c_char;
         if public.is_null() {
-            free(filename as *mut libc::c_void);
+            libc::free(filename as *mut libc::c_void);
         } else if sshkey_is_cert(public) == 0 {
             crate::log::sshlog(
                 b"ssh.c\0" as *const u8 as *const libc::c_char,
@@ -5886,7 +5885,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
                 sshkey_type(public),
             );
             sshkey_free(public);
-            free(filename as *mut libc::c_void);
+            libc::free(filename as *mut libc::c_void);
         } else {
             certificate_files[n_certs as usize] = filename;
             certificates[n_certs as usize] = public;

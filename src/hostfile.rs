@@ -41,7 +41,7 @@ extern "C" {
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
@@ -387,7 +387,7 @@ unsafe extern "C" fn extract_salt(
     );
     *b64salt.offset(b64len as isize) = '\0' as i32 as libc::c_char;
     ret = __b64_pton(b64salt, salt, salt_len);
-    free(b64salt as *mut libc::c_void);
+    libc::free(b64salt as *mut libc::c_void);
     if ret == -(1 as libc::c_int) {
         crate::log::sshlog(
             b"hostfile.c\0" as *const u8 as *const libc::c_char,
@@ -741,8 +741,8 @@ pub unsafe extern "C" fn free_hostkeys(mut hostkeys: *mut hostkeys) {
     let mut i: u_int = 0;
     i = 0 as libc::c_int as u_int;
     while i < (*hostkeys).num_entries {
-        free((*((*hostkeys).entries).offset(i as isize)).host as *mut libc::c_void);
-        free((*((*hostkeys).entries).offset(i as isize)).file as *mut libc::c_void);
+        libc::free((*((*hostkeys).entries).offset(i as isize)).host as *mut libc::c_void);
+        libc::free((*((*hostkeys).entries).offset(i as isize)).file as *mut libc::c_void);
         sshkey_free((*((*hostkeys).entries).offset(i as isize)).key);
         explicit_bzero(
             ((*hostkeys).entries).offset(i as isize) as *mut libc::c_void,
@@ -751,7 +751,7 @@ pub unsafe extern "C" fn free_hostkeys(mut hostkeys: *mut hostkeys) {
         i = i.wrapping_add(1);
         i;
     }
-    free((*hostkeys).entries as *mut libc::c_void);
+    libc::free((*hostkeys).entries as *mut libc::c_void);
     freezero(
         hostkeys as *mut libc::c_void,
         ::core::mem::size_of::<hostkeys>() as libc::c_ulong,
@@ -937,7 +937,7 @@ unsafe extern "C" fn write_host_entry(
                 0 as *const libc::c_char,
                 b"host_hash failed\0" as *const u8 as *const libc::c_char,
             );
-            free(lhost as *mut libc::c_void);
+            libc::free(lhost as *mut libc::c_void);
             return 0 as libc::c_int;
         }
         libc::fprintf(f, b"%s \0" as *const u8 as *const libc::c_char, hashed_host);
@@ -951,8 +951,8 @@ unsafe extern "C" fn write_host_entry(
     } else {
         libc::fprintf(f, b"%s \0" as *const u8 as *const libc::c_char, lhost);
     }
-    free(hashed_host as *mut libc::c_void);
-    free(lhost as *mut libc::c_void);
+    libc::free(hashed_host as *mut libc::c_void);
+    libc::free(lhost as *mut libc::c_void);
     r = sshkey_write(key, f);
     if r == 0 as libc::c_int {
         success = 1 as libc::c_int;
@@ -1065,7 +1065,7 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
             }
         }
     }
-    free(dotsshdir as *mut libc::c_void);
+    libc::free(dotsshdir as *mut libc::c_void);
 }
 pub unsafe extern "C" fn add_host_to_hostfile(
     mut filename: *const libc::c_char,
@@ -1462,7 +1462,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                                     sshkey_ssh_name(*keys.offset(i as isize)),
                                     fp,
                                 );
-                                free(fp as *mut libc::c_void);
+                                libc::free(fp as *mut libc::c_void);
                                 ctx.modified = 1 as libc::c_int;
                             }
                         }
@@ -1572,12 +1572,12 @@ pub unsafe extern "C" fn hostfile_replace_entries(
     if !temp.is_null() && r != 0 as libc::c_int {
         unlink(temp);
     }
-    free(temp as *mut libc::c_void);
-    free(back as *mut libc::c_void);
+    libc::free(temp as *mut libc::c_void);
+    libc::free(back as *mut libc::c_void);
     if !(ctx.out).is_null() {
         fclose(ctx.out);
     }
-    free(ctx.match_keys as *mut libc::c_void);
+    libc::free(ctx.match_keys as *mut libc::c_void);
     libc::umask(omask);
     if r == -(24 as libc::c_int) {
         *libc::__errno_location() = oerrno;
@@ -1603,7 +1603,7 @@ unsafe extern "C" fn match_maybe_hashed(
         }
         ret = (nlen == strlen(hashed_host) && strncmp(hashed_host, names, nlen) == 0 as libc::c_int)
             as libc::c_int;
-        free(hashed_host as *mut libc::c_void);
+        libc::free(hashed_host as *mut libc::c_void);
         return ret;
     }
     return (match_hostname(host, names) == 1 as libc::c_int) as libc::c_int;
@@ -1659,7 +1659,7 @@ pub unsafe extern "C" fn hostkeys_foreach_file(
         linenum;
         *line.offset(strcspn(line, b"\n\0" as *const u8 as *const libc::c_char) as isize) =
             '\0' as i32 as libc::c_char;
-        free(lineinfo.line as *mut libc::c_void);
+        libc::free(lineinfo.line as *mut libc::c_void);
         sshkey_free(lineinfo.key);
         memset(
             &mut lineinfo as *mut hostkey_foreach_line as *mut libc::c_void,
@@ -1953,8 +1953,8 @@ pub unsafe extern "C" fn hostkeys_foreach_file(
         }
     }
     sshkey_free(lineinfo.key);
-    free(lineinfo.line as *mut libc::c_void);
-    free(line as *mut libc::c_void);
+    libc::free(lineinfo.line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn hostkeys_foreach(

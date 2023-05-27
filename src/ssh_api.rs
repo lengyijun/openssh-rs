@@ -16,7 +16,7 @@ extern "C" {
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn sshpkt_ptr(_: *mut ssh, lenp: *mut size_t) -> *const u_char;
     fn sshpkt_put(ssh: *mut ssh, v: *const libc::c_void, len: size_t) -> libc::c_int;
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
@@ -494,7 +494,7 @@ pub unsafe extern "C" fn ssh_free(mut ssh: *mut ssh) {
         if !((*ssh).kex).is_null() && (*(*ssh).kex).server != 0 {
             sshkey_free((*k).key);
         }
-        free(k as *mut libc::c_void);
+        libc::free(k as *mut libc::c_void);
     }
     loop {
         k = (*ssh).private_keys.tqh_first;
@@ -507,10 +507,10 @@ pub unsafe extern "C" fn ssh_free(mut ssh: *mut ssh) {
             (*ssh).private_keys.tqh_last = (*k).next.tqe_prev;
         }
         *(*k).next.tqe_prev = (*k).next.tqe_next;
-        free(k as *mut libc::c_void);
+        libc::free(k as *mut libc::c_void);
     }
     ssh_packet_close(ssh);
-    free(ssh as *mut libc::c_void);
+    libc::free(ssh as *mut libc::c_void);
 }
 pub unsafe extern "C" fn ssh_set_app_data(mut ssh: *mut ssh, mut app_data: *mut libc::c_void) {
     (*ssh).app_data = app_data;
@@ -533,7 +533,7 @@ pub unsafe extern "C" fn ssh_add_hostkey(mut ssh: *mut ssh, mut key: *mut sshkey
             k_prv = libc::malloc(::core::mem::size_of::<key_entry>() as usize) as *mut key_entry;
             k_prv.is_null()
         } {
-            free(k as *mut libc::c_void);
+            libc::free(k as *mut libc::c_void);
             sshkey_free(pubkey);
             return -(2 as libc::c_int);
         }
@@ -814,8 +814,8 @@ pub unsafe extern "C" fn _ssh_read_banner(
             cp,
         );
     }
-    free(cp as *mut libc::c_void);
-    free(remote_version as *mut libc::c_void);
+    libc::free(cp as *mut libc::c_void);
+    libc::free(remote_version as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn _ssh_send_banner(
@@ -854,7 +854,7 @@ pub unsafe extern "C" fn _ssh_send_banner(
         b"Local version string %.100s\0" as *const u8 as *const libc::c_char,
         cp,
     );
-    free(cp as *mut libc::c_void);
+    libc::free(cp as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn _ssh_exchange_banner(mut ssh: *mut ssh) -> libc::c_int {
@@ -1093,7 +1093,7 @@ pub unsafe extern "C" fn _ssh_order_hostkeyalgs(mut ssh: *mut ssh) -> libc::c_in
                     (*(*ssh).kex).server,
                     replace,
                 );
-                free(orig as *mut libc::c_void);
+                libc::free(orig as *mut libc::c_void);
                 let ref mut fresh1 =
                     *proposal.offset(PROPOSAL_SERVER_HOST_KEY_ALGS as libc::c_int as isize);
                 *fresh1 = replace;
@@ -1102,8 +1102,8 @@ pub unsafe extern "C" fn _ssh_order_hostkeyalgs(mut ssh: *mut ssh) -> libc::c_in
             }
         }
     }
-    free(oavail as *mut libc::c_void);
-    free(replace as *mut libc::c_void);
+    libc::free(oavail as *mut libc::c_void);
+    libc::free(replace as *mut libc::c_void);
     kex_prop_free(proposal);
     return r;
 }

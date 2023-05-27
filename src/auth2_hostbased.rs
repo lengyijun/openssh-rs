@@ -12,7 +12,7 @@ extern "C" {
     pub type sshcipher;
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn sshpkt_get_cstring(
         ssh: *mut ssh,
@@ -896,11 +896,11 @@ unsafe extern "C" fn userauth_hostbased(
         authenticated,
     );
     sshkey_free(key);
-    free(pkalg as *mut libc::c_void);
-    free(pkblob as *mut libc::c_void);
-    free(cuser as *mut libc::c_void);
-    free(chost as *mut libc::c_void);
-    free(sig as *mut libc::c_void);
+    libc::free(pkalg as *mut libc::c_void);
+    libc::free(pkblob as *mut libc::c_void);
+    libc::free(cuser as *mut libc::c_void);
+    libc::free(chost as *mut libc::c_void);
+    libc::free(sig as *mut libc::c_void);
     return authenticated;
 }
 pub unsafe extern "C" fn hostbased_key_allowed(
@@ -1142,7 +1142,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
                 lookup,
             );
         }
-        free(fp as *mut libc::c_void);
+        libc::free(fp as *mut libc::c_void);
     }
     return (host_status as libc::c_uint == HOST_OK as libc::c_int as libc::c_uint) as libc::c_int;
 }

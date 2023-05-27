@@ -24,7 +24,6 @@ extern "C" {
     ) -> __ssize_t;
     fn ferror(__stream: *mut libc::FILE) -> libc::c_int;
 
-    fn free(_: *mut libc::c_void);
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
@@ -519,14 +518,14 @@ unsafe extern "C" fn sshkey_try_load_public(
                     }
                 }
                 *kp = k;
-                free(line as *mut libc::c_void);
+                libc::free(line as *mut libc::c_void);
                 fclose(f);
                 return r;
             }
         }
     }
-    free(k as *mut libc::c_void);
-    free(line as *mut libc::c_void);
+    libc::free(k as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     fclose(f);
     return -(4 as libc::c_int);
 }
@@ -564,7 +563,7 @@ pub unsafe extern "C" fn sshkey_load_public(
         }
     }
     oerrno = *libc::__errno_location();
-    free(pubfile as *mut libc::c_void);
+    libc::free(pubfile as *mut libc::c_void);
     *libc::__errno_location() = oerrno;
     return r;
 }
@@ -587,7 +586,7 @@ pub unsafe extern "C" fn sshkey_load_cert(
         return -(2 as libc::c_int);
     }
     r = sshkey_try_load_public(keyp, file, 0 as *mut *mut libc::c_char);
-    free(file as *mut libc::c_void);
+    libc::free(file as *mut libc::c_void);
     sshkey_free(pub_0);
     return r;
 }
@@ -723,7 +722,7 @@ pub unsafe extern "C" fn sshkey_in_file(
         }
         _ => {}
     }
-    free(line as *mut libc::c_void);
+    libc::free(line as *mut libc::c_void);
     sshkey_free(pub_0);
     fclose(f);
     return r;

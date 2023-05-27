@@ -7,7 +7,7 @@ extern "C" {
     fn fmt_scaled(number: libc::c_longlong, result: *mut libc::c_char) -> libc::c_int;
     fn user_from_uid(_: uid_t, _: libc::c_int) -> *mut libc::c_char;
     fn group_from_gid(_: gid_t, _: libc::c_int) -> *mut libc::c_char;
-    fn free(_: *mut libc::c_void);
+
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn time(__timer: *mut time_t) -> time_t;
@@ -234,8 +234,8 @@ pub unsafe extern "C" fn decode_attrib(mut b: *mut sshbuf, mut a: *mut Attrib) -
                 type_0,
                 dlen,
             );
-            free(type_0 as *mut libc::c_void);
-            free(data as *mut libc::c_void);
+            libc::free(type_0 as *mut libc::c_void);
+            libc::free(data as *mut libc::c_void);
             i = i.wrapping_add(1);
             i;
         }

@@ -68,7 +68,7 @@ extern "C" {
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
-    fn free(_: *mut libc::c_void);
+
     fn exit(_: libc::c_int) -> !;
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -944,7 +944,7 @@ unsafe extern "C" fn expand_proxy_command(
         options.user,
         0 as *mut libc::c_void as *mut libc::c_char,
     );
-    free(tmp as *mut libc::c_void);
+    libc::free(tmp as *mut libc::c_void);
     return ret;
 }
 unsafe extern "C" fn ssh_proxy_fdpass_connect(
@@ -1067,7 +1067,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
         );
     }
     close(sp[0 as libc::c_int as usize]);
-    free(command_string as *mut libc::c_void);
+    libc::free(command_string as *mut libc::c_void);
     sock = mm_receive_fd(sp[1 as libc::c_int as usize]);
     if sock == -(1 as libc::c_int) {
         sshfatal(
@@ -1218,7 +1218,7 @@ unsafe extern "C" fn ssh_proxy_connect(
     }
     close(pin[0 as libc::c_int as usize]);
     close(pout[1 as libc::c_int as usize]);
-    free(command_string as *mut libc::c_void);
+    libc::free(command_string as *mut libc::c_void);
     if (ssh_packet_set_connection(
         ssh,
         pout[0 as libc::c_int as usize],
@@ -1991,7 +1991,7 @@ unsafe extern "C" fn confirm(
         {
             ret = 1 as libc::c_int;
         }
-        free(cp as *mut libc::c_void);
+        libc::free(cp as *mut libc::c_void);
         if ret != -(1 as libc::c_int) {
             return ret;
         }
@@ -2209,7 +2209,7 @@ unsafe extern "C" fn hostkeys_find_by_key_cb(
     );
     (*ctx).nnames = ((*ctx).nnames).wrapping_add(1);
     (*ctx).nnames;
-    free(path as *mut libc::c_void);
+    libc::free(path as *mut libc::c_void);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn hostkeys_find_by_key_hostfile(
@@ -2365,11 +2365,11 @@ unsafe extern "C" fn hostkeys_find_by_key(
     }
     i = 0 as libc::c_int as u_int;
     while i < ctx.nnames {
-        free(*(ctx.names).offset(i as isize) as *mut libc::c_void);
+        libc::free(*(ctx.names).offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free(ctx.names as *mut libc::c_void);
+    libc::free(ctx.names as *mut libc::c_void);
 }
 unsafe extern "C" fn other_hostkeys_message(
     mut host: *const libc::c_char,
@@ -2431,11 +2431,11 @@ unsafe extern "C" fn other_hostkeys_message(
     }
     i = 0 as libc::c_int as u_int;
     while i < num_othernames {
-        free(*othernames.offset(i as isize) as *mut libc::c_void);
+        libc::free(*othernames.offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free(othernames as *mut libc::c_void);
+    libc::free(othernames as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn load_hostkeys_command(
@@ -2587,7 +2587,7 @@ pub unsafe extern "C" fn load_hostkeys_command(
                     b"percent_expand failed\0" as *const u8 as *const libc::c_char,
                 );
             }
-            free(*av.offset(i as isize) as *mut libc::c_void);
+            libc::free(*av.offset(i as isize) as *mut libc::c_void);
             let ref mut fresh0 = *av.offset(i as isize);
             *fresh0 = tmp;
             i += 1;
@@ -2637,15 +2637,15 @@ pub unsafe extern "C" fn load_hostkeys_command(
     ssh_signal(17 as libc::c_int, osigchld);
     i = 0 as libc::c_int;
     while i < ac {
-        free(*av.offset(i as isize) as *mut libc::c_void);
+        libc::free(*av.offset(i as isize) as *mut libc::c_void);
         i += 1;
         i;
     }
-    free(av as *mut libc::c_void);
-    free(tag as *mut libc::c_void);
-    free(command as *mut libc::c_void);
-    free(key_fp as *mut libc::c_void);
-    free(keytext as *mut libc::c_void);
+    libc::free(av as *mut libc::c_void);
+    libc::free(tag as *mut libc::c_void);
+    libc::free(command as *mut libc::c_void);
+    libc::free(key_fp as *mut libc::c_void);
+    libc::free(keytext as *mut libc::c_void);
 }
 unsafe extern "C" fn check_host_key(
     mut hostname: *mut libc::c_char,
@@ -3077,8 +3077,8 @@ unsafe extern "C" fn check_host_key(
                                 fp,
                                 ra,
                             );
-                            free(ra as *mut libc::c_void);
-                            free(fp as *mut libc::c_void);
+                            libc::free(ra as *mut libc::c_void);
+                            libc::free(fp as *mut libc::c_void);
                         }
                         hostkey_trusted = 1 as libc::c_int;
                         current_block = 1918110639124887667;
@@ -3264,10 +3264,10 @@ unsafe extern "C" fn check_host_key(
                                         as *const u8 as *const libc::c_char,
                                 );
                                 confirmed = confirm(msg1, fp);
-                                free(ra as *mut libc::c_void);
-                                free(fp as *mut libc::c_void);
-                                free(msg1 as *mut libc::c_void);
-                                free(msg2 as *mut libc::c_void);
+                                libc::free(ra as *mut libc::c_void);
+                                libc::free(fp as *mut libc::c_void);
+                                libc::free(msg1 as *mut libc::c_void);
+                                libc::free(msg2 as *mut libc::c_void);
                                 if confirmed == 0 {
                                     current_block = 16170235306303725311;
                                 } else {
@@ -3982,8 +3982,8 @@ unsafe extern "C" fn check_host_key(
             host_key = raw_key;
         } else {
             sshkey_free(raw_key);
-            free(ip as *mut libc::c_void);
-            free(host as *mut libc::c_void);
+            libc::free(ip as *mut libc::c_void);
+            libc::free(host as *mut libc::c_void);
             if !host_hostkeys.is_null() {
                 free_hostkeys(host_hostkeys);
             }
@@ -4007,8 +4007,8 @@ unsafe extern "C" fn check_host_key(
         );
         options.update_hostkeys = 0 as libc::c_int;
     }
-    free(ip as *mut libc::c_void);
-    free(host as *mut libc::c_void);
+    libc::free(ip as *mut libc::c_void);
+    libc::free(host as *mut libc::c_void);
     if !host_hostkeys.is_null() {
         free_hostkeys(host_hostkeys);
     }
@@ -4334,8 +4334,8 @@ pub unsafe extern "C" fn verify_host_key(
         }
     }
     sshkey_free(plain);
-    free(fp as *mut libc::c_void);
-    free(cafp as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
+    libc::free(cafp as *mut libc::c_void);
     if r == 0 as libc::c_int && !host_key.is_null() {
         sshkey_free(previous_host_key);
         r = sshkey_from_private(host_key, &mut previous_host_key);
@@ -4387,8 +4387,8 @@ pub unsafe extern "C" fn ssh_login(
     );
     ssh_kex2(ssh, host, hostaddr, port, cinfo);
     ssh_userauth2(ssh, local_user, server_user, host, sensitive);
-    free(local_user as *mut libc::c_void);
-    free(host as *mut libc::c_void);
+    libc::free(local_user as *mut libc::c_void);
+    libc::free(host as *mut libc::c_void);
 }
 unsafe extern "C" fn show_other_keys(
     mut hostkeys: *mut hostkeys,
@@ -4467,8 +4467,8 @@ unsafe extern "C" fn show_other_keys(
                         ra,
                     );
                 }
-                free(ra as *mut libc::c_void);
-                free(fp as *mut libc::c_void);
+                libc::free(ra as *mut libc::c_void);
+                libc::free(fp as *mut libc::c_void);
                 ret = 1 as libc::c_int;
             }
         }
@@ -4573,7 +4573,7 @@ unsafe extern "C" fn warn_changed_key(mut host_key: *mut sshkey) {
         0 as *const libc::c_char,
         b"Please contact your system administrator.\0" as *const u8 as *const libc::c_char,
     );
-    free(fp as *mut libc::c_void);
+    libc::free(fp as *mut libc::c_void);
 }
 pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c_int {
     let mut shell: *mut libc::c_char = 0 as *mut libc::c_char;

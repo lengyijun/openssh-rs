@@ -4,7 +4,7 @@ use ::libc;
 
 extern "C" {
     pub type dirent;
-    fn free(_: *mut libc::c_void);
+
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn sshfatal(
         _: *const libc::c_char,
@@ -328,8 +328,8 @@ unsafe extern "C" fn idname_free(mut idname: *mut idname) {
     if idname.is_null() {
         return;
     }
-    free((*idname).name as *mut libc::c_void);
-    free(idname as *mut libc::c_void);
+    libc::free((*idname).name as *mut libc::c_void);
+    libc::free(idname as *mut libc::c_void);
 }
 unsafe extern "C" fn idname_enter(
     mut tree: *mut idname_tree,
@@ -392,11 +392,11 @@ unsafe extern "C" fn freenames(mut names: *mut *mut libc::c_char, mut nnames: u_
     }
     i = 0 as libc::c_int as u_int;
     while i < nnames {
-        free(*names.offset(i as isize) as *mut libc::c_void);
+        libc::free(*names.offset(i as isize) as *mut libc::c_void);
         i = i.wrapping_add(1);
         i;
     }
-    free(names as *mut libc::c_void);
+    libc::free(names as *mut libc::c_void);
 }
 unsafe extern "C" fn lookup_and_record(
     mut conn: *mut sftp_conn,
@@ -583,8 +583,8 @@ pub unsafe extern "C" fn get_remote_user_groups_from_glob(
     collect_ids_from_glob(g, 1 as libc::c_int, &mut uids, &mut nuids);
     collect_ids_from_glob(g, 0 as libc::c_int, &mut gids, &mut ngids);
     lookup_and_record(conn, uids, nuids, gids, ngids);
-    free(uids as *mut libc::c_void);
-    free(gids as *mut libc::c_void);
+    libc::free(uids as *mut libc::c_void);
+    libc::free(gids as *mut libc::c_void);
 }
 unsafe extern "C" fn collect_ids_from_dirents(
     mut d: *mut *mut SFTP_DIRENT,
@@ -648,8 +648,8 @@ pub unsafe extern "C" fn get_remote_user_groups_from_dirents(
     collect_ids_from_dirents(d, 1 as libc::c_int, &mut uids, &mut nuids);
     collect_ids_from_dirents(d, 0 as libc::c_int, &mut gids, &mut ngids);
     lookup_and_record(conn, uids, nuids, gids, ngids);
-    free(uids as *mut libc::c_void);
-    free(gids as *mut libc::c_void);
+    libc::free(uids as *mut libc::c_void);
+    libc::free(gids as *mut libc::c_void);
 }
 pub unsafe extern "C" fn ruser_name(mut uid: uid_t) -> *const libc::c_char {
     return idname_lookup(&mut user_idname, uid);

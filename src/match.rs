@@ -4,7 +4,6 @@ extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __ctype_tolower_loc() -> *mut *const __int32_t;
 
-    fn free(_: *mut libc::c_void);
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -194,7 +193,7 @@ pub unsafe extern "C" fn match_hostname(
     let mut r: libc::c_int = 0;
     lowercase(hostcopy);
     r = match_pattern_list(hostcopy, pattern, 1 as libc::c_int);
-    free(hostcopy as *mut libc::c_void);
+    libc::free(hostcopy as *mut libc::c_void);
     return r;
 }
 pub unsafe extern "C" fn match_host_and_ip(
@@ -257,7 +256,7 @@ pub unsafe extern "C" fn match_user(
     if ret == 1 as libc::c_int {
         ret = match_host_and_ip(host, ipaddr, p);
     }
-    free(pat as *mut libc::c_void);
+    libc::free(pat as *mut libc::c_void);
     return ret;
 }
 pub unsafe extern "C" fn match_list(
@@ -305,8 +304,8 @@ pub unsafe extern "C" fn match_list(
                         cp.offset_from(c) as libc::c_long as u_int as libc::c_ulong
                     }) as u_int;
                 }
-                free(c as *mut libc::c_void);
-                free(s as *mut libc::c_void);
+                libc::free(c as *mut libc::c_void);
+                libc::free(s as *mut libc::c_void);
                 return ret;
             }
             j += 1;
@@ -319,8 +318,8 @@ pub unsafe extern "C" fn match_list(
     if !next.is_null() {
         *next = strlen(c) as u_int;
     }
-    free(c as *mut libc::c_void);
-    free(s as *mut libc::c_void);
+    libc::free(c as *mut libc::c_void);
+    libc::free(s as *mut libc::c_void);
     return 0 as *mut libc::c_char;
 }
 unsafe extern "C" fn filter_list(
@@ -335,8 +334,8 @@ unsafe extern "C" fn filter_list(
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
     if fix_prop.is_null() || orig_prop.is_null() {
-        free(orig_prop as *mut libc::c_void);
-        free(fix_prop as *mut libc::c_void);
+        libc::free(orig_prop as *mut libc::c_void);
+        libc::free(fix_prop as *mut libc::c_void);
         return 0 as *mut libc::c_char;
     }
     tmp = orig_prop;
@@ -354,7 +353,7 @@ unsafe extern "C" fn filter_list(
             strlcat(fix_prop, cp, len);
         }
     }
-    free(orig_prop as *mut libc::c_void);
+    libc::free(orig_prop as *mut libc::c_void);
     return fix_prop;
 }
 pub unsafe extern "C" fn match_filter_denylist(

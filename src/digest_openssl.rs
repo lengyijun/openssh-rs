@@ -7,7 +7,7 @@ extern "C" {
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
+
     fn EVP_MD_get_block_size(md: *const EVP_MD) -> libc::c_int;
     fn EVP_MD_CTX_get0_md(ctx: *const EVP_MD_CTX) -> *const EVP_MD;
     fn EVP_MD_CTX_new() -> *mut EVP_MD_CTX;
@@ -178,7 +178,7 @@ pub unsafe extern "C" fn ssh_digest_start(mut alg: libc::c_int) -> *mut ssh_dige
     (*ret).alg = alg;
     (*ret).mdctx = EVP_MD_CTX_new();
     if ((*ret).mdctx).is_null() {
-        free(ret as *mut libc::c_void);
+        libc::free(ret as *mut libc::c_void);
         return 0 as *mut ssh_digest_ctx;
     }
     if EVP_DigestInit_ex(

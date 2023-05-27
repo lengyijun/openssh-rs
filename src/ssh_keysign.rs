@@ -14,7 +14,6 @@ extern "C" {
     fn getuid() -> __uid_t;
     fn pledge(promises: *const libc::c_char, paths: *mut *const libc::c_char) -> libc::c_int;
 
-    fn free(_: *mut libc::c_void);
     fn exit(_: libc::c_int) -> !;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -471,7 +470,7 @@ unsafe extern "C" fn valid_request(
         fail += 1;
         fail;
     }
-    free(p as *mut libc::c_void);
+    libc::free(p as *mut libc::c_void);
     r = sshbuf_get_cstring(b, &mut p, 0 as *mut size_t);
     if r != 0 as libc::c_int {
         sshfatal(
@@ -489,7 +488,7 @@ unsafe extern "C" fn valid_request(
         fail += 1;
         fail;
     }
-    free(p as *mut libc::c_void);
+    libc::free(p as *mut libc::c_void);
     r = sshbuf_get_cstring(b, &mut pkalg, 0 as *mut size_t);
     if r != 0 as libc::c_int || {
         r = sshbuf_get_string(b, &mut pkblob, &mut blen);
@@ -568,7 +567,7 @@ unsafe extern "C" fn valid_request(
         fail += 1;
         fail;
     }
-    free(p as *mut libc::c_void);
+    libc::free(p as *mut libc::c_void);
     r = sshbuf_get_cstring(b, &mut luser, 0 as *mut size_t);
     if r != 0 as libc::c_int {
         sshfatal(
@@ -586,7 +585,7 @@ unsafe extern "C" fn valid_request(
         fail += 1;
         fail;
     }
-    free(luser as *mut libc::c_void);
+    libc::free(luser as *mut libc::c_void);
     if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
         fail += 1;
         fail;
@@ -613,8 +612,8 @@ unsafe extern "C" fn valid_request(
         }
     }
     sshkey_free(key);
-    free(pkalg as *mut libc::c_void);
-    free(pkblob as *mut libc::c_void);
+    libc::free(pkalg as *mut libc::c_void);
+    libc::free(pkblob as *mut libc::c_void);
     return if fail != 0 {
         -(1 as libc::c_int)
     } else {
@@ -1061,7 +1060,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             __progname,
         );
     }
-    free(host as *mut libc::c_void);
+    libc::free(host as *mut libc::c_void);
     found = 0 as libc::c_int;
     i = 0 as libc::c_int;
     while i < 5 as libc::c_int {
@@ -1127,7 +1126,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             __progname,
         );
     }
-    free(data as *mut libc::c_void);
+    libc::free(data as *mut libc::c_void);
     sshbuf_reset(b);
     r = sshbuf_put_string(b, signature as *const libc::c_void, slen);
     if r != 0 as libc::c_int {
