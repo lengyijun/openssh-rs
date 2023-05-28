@@ -92,7 +92,7 @@ extern "C" {
         cb: Option<unsafe extern "C" fn(*mut libc::c_void, size_t) -> libc::c_int>,
         _: *mut libc::c_void,
     ) -> size_t;
-    fn start_progress_meter(_: *const libc::c_char, _: off_t, _: *mut off_t);
+    
     
     fn stop_progress_meter();
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
@@ -4129,7 +4129,7 @@ pub unsafe extern "C" fn do_download(
                 max_req = 1 as libc::c_int as u_int;
                 progress_counter = offset as off_t;
                 if showprogress != 0 && size != 0 as libc::c_int as libc::c_ulong {
-                    start_progress_meter(
+                    crate::progressmeter::start_progress_meter(
                         progress_meter_path(remote_path),
                         size as off_t,
                         &mut progress_counter,
@@ -5209,7 +5209,7 @@ pub unsafe extern "C" fn do_upload(
     }) as off_t;
     offset = progress_counter;
     if showprogress != 0 {
-        start_progress_meter(
+        crate::progressmeter::start_progress_meter(
             progress_meter_path(local_path),
             sb.st_size,
             &mut progress_counter,
@@ -6097,7 +6097,7 @@ pub unsafe extern "C" fn do_crossload(
     max_req = 1 as libc::c_int as u_int;
     progress_counter = 0 as libc::c_int as off_t;
     if showprogress != 0 && size != 0 as libc::c_int as libc::c_ulong {
-        start_progress_meter(
+        crate::progressmeter::start_progress_meter(
             progress_meter_path(from_path),
             size as off_t,
             &mut progress_counter,

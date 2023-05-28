@@ -97,7 +97,7 @@ extern "C" {
     ) -> !;
 
     
-    fn start_progress_meter(_: *const libc::c_char, _: off_t, _: *mut off_t);
+    
     
     fn stop_progress_meter();
 
@@ -2578,7 +2578,7 @@ pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc:
                                         current_block = 1443331007555087595;
                                     } else {
                                         if showprogress != 0 {
-                                            start_progress_meter(
+                                            crate::progressmeter::start_progress_meter(
                                                 curfile,
                                                 stb.st_size,
                                                 &mut statbytes,
@@ -3912,7 +3912,7 @@ pub unsafe extern "C" fn sink(
                                             wrerr = 0 as libc::c_int;
                                             statbytes = 0 as libc::c_int as off_t;
                                             if showprogress != 0 {
-                                                start_progress_meter(curfile, size, &mut statbytes);
+                                                crate::progressmeter::start_progress_meter(curfile, size, &mut statbytes);
                                             }
                                             crate::misc::set_nonblock(remin);
                                             i = 0 as libc::c_int as off_t;
