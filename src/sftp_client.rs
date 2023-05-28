@@ -93,7 +93,7 @@ extern "C" {
         _: *mut libc::c_void,
     ) -> size_t;
     fn start_progress_meter(_: *const libc::c_char, _: off_t, _: *mut off_t);
-    fn refresh_progress_meter(_: libc::c_int);
+    
     fn stop_progress_meter();
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
     fn put_u32(_: *mut libc::c_void, _: u_int32_t);
@@ -281,7 +281,7 @@ unsafe extern "C" fn request_find(mut requests: *mut requests, mut id: u_int) ->
 }
 unsafe extern "C" fn sftpio(mut _bwlimit: *mut libc::c_void, mut amount: size_t) -> libc::c_int {
     let mut bwlimit: *mut crate::misc::bwlimit = _bwlimit as *mut crate::misc::bwlimit;
-    refresh_progress_meter(0 as libc::c_int);
+    crate::progressmeter::refresh_progress_meter(0 as libc::c_int);
     if !bwlimit.is_null() {
         crate::misc::bandwidth_limit(bwlimit, amount);
     }

@@ -98,7 +98,7 @@ extern "C" {
 
     
     fn start_progress_meter(_: *const libc::c_char, _: off_t, _: *mut off_t);
-    fn refresh_progress_meter(_: libc::c_int);
+    
     fn stop_progress_meter();
 
     static mut __progname: *mut libc::c_char;
@@ -1126,7 +1126,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
 unsafe extern "C" fn scpio(mut _cnt: *mut libc::c_void, mut s: size_t) -> libc::c_int {
     let mut cnt: *mut off_t = _cnt as *mut off_t;
     *cnt = (*cnt as libc::c_ulong).wrapping_add(s) as off_t as off_t;
-    refresh_progress_meter(0 as libc::c_int);
+    crate::progressmeter::refresh_progress_meter(0 as libc::c_int);
     if limit_kbps > 0 as libc::c_int as libc::c_longlong {
         crate::misc::bandwidth_limit(&mut bwlimit, s);
     }
