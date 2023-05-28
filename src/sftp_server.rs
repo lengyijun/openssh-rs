@@ -78,7 +78,6 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
 
     fn strftime(
         __s: *mut libc::c_char,

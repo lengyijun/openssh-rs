@@ -63,7 +63,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn xvasprintf(
@@ -1157,7 +1157,7 @@ unsafe extern "C" fn client_x11_display_valid(mut display: *const libc::c_char) 
             as libc::c_int
             & _ISalnum as libc::c_int as libc::c_ushort as libc::c_int
             == 0
-            && (strchr(
+            && (libc::strchr(
                 b":/.-_\0" as *const u8 as *const libc::c_char,
                 *display.offset(i as isize) as libc::c_int,
             ))
@@ -4714,14 +4714,15 @@ unsafe extern "C" fn hostkeys_update_ctx_free(mut ctx: *mut hostkeys_update_ctx)
 }
 unsafe extern "C" fn hostspec_is_complex(mut hosts: *const libc::c_char) -> libc::c_int {
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
-    if !(strchr(hosts, '*' as i32)).is_null() || !(strchr(hosts, '?' as i32)).is_null() {
+    if !(libc::strchr(hosts, '*' as i32)).is_null() || !(libc::strchr(hosts, '?' as i32)).is_null()
+    {
         return 1 as libc::c_int;
     }
-    cp = strchr(hosts, ',' as i32);
+    cp = libc::strchr(hosts, ',' as i32);
     if cp.is_null() {
         return 0 as libc::c_int;
     }
-    if !(strchr(cp.offset(1 as libc::c_int as isize), ',' as i32)).is_null() {
+    if !(libc::strchr(cp.offset(1 as libc::c_int as isize), ',' as i32)).is_null() {
         return 1 as libc::c_int;
     }
     return 0 as libc::c_int;
@@ -4778,7 +4779,7 @@ unsafe extern "C" fn hostkeys_find(
         (*ctx).complex_hostspec = 1 as libc::c_int;
         return 0 as libc::c_int;
     }
-    if !((*ctx).ip_str).is_null() && !(strchr((*l).hosts, ',' as i32)).is_null() {
+    if !((*ctx).ip_str).is_null() && !(libc::strchr((*l).hosts, ',' as i32)).is_null() {
         if (*l).match_0 & 1 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint {
             (*ctx).other_name_seen = 1 as libc::c_int;
             crate::log::sshlog(
@@ -6461,7 +6462,7 @@ pub unsafe extern "C" fn client_session2_setup(
         i = 0 as libc::c_int as size_t;
         while !(*env.offset(i as isize)).is_null() {
             name = crate::xmalloc::xstrdup(*env.offset(i as isize));
-            val = strchr(name, '=' as i32);
+            val = libc::strchr(name, '=' as i32);
             if val.is_null() {
                 libc::free(name as *mut libc::c_void);
             } else {
@@ -6506,7 +6507,7 @@ pub unsafe extern "C" fn client_session2_setup(
     i = 0 as libc::c_int as size_t;
     while i < options.num_setenv as libc::c_ulong {
         name = crate::xmalloc::xstrdup(*(options.setenv).offset(i as isize));
-        val = strchr(name, '=' as i32);
+        val = libc::strchr(name, '=' as i32);
         if val.is_null() {
             libc::free(name as *mut libc::c_void);
         } else {

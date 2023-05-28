@@ -64,7 +64,6 @@ extern "C" {
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -2422,7 +2421,7 @@ pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc:
         if fd == -(1 as libc::c_int) {
             current_block = 13417990991670220822;
         } else {
-            if !(strchr(name, '\n' as i32)).is_null() {
+            if !(libc::strchr(name, '\n' as i32)).is_null() {
                 strnvis(
                     encname.as_mut_ptr(),
                     name,
@@ -3684,7 +3683,7 @@ pub unsafe extern "C" fn sink(
                             } else {
                                 size = ull as off_t;
                                 if *cp as libc::c_int == '\0' as i32
-                                    || !(strchr(cp, '/' as i32)).is_null()
+                                    || !(libc::strchr(cp, '/' as i32)).is_null()
                                     || libc::strcmp(cp, b".\0" as *const u8 as *const libc::c_char)
                                         == 0 as libc::c_int
                                     || libc::strcmp(cp, b"..\0" as *const u8 as *const libc::c_char)

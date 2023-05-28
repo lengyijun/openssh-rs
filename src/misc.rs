@@ -95,7 +95,6 @@ extern "C" {
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strpbrk(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
@@ -1208,7 +1207,7 @@ pub unsafe extern "C" fn a2tun(
     if !remote.is_null() {
         *remote = 0x7fffffff as libc::c_int;
         sp = crate::xmalloc::xstrdup(s);
-        ep = strchr(sp, ':' as i32);
+        ep = libc::strchr(sp, ':' as i32);
         if ep.is_null() {
             libc::free(sp as *mut libc::c_void);
             return a2tun(s, 0 as *mut libc::c_int);
@@ -1411,7 +1410,7 @@ pub unsafe extern "C" fn hpdelim2(
     s = *cp;
     old = s;
     if *s as libc::c_int == '[' as i32 {
-        s = strchr(s, ']' as i32);
+        s = libc::strchr(s, ']' as i32);
         if s.is_null() {
             return 0 as *mut libc::c_char;
         } else {
@@ -1767,11 +1766,11 @@ pub unsafe extern "C" fn parse_uri(
     }
     tmp = crate::xmalloc::xstrdup(uri);
     uridup = tmp;
-    cp = strchr(tmp, '@' as i32);
+    cp = libc::strchr(tmp, '@' as i32);
     if !cp.is_null() {
         let mut delim: *mut libc::c_char = 0 as *mut libc::c_char;
         *cp = '\0' as i32 as libc::c_char;
-        delim = strchr(tmp, ';' as i32);
+        delim = libc::strchr(tmp, ';' as i32);
         if !delim.is_null() {
             *delim = '\0' as i32 as libc::c_char;
         }
@@ -1797,7 +1796,7 @@ pub unsafe extern "C" fn parse_uri(
                 if !(valid_domain(host, 0 as libc::c_int, 0 as *mut *const libc::c_char) == 0) {
                     if !tmp.is_null() && *tmp as libc::c_int != '\0' as i32 {
                         if ch as libc::c_int == ':' as i32 {
-                            cp = strchr(tmp, '/' as i32);
+                            cp = libc::strchr(tmp, '/' as i32);
                             if !cp.is_null() {
                                 *cp = '\0' as i32 as libc::c_char;
                             }
@@ -2031,7 +2030,7 @@ pub unsafe extern "C" fn tilde_expand(
         }
     } else {
         user = copy;
-        path = strchr(copy, '/' as i32);
+        path = libc::strchr(copy, '/' as i32);
         if !path.is_null() {
             *copy.offset(path.offset_from(copy) as libc::c_long as isize) =
                 '\0' as i32 as libc::c_char;
@@ -2266,7 +2265,7 @@ unsafe extern "C" fn vdollar_percent_expand(
             && *string.offset(1 as libc::c_int as isize) as libc::c_int == '{' as i32
         {
             string = string.offset(2 as libc::c_int as isize);
-            varend = strchr(string, '}' as i32);
+            varend = libc::strchr(string, '}' as i32);
             if varend.is_null() {
                 crate::log::sshlog(
                     b"misc.c\0" as *const u8 as *const libc::c_char,
@@ -2388,7 +2387,9 @@ unsafe extern "C" fn vdollar_percent_expand(
                     } else {
                         i = 0 as libc::c_int as u_int;
                         while i < num_keys {
-                            if !(strchr(keys[i as usize].key, *string as libc::c_int)).is_null() {
+                            if !(libc::strchr(keys[i as usize].key, *string as libc::c_int))
+                                .is_null()
+                            {
                                 r = sshbuf_put(
                                     buf,
                                     keys[i as usize].repl as *const libc::c_void,
@@ -3916,7 +3917,7 @@ pub unsafe extern "C" fn child_set_env(
     let mut envsize: u_int = 0;
     let mut i: u_int = 0;
     let mut namelen: u_int = 0;
-    if !(strchr(name, '=' as i32)).is_null() {
+    if !(libc::strchr(name, '=' as i32)).is_null() {
         crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"child_set_env\0"))
@@ -5064,7 +5065,7 @@ pub unsafe extern "C" fn lookup_setenv_in_list(
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut ret: *const libc::c_char = 0 as *const libc::c_char;
     name = crate::xmalloc::xstrdup(env);
-    cp = strchr(name, '=' as i32);
+    cp = libc::strchr(name, '=' as i32);
     if cp.is_null() {
         libc::free(name as *mut libc::c_void);
         return 0 as *const libc::c_char;

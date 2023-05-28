@@ -42,7 +42,6 @@ extern "C" {
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn strsignal(__sig: libc::c_int) -> *mut libc::c_char;
@@ -1094,7 +1093,7 @@ unsafe extern "C" fn env_permitted(mut env: *const libc::c_char) -> libc::c_int 
     let mut ret: libc::c_int = 0;
     let mut name: [libc::c_char; 1024] = [0; 1024];
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
-    cp = strchr(env, '=' as i32);
+    cp = libc::strchr(env, '=' as i32);
     if cp.is_null() || cp == env as *mut libc::c_char {
         return 0 as libc::c_int;
     }

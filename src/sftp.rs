@@ -85,7 +85,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -1516,7 +1516,7 @@ unsafe extern "C" fn escape_glob(mut s: *const libc::c_char) -> *mut libc::c_cha
     o = 0 as libc::c_int as size_t;
     i = o;
     while i < len {
-        if !(strchr(
+        if !(libc::strchr(
             b"[]?*\\\0" as *const u8 as *const libc::c_char,
             *s.offset(i as isize) as libc::c_int,
         ))
@@ -4568,7 +4568,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 user,
             );
         }
-        if sftp_server.is_null() || (strchr(sftp_server, '/' as i32)).is_null() {
+        if sftp_server.is_null() || (libc::strchr(sftp_server, '/' as i32)).is_null() {
             crate::misc::addargs(
                 &mut args as *mut arglist,
                 b"-s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,

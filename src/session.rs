@@ -93,7 +93,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strtok(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
@@ -1905,7 +1905,7 @@ unsafe extern "C" fn read_environment_file(
         }
         *cp.offset(strcspn(cp, b"\n\0" as *const u8 as *const libc::c_char) as isize) =
             '\0' as i32 as libc::c_char;
-        value = strchr(cp, '=' as i32);
+        value = libc::strchr(cp, '=' as i32);
         if value.is_null() {
             libc::fprintf(
                 stderr,
@@ -2061,7 +2061,7 @@ unsafe extern "C" fn do_setup_env(
         n = 0 as libc::c_int as size_t;
         while n < (*auth_opts).nenv {
             ocp = crate::xmalloc::xstrdup(*((*auth_opts).env).offset(n as isize));
-            cp = strchr(ocp, '=' as i32);
+            cp = libc::strchr(ocp, '=' as i32);
             if !cp.is_null() {
                 *cp = '\0' as i32 as libc::c_char;
                 if (options.permit_user_env_allowlist).is_null()
@@ -2099,7 +2099,7 @@ unsafe extern "C" fn do_setup_env(
     i = 0 as libc::c_int as u_int;
     while i < options.num_setenv {
         cp = crate::xmalloc::xstrdup(*(options.setenv).offset(i as isize));
-        value = strchr(cp, '=' as i32);
+        value = libc::strchr(cp, '=' as i32);
         if value.is_null() {
             sshfatal(
                 b"session.c\0" as *const u8 as *const libc::c_char,
@@ -2437,7 +2437,7 @@ unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut _uid: uid_
     }
     cp = path;
     while !cp.is_null() {
-        cp = strchr(cp, '/' as i32);
+        cp = libc::strchr(cp, '/' as i32);
         if cp.is_null() {
             strlcpy(
                 component.as_mut_ptr(),

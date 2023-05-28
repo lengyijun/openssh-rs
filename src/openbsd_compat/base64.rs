@@ -1,7 +1,7 @@
 use ::libc;
 extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -160,7 +160,7 @@ pub unsafe extern "C" fn __b64_pton(
         if ch == Pad64 as libc::c_int {
             break;
         }
-        pos = strchr(Base64.as_ptr(), ch);
+        pos = libc::strchr(Base64.as_ptr(), ch);
         if pos.is_null() {
             return -(1 as libc::c_int);
         }

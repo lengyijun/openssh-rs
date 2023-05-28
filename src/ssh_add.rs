@@ -43,7 +43,6 @@ extern "C" {
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -1515,7 +1514,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
         ::core::mem::size_of::<dest_constraint_hop>() as libc::c_ulong,
     );
     os = crate::xmalloc::xstrdup(s);
-    host = strchr(os, '@' as i32);
+    host = libc::strchr(os, '@' as i32);
     if host.is_null() {
         host = os;
     } else {
@@ -1699,7 +1698,7 @@ unsafe extern "C" fn parse_dest_constraint(
         ::core::mem::size_of::<dest_constraint>() as libc::c_ulong,
     ) as *mut dest_constraint;
     os = crate::xmalloc::xstrdup(s);
-    cp = strchr(os, '>' as i32);
+    cp = libc::strchr(os, '>' as i32);
     if cp.is_null() {
         parse_dest_constraint_hop(os, &mut (*dc).to, hostkey_files);
     } else {

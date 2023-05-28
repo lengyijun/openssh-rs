@@ -12,7 +12,6 @@ extern "C" {
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
@@ -570,7 +569,7 @@ unsafe extern "C" fn handle_permit(
     if opt.is_null() {
         return -(1 as libc::c_int);
     }
-    if allow_bare_port != 0 && (strchr(opt, ':' as i32)).is_null() {
+    if allow_bare_port != 0 && (libc::strchr(opt, ':' as i32)).is_null() {
         if asprintf(
             &mut tmp as *mut *mut libc::c_char,
             b"*:%s\0" as *const u8 as *const libc::c_char,
@@ -849,7 +848,7 @@ pub unsafe extern "C" fn sshauthopt_parse(
                                                         current_block = 2182509200741687066;
                                                         break;
                                                     }
-                                                    tmp = strchr(opt, '=' as i32);
+                                                    tmp = libc::strchr(opt, '=' as i32);
                                                     if tmp.is_null() {
                                                         libc::free(opt as *mut libc::c_void);
                                                         errstr = b"invalid environment string\0"

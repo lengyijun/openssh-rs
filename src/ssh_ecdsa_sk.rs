@@ -11,7 +11,6 @@ extern "C" {
     fn BN_clear_free(a: *mut BIGNUM);
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
 
     fn ECDSA_do_verify(
         dgst: *const libc::c_uchar,
@@ -334,7 +333,7 @@ unsafe extern "C" fn webauthn_check_prepare_hash(
         chall.is_null()
     } {
         r = -(2 as libc::c_int);
-    } else if !(strchr(origin, '"' as i32)).is_null()
+    } else if !(libc::strchr(origin, '"' as i32)).is_null()
         || flags as libc::c_int & 0x40 as libc::c_int != 0 as libc::c_int
         || (flags as libc::c_int & 0x80 as libc::c_int == 0 as libc::c_int) as libc::c_int
             != (sshbuf_len(extensions) == 0 as libc::c_int as libc::c_ulong) as libc::c_int

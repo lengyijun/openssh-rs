@@ -2,7 +2,7 @@ use ::libc;
 extern "C" {
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
 }
@@ -129,7 +129,7 @@ unsafe extern "C" fn parse_long_options(
     match_0 = -(1 as libc::c_int);
     BSDoptind += 1;
     BSDoptind;
-    has_equal = strchr(current_argv, '=' as i32);
+    has_equal = libc::strchr(current_argv, '=' as i32);
     if !has_equal.is_null() {
         current_argv_len = has_equal.offset_from(current_argv) as libc::c_long as size_t;
         has_equal = has_equal.offset(1);
@@ -339,7 +339,7 @@ unsafe extern "C" fn getopt_internal(
         place = *nargv.offset(BSDoptind as isize);
         if *place as libc::c_int != '-' as i32
             || *place.offset(1 as libc::c_int as isize) as libc::c_int == '\0' as i32
-                && (strchr(options, '-' as i32)).is_null()
+                && (libc::strchr(options, '-' as i32)).is_null()
         {
             place = b"\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
             if flags & 0x2 as libc::c_int != 0 {
@@ -394,7 +394,7 @@ unsafe extern "C" fn getopt_internal(
             place = place.offset(1);
             place;
         } else if *place as libc::c_int != ':' as i32
-            && !(strchr(options, *place as libc::c_int)).is_null()
+            && !(libc::strchr(options, *place as libc::c_int)).is_null()
         {
             short_too = 1 as libc::c_int;
         }
@@ -408,7 +408,7 @@ unsafe extern "C" fn getopt_internal(
     place = place.offset(1);
     optchar = *fresh4 as libc::c_int;
     if optchar == ':' as i32 || optchar == '-' as i32 && *place as libc::c_int != '\0' as i32 || {
-        oli = strchr(options, optchar);
+        oli = libc::strchr(options, optchar);
         oli.is_null()
     } {
         if optchar == '-' as i32 && *place as libc::c_int == '\0' as i32 {

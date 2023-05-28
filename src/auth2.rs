@@ -23,7 +23,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
@@ -857,7 +857,7 @@ unsafe extern "C" fn input_userauth_request(
             (*authctxt).attempt,
             (*authctxt).failures,
         );
-        style = strchr(user, ':' as i32);
+        style = libc::strchr(user, ':' as i32);
         if !style.is_null() {
             let fresh0 = style;
             style = style.offset(1);
@@ -1371,7 +1371,7 @@ pub unsafe extern "C" fn auth2_methods_valid(
         i = 0 as libc::c_int as u_int;
         found = i;
         while found == 0 && !(authmethods[i as usize]).is_null() {
-            p = strchr(method, ':' as i32);
+            p = libc::strchr(method, ':' as i32);
             if !p.is_null() {
                 *p = '\0' as i32 as libc::c_char;
             }
@@ -1867,7 +1867,7 @@ pub unsafe extern "C" fn auth2_update_session_info(
         }
     }
     if !((*authctxt).auth_method_info).is_null() {
-        if !(strchr((*authctxt).auth_method_info, '\n' as i32)).is_null() {
+        if !(libc::strchr((*authctxt).auth_method_info, '\n' as i32)).is_null() {
             sshfatal(
                 b"auth2.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(

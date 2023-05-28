@@ -67,7 +67,7 @@ extern "C" {
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
@@ -10554,7 +10554,7 @@ pub unsafe extern "C" fn x11_connect_display(mut ssh: *mut ssh) -> libc::c_int {
         display,
         ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
     );
-    cp = strchr(buf.as_mut_ptr(), ':' as i32);
+    cp = libc::strchr(buf.as_mut_ptr(), ':' as i32);
     if cp.is_null() {
         crate::log::sshlog(
             b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -10726,9 +10726,9 @@ pub unsafe extern "C" fn x11_request_forwarding_with_spoofing(
         );
         return;
     }
-    cp = strchr(disp, ':' as i32);
+    cp = libc::strchr(disp, ':' as i32);
     if !cp.is_null() {
-        cp = strchr(cp, '.' as i32);
+        cp = libc::strchr(cp, '.' as i32);
     }
     if !cp.is_null() {
         screen_number = crate::openbsd_compat::strtonum::strtonum(

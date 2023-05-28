@@ -98,7 +98,7 @@ extern "C" {
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -4950,7 +4950,7 @@ unsafe extern "C" fn parse_cert_times(mut timespec: *mut libc::c_char) {
     let mut to: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut now: time_t = time(0 as *mut time_t);
     let mut secs: int64_t = 0;
-    if *timespec as libc::c_int == '+' as i32 && (strchr(timespec, ':' as i32)).is_null() {
+    if *timespec as libc::c_int == '+' as i32 && (libc::strchr(timespec, ':' as i32)).is_null() {
         secs = convtime(timespec.offset(1 as libc::c_int as isize)) as int64_t;
         if secs == -(1 as libc::c_int) as libc::c_long {
             sshfatal(
@@ -4972,7 +4972,7 @@ unsafe extern "C" fn parse_cert_times(mut timespec: *mut libc::c_char) {
         return;
     }
     from = crate::xmalloc::xstrdup(timespec);
-    to = strchr(from, ':' as i32);
+    to = libc::strchr(from, ':' as i32);
     if to.is_null()
         || from == to
         || *to.offset(1 as libc::c_int as isize) as libc::c_int == '\0' as i32
@@ -5225,8 +5225,10 @@ unsafe extern "C" fn add_cert_option(mut opt: *mut libc::c_char) {
             iscrit != 0
         }
     {
-        val = crate::xmalloc::xstrdup((strchr(opt, ':' as i32)).offset(1 as libc::c_int as isize));
-        cp = strchr(val, '=' as i32);
+        val = crate::xmalloc::xstrdup(
+            (libc::strchr(opt, ':' as i32)).offset(1 as libc::c_int as isize),
+        );
+        cp = libc::strchr(val, '=' as i32);
         if !cp.is_null() {
             let fresh6 = cp;
             cp = cp.offset(1);
@@ -7959,9 +7961,9 @@ unsafe extern "C" fn sk_suffix(
             b"asmprintf failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    if !(strchr(cp, '/' as i32)).is_null()
+    if !(libc::strchr(cp, '/' as i32)).is_null()
         || !(strstr(cp, b"..\0" as *const u8 as *const libc::c_char)).is_null()
-        || !(strchr(cp, '\\' as i32)).is_null()
+        || !(libc::strchr(cp, '\\' as i32)).is_null()
     {
         libc::free(cp as *mut libc::c_void);
         cp = tohex(user as *const libc::c_void, slen);

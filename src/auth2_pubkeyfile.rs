@@ -19,7 +19,6 @@ extern "C" {
     ) -> __ssize_t;
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
@@ -574,7 +573,7 @@ pub unsafe extern "C" fn auth_process_principals(
             cp = cp.offset(1);
             cp;
         }
-        ep = strchr(cp, '#' as i32);
+        ep = libc::strchr(cp, '#' as i32);
         if !ep.is_null() {
             *ep = '\0' as i32 as libc::c_char;
         }

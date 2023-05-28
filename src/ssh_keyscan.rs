@@ -74,7 +74,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strtok(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -2194,7 +2194,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             }
         }
         while getline(&mut line, &mut linesize, fp) != -(1 as libc::c_int) as libc::c_long {
-            cp = strchr(line, '#' as i32);
+            cp = libc::strchr(line, '#' as i32);
             if cp.is_null() {
                 cp = line
                     .offset(strlen(line) as isize)

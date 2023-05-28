@@ -34,7 +34,6 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
@@ -859,7 +858,7 @@ unsafe extern "C" fn first_alg(mut algs: *const libc::c_char) -> *mut libc::c_ch
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     ret = crate::xmalloc::xstrdup(algs);
-    cp = strchr(ret, ',' as i32);
+    cp = libc::strchr(ret, ',' as i32);
     if !cp.is_null() {
         *cp = '\0' as i32 as libc::c_char;
     }

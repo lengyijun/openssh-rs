@@ -29,7 +29,6 @@ extern "C" {
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
@@ -2094,11 +2093,11 @@ unsafe extern "C" fn proposals_match(
     let mut p: *mut libc::c_char = 0 as *mut libc::c_char;
     idx = &mut *check.as_mut_ptr().offset(0 as libc::c_int as isize) as *mut libc::c_int;
     while *idx != -(1 as libc::c_int) {
-        p = strchr(*my.offset(*idx as isize), ',' as i32);
+        p = libc::strchr(*my.offset(*idx as isize), ',' as i32);
         if !p.is_null() {
             *p = '\0' as i32 as libc::c_char;
         }
-        p = strchr(*peer.offset(*idx as isize), ',' as i32);
+        p = libc::strchr(*peer.offset(*idx as isize), ',' as i32);
         if !p.is_null() {
             *p = '\0' as i32 as libc::c_char;
         }

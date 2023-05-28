@@ -44,7 +44,6 @@ extern "C" {
         -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -3114,7 +3113,7 @@ unsafe extern "C" fn process_config_line_depth(
     len = len.wrapping_sub(1);
     len;
     while len > 0 as libc::c_int as libc::c_ulong {
-        if (strchr(
+        if (libc::strchr(
             b" \t\r\n\x0C\0" as *const u8 as *const libc::c_char,
             *line.offset(len as isize) as libc::c_int,
         ))
@@ -4493,7 +4492,7 @@ unsafe extern "C" fn process_config_line_depth(
                 current_block = 3935247052025034411;
                 break;
             }
-            if *arg as libc::c_int == '\0' as i32 || !(strchr(arg, '=' as i32)).is_null() {
+            if *arg as libc::c_int == '\0' as i32 || !(libc::strchr(arg, '=' as i32)).is_null() {
                 crate::log::sshlog(
                     b"readconf.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
@@ -4536,7 +4535,7 @@ unsafe extern "C" fn process_config_line_depth(
                     current_block = 3935247052025034411;
                     break;
                 }
-                if (strchr(arg, '=' as i32)).is_null() {
+                if (libc::strchr(arg, '=' as i32)).is_null() {
                     crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
@@ -5191,7 +5190,7 @@ unsafe extern "C" fn process_config_line_depth(
                     arg2 = arg;
                 } else {
                     lowercase(arg);
-                    arg2 = strchr(arg, ':' as i32);
+                    arg2 = libc::strchr(arg, ':' as i32);
                     if arg2.is_null()
                         || *arg2.offset(1 as libc::c_int as isize) as libc::c_int == '\0' as i32
                     {
@@ -7149,7 +7148,7 @@ pub unsafe extern "C" fn parse_jump(
     active &= (((*o).proxy_command).is_null() && ((*o).jump_host).is_null()) as libc::c_int;
     sdup = crate::xmalloc::xstrdup(s);
     orig = sdup;
-    cp = strchr(orig, '#' as i32);
+    cp = libc::strchr(orig, '#' as i32);
     if !cp.is_null() {
         *cp = '\0' as i32 as libc::c_char;
     }
@@ -7717,7 +7716,7 @@ pub unsafe extern "C" fn dump_client_config(mut o: *mut Options, mut host: *cons
     if ((*o).jump_host).is_null() {
         dump_cfg_string(oProxyCommand, (*o).proxy_command);
     } else {
-        i = (!(strchr((*o).jump_host, ':' as i32)).is_null()
+        i = (!(libc::strchr((*o).jump_host, ':' as i32)).is_null()
             || strspn(
                 (*o).jump_host,
                 b"1234567890.\0" as *const u8 as *const libc::c_char,

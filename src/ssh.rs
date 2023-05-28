@@ -72,7 +72,6 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -1356,8 +1355,8 @@ unsafe extern "C" fn resolve_host(
     return res;
 }
 unsafe extern "C" fn is_addr_fast(mut name: *const libc::c_char) -> libc::c_int {
-    return (!(strchr(name, '%' as i32)).is_null()
-        || !(strchr(name, ':' as i32)).is_null()
+    return (!(libc::strchr(name, '%' as i32)).is_null()
+        || !(libc::strchr(name, ':' as i32)).is_null()
         || strspn(name, b"0123456789.\0" as *const u8 as *const libc::c_char) == strlen(name))
         as libc::c_int;
 }
@@ -3086,7 +3085,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 options.jump_host,
             );
         }
-        if !(strchr(argv0, '/' as i32)).is_null()
+        if !(libc::strchr(argv0, '/' as i32)).is_null()
             && access(argv0, 1 as libc::c_int) != 0 as libc::c_int
         {
             sshbin = b"ssh\0" as *const u8 as *const libc::c_char;

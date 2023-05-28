@@ -45,7 +45,7 @@ extern "C" {
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -500,9 +500,9 @@ unsafe extern "C" fn check_markers(mut cpp: *mut *mut libc::c_char) -> HostkeyMa
         if ret != MRK_NONE as libc::c_int {
             return MRK_ERROR;
         }
-        sp = strchr(cp, ' ' as i32);
+        sp = libc::strchr(cp, ' ' as i32);
         if sp.is_null() && {
-            sp = strchr(cp, '\t' as i32);
+            sp = libc::strchr(cp, '\t' as i32);
             sp.is_null()
         } {
             return MRK_ERROR;

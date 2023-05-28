@@ -19,7 +19,7 @@ extern "C" {
     ) -> libc::c_int;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
     fn strtoul(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_ulong;
 }
 pub type __u_int = libc::c_uint;
@@ -693,7 +693,7 @@ pub unsafe extern "C" fn addr_pton_cidr(
     {
         return -(1 as libc::c_int);
     }
-    mp = strchr(addrbuf.as_mut_ptr(), '/' as i32);
+    mp = libc::strchr(addrbuf.as_mut_ptr(), '/' as i32);
     if !mp.is_null() {
         *mp = '\0' as i32 as libc::c_char;
         mp = mp.offset(1);

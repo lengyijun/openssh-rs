@@ -4,7 +4,6 @@ extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __ctype_tolower_loc() -> *mut *const __int32_t;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
@@ -226,7 +225,7 @@ pub unsafe extern "C" fn match_user(
     let mut pat: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut ret: libc::c_int = 0;
     if user.is_null() && host.is_null() && ipaddr.is_null() {
-        p = strchr(pattern, '@' as i32);
+        p = libc::strchr(pattern, '@' as i32);
         if !p.is_null()
             && match_host_and_ip(
                 0 as *const libc::c_char,
@@ -241,12 +240,12 @@ pub unsafe extern "C" fn match_user(
     if user.is_null() {
         return 0 as libc::c_int;
     }
-    p = strchr(pattern, '@' as i32);
+    p = libc::strchr(pattern, '@' as i32);
     if p.is_null() {
         return match_pattern(user, pattern);
     }
     pat = crate::xmalloc::xstrdup(pattern);
-    p = strchr(pat, '@' as i32);
+    p = libc::strchr(pat, '@' as i32);
     let fresh0 = p;
     p = p.offset(1);
     *fresh0 = '\0' as i32 as libc::c_char;

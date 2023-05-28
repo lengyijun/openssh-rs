@@ -11,7 +11,6 @@ extern "C" {
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
 
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 }
@@ -106,7 +105,7 @@ pub unsafe extern "C" fn sftp_realpath(
                 current_block = 17515716450947708786;
                 break;
             }
-            p = strchr(left.as_mut_ptr(), '/' as i32);
+            p = libc::strchr(left.as_mut_ptr(), '/' as i32);
             s = if !p.is_null() {
                 p
             } else {
