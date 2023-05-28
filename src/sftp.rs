@@ -48,11 +48,7 @@ extern "C" {
     static mut BSDoptind: libc::c_int;
     static mut BSDopterr: libc::c_int;
     static mut BSDoptopt: libc::c_int;
-    fn BSDgetopt(
-        ___argc: libc::c_int,
-        ___argv: *const *mut libc::c_char,
-        __shortopts: *const libc::c_char,
-    ) -> libc::c_int;
+
     static mut stdin: *mut libc::FILE;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
@@ -1100,7 +1096,7 @@ unsafe extern "C" fn parse_getput_flags(
     *fflag = *rflag;
     *aflag = *fflag;
     loop {
-        ch = BSDgetopt(argc, argv, b"afPpRr\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"afPpRr\0" as *const u8 as *const libc::c_char);
         if !(ch != -(1 as libc::c_int)) {
             break;
         }
@@ -1166,7 +1162,7 @@ unsafe extern "C" fn parse_link_flags(
     BSDopterr = 0 as libc::c_int;
     *sflag = 0 as libc::c_int;
     loop {
-        ch = BSDgetopt(argc, argv, b"s\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"s\0" as *const u8 as *const libc::c_char);
         if !(ch != -(1 as libc::c_int)) {
             break;
         }
@@ -1223,7 +1219,7 @@ unsafe extern "C" fn parse_rename_flags(
     BSDopterr = 0 as libc::c_int;
     *lflag = 0 as libc::c_int;
     loop {
-        ch = BSDgetopt(argc, argv, b"l\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"l\0" as *const u8 as *const libc::c_char);
         if !(ch != -(1 as libc::c_int)) {
             break;
         }
@@ -1279,7 +1275,7 @@ unsafe extern "C" fn parse_ls_flags(
     BSDopterr = 0 as libc::c_int;
     *lflag = 0x8 as libc::c_int;
     loop {
-        ch = BSDgetopt(
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(
             argc,
             argv,
             b"1Safhlnrt\0" as *const u8 as *const libc::c_char,
@@ -1373,7 +1369,7 @@ unsafe extern "C" fn parse_df_flags(
     *iflag = 0 as libc::c_int;
     *hflag = *iflag;
     loop {
-        ch = BSDgetopt(argc, argv, b"hi\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"hi\0" as *const u8 as *const libc::c_char);
         if !(ch != -(1 as libc::c_int)) {
             break;
         }
@@ -1433,7 +1429,7 @@ unsafe extern "C" fn parse_ch_flags(
     BSDopterr = 0 as libc::c_int;
     *hflag = 0 as libc::c_int;
     loop {
-        ch = BSDgetopt(argc, argv, b"h\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"h\0" as *const u8 as *const libc::c_char);
         if !(ch != -(1 as libc::c_int)) {
             break;
         }
@@ -1487,7 +1483,7 @@ unsafe extern "C" fn parse_no_flags(
     BSDoptreset = 1 as libc::c_int;
     BSDoptind = BSDoptreset;
     BSDopterr = 0 as libc::c_int;
-    ch = BSDgetopt(argc, argv, b"\0" as *const u8 as *const libc::c_char);
+    ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"\0" as *const u8 as *const libc::c_char);
     if ch != -(1 as libc::c_int) {
         match ch {
             _ => {}
@@ -4213,7 +4209,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     ll = SYSLOG_LEVEL_INFO;
     infile = stdin;
     loop {
-        ch = BSDgetopt(
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(
             argc,
             argv,
             b"1246AafhNpqrvCc:D:i:l:o:s:S:b:B:F:J:P:R:X:\0" as *const u8 as *const libc::c_char,

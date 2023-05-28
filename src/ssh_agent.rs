@@ -47,11 +47,7 @@ extern "C" {
     fn rmdir(__path: *const libc::c_char) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
-    fn BSDgetopt(
-        ___argc: libc::c_int,
-        ___argv: *const *mut libc::c_char,
-        __shortopts: *const libc::c_char,
-    ) -> libc::c_int;
+
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
 
@@ -4735,7 +4731,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         crate::openbsd_compat::bsd_misc::ssh_get_progname(*av.offset(0 as libc::c_int as isize));
     seed_rng();
     loop {
-        ch = BSDgetopt(
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(
             ac,
             av,
             b"cDdksE:a:O:P:t:\0" as *const u8 as *const libc::c_char,

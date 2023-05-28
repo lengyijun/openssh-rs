@@ -37,11 +37,7 @@ extern "C" {
     fn sysconf(__name: libc::c_int) -> libc::c_long;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
-    fn BSDgetopt(
-        ___argc: libc::c_int,
-        ___argv: *const *mut libc::c_char,
-        __shortopts: *const libc::c_char,
-    ) -> libc::c_int;
+
     fn getaddrinfo(
         __name: *const libc::c_char,
         __service: *const libc::c_char,
@@ -1958,7 +1954,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         usage();
     }
     loop {
-        opt = BSDgetopt(
+        opt = crate::openbsd_compat::getopt_long::BSDgetopt(
             argc,
             argv,
             b"cDHv46O:p:T:t:f:\0" as *const u8 as *const libc::c_char,

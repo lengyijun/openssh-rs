@@ -95,11 +95,7 @@ extern "C" {
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
-    fn BSDgetopt(
-        ___argc: libc::c_int,
-        ___argv: *const *mut libc::c_char,
-        __shortopts: *const libc::c_char,
-    ) -> libc::c_int;
+
     fn daemon(__nochdir: libc::c_int, __noclose: libc::c_int) -> libc::c_int;
     fn chroot(__path: *const libc::c_char) -> libc::c_int;
     fn freeaddrinfo(__ai: *mut addrinfo);
@@ -3724,7 +3720,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     crate::misc::sanitise_stdfd();
     initialize_server_options(&mut options);
     loop {
-        opt = BSDgetopt(
+        opt = crate::openbsd_compat::getopt_long::BSDgetopt(
             ac,
             av,
             b"C:E:b:c:f:g:h:k:o:p:u:46DGQRTdeiqrtV\0" as *const u8 as *const libc::c_char,

@@ -13,11 +13,7 @@ extern "C" {
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
 
-    fn BSDgetopt(
-        ___argc: libc::c_int,
-        ___argv: *const *mut libc::c_char,
-        __shortopts: *const libc::c_char,
-    ) -> libc::c_int;
+
     static mut stderr: *mut libc::FILE;
 
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
@@ -813,7 +809,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     pkcs11_keylist.tqh_last = &mut pkcs11_keylist.tqh_first;
     log_init(__progname, log_level, log_facility, log_stderr);
     loop {
-        ch = BSDgetopt(argc, argv, b"v\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"v\0" as *const u8 as *const libc::c_char);
         if !(ch != -(1 as libc::c_int)) {
             break;
         }

@@ -51,11 +51,7 @@ extern "C" {
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
-    fn BSDgetopt(
-        ___argc: libc::c_int,
-        ___argv: *const *mut libc::c_char,
-        __shortopts: *const libc::c_char,
-    ) -> libc::c_int;
+
     fn ftruncate(__fd: libc::c_int, __length: __off_t) -> libc::c_int;
     fn perror(__s: *const libc::c_char);
     fn scan_scaled(_: *mut libc::c_char, _: *mut libc::c_longlong) -> libc::c_int;
@@ -789,7 +785,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
     Tflag = tflag;
     fflag = Tflag;
     loop {
-        ch = BSDgetopt(
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(
             argc,
             argv,
             b"12346ABCTdfOpqRrstvD:F:J:M:P:S:c:i:l:o:X:\0" as *const u8 as *const libc::c_char,

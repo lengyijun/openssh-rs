@@ -30,11 +30,7 @@ extern "C" {
     fn seed_rng();
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
-    fn BSDgetopt(
-        ___argc: libc::c_int,
-        ___argv: *const *mut libc::c_char,
-        __shortopts: *const libc::c_char,
-    ) -> libc::c_int;
+
     fn getaddrinfo(
         __name: *const libc::c_char,
         __service: *const libc::c_char,
@@ -2140,7 +2136,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     argv0 = *av.offset(0 as libc::c_int as isize);
     loop {
         loop {
-            opt = BSDgetopt(
+            opt = crate::openbsd_compat::getopt_long::BSDgetopt(
                 ac,
                 av,
                 b"1246ab:c:e:fgi:kl:m:no:p:qstvxAB:CD:E:F:GI:J:KL:MNO:PQ:R:S:TVw:W:XYy\0"

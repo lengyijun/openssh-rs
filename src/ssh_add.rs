@@ -15,11 +15,7 @@ extern "C" {
     
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
-    fn BSDgetopt(
-        ___argc: libc::c_int,
-        ___argv: *const *mut libc::c_char,
-        __shortopts: *const libc::c_char,
-    ) -> libc::c_int;
+
     static mut stdin: *mut libc::FILE;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
@@ -1865,7 +1861,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     }
     skprovider = getenv(b"SSH_SK_PROVIDER\0" as *const u8 as *const libc::c_char);
     loop {
-        ch = BSDgetopt(
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(
             argc,
             argv,
             b"vkKlLcdDTxXE:e:h:H:M:m:qs:S:t:\0" as *const u8 as *const libc::c_char,

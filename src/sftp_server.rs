@@ -55,11 +55,7 @@ extern "C" {
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rmdir(__path: *const libc::c_char) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
-    fn BSDgetopt(
-        ___argc: libc::c_int,
-        ___argv: *const *mut libc::c_char,
-        __shortopts: *const libc::c_char,
-    ) -> libc::c_int;
+
     fn fsync(__fd: libc::c_int) -> libc::c_int;
     fn truncate(__file: *const libc::c_char, __length: __off_t) -> libc::c_int;
     fn ftruncate(__fd: libc::c_int, __length: __off_t) -> libc::c_int;
