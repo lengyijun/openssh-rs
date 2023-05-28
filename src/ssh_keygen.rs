@@ -22,7 +22,7 @@ extern "C" {
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    
 
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     
@@ -8376,7 +8376,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         1 as libc::c_int,
     );
     msetlocale();
-    pw = getpwuid(libc::getuid());
+    pw = libc::getpwuid(libc::getuid());
     if pw.is_null() {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,

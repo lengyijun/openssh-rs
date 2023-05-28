@@ -38,7 +38,7 @@ extern "C" {
 
     fn vfprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ::core::ffi::VaList) -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
@@ -1038,7 +1038,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
         mode = MODE_SCP;
     }
     userid = libc::getuid();
-    pwd = getpwuid(userid);
+    pwd = libc::getpwuid(userid);
     if pwd.is_null() {
         sshfatal(
             b"scp.c\0" as *const u8 as *const libc::c_char,

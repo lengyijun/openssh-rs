@@ -4,7 +4,7 @@ extern "C" {
 
     fn lstat(__file: *const libc::c_char, __buf: *mut libc::stat) -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    
     fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     
     fn geteuid() -> __uid_t;
@@ -471,7 +471,7 @@ unsafe extern "C" fn globtilde(
             h = getenv(b"HOME\0" as *const u8 as *const libc::c_char);
             h.is_null()
         } {
-            pwd = getpwuid(libc::getuid());
+            pwd = libc::getpwuid(libc::getuid());
             if pwd.is_null() {
                 return pattern;
             } else {

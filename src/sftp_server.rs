@@ -29,7 +29,7 @@ extern "C" {
         __flags: libc::c_int,
     ) -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    
     fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn platform_disable_tracing(_: libc::c_int);
     fn platform_pledge_sftp_server();
@@ -4177,7 +4177,7 @@ unsafe extern "C" fn process_extended_get_users_groups_by_id(mut id: u_int32_t) 
                 b"parse inner uid\0" as *const u8 as *const libc::c_char,
             );
         }
-        user_pw = getpwuid(n);
+        user_pw = libc::getpwuid(n);
         name = if user_pw.is_null() {
             b"\0" as *const u8 as *const libc::c_char
         } else {

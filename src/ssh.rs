@@ -20,7 +20,7 @@ extern "C" {
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
 
     fn closefrom(__lowfd: libc::c_int);
@@ -2099,7 +2099,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     compat_init_setproctitle(ac, av);
     av = saved_av;
     seed_rng();
-    pw = getpwuid(libc::getuid());
+    pw = libc::getpwuid(libc::getuid());
     if pw.is_null() {
         crate::log::sshlog(
             b"ssh.c\0" as *const u8 as *const libc::c_char,

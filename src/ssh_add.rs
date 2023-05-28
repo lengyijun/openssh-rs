@@ -11,7 +11,7 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
 
-    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    
     
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
@@ -2167,7 +2167,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
                     let mut st: libc::stat = unsafe { std::mem::zeroed() };
                     let mut count: libc::c_int = 0 as libc::c_int;
-                    pw = getpwuid(libc::getuid());
+                    pw = libc::getpwuid(libc::getuid());
                     if pw.is_null() {
                         libc::fprintf(
                             stderr,

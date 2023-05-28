@@ -1,6 +1,6 @@
 use ::libc;
 extern "C" {
-    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    
 
     fn getgrgid(__gid: __gid_t) -> *mut group;
 
@@ -53,7 +53,7 @@ pub unsafe extern "C" fn user_from_uid(
         if pwopen == 0 as libc::c_int {
             pwopen = 1 as libc::c_int;
         }
-        pw = getpwuid(uid);
+        pw = libc::getpwuid(uid);
         if pw.is_null() {
             if nouser != 0 {
                 return 0 as *mut libc::c_char;

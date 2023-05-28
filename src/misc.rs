@@ -42,7 +42,7 @@ extern "C" {
         -> libc::c_int;
     fn gettimeofday(__tv: *mut libc::timeval, __tz: *mut libc::c_void) -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    
     fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn platform_sys_dir_uid(_: uid_t) -> libc::c_int;
 
@@ -2067,7 +2067,7 @@ pub unsafe extern "C" fn tilde_expand(
             current_block = 17478428563724192186;
         }
     } else {
-        pw = getpwuid(uid);
+        pw = libc::getpwuid(uid);
         if pw.is_null() {
             crate::log::sshlog(
                 b"misc.c\0" as *const u8 as *const libc::c_char,
@@ -4602,7 +4602,7 @@ pub unsafe extern "C" fn subprocess(
         return 0 as libc::c_int;
     }
     if pw.is_null() && {
-        pw = getpwuid(libc::getuid());
+        pw = libc::getpwuid(libc::getuid());
         pw.is_null()
     } {
         crate::log::sshlog(

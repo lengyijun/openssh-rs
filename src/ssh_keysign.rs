@@ -9,7 +9,7 @@ extern "C" {
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    
 
     
 
@@ -815,7 +815,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
         b"/usr/local/etc/ssh_host_rsa_key\0" as *const u8 as *const libc::c_char,
         0 as libc::c_int,
     );
-    pw = getpwuid(libc::getuid());
+    pw = libc::getpwuid(libc::getuid());
     if pw.is_null() {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
@@ -824,7 +824,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"getpwuid failed\0" as *const u8 as *const libc::c_char,
+            b"libc::getpwuid failed\0" as *const u8 as *const libc::c_char,
         );
     }
     pw = pwcopy(pw);

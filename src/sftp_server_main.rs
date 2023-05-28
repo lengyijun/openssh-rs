@@ -4,7 +4,7 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
     
-    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    
     static mut stderr: *mut libc::FILE;
 
     fn sftp_server_main(_: libc::c_int, _: *mut *mut libc::c_char, _: *mut libc::passwd) -> libc::c_int;
@@ -28,7 +28,7 @@ pub unsafe extern "C" fn cleanup_exit(mut i: libc::c_int) -> ! {
 unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> libc::c_int {
     let mut user_pw: *mut libc::passwd = 0 as *mut libc::passwd;
     crate::misc::sanitise_stdfd();
-    user_pw = getpwuid(libc::getuid());
+    user_pw = libc::getpwuid(libc::getuid());
     if user_pw.is_null() {
         libc::fprintf(
             stderr,

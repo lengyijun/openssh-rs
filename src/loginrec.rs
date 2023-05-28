@@ -31,7 +31,7 @@ extern "C" {
         __ut_host: *const libc::c_char,
     );
 
-    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    
     fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn lseek(__fd: libc::c_int, __offset: __off_t, __whence: libc::c_int) -> __off_t;
 
@@ -384,7 +384,7 @@ pub unsafe extern "C" fn login_get_lastlog(mut li: *mut logininfo, uid: uid_t) -
         ::core::mem::size_of::<logininfo>() as libc::c_ulong,
     );
     (*li).uid = uid;
-    pw = getpwuid(uid);
+    pw = libc::getpwuid(uid);
     if pw.is_null() {
         sshfatal(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
