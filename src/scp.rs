@@ -77,11 +77,7 @@ extern "C" {
     fn _ssh__compat_globfree(_: *mut _ssh_compat_glob_t);
     fn __xpg_basename(__path: *mut libc::c_char) -> *mut libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
-    fn strtoull(
-        _: *const libc::c_char,
-        _: *mut *mut libc::c_char,
-        _: libc::c_int,
-    ) -> libc::c_ulonglong;
+
 
     fn reallocarray(__ptr: *mut libc::c_void, __nmemb: size_t, __size: size_t)
         -> *mut libc::c_void;
@@ -3564,7 +3560,7 @@ pub unsafe extern "C" fn sink(
                             current_block = 2582807901502089632;
                             break;
                         } else {
-                            ull = strtoull(cp, &mut cp, 10 as libc::c_int);
+                            ull = libc::strtoull(cp, &mut cp, 10 as libc::c_int);
                             if cp.is_null() || {
                                 let fresh5 = cp;
                                 cp = cp.offset(1);
@@ -3622,7 +3618,7 @@ pub unsafe extern "C" fn sink(
                                     current_block = 2582807901502089632;
                                     break;
                                 } else {
-                                    ull = strtoull(cp, &mut cp, 10 as libc::c_int);
+                                    ull = libc::strtoull(cp, &mut cp, 10 as libc::c_int);
                                     if cp.is_null() || {
                                         let fresh7 = cp;
                                         cp = cp.offset(1);
@@ -3756,7 +3752,7 @@ pub unsafe extern "C" fn sink(
                             current_block = 2582807901502089632;
                             break;
                         } else {
-                            ull = strtoull(cp, &mut cp, 10 as libc::c_int);
+                            ull = libc::strtoull(cp, &mut cp, 10 as libc::c_int);
                             if cp.is_null() || {
                                 let fresh10 = cp;
                                 cp = cp.offset(1);

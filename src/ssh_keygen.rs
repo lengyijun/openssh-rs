@@ -83,11 +83,7 @@ extern "C" {
     fn EVP_PKEY_free(pkey: *mut EVP_PKEY);
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
     fn strtoul(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_ulong;
-    fn strtoull(
-        _: *const libc::c_char,
-        _: *mut *mut libc::c_char,
-        _: libc::c_int,
-    ) -> libc::c_ulonglong;
+
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn qsort(__base: *mut libc::c_void, __nmemb: size_t, __size: size_t, __compar: __compar_fn_t);
@@ -4939,7 +4935,7 @@ unsafe extern "C" fn parse_hex_u64(mut s: *const libc::c_char, mut up: *mut uint
     let mut ep: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut ull: libc::c_ulonglong = 0;
     *libc::__errno_location() = 0 as libc::c_int;
-    ull = strtoull(s, &mut ep, 16 as libc::c_int);
+    ull = libc::strtoull(s, &mut ep, 16 as libc::c_int);
     if *s as libc::c_int == '\0' as i32 || *ep as libc::c_int != '\0' as i32 {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -5850,7 +5846,7 @@ unsafe extern "C" fn update_krl_from_file(
             cp = cp.offset(7 as libc::c_int as isize);
             cp = cp.offset(strspn(cp, b" \t\0" as *const u8 as *const libc::c_char) as isize);
             *libc::__errno_location() = 0 as libc::c_int;
-            serial = strtoull(cp, &mut ep, 0 as libc::c_int);
+            serial = libc::strtoull(cp, &mut ep, 0 as libc::c_int);
             if *cp as libc::c_int == '\0' as i32
                 || *ep as libc::c_int != '\0' as i32 && *ep as libc::c_int != '-' as i32
             {
@@ -5895,7 +5891,7 @@ unsafe extern "C" fn update_krl_from_file(
             if *ep as libc::c_int == '-' as i32 {
                 cp = ep.offset(1 as libc::c_int as isize);
                 *libc::__errno_location() = 0 as libc::c_int;
-                serial2 = strtoull(cp, &mut ep, 0 as libc::c_int);
+                serial2 = libc::strtoull(cp, &mut ep, 0 as libc::c_int);
                 if *cp as libc::c_int == '\0' as i32 || *ep as libc::c_int != '\0' as i32 {
                     sshfatal(
                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -8694,7 +8690,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     BSDoptarg = BSDoptarg.offset(1);
                     BSDoptarg;
                 }
-                cert_serial = strtoull(BSDoptarg, &mut ep, 10 as libc::c_int);
+                cert_serial = libc::strtoull(BSDoptarg, &mut ep, 10 as libc::c_int);
                 if (*BSDoptarg as libc::c_int) < '0' as i32
                     || *BSDoptarg as libc::c_int > '9' as i32
                     || *ep as libc::c_int != '\0' as i32
