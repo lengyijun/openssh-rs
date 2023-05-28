@@ -71,7 +71,7 @@ extern "C" {
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn fmt_scaled(number: libc::c_longlong, result: *mut libc::c_char) -> libc::c_int;
-    fn scan_scaled(_: *mut libc::c_char, _: *mut libc::c_longlong) -> libc::c_int;
+    
     static mut BSDoptreset: libc::c_int;
 
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
@@ -4413,7 +4413,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     7 as libc::c_int as libc::c_ulong,
                 ) == 0 as libc::c_int
                 {
-                    r = scan_scaled(BSDoptarg.offset(7 as libc::c_int as isize), &mut llv);
+                    r = crate::openbsd_compat::fmt_scaled::scan_scaled(BSDoptarg.offset(7 as libc::c_int as isize), &mut llv);
                     if r == 0 as libc::c_int
                         && (llv <= 0 as libc::c_int as libc::c_longlong
                             || llv > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_longlong)

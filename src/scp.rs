@@ -54,7 +54,7 @@ extern "C" {
 
     
     
-    fn scan_scaled(_: *mut libc::c_char, _: *mut libc::c_longlong) -> libc::c_int;
+    
 
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn opendir(__name: *const libc::c_char) -> *mut DIR;
@@ -944,7 +944,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
                     7 as libc::c_int as libc::c_ulong,
                 ) == 0 as libc::c_int
                 {
-                    r = scan_scaled(BSDoptarg.offset(7 as libc::c_int as isize), &mut llv);
+                    r = crate::openbsd_compat::fmt_scaled::scan_scaled(BSDoptarg.offset(7 as libc::c_int as isize), &mut llv);
                     if r == 0 as libc::c_int
                         && (llv <= 0 as libc::c_int as libc::c_longlong
                             || llv > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_longlong)
