@@ -21,7 +21,7 @@ extern "C" {
 
     fn execlp(__file: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
 
-    fn fork() -> __pid_t;
+    
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut stdout: *mut libc::FILE;
 
@@ -153,7 +153,7 @@ unsafe extern "C" fn ssh_askpass(
         return 0 as *mut libc::c_char;
     }
     osigchld = ssh_signal(17 as libc::c_int, None);
-    pid = fork();
+    pid = libc::fork();
     if pid == -(1 as libc::c_int) {
         crate::log::sshlog(
             b"readpass.c\0" as *const u8 as *const libc::c_char,
@@ -162,7 +162,7 @@ unsafe extern "C" fn ssh_askpass(
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"fork: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
         ssh_signal(17 as libc::c_int, osigchld);
@@ -512,7 +512,7 @@ pub unsafe extern "C" fn notify_start(
             current_block = 13051439020340349553;
         } else {
             osigchld = ssh_signal(17 as libc::c_int, None);
-            pid = fork();
+            pid = libc::fork();
             if pid == -(1 as libc::c_int) {
                 crate::log::sshlog(
                     b"readpass.c\0" as *const u8 as *const libc::c_char,
@@ -522,7 +522,7 @@ pub unsafe extern "C" fn notify_start(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"fork: %s\0" as *const u8 as *const libc::c_char,
+                    b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
                     strerror(*libc::__errno_location()),
                 );
                 ssh_signal(17 as libc::c_int, osigchld);

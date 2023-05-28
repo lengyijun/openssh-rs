@@ -91,7 +91,7 @@ extern "C" {
     fn setsid() -> __pid_t;
     
     fn geteuid() -> __uid_t;
-    fn fork() -> __pid_t;
+    
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
@@ -1543,7 +1543,7 @@ unsafe extern "C" fn privsep_preauth(mut ssh: *mut ssh) -> libc::c_int {
     if use_privsep == 1 as libc::c_int {
         box_0 = ssh_sandbox_init(pmonitor);
     }
-    pid = fork();
+    pid = libc::fork();
     if pid == -(1 as libc::c_int) {
         sshfatal(
             b"sshd.c\0" as *const u8 as *const libc::c_char,
@@ -1553,7 +1553,7 @@ unsafe extern "C" fn privsep_preauth(mut ssh: *mut ssh) -> libc::c_int {
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"fork of unprivileged child failed\0" as *const u8 as *const libc::c_char,
+            b"libc::fork of unprivileged child failed\0" as *const u8 as *const libc::c_char,
         );
     } else if pid != 0 as libc::c_int {
         crate::log::sshlog(
@@ -1677,7 +1677,7 @@ unsafe extern "C" fn privsep_postauth(mut ssh: *mut ssh, mut authctxt: *mut Auth
         use_privsep = 0 as libc::c_int;
     } else {
         monitor_reinit(pmonitor);
-        (*pmonitor).m_pid = fork();
+        (*pmonitor).m_pid = libc::fork();
         if (*pmonitor).m_pid == -(1 as libc::c_int) {
             sshfatal(
                 b"sshd.c\0" as *const u8 as *const libc::c_char,
@@ -1687,7 +1687,7 @@ unsafe extern "C" fn privsep_postauth(mut ssh: *mut ssh, mut authctxt: *mut Auth
                 0 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"fork of unprivileged child failed\0" as *const u8 as *const libc::c_char,
+                b"libc::fork of unprivileged child failed\0" as *const u8 as *const libc::c_char,
             );
         } else if (*pmonitor).m_pid != 0 as libc::c_int {
             crate::log::sshlog(
@@ -3256,7 +3256,7 @@ unsafe extern "C" fn server_accept_loop(
                             0 as libc::c_int,
                             SYSLOG_LEVEL_DEBUG1,
                             0 as *const libc::c_char,
-                            b"Server will not fork when running in debugging mode.\0" as *const u8
+                            b"Server will not libc::fork when running in debugging mode.\0" as *const u8
                                 as *const libc::c_char,
                         );
                         close_listen_socks();
@@ -3276,7 +3276,7 @@ unsafe extern "C" fn server_accept_loop(
                     platform_pre_fork();
                     listening += 1;
                     listening;
-                    pid = fork();
+                    pid = libc::fork();
                     if pid == 0 as libc::c_int {
                         platform_post_fork_child();
                         startup_pipe = startup_p[1 as libc::c_int as usize];
@@ -3340,7 +3340,7 @@ unsafe extern "C" fn server_accept_loop(
                             0 as libc::c_int,
                             SYSLOG_LEVEL_ERROR,
                             0 as *const libc::c_char,
-                            b"fork: %.100s\0" as *const u8 as *const libc::c_char,
+                            b"libc::fork: %.100s\0" as *const u8 as *const libc::c_char,
                             strerror(*libc::__errno_location()),
                         );
                     } else {

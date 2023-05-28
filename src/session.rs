@@ -77,7 +77,7 @@ extern "C" {
     
     fn geteuid() -> __uid_t;
     fn setgid(__gid: __gid_t) -> libc::c_int;
-    fn fork() -> __pid_t;
+    
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rmdir(__path: *const libc::c_char) -> libc::c_int;
     fn setlogin(__name: *const libc::c_char) -> libc::c_int;
@@ -1405,7 +1405,7 @@ pub unsafe extern "C" fn do_exec_no_pty(
         return -(1 as libc::c_int);
     }
     session_proctitle(s);
-    pid = fork();
+    pid = libc::fork();
     match pid {
         -1 => {
             crate::log::sshlog(
@@ -1416,7 +1416,7 @@ pub unsafe extern "C" fn do_exec_no_pty(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"fork: %.100s\0" as *const u8 as *const libc::c_char,
+                b"libc::fork: %.100s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
             close(pin[0 as libc::c_int as usize]);
@@ -1543,7 +1543,7 @@ pub unsafe extern "C" fn do_exec_pty(
         close(fdout);
         return -(1 as libc::c_int);
     }
-    pid = fork();
+    pid = libc::fork();
     match pid {
         -1 => {
             crate::log::sshlog(
@@ -1554,7 +1554,7 @@ pub unsafe extern "C" fn do_exec_pty(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"fork: %.100s\0" as *const u8 as *const libc::c_char,
+                b"libc::fork: %.100s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
             close(fdout);

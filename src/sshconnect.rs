@@ -45,7 +45,7 @@ extern "C" {
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
 
-    fn fork() -> __pid_t;
+    
     fn getaddrinfo(
         __name: *const libc::c_char,
         __service: *const libc::c_char,
@@ -992,7 +992,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
         b"Executing proxy dialer command: %.500s\0" as *const u8 as *const libc::c_char,
         command_string,
     );
-    pid = fork();
+    pid = libc::fork();
     if pid == 0 as libc::c_int {
         let mut argv: [*mut libc::c_char; 10] = [0 as *mut libc::c_char; 10];
         close(sp[1 as libc::c_int as usize]);
@@ -1051,7 +1051,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"fork failed: %.100s\0" as *const u8 as *const libc::c_char,
+            b"libc::fork failed: %.100s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
     }
@@ -1145,7 +1145,7 @@ unsafe extern "C" fn ssh_proxy_connect(
         b"Executing proxy command: %.500s\0" as *const u8 as *const libc::c_char,
         command_string,
     );
-    pid = fork();
+    pid = libc::fork();
     if pid == 0 as libc::c_int {
         let mut argv: [*mut libc::c_char; 10] = [0 as *mut libc::c_char; 10];
         close(pin[1 as libc::c_int as usize]);
@@ -1199,7 +1199,7 @@ unsafe extern "C" fn ssh_proxy_connect(
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"fork failed: %.100s\0" as *const u8 as *const libc::c_char,
+            b"libc::fork failed: %.100s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
     } else {
@@ -4577,7 +4577,7 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
         shell = b"/bin/sh\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
     }
     osighand = ssh_signal(17 as libc::c_int, None);
-    pid = fork();
+    pid = libc::fork();
     if pid == 0 as libc::c_int {
         ssh_signal(13 as libc::c_int, None);
         crate::log::sshlog(
@@ -4622,7 +4622,7 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"fork failed: %.100s\0" as *const u8 as *const libc::c_char,
+            b"libc::fork failed: %.100s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
     }

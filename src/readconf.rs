@@ -27,7 +27,7 @@ extern "C" {
 
     
     
-    fn fork() -> __pid_t;
+    
     fn gethostname(__name: *mut libc::c_char, __len: size_t) -> libc::c_int;
     fn getservbyname(__name: *const libc::c_char, __proto: *const libc::c_char) -> *mut servent;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
@@ -1799,7 +1799,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
         b"Executing command: '%.500s'\0" as *const u8 as *const libc::c_char,
         cmd,
     );
-    pid = fork();
+    pid = libc::fork();
     if pid == 0 as libc::c_int {
         let mut argv: [*mut libc::c_char; 4] = [0 as *mut libc::c_char; 4];
         if stdfd_devnull(1 as libc::c_int, 1 as libc::c_int, 0 as libc::c_int)
@@ -1851,7 +1851,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"fork: %.100s\0" as *const u8 as *const libc::c_char,
+            b"libc::fork: %.100s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
     }

@@ -20,7 +20,7 @@ extern "C" {
 
     fn execlp(__file: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
 
-    fn fork() -> __pid_t;
+    
     static mut stderr: *mut libc::FILE;
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -857,7 +857,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
         );
         return -(1 as libc::c_int);
     }
-    pid = fork();
+    pid = libc::fork();
     if pid == -(1 as libc::c_int) {
         crate::log::sshlog(
             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
@@ -867,7 +867,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"fork: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);

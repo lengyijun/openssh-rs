@@ -42,7 +42,7 @@ extern "C" {
     fn platform_pledge_agent();
 
     fn setegid(__gid: __gid_t) -> libc::c_int;
-    fn fork() -> __pid_t;
+    
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rmdir(__path: *const libc::c_char) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
@@ -5020,9 +5020,9 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         );
         libc::fflush(stdout);
     } else {
-        pid = fork();
+        pid = libc::fork();
         if pid == -(1 as libc::c_int) {
-            perror(b"fork\0" as *const u8 as *const libc::c_char);
+            perror(b"libc::fork\0" as *const u8 as *const libc::c_char);
             cleanup_exit(1 as libc::c_int);
         }
         if pid != 0 as libc::c_int {

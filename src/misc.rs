@@ -72,7 +72,7 @@ extern "C" {
     fn sys_tun_open(_: libc::c_int, _: libc::c_int, _: *mut *mut libc::c_char) -> libc::c_int;
     fn sys_get_rdomain(fd: libc::c_int) -> *mut libc::c_char;
     fn sys_set_rdomain(fd: libc::c_int, name: *const libc::c_char) -> libc::c_int;
-    fn fork() -> __pid_t;
+    
     fn setresgid(__rgid: __gid_t, __egid: __gid_t, __sgid: __gid_t) -> libc::c_int;
     fn execve(
         __path: *const libc::c_char,
@@ -4731,7 +4731,7 @@ pub unsafe extern "C" fn subprocess(
         if restore_privs.is_some() {
             restore_privs.expect("non-null function pointer")();
         }
-        pid = fork();
+        pid = libc::fork();
         match pid {
             -1 => {
                 crate::log::sshlog(
@@ -4742,7 +4742,7 @@ pub unsafe extern "C" fn subprocess(
                     0 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"%s: fork: %s\0" as *const u8 as *const libc::c_char,
+                    b"%s: libc::fork: %s\0" as *const u8 as *const libc::c_char,
                     tag,
                     strerror(*libc::__errno_location()),
                 );

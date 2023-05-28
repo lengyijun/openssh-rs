@@ -42,7 +42,7 @@ extern "C" {
 
     
     
-    fn fork() -> __pid_t;
+    
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
@@ -928,7 +928,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
     if shell.is_null() || *shell as libc::c_int == '\0' as i32 {
         shell = b"/bin/sh\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
     }
-    pid = fork();
+    pid = libc::fork();
     if pid == -(1 as libc::c_int) {
         sshfatal(
             b"sftp.c\0" as *const u8 as *const libc::c_char,
@@ -938,7 +938,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"Couldn't fork: %s\0" as *const u8 as *const libc::c_char,
+            b"Couldn't libc::fork: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
     }
@@ -4055,7 +4055,7 @@ unsafe extern "C" fn connect_to_server(
     *in_0 = *out;
     c_out = inout[1 as libc::c_int as usize];
     c_in = c_out;
-    ::core::ptr::write_volatile(&mut sshpid as *mut pid_t, fork());
+    ::core::ptr::write_volatile(&mut sshpid as *mut pid_t, libc::fork());
     if ::core::ptr::read_volatile::<pid_t>(&sshpid as *const pid_t) == -(1 as libc::c_int) {
         sshfatal(
             b"sftp.c\0" as *const u8 as *const libc::c_char,
@@ -4065,7 +4065,7 @@ unsafe extern "C" fn connect_to_server(
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"fork: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
     } else if sshpid == 0 as libc::c_int {

@@ -47,7 +47,7 @@ extern "C" {
 
     
     
-    fn fork() -> __pid_t;
+    
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
@@ -357,7 +357,7 @@ unsafe extern "C" fn do_local_cmd(mut a: *mut arglist) -> libc::c_int {
         }
         libc::fprintf(stderr, b"\n\0" as *const u8 as *const libc::c_char);
     }
-    pid = fork();
+    pid = libc::fork();
     if pid == -(1 as libc::c_int) {
         sshfatal(
             b"scp.c\0" as *const u8 as *const libc::c_char,
@@ -366,7 +366,7 @@ unsafe extern "C" fn do_local_cmd(mut a: *mut arglist) -> libc::c_int {
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"do_local_cmd: fork: %s\0" as *const u8 as *const libc::c_char,
+            b"do_local_cmd: libc::fork: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
     }
@@ -474,7 +474,7 @@ pub unsafe extern "C" fn do_cmd(
         22 as libc::c_int,
         Some(suspchild as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    *pid = fork();
+    *pid = libc::fork();
     match *pid {
         -1 => {
             sshfatal(
@@ -484,7 +484,7 @@ pub unsafe extern "C" fn do_cmd(
                 0 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"fork: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -607,7 +607,7 @@ pub unsafe extern "C" fn do_cmd2(
     if port == -(1 as libc::c_int) {
         port = sshport;
     }
-    pid = fork();
+    pid = libc::fork();
     if pid == 0 as libc::c_int {
         if libc::dup2(fdin, 0 as libc::c_int) == -(1 as libc::c_int) {
             perror(b"libc::dup2\0" as *const u8 as *const libc::c_char);
@@ -672,7 +672,7 @@ pub unsafe extern "C" fn do_cmd2(
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"fork: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
     }

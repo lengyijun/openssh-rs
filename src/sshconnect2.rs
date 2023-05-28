@@ -24,7 +24,7 @@ extern "C" {
 
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     
-    fn fork() -> __pid_t;
+    
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
 
@@ -4098,7 +4098,7 @@ unsafe extern "C" fn ssh_keysign(
         );
         return -(1 as libc::c_int);
     }
-    pid = fork();
+    pid = libc::fork();
     if pid == -(1 as libc::c_int) {
         crate::log::sshlog(
             b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
@@ -4107,7 +4107,7 @@ unsafe extern "C" fn ssh_keysign(
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"fork: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);

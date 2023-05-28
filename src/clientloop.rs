@@ -53,7 +53,7 @@ extern "C" {
     fn rmdir(__path: *const libc::c_char) -> libc::c_int;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
-    fn fork() -> __pid_t;
+    
     
 
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
@@ -2092,7 +2092,7 @@ unsafe extern "C" fn client_repledge() {
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
-            b"crate::openbsd_compat::bsd_misc::pledge: fork\0" as *const u8 as *const libc::c_char,
+            b"crate::openbsd_compat::bsd_misc::pledge: libc::fork\0" as *const u8 as *const libc::c_char,
         );
         if crate::openbsd_compat::bsd_misc::pledge(
             b"stdio proc tty\0" as *const u8 as *const libc::c_char,
@@ -2941,7 +2941,7 @@ unsafe extern "C" fn process_escapes(
                                 b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
                             );
                         }
-                        pid = fork();
+                        pid = libc::fork();
                         if pid == -(1 as libc::c_int) {
                             crate::log::sshlog(
                                 b"clientloop.c\0" as *const u8 as *const libc::c_char,
@@ -2953,7 +2953,7 @@ unsafe extern "C" fn process_escapes(
                                 0 as libc::c_int,
                                 SYSLOG_LEVEL_ERROR,
                                 0 as *const libc::c_char,
-                                b"fork: %.100s\0" as *const u8 as *const libc::c_char,
+                                b"libc::fork: %.100s\0" as *const u8 as *const libc::c_char,
                                 strerror(*libc::__errno_location()),
                             );
                         } else {

@@ -14,7 +14,7 @@ extern "C" {
 
     fn execlp(__file: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
 
-    fn fork() -> __pid_t;
+    
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
@@ -199,7 +199,7 @@ unsafe extern "C" fn start_helper(
         return -(24 as libc::c_int);
     }
     osigchld = ssh_signal(17 as libc::c_int, None);
-    pid = fork();
+    pid = libc::fork();
     if pid == -(1 as libc::c_int) {
         oerrno = *libc::__errno_location();
         crate::log::sshlog(
@@ -209,7 +209,7 @@ unsafe extern "C" fn start_helper(
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"fork: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
         close(pair[0 as libc::c_int as usize]);

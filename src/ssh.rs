@@ -62,7 +62,7 @@ extern "C" {
     fn compat_init_setproctitle(argc: libc::c_int, argv: *mut *mut libc::c_char);
     static mut BSDoptreset: libc::c_int;
 
-    fn fork() -> __pid_t;
+    
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn daemon(__nochdir: libc::c_int, __noclose: libc::c_int) -> libc::c_int;
@@ -3268,7 +3268,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"Cannot fork into background without a command to execute.\0" as *const u8
+            b"Cannot libc::fork into background without a command to execute.\0" as *const u8
                 as *const libc::c_char,
         );
     }
@@ -4381,7 +4381,7 @@ unsafe extern "C" fn control_persist_detach() {
         0 as *const libc::c_char,
         b"backgrounding master process\0" as *const u8 as *const libc::c_char,
     );
-    pid = fork();
+    pid = libc::fork();
     match pid {
         -1 => {
             sshfatal(
@@ -4394,7 +4394,7 @@ unsafe extern "C" fn control_persist_detach() {
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"fork: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -5559,7 +5559,7 @@ unsafe extern "C" fn ssh_session2(
                 0 as libc::c_int,
                 SYSLOG_LEVEL_DEBUG1,
                 0 as *const libc::c_char,
-                b"deferring postauth fork until remote forward confirmation received\0" as *const u8
+                b"deferring postauth libc::fork until remote forward confirmation received\0" as *const u8
                     as *const libc::c_char,
             );
         } else {
