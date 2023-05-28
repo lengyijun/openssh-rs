@@ -64,7 +64,7 @@ extern "C" {
         _: ...
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    
+
     fn unix_listener(_: *const libc::c_char, _: libc::c_int, _: libc::c_int) -> libc::c_int;
     fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
     fn lookup_env_in_list(

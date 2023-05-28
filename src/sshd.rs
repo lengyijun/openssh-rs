@@ -226,8 +226,7 @@ extern "C" {
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_dup_string(buf: *mut sshbuf) -> *mut libc::c_char;
     fn daemonized() -> libc::c_int;
-    
-    fn unset_nonblock(_: libc::c_int) -> libc::c_int;
+
     fn set_reuseaddr(_: libc::c_int) -> libc::c_int;
     fn set_rdomain(_: libc::c_int, _: *const libc::c_char) -> libc::c_int;
 
@@ -3199,7 +3198,7 @@ unsafe extern "C" fn server_accept_loop(
                     {
                         usleep((100 as libc::c_int * 1000 as libc::c_int) as __useconds_t);
                     }
-                } else if unset_nonblock(*newsock) == -(1 as libc::c_int) {
+                } else if crate::misc::unset_nonblock(*newsock) == -(1 as libc::c_int) {
                     close(*newsock);
                 } else if pipe(startup_p.as_mut_ptr()) == -(1 as libc::c_int) {
                     crate::log::sshlog(

@@ -125,8 +125,6 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    
-    fn unset_nonblock(_: libc::c_int) -> libc::c_int;
 
     fn bandwidth_limit_init(_: *mut bwlimit, _: u_int64_t, _: size_t);
     fn bandwidth_limit(_: *mut bwlimit, _: size_t);
@@ -2550,7 +2548,7 @@ pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc:
                 );
                 current_block = 1443331007555087595;
             } else {
-                unset_nonblock(fd);
+                crate::misc::unset_nonblock(fd);
                 match stb.st_mode & 0o170000 as libc::c_int as libc::c_uint {
                     32768 => {
                         last = strrchr(name, '/' as i32);
@@ -2769,7 +2767,7 @@ pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc:
                                                 as off_t
                                                 as off_t;
                                         }
-                                        unset_nonblock(remout);
+                                        crate::misc::unset_nonblock(remout);
                                         if fd != -(1 as libc::c_int) {
                                             if close(fd) == -(1 as libc::c_int) && haderr == 0 {
                                                 haderr = *libc::__errno_location();
@@ -4085,7 +4083,7 @@ pub unsafe extern "C" fn sink(
                                                     as off_t
                                                     as off_t;
                                             }
-                                            unset_nonblock(remin);
+                                            crate::misc::unset_nonblock(remin);
                                             if count != 0 as libc::c_int as libc::c_ulong
                                                 && wrerr == 0
                                                 && atomicio(

@@ -105,7 +105,6 @@ extern "C" {
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn chop(_: *mut libc::c_char) -> *mut libc::c_char;
-    
 
     fn put_host_port(_: *const libc::c_char, _: u_short) -> *mut libc::c_char;
     fn convtime(_: *const libc::c_char) -> libc::c_int;

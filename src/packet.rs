@@ -152,7 +152,7 @@ extern "C" {
     fn get_peer_port(_: libc::c_int) -> libc::c_int;
     fn get_local_ipaddr(_: libc::c_int) -> *mut libc::c_char;
     fn get_local_port(_: libc::c_int) -> libc::c_int;
-    
+
     fn set_nodelay(_: libc::c_int);
     fn get_rdomain(_: libc::c_int) -> *mut libc::c_char;
     fn get_sock_af(_: libc::c_int) -> libc::c_int;

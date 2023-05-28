@@ -176,7 +176,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    
+
     fn set_nodelay(_: libc::c_int);
     fn set_reuseaddr(_: libc::c_int) -> libc::c_int;
 

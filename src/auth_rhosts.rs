@@ -30,7 +30,6 @@ extern "C" {
     fn temporarily_use_uid(_: *mut passwd);
     fn restore_uid();
 
-    fn unset_nonblock(_: libc::c_int) -> libc::c_int;
     fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn auth_debug_add(fmt: *const libc::c_char, _: ...);
     static mut options: ServerOptions;
@@ -300,7 +299,7 @@ unsafe extern "C" fn check_rhosts_file(
         close(fd);
         return 0 as libc::c_int;
     }
-    unset_nonblock(fd);
+    crate::misc::unset_nonblock(fd);
     f = libc::fdopen(fd, b"r\0" as *const u8 as *const libc::c_char);
     if f.is_null() {
         close(fd);

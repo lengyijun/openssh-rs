@@ -192,7 +192,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    
+
     fn convtime(_: *const libc::c_char) -> libc::c_int;
 
     fn monotime() -> time_t;

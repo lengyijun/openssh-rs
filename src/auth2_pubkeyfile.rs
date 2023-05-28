@@ -37,7 +37,7 @@ extern "C" {
         _: ...
     ) -> !;
     fn skip_space(_: *mut *mut libc::c_char);
-    fn unset_nonblock(_: libc::c_int) -> libc::c_int;
+
     fn format_absolute_time(_: uint64_t, _: *mut libc::c_char, _: size_t);
     fn safe_path_fd(
         _: libc::c_int,
@@ -1113,7 +1113,7 @@ unsafe extern "C" fn auth_openfile(
         close(fd);
         return 0 as *mut libc::FILE;
     }
-    unset_nonblock(fd);
+    crate::misc::unset_nonblock(fd);
     f = libc::fdopen(fd, b"r\0" as *const u8 as *const libc::c_char);
     if f.is_null() {
         close(fd);
