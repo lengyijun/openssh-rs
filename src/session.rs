@@ -45,7 +45,7 @@ extern "C" {
         __stream: *mut libc::FILE,
     ) -> __ssize_t;
     fn fputs(__s: *const libc::c_char, __stream: *mut libc::FILE) -> libc::c_int;
-    fn perror(__s: *const libc::c_char);
+    
     fn pclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn popen(__command: *const libc::c_char, __modes: *const libc::c_char) -> *mut libc::FILE;
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
@@ -1446,19 +1446,19 @@ pub unsafe extern "C" fn do_exec_no_pty(
             }
             close(pin[1 as libc::c_int as usize]);
             if libc::dup2(pin[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int) {
-                perror(b"libc::dup2 stdin\0" as *const u8 as *const libc::c_char);
+                libc::perror(b"libc::dup2 stdin\0" as *const u8 as *const libc::c_char);
             }
             close(pin[0 as libc::c_int as usize]);
             close(pout[0 as libc::c_int as usize]);
             if libc::dup2(pout[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int)
             {
-                perror(b"libc::dup2 stdout\0" as *const u8 as *const libc::c_char);
+                libc::perror(b"libc::dup2 stdout\0" as *const u8 as *const libc::c_char);
             }
             close(pout[1 as libc::c_int as usize]);
             close(perr[0 as libc::c_int as usize]);
             if libc::dup2(perr[1 as libc::c_int as usize], 2 as libc::c_int) == -(1 as libc::c_int)
             {
-                perror(b"libc::dup2 stderr\0" as *const u8 as *const libc::c_char);
+                libc::perror(b"libc::dup2 stderr\0" as *const u8 as *const libc::c_char);
             }
             close(perr[1 as libc::c_int as usize]);
             do_child(ssh, s, command);
@@ -2591,11 +2591,11 @@ pub unsafe extern "C" fn do_setusercontext(mut pw: *mut libc::passwd) {
             );
         }
         if setgid((*pw).pw_gid) < 0 as libc::c_int {
-            perror(b"setgid\0" as *const u8 as *const libc::c_char);
+            libc::perror(b"setgid\0" as *const u8 as *const libc::c_char);
             libc::exit(1 as libc::c_int);
         }
         if initgroups((*pw).pw_name, (*pw).pw_gid) < 0 as libc::c_int {
-            perror(b"initgroups\0" as *const u8 as *const libc::c_char);
+            libc::perror(b"initgroups\0" as *const u8 as *const libc::c_char);
             libc::exit(1 as libc::c_int);
         }
         endgrent();
@@ -2681,7 +2681,7 @@ unsafe extern "C" fn do_pwchange(mut s: *mut Session) {
             b"libc::passwd\0" as *const u8 as *const libc::c_char,
             0 as *mut libc::c_void as *mut libc::c_char,
         );
-        perror(b"libc::passwd\0" as *const u8 as *const libc::c_char);
+        libc::perror(b"libc::passwd\0" as *const u8 as *const libc::c_char);
     } else {
         libc::fprintf(
             stderr,
@@ -2847,7 +2847,7 @@ pub unsafe extern "C" fn do_child(
             .wrapping_sub(1 as libc::c_int as libc::c_ulong)
         {
             *libc::__errno_location() = 22 as libc::c_int;
-            perror(shell);
+            libc::perror(shell);
             libc::exit(1 as libc::c_int);
         }
         argv[0 as libc::c_int as usize] = argv0.as_mut_ptr();
@@ -2857,7 +2857,7 @@ pub unsafe extern "C" fn do_child(
             argv.as_mut_ptr() as *const *mut libc::c_char,
             env as *const *mut libc::c_char,
         );
-        perror(shell);
+        libc::perror(shell);
         libc::exit(1 as libc::c_int);
     }
     argv[0 as libc::c_int as usize] = shell0 as *mut libc::c_char;
@@ -2870,7 +2870,7 @@ pub unsafe extern "C" fn do_child(
         argv.as_mut_ptr() as *const *mut libc::c_char,
         env as *const *mut libc::c_char,
     );
-    perror(shell);
+    libc::perror(shell);
     libc::exit(1 as libc::c_int);
 }
 pub unsafe extern "C" fn session_unused(mut id: libc::c_int) {

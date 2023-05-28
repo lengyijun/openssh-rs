@@ -64,7 +64,7 @@ extern "C" {
     ) -> libc::c_int;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
-    fn perror(__s: *const libc::c_char);
+    
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
@@ -998,12 +998,12 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
         close(sp[1 as libc::c_int as usize]);
         if sp[0 as libc::c_int as usize] != 0 as libc::c_int {
             if libc::dup2(sp[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int) {
-                perror(b"libc::dup2 stdin\0" as *const u8 as *const libc::c_char);
+                libc::perror(b"libc::dup2 stdin\0" as *const u8 as *const libc::c_char);
             }
         }
         if sp[0 as libc::c_int as usize] != 1 as libc::c_int {
             if libc::dup2(sp[0 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
-                perror(b"libc::dup2 stdout\0" as *const u8 as *const libc::c_char);
+                libc::perror(b"libc::dup2 stdout\0" as *const u8 as *const libc::c_char);
             }
         }
         if sp[0 as libc::c_int as usize] >= 2 as libc::c_int {
@@ -1037,7 +1037,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
             argv[0 as libc::c_int as usize],
             argv.as_mut_ptr() as *const *mut libc::c_char,
         );
-        perror(argv[0 as libc::c_int as usize]);
+        libc::perror(argv[0 as libc::c_int as usize]);
         libc::exit(1 as libc::c_int);
     }
     if pid == -(1 as libc::c_int) {
@@ -1151,13 +1151,13 @@ unsafe extern "C" fn ssh_proxy_connect(
         close(pin[1 as libc::c_int as usize]);
         if pin[0 as libc::c_int as usize] != 0 as libc::c_int {
             if libc::dup2(pin[0 as libc::c_int as usize], 0 as libc::c_int) == -(1 as libc::c_int) {
-                perror(b"libc::dup2 stdin\0" as *const u8 as *const libc::c_char);
+                libc::perror(b"libc::dup2 stdin\0" as *const u8 as *const libc::c_char);
             }
             close(pin[0 as libc::c_int as usize]);
         }
         close(pout[0 as libc::c_int as usize]);
         if libc::dup2(pout[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
-            perror(b"libc::dup2 stdout\0" as *const u8 as *const libc::c_char);
+            libc::perror(b"libc::dup2 stdout\0" as *const u8 as *const libc::c_char);
         }
         close(pout[1 as libc::c_int as usize]);
         if debug_flag == 0
@@ -1187,7 +1187,7 @@ unsafe extern "C" fn ssh_proxy_connect(
             argv[0 as libc::c_int as usize],
             argv.as_mut_ptr() as *const *mut libc::c_char,
         );
-        perror(argv[0 as libc::c_int as usize]);
+        libc::perror(argv[0 as libc::c_int as usize]);
         libc::exit(1 as libc::c_int);
     }
     if pid == -(1 as libc::c_int) {

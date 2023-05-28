@@ -53,7 +53,7 @@ extern "C" {
 
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
 
-    fn perror(__s: *const libc::c_char);
+    
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
@@ -4898,7 +4898,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             libc::exit(1 as libc::c_int);
         }
         if kill(pid, 15 as libc::c_int) == -(1 as libc::c_int) {
-            perror(b"kill\0" as *const u8 as *const libc::c_char);
+            libc::perror(b"kill\0" as *const u8 as *const libc::c_char);
             libc::exit(1 as libc::c_int);
         }
         format = (if c_flag != 0 {
@@ -4959,7 +4959,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
         );
         if (mkdtemp(socket_dir.as_mut_ptr())).is_null() {
-            perror(b"mkdtemp: private socket dir\0" as *const u8 as *const libc::c_char);
+            libc::perror(b"mkdtemp: private socket dir\0" as *const u8 as *const libc::c_char);
             libc::exit(1 as libc::c_int);
         }
         libc::snprintf(
@@ -5018,7 +5018,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     } else {
         pid = libc::fork();
         if pid == -(1 as libc::c_int) {
-            perror(b"libc::fork\0" as *const u8 as *const libc::c_char);
+            libc::perror(b"libc::fork\0" as *const u8 as *const libc::c_char);
             cleanup_exit(1 as libc::c_int);
         }
         if pid != 0 as libc::c_int {
@@ -5064,14 +5064,14 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     1 as libc::c_int,
                 ) == -(1 as libc::c_int)
             {
-                perror(b"setenv\0" as *const u8 as *const libc::c_char);
+                libc::perror(b"setenv\0" as *const u8 as *const libc::c_char);
                 libc::exit(1 as libc::c_int);
             }
             execvp(
                 *av.offset(0 as libc::c_int as isize),
                 av as *const *mut libc::c_char,
             );
-            perror(*av.offset(0 as libc::c_int as isize));
+            libc::perror(*av.offset(0 as libc::c_int as isize));
             libc::exit(1 as libc::c_int);
         }
         log_init(

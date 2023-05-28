@@ -53,7 +53,7 @@ extern "C" {
     static mut BSDoptind: libc::c_int;
 
     
-    fn perror(__s: *const libc::c_char);
+    
     fn scan_scaled(_: *mut libc::c_char, _: *mut libc::c_longlong) -> libc::c_int;
 
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
@@ -371,7 +371,7 @@ unsafe extern "C" fn do_local_cmd(mut a: *mut arglist) -> libc::c_int {
             *((*a).list).offset(0 as libc::c_int as isize),
             (*a).list as *const *mut libc::c_char,
         );
-        perror(*((*a).list).offset(0 as libc::c_int as isize));
+        libc::perror(*((*a).list).offset(0 as libc::c_int as isize));
         libc::exit(1 as libc::c_int);
     }
     do_cmd_pid = pid;
@@ -552,7 +552,7 @@ pub unsafe extern "C" fn do_cmd(
                 cmd_0,
             );
             execvp(program, args.list as *const *mut libc::c_char);
-            perror(program);
+            libc::perror(program);
             libc::_exit(1 as libc::c_int);
         }
         _ => {
@@ -606,10 +606,10 @@ pub unsafe extern "C" fn do_cmd2(
     pid = libc::fork();
     if pid == 0 as libc::c_int {
         if libc::dup2(fdin, 0 as libc::c_int) == -(1 as libc::c_int) {
-            perror(b"libc::dup2\0" as *const u8 as *const libc::c_char);
+            libc::perror(b"libc::dup2\0" as *const u8 as *const libc::c_char);
         }
         if libc::dup2(fdout, 1 as libc::c_int) == -(1 as libc::c_int) {
-            perror(b"libc::dup2\0" as *const u8 as *const libc::c_char);
+            libc::perror(b"libc::dup2\0" as *const u8 as *const libc::c_char);
         }
         crate::misc::replacearg(
             &mut args as *mut arglist,
@@ -658,7 +658,7 @@ pub unsafe extern "C" fn do_cmd2(
             cmd_0,
         );
         execvp(ssh_program, args.list as *const *mut libc::c_char);
-        perror(ssh_program);
+        libc::perror(ssh_program);
         libc::exit(1 as libc::c_int);
     } else if pid == -(1 as libc::c_int) {
         sshfatal(
@@ -1060,7 +1060,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
             0 as *mut *const libc::c_char,
         ) == -(1 as libc::c_int)
         {
-            perror(
+            libc::perror(
                 b"crate::openbsd_compat::bsd_misc::pledge\0" as *const u8 as *const libc::c_char,
             );
             libc::exit(1 as libc::c_int);

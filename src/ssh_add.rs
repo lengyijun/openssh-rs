@@ -34,7 +34,7 @@ extern "C" {
         __delimiter: libc::c_int,
         __stream: *mut libc::FILE,
     ) -> __ssize_t;
-    fn perror(__s: *const libc::c_char);
+    
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
@@ -598,7 +598,7 @@ unsafe extern "C" fn add_file(
     } else {
         fd = libc::open(filename, 0 as libc::c_int);
         if fd == -(1 as libc::c_int) {
-            perror(filename);
+            libc::perror(filename);
             return -(1 as libc::c_int);
         }
     }

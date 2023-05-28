@@ -10,7 +10,7 @@ extern "C" {
         __termios_p: *const termios,
     ) -> libc::c_int;
     static mut stdin: *mut libc::FILE;
-    fn perror(__s: *const libc::c_char);
+    
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
 }
 pub type __off_t = libc::c_long;
@@ -58,7 +58,7 @@ pub unsafe extern "C" fn leave_raw_mode(mut quiet: libc::c_int) {
     }
     if tcsetattr(fileno(stdin), 1 as libc::c_int, &mut _saved_tio) == -(1 as libc::c_int) {
         if quiet == 0 {
-            perror(b"tcsetattr\0" as *const u8 as *const libc::c_char);
+            libc::perror(b"tcsetattr\0" as *const u8 as *const libc::c_char);
         }
     } else {
         _in_raw_mode = 0 as libc::c_int;
@@ -77,7 +77,7 @@ pub unsafe extern "C" fn enter_raw_mode(mut quiet: libc::c_int) {
     };
     if tcgetattr(fileno(stdin), &mut tio) == -(1 as libc::c_int) {
         if quiet == 0 {
-            perror(b"tcgetattr\0" as *const u8 as *const libc::c_char);
+            libc::perror(b"tcgetattr\0" as *const u8 as *const libc::c_char);
         }
         return;
     }
@@ -103,7 +103,7 @@ pub unsafe extern "C" fn enter_raw_mode(mut quiet: libc::c_int) {
     tio.c_cc[5 as libc::c_int as usize] = 0 as libc::c_int as cc_t;
     if tcsetattr(fileno(stdin), 1 as libc::c_int, &mut tio) == -(1 as libc::c_int) {
         if quiet == 0 {
-            perror(b"tcsetattr\0" as *const u8 as *const libc::c_char);
+            libc::perror(b"tcsetattr\0" as *const u8 as *const libc::c_char);
         }
     } else {
         _in_raw_mode = 1 as libc::c_int;
