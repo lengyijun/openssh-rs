@@ -235,7 +235,7 @@ extern "C" {
     fn sock_set_v6only(_: libc::c_int);
     fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
     fn ssh_gai_strerror(_: libc::c_int) -> *const libc::c_char;
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn match_pattern_list(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -1319,7 +1319,7 @@ unsafe extern "C" fn sighup_restart() {
     platform_pre_restart();
     close_listen_socks();
     close_startup_pipes();
-    ssh_signal(
+    crate::misc::ssh_signal(
         1 as libc::c_int,
         ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             1 as libc::c_int as libc::intptr_t,
@@ -1361,7 +1361,7 @@ unsafe extern "C" fn main_sigchld_handler(mut _sig: libc::c_int) {
 }
 unsafe extern "C" fn grace_alarm_handler(mut _sig: libc::c_int) {
     if getpgid(0 as libc::c_int) == libc::getpid() {
-        ssh_signal(
+        crate::misc::ssh_signal(
             15 as libc::c_int,
             ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
                 1 as libc::c_int as libc::intptr_t,
@@ -4655,7 +4655,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             strerror(*libc::__errno_location()),
         );
     }
-    ssh_signal(
+    crate::misc::ssh_signal(
         13 as libc::c_int,
         ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             1 as libc::c_int as libc::intptr_t,
@@ -4666,19 +4666,19 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     } else {
         platform_pre_listen();
         server_listen();
-        ssh_signal(
+        crate::misc::ssh_signal(
             1 as libc::c_int,
             Some(sighup_handler as unsafe extern "C" fn(libc::c_int) -> ()),
         );
-        ssh_signal(
+        crate::misc::ssh_signal(
             17 as libc::c_int,
             Some(main_sigchld_handler as unsafe extern "C" fn(libc::c_int) -> ()),
         );
-        ssh_signal(
+        crate::misc::ssh_signal(
             15 as libc::c_int,
             Some(sigterm_handler as unsafe extern "C" fn(libc::c_int) -> ()),
         );
-        ssh_signal(
+        crate::misc::ssh_signal(
             3 as libc::c_int,
             Some(sigterm_handler as unsafe extern "C" fn(libc::c_int) -> ()),
         );
@@ -4805,7 +4805,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             );
         }
         close(config_s[1 as libc::c_int as usize]);
-        ssh_signal(
+        crate::misc::ssh_signal(
             1 as libc::c_int,
             ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
                 1 as libc::c_int as libc::intptr_t,
@@ -4868,12 +4868,12 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     }
     fcntl(sock_out, 2 as libc::c_int, 1 as libc::c_int);
     fcntl(sock_in, 2 as libc::c_int, 1 as libc::c_int);
-    ssh_signal(14 as libc::c_int, None);
-    ssh_signal(1 as libc::c_int, None);
-    ssh_signal(15 as libc::c_int, None);
-    ssh_signal(3 as libc::c_int, None);
-    ssh_signal(17 as libc::c_int, None);
-    ssh_signal(2 as libc::c_int, None);
+    crate::misc::ssh_signal(14 as libc::c_int, None);
+    crate::misc::ssh_signal(1 as libc::c_int, None);
+    crate::misc::ssh_signal(15 as libc::c_int, None);
+    crate::misc::ssh_signal(3 as libc::c_int, None);
+    crate::misc::ssh_signal(17 as libc::c_int, None);
+    crate::misc::ssh_signal(2 as libc::c_int, None);
     ssh = ssh_packet_set_connection(0 as *mut ssh, sock_in, sock_out);
     if ssh.is_null() {
         sshfatal(
@@ -4962,7 +4962,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         },
     );
     libc::free(laddr as *mut libc::c_void);
-    ssh_signal(
+    crate::misc::ssh_signal(
         14 as libc::c_int,
         Some(grace_alarm_handler as unsafe extern "C" fn(libc::c_int) -> ()),
     );
@@ -5047,7 +5047,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         _ => {}
     }
     alarm(0 as libc::c_int as libc::c_uint);
-    ssh_signal(14 as libc::c_int, None);
+    crate::misc::ssh_signal(14 as libc::c_int, None);
     (*authctxt).authenticated = 1 as libc::c_int;
     if startup_pipe != -(1 as libc::c_int) {
         close(startup_pipe);

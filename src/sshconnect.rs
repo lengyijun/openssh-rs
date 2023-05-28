@@ -213,7 +213,7 @@ extern "C" {
     ) -> libc::c_int;
     fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn ask_permission(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn verify_host_key_dns(
         _: *const libc::c_char,
         _: *mut sockaddr,
@@ -1179,7 +1179,7 @@ unsafe extern "C" fn ssh_proxy_connect(
             b"-c\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
         argv[2 as libc::c_int as usize] = command_string;
         argv[3 as libc::c_int as usize] = 0 as *mut libc::c_char;
-        ssh_signal(13 as libc::c_int, None);
+        crate::misc::ssh_signal(13 as libc::c_int, None);
         execv(
             argv[0 as libc::c_int as usize],
             argv.as_mut_ptr() as *const *mut libc::c_char,
@@ -2481,7 +2481,7 @@ pub unsafe extern "C" fn load_hostkeys_command(
             );
         }
     }
-    osigchld = ssh_signal(17 as libc::c_int, None);
+    osigchld = crate::misc::ssh_signal(17 as libc::c_int, None);
     if argv_split(command_template, &mut ac, &mut av, 0 as libc::c_int) != 0 as libc::c_int {
         crate::log::sshlog(
             b"sshconnect.c\0" as *const u8 as *const libc::c_char,
@@ -2620,7 +2620,7 @@ pub unsafe extern "C" fn load_hostkeys_command(
     if !f.is_null() {
         fclose(f);
     }
-    ssh_signal(17 as libc::c_int, osigchld);
+    crate::misc::ssh_signal(17 as libc::c_int, osigchld);
     i = 0 as libc::c_int;
     while i < ac {
         libc::free(*av.offset(i as isize) as *mut libc::c_void);
@@ -4573,10 +4573,10 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
     if shell.is_null() || *shell as libc::c_int == '\0' as i32 {
         shell = b"/bin/sh\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
     }
-    osighand = ssh_signal(17 as libc::c_int, None);
+    osighand = crate::misc::ssh_signal(17 as libc::c_int, None);
     pid = libc::fork();
     if pid == 0 as libc::c_int {
-        ssh_signal(13 as libc::c_int, None);
+        crate::misc::ssh_signal(13 as libc::c_int, None);
         crate::log::sshlog(
             b"sshconnect.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"ssh_local_cmd\0"))
@@ -4638,7 +4638,7 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
             );
         }
     }
-    ssh_signal(17 as libc::c_int, osighand);
+    crate::misc::ssh_signal(17 as libc::c_int, osighand);
     if !(status & 0x7f as libc::c_int == 0 as libc::c_int) {
         return 1 as libc::c_int;
     }

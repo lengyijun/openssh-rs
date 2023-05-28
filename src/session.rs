@@ -245,7 +245,7 @@ extern "C" {
         name: *const libc::c_char,
         value: *const libc::c_char,
     );
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn record_login(
         _: pid_t,
         _: *const libc::c_char,
@@ -2771,7 +2771,7 @@ pub unsafe extern "C" fn do_child(
     }
     closefrom(2 as libc::c_int + 1 as libc::c_int);
     do_rc_files(ssh, s, shell);
-    ssh_signal(13 as libc::c_int, None);
+    crate::misc::ssh_signal(13 as libc::c_int, None);
     if (*s).is_subsystem == 3 as libc::c_int {
         crate::log::sshlog(
             b"session.c\0" as *const u8 as *const libc::c_char,

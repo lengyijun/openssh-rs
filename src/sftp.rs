@@ -128,7 +128,7 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_int;
     fn argv_free(_: *mut *mut libc::c_char, _: libc::c_int);
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
 
     fn attrib_clear(_: *mut Attrib);
@@ -4012,7 +4012,7 @@ unsafe extern "C" fn interactive_loop(
                 b"\n\0" as *const u8 as *const libc::c_char,
             ) as usize] = '\0' as i32 as libc::c_char;
             ::core::ptr::write_volatile(&mut interrupted as *mut sig_atomic_t, 0 as libc::c_int);
-            ssh_signal(
+            crate::misc::ssh_signal(
                 2 as libc::c_int,
                 Some(cmd_interrupt as unsafe extern "C" fn(libc::c_int) -> ()),
             );
@@ -4029,7 +4029,7 @@ unsafe extern "C" fn interactive_loop(
             }
         }
     }
-    ssh_signal(17 as libc::c_int, None);
+    crate::misc::ssh_signal(17 as libc::c_int, None);
     libc::free(remote_path as *mut libc::c_void);
     libc::free(startdir as *mut libc::c_void);
     libc::free(conn as *mut libc::c_void);
@@ -4099,13 +4099,13 @@ unsafe extern "C" fn connect_to_server(
         close(*out);
         close(c_in);
         close(c_out);
-        ssh_signal(
+        crate::misc::ssh_signal(
             2 as libc::c_int,
             ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
                 1 as libc::c_int as libc::intptr_t,
             ),
         );
-        ssh_signal(15 as libc::c_int, None);
+        crate::misc::ssh_signal(15 as libc::c_int, None);
         execvp(path, args as *const *mut libc::c_char);
         libc::fprintf(
             stderr,
@@ -4115,31 +4115,31 @@ unsafe extern "C" fn connect_to_server(
         );
         libc::_exit(1 as libc::c_int);
     }
-    ssh_signal(
+    crate::misc::ssh_signal(
         15 as libc::c_int,
         Some(killchild as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         2 as libc::c_int,
         Some(killchild as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         1 as libc::c_int,
         Some(killchild as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         20 as libc::c_int,
         Some(suspchild as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         21 as libc::c_int,
         Some(suspchild as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         22 as libc::c_int,
         Some(suspchild as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         17 as libc::c_int,
         Some(sigchld_handler as unsafe extern "C" fn(libc::c_int) -> ()),
     );

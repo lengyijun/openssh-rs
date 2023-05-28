@@ -114,7 +114,7 @@ extern "C" {
     fn ptimeout_deadline_ms(pt: *mut libc::timespec, ms: libc::c_long);
     fn ptimeout_deadline_monotime(pt: *mut libc::timespec, when: time_t);
     fn ptimeout_get_tsp(pt: *mut libc::timespec) -> *mut libc::timespec;
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn channel_lookup(_: *mut ssh, _: libc::c_int) -> *mut Channel;
     fn channel_new(
         _: *mut ssh,
@@ -1237,7 +1237,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
             strerror(*libc::__errno_location()),
         );
     }
-    ssh_signal(
+    crate::misc::ssh_signal(
         17 as libc::c_int,
         Some(sigchld_handler as unsafe extern "C" fn(libc::c_int) -> ()),
     );
@@ -1245,15 +1245,15 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
     connection_in = ssh_packet_get_connection_in(ssh) as u_int;
     connection_out = ssh_packet_get_connection_out(ssh) as u_int;
     if use_privsep == 0 {
-        ssh_signal(
+        crate::misc::ssh_signal(
             15 as libc::c_int,
             Some(sigterm_handler as unsafe extern "C" fn(libc::c_int) -> ()),
         );
-        ssh_signal(
+        crate::misc::ssh_signal(
             2 as libc::c_int,
             Some(sigterm_handler as unsafe extern "C" fn(libc::c_int) -> ()),
         );
-        ssh_signal(
+        crate::misc::ssh_signal(
             3 as libc::c_int,
             Some(sigterm_handler as unsafe extern "C" fn(libc::c_int) -> ()),
         );

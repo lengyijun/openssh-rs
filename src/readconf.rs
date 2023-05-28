@@ -145,7 +145,7 @@ extern "C" {
         lp: *mut u_int,
         s: *const libc::c_char,
     );
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn match_pattern_list(
         _: *const libc::c_char,
@@ -1832,7 +1832,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             cmd,
             strerror(*libc::__errno_location()),
         );
-        ssh_signal(15 as libc::c_int, None);
+        crate::misc::ssh_signal(15 as libc::c_int, None);
         kill(libc::getpid(), 15 as libc::c_int);
         libc::_exit(1 as libc::c_int);
     }

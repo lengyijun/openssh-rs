@@ -191,7 +191,7 @@ extern "C" {
     fn ask_permission(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn notify_start(_: libc::c_int, _: *const libc::c_char, _: ...) -> *mut notifier_ctx;
     fn notify_complete(_: *mut notifier_ctx, _: *const libc::c_char, _: ...);
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn ssh_digest_alg_by_name(name: *const libc::c_char) -> libc::c_int;
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn match_pattern_list(
@@ -5128,13 +5128,13 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         parent_alive_interval = 10 as libc::c_int as time_t;
     }
     idtab_init();
-    ssh_signal(
+    crate::misc::ssh_signal(
         13 as libc::c_int,
         ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             1 as libc::c_int as libc::intptr_t,
         ),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         2 as libc::c_int,
         if d_flag | D_flag != 0 {
             Some(cleanup_handler as unsafe extern "C" fn(libc::c_int) -> ())
@@ -5144,11 +5144,11 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             )
         },
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         1 as libc::c_int,
         Some(cleanup_handler as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         15 as libc::c_int,
         Some(cleanup_handler as unsafe extern "C" fn(libc::c_int) -> ()),
     );

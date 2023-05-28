@@ -17,7 +17,7 @@ extern "C" {
         _: ...
     );
     fn monotime_double() -> libc::c_double;
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn asmprintf(
         _: *mut *mut libc::c_char,
         _: size_t,
@@ -308,11 +308,11 @@ pub unsafe extern "C" fn start_progress_meter(
     bytes_per_second = 0 as libc::c_int;
     setscreensize();
     refresh_progress_meter(1 as libc::c_int);
-    ssh_signal(
+    crate::misc::ssh_signal(
         14 as libc::c_int,
         Some(sig_alarm as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         28 as libc::c_int,
         Some(sig_winch as unsafe extern "C" fn(libc::c_int) -> ()),
     );

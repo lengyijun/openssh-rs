@@ -51,7 +51,7 @@ extern "C" {
         _: ::core::ffi::VaList,
     ) -> libc::c_int;
     fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -151,7 +151,7 @@ unsafe extern "C" fn ssh_askpass(
         );
         return 0 as *mut libc::c_char;
     }
-    osigchld = ssh_signal(17 as libc::c_int, None);
+    osigchld = crate::misc::ssh_signal(17 as libc::c_int, None);
     pid = libc::fork();
     if pid == -(1 as libc::c_int) {
         crate::log::sshlog(
@@ -164,7 +164,7 @@ unsafe extern "C" fn ssh_askpass(
             b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
-        ssh_signal(17 as libc::c_int, osigchld);
+        crate::misc::ssh_signal(17 as libc::c_int, osigchld);
         return 0 as *mut libc::c_char;
     }
     if pid == 0 as libc::c_int {
@@ -244,7 +244,7 @@ unsafe extern "C" fn ssh_askpass(
             break;
         }
     }
-    ssh_signal(17 as libc::c_int, osigchld);
+    crate::misc::ssh_signal(17 as libc::c_int, osigchld);
     if ret == -(1 as libc::c_int)
         || !(status & 0x7f as libc::c_int == 0 as libc::c_int)
         || (status & 0xff00 as libc::c_int) >> 8 as libc::c_int != 0 as libc::c_int
@@ -510,7 +510,7 @@ pub unsafe extern "C" fn notify_start(
             );
             current_block = 13051439020340349553;
         } else {
-            osigchld = ssh_signal(17 as libc::c_int, None);
+            osigchld = crate::misc::ssh_signal(17 as libc::c_int, None);
             pid = libc::fork();
             if pid == -(1 as libc::c_int) {
                 crate::log::sshlog(
@@ -524,7 +524,7 @@ pub unsafe extern "C" fn notify_start(
                     b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
                     strerror(*libc::__errno_location()),
                 );
-                ssh_signal(17 as libc::c_int, osigchld);
+                crate::misc::ssh_signal(17 as libc::c_int, osigchld);
                 libc::free(prompt as *mut libc::c_void);
                 return 0 as *mut notifier_ctx;
             }
@@ -644,6 +644,6 @@ pub unsafe extern "C" fn notify_complete(
             strerror(*libc::__errno_location()),
         );
     }
-    ssh_signal(17 as libc::c_int, (*ctx).osigchld);
+    crate::misc::ssh_signal(17 as libc::c_int, (*ctx).osigchld);
     libc::free(ctx as *mut libc::c_void);
 }

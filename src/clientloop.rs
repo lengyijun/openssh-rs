@@ -280,7 +280,7 @@ extern "C" {
     fn ptimeout_deadline_monotime(pt: *mut libc::timespec, when: time_t);
     fn ptimeout_get_ms(pt: *mut libc::timespec) -> libc::c_int;
     fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn parse_forward(
         _: *mut Forward,
         _: *const libc::c_char,
@@ -2139,7 +2139,7 @@ unsafe extern "C" fn process_cmdline(mut ssh: *mut ssh) {
         ::core::mem::size_of::<Forward>() as libc::c_ulong,
     );
     leave_raw_mode((options.request_tty == 3 as libc::c_int) as libc::c_int);
-    handler = ssh_signal(
+    handler = crate::misc::ssh_signal(
         2 as libc::c_int,
         ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             1 as libc::c_int as libc::intptr_t,
@@ -2510,7 +2510,7 @@ unsafe extern "C" fn process_cmdline(mut ssh: *mut ssh) {
             }
         }
     }
-    ssh_signal(2 as libc::c_int, handler);
+    crate::misc::ssh_signal(2 as libc::c_int, handler);
     enter_raw_mode((options.request_tty == 3 as libc::c_int) as libc::c_int);
     libc::free(cmd as *mut libc::c_void);
     libc::free(fwd.listen_host as *mut libc::c_void);
@@ -3393,7 +3393,7 @@ pub unsafe extern "C" fn client_loop(
         );
     }
     client_init_dispatch(ssh);
-    if ssh_signal(
+    if crate::misc::ssh_signal(
         1 as libc::c_int,
         ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             1 as libc::c_int as libc::intptr_t,
@@ -3401,12 +3401,12 @@ pub unsafe extern "C" fn client_loop(
     ) != ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
         1 as libc::c_int as libc::intptr_t,
     ) {
-        ssh_signal(
+        crate::misc::ssh_signal(
             1 as libc::c_int,
             Some(signal_handler as unsafe extern "C" fn(libc::c_int) -> ()),
         );
     }
-    if ssh_signal(
+    if crate::misc::ssh_signal(
         2 as libc::c_int,
         ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             1 as libc::c_int as libc::intptr_t,
@@ -3414,12 +3414,12 @@ pub unsafe extern "C" fn client_loop(
     ) != ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
         1 as libc::c_int as libc::intptr_t,
     ) {
-        ssh_signal(
+        crate::misc::ssh_signal(
             2 as libc::c_int,
             Some(signal_handler as unsafe extern "C" fn(libc::c_int) -> ()),
         );
     }
-    if ssh_signal(
+    if crate::misc::ssh_signal(
         3 as libc::c_int,
         ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             1 as libc::c_int as libc::intptr_t,
@@ -3427,12 +3427,12 @@ pub unsafe extern "C" fn client_loop(
     ) != ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
         1 as libc::c_int as libc::intptr_t,
     ) {
-        ssh_signal(
+        crate::misc::ssh_signal(
             3 as libc::c_int,
             Some(signal_handler as unsafe extern "C" fn(libc::c_int) -> ()),
         );
     }
-    if ssh_signal(
+    if crate::misc::ssh_signal(
         15 as libc::c_int,
         ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             1 as libc::c_int as libc::intptr_t,
@@ -3440,12 +3440,12 @@ pub unsafe extern "C" fn client_loop(
     ) != ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
         1 as libc::c_int as libc::intptr_t,
     ) {
-        ssh_signal(
+        crate::misc::ssh_signal(
             15 as libc::c_int,
             Some(signal_handler as unsafe extern "C" fn(libc::c_int) -> ()),
         );
     }
-    ssh_signal(
+    crate::misc::ssh_signal(
         28 as libc::c_int,
         Some(window_change_handler as unsafe extern "C" fn(libc::c_int) -> ()),
     );
@@ -3602,7 +3602,7 @@ pub unsafe extern "C" fn client_loop(
         break;
     }
     libc::free(pfd as *mut libc::c_void);
-    ssh_signal(28 as libc::c_int, None);
+    crate::misc::ssh_signal(28 as libc::c_int, None);
     r = sshpkt_start(ssh, 1 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {

@@ -8,7 +8,7 @@ extern "C" {
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -44,7 +44,7 @@ unsafe extern "C" fn sshbuf_check_sanity(mut buf: *const sshbuf) -> libc::c_int 
         != 0 as libc::c_int) as libc::c_int as libc::c_long
         != 0
     {
-        ssh_signal(11 as libc::c_int, None);
+        crate::misc::ssh_signal(11 as libc::c_int, None);
         raise(11 as libc::c_int);
         return -(1 as libc::c_int);
     }

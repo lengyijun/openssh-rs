@@ -54,7 +54,7 @@ extern "C" {
     fn sshkey_private_deserialize(buf: *mut sshbuf, keyp: *mut *mut sshkey) -> libc::c_int;
     fn ssh_msg_send(_: libc::c_int, _: u_char, _: *mut sshbuf) -> libc::c_int;
     fn ssh_msg_recv(_: libc::c_int, _: *mut sshbuf) -> libc::c_int;
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -197,7 +197,7 @@ unsafe extern "C" fn start_helper(
         );
         return -(24 as libc::c_int);
     }
-    osigchld = ssh_signal(17 as libc::c_int, None);
+    osigchld = crate::misc::ssh_signal(17 as libc::c_int, None);
     pid = libc::fork();
     if pid == -(1 as libc::c_int) {
         oerrno = *libc::__errno_location();
@@ -213,7 +213,7 @@ unsafe extern "C" fn start_helper(
         );
         close(pair[0 as libc::c_int as usize]);
         close(pair[1 as libc::c_int as usize]);
-        ssh_signal(17 as libc::c_int, osigchld);
+        crate::misc::ssh_signal(17 as libc::c_int, osigchld);
         *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
     }
@@ -566,7 +566,7 @@ unsafe extern "C" fn client_converse(
     }
     sshbuf_free(req);
     sshbuf_free(resp);
-    ssh_signal(17 as libc::c_int, osigchld);
+    crate::misc::ssh_signal(17 as libc::c_int, osigchld);
     *libc::__errno_location() = oerrno;
     return r;
 }

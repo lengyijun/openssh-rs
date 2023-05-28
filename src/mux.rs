@@ -73,7 +73,7 @@ extern "C" {
         nenvs: size_t,
     ) -> *const libc::c_char;
     fn ask_permission(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn sshbuf_get_string_direct(
         buf: *mut sshbuf,
@@ -5336,7 +5336,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
         );
         return -(1 as libc::c_int);
     }
-    ssh_signal(
+    crate::misc::ssh_signal(
         13 as libc::c_int,
         ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             1 as libc::c_int as libc::intptr_t,
@@ -5723,19 +5723,19 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
         );
     }
     platform_pledge_mux();
-    ssh_signal(
+    crate::misc::ssh_signal(
         1 as libc::c_int,
         Some(control_client_sighandler as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         2 as libc::c_int,
         Some(control_client_sighandler as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         15 as libc::c_int,
         Some(control_client_sighandler as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         28 as libc::c_int,
         Some(control_client_sigrelay as unsafe extern "C" fn(libc::c_int) -> ()),
     );
@@ -6113,7 +6113,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
         );
         return -(1 as libc::c_int);
     }
-    ssh_signal(
+    crate::misc::ssh_signal(
         13 as libc::c_int,
         ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             1 as libc::c_int as libc::intptr_t,
@@ -6412,19 +6412,19 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
     }
     muxclient_request_id = muxclient_request_id.wrapping_add(1);
     muxclient_request_id;
-    ssh_signal(
+    crate::misc::ssh_signal(
         1 as libc::c_int,
         Some(control_client_sighandler as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         2 as libc::c_int,
         Some(control_client_sighandler as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         15 as libc::c_int,
         Some(control_client_sighandler as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    ssh_signal(
+    crate::misc::ssh_signal(
         28 as libc::c_int,
         Some(control_client_sigrelay as unsafe extern "C" fn(libc::c_int) -> ()),
     );

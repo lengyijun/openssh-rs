@@ -259,7 +259,7 @@ extern "C" {
         envs: *const *mut libc::c_char,
         nenvs: size_t,
     ) -> *const libc::c_char;
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn ssh_connection_hash(
         thishost: *const libc::c_char,
         host_0: *const libc::c_char,
@@ -2906,7 +2906,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             i;
         }
     }
-    ssh_signal(
+    crate::misc::ssh_signal(
         13 as libc::c_int,
         ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
             1 as libc::c_int as libc::intptr_t,
@@ -4292,7 +4292,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 (options.user_hostfiles).as_mut_ptr(),
                 options.num_user_hostfiles,
             );
-            ssh_signal(
+            crate::misc::ssh_signal(
                 17 as libc::c_int,
                 Some(main_sigchld_handler as unsafe extern "C" fn(libc::c_int) -> ()),
             );

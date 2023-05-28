@@ -223,7 +223,7 @@ extern "C" {
     fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn notify_start(_: libc::c_int, _: *const libc::c_char, _: ...) -> *mut notifier_ctx;
     fn notify_complete(_: *mut notifier_ctx, _: *const libc::c_char, _: ...);
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn kex_default_pk_alg() -> *const libc::c_char;
     fn match_pattern_list(
         _: *const libc::c_char,
@@ -4111,7 +4111,7 @@ unsafe extern "C" fn ssh_keysign(
         );
         return -(1 as libc::c_int);
     }
-    osigchld = ssh_signal(17 as libc::c_int, None);
+    osigchld = crate::misc::ssh_signal(17 as libc::c_int, None);
     if pid == 0 as libc::c_int {
         close(from[0 as libc::c_int as usize]);
         if libc::dup2(from[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
@@ -4353,7 +4353,7 @@ unsafe extern "C" fn ssh_keysign(
                                 b"buffer error\0" as *const u8 as *const libc::c_char,
                             );
                         } else {
-                            ssh_signal(17 as libc::c_int, osigchld);
+                            crate::misc::ssh_signal(17 as libc::c_int, osigchld);
                             sshbuf_free(b);
                             return 0 as libc::c_int;
                         }
@@ -4362,7 +4362,7 @@ unsafe extern "C" fn ssh_keysign(
             }
         }
     }
-    ssh_signal(17 as libc::c_int, osigchld);
+    crate::misc::ssh_signal(17 as libc::c_int, osigchld);
     sshbuf_free(b);
     return -(1 as libc::c_int);
 }

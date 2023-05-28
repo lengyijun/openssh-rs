@@ -89,7 +89,7 @@ extern "C" {
         _: *const libc::c_char,
         _: libc::c_int,
     ) -> libc::c_int;
-    fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
+    
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_equal(_: *const sshkey, _: *const sshkey) -> libc::c_int;
     fn sshkey_fingerprint(_: *const sshkey, _: libc::c_int, _: sshkey_fp_rep) -> *mut libc::c_char;
@@ -1548,7 +1548,7 @@ unsafe extern "C" fn match_principals_command(
         );
         return 0 as libc::c_int;
     }
-    osigchld = ssh_signal(17 as libc::c_int, None);
+    osigchld = crate::misc::ssh_signal(17 as libc::c_int, None);
     username = percent_expand(
         options.authorized_principals_command_user,
         b"u\0" as *const u8 as *const libc::c_char,
@@ -1780,7 +1780,7 @@ unsafe extern "C" fn match_principals_command(
     if !f.is_null() {
         fclose(f);
     }
-    ssh_signal(17 as libc::c_int, osigchld);
+    crate::misc::ssh_signal(17 as libc::c_int, osigchld);
     i = 0 as libc::c_int;
     while i < ac {
         libc::free(*av.offset(i as isize) as *mut libc::c_void);
@@ -2079,7 +2079,7 @@ unsafe extern "C" fn user_key_command_allowed2(
         );
         return 0 as libc::c_int;
     }
-    osigchld = ssh_signal(17 as libc::c_int, None);
+    osigchld = crate::misc::ssh_signal(17 as libc::c_int, None);
     username = percent_expand(
         options.authorized_keys_command_user,
         b"u\0" as *const u8 as *const libc::c_char,
@@ -2274,7 +2274,7 @@ unsafe extern "C" fn user_key_command_allowed2(
     if !f.is_null() {
         fclose(f);
     }
-    ssh_signal(17 as libc::c_int, osigchld);
+    crate::misc::ssh_signal(17 as libc::c_int, osigchld);
     i = 0 as libc::c_int;
     while i < ac {
         libc::free(*av.offset(i as isize) as *mut libc::c_void);
