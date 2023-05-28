@@ -131,7 +131,6 @@ extern "C" {
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
 
     fn initgroups(__user: *const libc::c_char, __group: __gid_t) -> libc::c_int;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
@@ -1678,8 +1677,8 @@ unsafe extern "C" fn urldecode(mut src: *const libc::c_char) -> *mut libc::c_cha
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut dst: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut ch: libc::c_int = 0;
-    ret =
-        xmalloc((strlen(src)).wrapping_add(1 as libc::c_int as libc::c_ulong)) as *mut libc::c_char;
+    ret = crate::xmalloc::xmalloc((strlen(src)).wrapping_add(1 as libc::c_int as libc::c_ulong))
+        as *mut libc::c_char;
     dst = ret;
     while *src as libc::c_int != '\0' as i32 {
         match *src as libc::c_int {
@@ -2303,8 +2302,9 @@ unsafe extern "C" fn vdollar_percent_expand(
                     current_block = 17254736040813544624;
                     break;
                 } else {
-                    var = xmalloc(len.wrapping_add(1 as libc::c_int as libc::c_ulong))
-                        as *mut libc::c_char;
+                    var = crate::xmalloc::xmalloc(
+                        len.wrapping_add(1 as libc::c_int as libc::c_ulong),
+                    ) as *mut libc::c_char;
                     strlcpy(
                         var,
                         string,
@@ -3942,7 +3942,7 @@ pub unsafe extern "C" fn child_set_env(
         );
     }
     if (*envp).is_null() && *envsizep == 0 as libc::c_int as libc::c_uint {
-        *envp = xmalloc(::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong)
+        *envp = crate::xmalloc::xmalloc(::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong)
             as *mut *mut libc::c_char;
         let ref mut fresh17 = **envp.offset(0 as libc::c_int as isize);
         *fresh17 = 0 as *mut libc::c_char;
@@ -3992,7 +3992,7 @@ pub unsafe extern "C" fn child_set_env(
         *fresh18 = 0 as *mut libc::c_char;
     }
     let ref mut fresh19 = *env.offset(i as isize);
-    *fresh19 = xmalloc(
+    *fresh19 = crate::xmalloc::xmalloc(
         (strlen(name))
             .wrapping_add(1 as libc::c_int as libc::c_ulong)
             .wrapping_add(strlen(value))

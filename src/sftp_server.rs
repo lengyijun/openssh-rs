@@ -88,8 +88,6 @@ extern "C" {
     ) -> size_t;
     fn localtime(__timer: *const time_t) -> *mut tm;
 
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
-
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
@@ -952,7 +950,8 @@ unsafe extern "C" fn handle_to_string(
     if stringp.is_null() || hlenp.is_null() {
         return -(1 as libc::c_int);
     }
-    *stringp = xmalloc(::core::mem::size_of::<int32_t>() as libc::c_ulong) as *mut u_char;
+    *stringp =
+        crate::xmalloc::xmalloc(::core::mem::size_of::<int32_t>() as libc::c_ulong) as *mut u_char;
     put_u32(*stringp as *mut libc::c_void, handle as u_int32_t);
     *hlenp = ::core::mem::size_of::<int32_t>() as libc::c_ulong as libc::c_int;
     return 0 as libc::c_int;

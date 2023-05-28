@@ -33,7 +33,6 @@ extern "C" {
     fn strpbrk(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
@@ -5191,7 +5190,7 @@ pub unsafe extern "C" fn do_upload(
     id = (*conn).msg_id;
     ackid = id.wrapping_add(1 as libc::c_int as libc::c_uint);
     startid = ackid;
-    data = xmalloc((*conn).upload_buflen as size_t) as *mut u_char;
+    data = crate::xmalloc::xmalloc((*conn).upload_buflen as size_t) as *mut u_char;
     progress_counter = (if resume != 0 {
         (*c).size
     } else {
@@ -7213,7 +7212,7 @@ pub unsafe extern "C" fn path_append(
     let mut len: size_t = (strlen(p1))
         .wrapping_add(strlen(p2))
         .wrapping_add(2 as libc::c_int as libc::c_ulong);
-    ret = xmalloc(len) as *mut libc::c_char;
+    ret = crate::xmalloc::xmalloc(len) as *mut libc::c_char;
     strlcpy(ret, p1, len);
     if *p1.offset(0 as libc::c_int as isize) as libc::c_int != '\0' as i32
         && *p1.offset((strlen(p1)).wrapping_sub(1 as libc::c_int as libc::c_ulong) as isize)

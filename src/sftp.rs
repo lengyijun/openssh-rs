@@ -91,7 +91,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strsignal(__sig: libc::c_int) -> *mut libc::c_char;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -1004,7 +1003,8 @@ unsafe extern "C" fn local_do_ls(mut args: *const libc::c_char) {
             .wrapping_add(strlen(args))
             .wrapping_add(1 as libc::c_int as libc::c_ulong)
             as libc::c_int;
-        let mut buf: *mut libc::c_char = xmalloc(len as size_t) as *mut libc::c_char;
+        let mut buf: *mut libc::c_char =
+            crate::xmalloc::xmalloc(len as size_t) as *mut libc::c_char;
         libc::snprintf(
             buf,
             len as usize,

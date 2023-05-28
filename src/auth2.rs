@@ -33,8 +33,6 @@ extern "C" {
         __remaining: *mut libc::timespec,
     ) -> libc::c_int;
 
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
-
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_get_cstring(
         ssh: *mut ssh,
@@ -507,7 +505,8 @@ pub unsafe extern "C" fn auth2_read_banner() -> *mut libc::c_char {
         return 0 as *mut libc::c_char;
     }
     len = st.st_size as size_t;
-    banner = xmalloc(len.wrapping_add(1 as libc::c_int as libc::c_ulong)) as *mut libc::c_char;
+    banner = crate::xmalloc::xmalloc(len.wrapping_add(1 as libc::c_int as libc::c_ulong))
+        as *mut libc::c_char;
     n = atomicio(
         Some(read as unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t),
         fd,
@@ -699,7 +698,7 @@ unsafe extern "C" fn input_service_request(
 unsafe extern "C" fn user_specific_delay(mut user: *const libc::c_char) -> libc::c_double {
     let mut b: [libc::c_char; 512] = [0; 512];
     let mut len: size_t = ssh_digest_bytes(4 as libc::c_int);
-    let mut hash: *mut u_char = xmalloc(len) as *mut u_char;
+    let mut hash: *mut u_char = crate::xmalloc::xmalloc(len) as *mut u_char;
     let mut delay: libc::c_double = 0.;
     libc::snprintf(
         b.as_mut_ptr(),

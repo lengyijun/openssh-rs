@@ -141,7 +141,6 @@ extern "C" {
     fn RAND_bytes(buf: *mut libc::c_uchar, num: libc::c_int) -> libc::c_int;
     fn RAND_seed(buf: *const libc::c_void, num: libc::c_int);
     fn RAND_poll() -> libc::c_int;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn disconnect_controlling_tty();
     fn ssh_packet_set_connection(_: *mut ssh, _: libc::c_int, _: libc::c_int) -> *mut ssh;
@@ -3527,7 +3526,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
             );
         }
         len = ssh_digest_bytes(4 as libc::c_int);
-        hash = xmalloc(len) as *mut u_char;
+        hash = crate::xmalloc::xmalloc(len) as *mut u_char;
         if ssh_digest_final(ctx, hash, len) != 0 as libc::c_int {
             sshfatal(
                 b"sshd.c\0" as *const u8 as *const libc::c_char,

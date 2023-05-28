@@ -207,7 +207,6 @@ extern "C" {
     fn sshkey_fingerprint(_: *const sshkey, _: libc::c_int, _: sshkey_fp_rep) -> *mut libc::c_char;
     fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
     fn sshkey_ecdsa_key_to_nid(_: *mut EC_KEY) -> libc::c_int;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
 }
 pub type __u_char = libc::c_uchar;
@@ -1772,7 +1771,7 @@ unsafe extern "C" fn pkcs11_rsa_wrap(
     (*k11).slotidx = slotidx;
     (*k11).keyid_len = (*keyid_attrib).ulValueLen as libc::c_int;
     if (*k11).keyid_len > 0 as libc::c_int {
-        (*k11).keyid = xmalloc((*k11).keyid_len as size_t) as *mut libc::c_char;
+        (*k11).keyid = crate::xmalloc::xmalloc((*k11).keyid_len as size_t) as *mut libc::c_char;
         memcpy(
             (*k11).keyid as *mut libc::c_void,
             (*keyid_attrib).pValue,
@@ -1822,7 +1821,7 @@ unsafe extern "C" fn ecdsa_do_sign(
     si =
         &mut *((*(*k11).provider).slotinfo).offset((*k11).slotidx as isize) as *mut pkcs11_slotinfo;
     siglen = ECDSA_size(ec) as CK_ULONG;
-    sig = xmalloc(siglen) as *mut u_char;
+    sig = crate::xmalloc::xmalloc(siglen) as *mut u_char;
     rv = ((*f).C_Sign).expect("non-null function pointer")(
         (*si).session,
         dgst as *mut CK_BYTE,
@@ -2007,7 +2006,7 @@ unsafe extern "C" fn pkcs11_ecdsa_wrap(
     (*k11).slotidx = slotidx;
     (*k11).keyid_len = (*keyid_attrib).ulValueLen as libc::c_int;
     if (*k11).keyid_len > 0 as libc::c_int {
-        (*k11).keyid = xmalloc((*k11).keyid_len as size_t) as *mut libc::c_char;
+        (*k11).keyid = crate::xmalloc::xmalloc((*k11).keyid_len as size_t) as *mut libc::c_char;
         memcpy(
             (*k11).keyid as *mut libc::c_void,
             (*keyid_attrib).pValue,

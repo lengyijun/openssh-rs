@@ -52,7 +52,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn match_hostname(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn sshkey_ssh_name(_: *const sshkey) -> *const libc::c_char;
@@ -350,8 +349,9 @@ unsafe extern "C" fn extract_salt(
         );
         return -(1 as libc::c_int);
     }
-    b64salt = xmalloc((1 as libc::c_int as libc::c_uint).wrapping_add(b64len) as size_t)
-        as *mut libc::c_char;
+    b64salt =
+        crate::xmalloc::xmalloc((1 as libc::c_int as libc::c_uint).wrapping_add(b64len) as size_t)
+            as *mut libc::c_char;
     memcpy(
         b64salt as *mut libc::c_void,
         s as *const libc::c_void,

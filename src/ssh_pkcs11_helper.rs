@@ -21,7 +21,6 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
@@ -533,7 +532,7 @@ unsafe extern "C" fn process_sign() {
             let mut ret: libc::c_int = 0;
             if (*key).type_0 == KEY_RSA as libc::c_int {
                 slen = RSA_size((*key).rsa) as size_t;
-                signature = xmalloc(slen) as *mut u_char;
+                signature = crate::xmalloc::xmalloc(slen) as *mut u_char;
                 ret = RSA_private_encrypt(
                     dlen as libc::c_int,
                     data,
@@ -547,7 +546,7 @@ unsafe extern "C" fn process_sign() {
                 }
             } else if (*key).type_0 == KEY_ECDSA as libc::c_int {
                 let mut xslen: u_int = ECDSA_size((*key).ecdsa) as u_int;
-                signature = xmalloc(xslen as size_t) as *mut u_char;
+                signature = crate::xmalloc::xmalloc(xslen as size_t) as *mut u_char;
                 ret = ECDSA_sign(
                     -(1 as libc::c_int),
                     data,

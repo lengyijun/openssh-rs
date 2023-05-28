@@ -27,8 +27,6 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
-
     fn sshkey_fingerprint_raw(
         k: *const sshkey,
         _: libc::c_int,
@@ -293,7 +291,7 @@ unsafe extern "C" fn dns_read_rdata(
         *digest_type = *rdata.offset(1 as libc::c_int as isize);
         *digest_len = (rdata_len - 2 as libc::c_int) as size_t;
         if *digest_len > 0 as libc::c_int as libc::c_ulong {
-            *digest = xmalloc(*digest_len) as *mut u_char;
+            *digest = crate::xmalloc::xmalloc(*digest_len) as *mut u_char;
             memcpy(
                 *digest as *mut libc::c_void,
                 rdata.offset(2 as libc::c_int as isize) as *const libc::c_void,

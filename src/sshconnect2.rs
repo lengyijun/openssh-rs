@@ -39,7 +39,6 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn sshbuf_dup_string(buf: *mut sshbuf) -> *mut libc::c_char;
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
@@ -949,8 +948,8 @@ unsafe extern "C" fn order_hostkeyalgs(
         avail = crate::xmalloc::xstrdup(options.hostkeyalgorithms);
         oavail = avail;
         maxlen = (strlen(avail)).wrapping_add(1 as libc::c_int as libc::c_ulong);
-        first = xmalloc(maxlen) as *mut libc::c_char;
-        last = xmalloc(maxlen) as *mut libc::c_char;
+        first = crate::xmalloc::xmalloc(maxlen) as *mut libc::c_char;
+        last = crate::xmalloc::xmalloc(maxlen) as *mut libc::c_char;
         *last = '\0' as i32 as libc::c_char;
         *first = *last;
         loop {

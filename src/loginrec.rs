@@ -50,7 +50,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn time(__timer: *mut time_t) -> time_t;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -434,7 +433,8 @@ pub unsafe extern "C" fn login_alloc_entry(
     mut line: *const libc::c_char,
 ) -> *mut logininfo {
     let mut newli: *mut logininfo = 0 as *mut logininfo;
-    newli = xmalloc(::core::mem::size_of::<logininfo>() as libc::c_ulong) as *mut logininfo;
+    newli = crate::xmalloc::xmalloc(::core::mem::size_of::<logininfo>() as libc::c_ulong)
+        as *mut logininfo;
     login_init_entry(newli, pid, username, hostname, line);
     return newli;
 }
@@ -703,7 +703,7 @@ pub unsafe extern "C" fn construct_utmp(mut li: *mut logininfo, mut ut: *mut utm
 }
 unsafe extern "C" fn syslogin_perform_login(mut li: *mut logininfo) -> libc::c_int {
     let mut ut: *mut utmp = 0 as *mut utmp;
-    ut = xmalloc(::core::mem::size_of::<utmp>() as libc::c_ulong) as *mut utmp;
+    ut = crate::xmalloc::xmalloc(::core::mem::size_of::<utmp>() as libc::c_ulong) as *mut utmp;
     construct_utmp(li, ut);
     login(ut);
     libc::free(ut as *mut libc::c_void);

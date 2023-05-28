@@ -56,8 +56,6 @@ extern "C" {
     );
     fn DH_free(dh: *mut DH);
 
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
-
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_fingerprint(_: *const sshkey, _: libc::c_int, _: sshkey_fp_rep) -> *mut libc::c_char;
     fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
@@ -1861,7 +1859,7 @@ pub unsafe extern "C" fn mm_answer_sign(
     }
     if session_id2_len == 0 as libc::c_int as libc::c_uint {
         session_id2_len = datlen as u_int;
-        session_id2 = xmalloc(session_id2_len as size_t) as *mut u_char;
+        session_id2 = crate::xmalloc::xmalloc(session_id2_len as size_t) as *mut u_char;
         memcpy(
             session_id2 as *mut libc::c_void,
             p as *const libc::c_void,

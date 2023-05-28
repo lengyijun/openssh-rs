@@ -59,7 +59,6 @@ extern "C" {
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -1061,8 +1060,9 @@ pub unsafe extern "C" fn prime_test(
         );
     }
     res = 0 as libc::c_int;
-    lp = xmalloc((100 as libc::c_int + 8192 as libc::c_int + 1 as libc::c_int) as size_t)
-        as *mut libc::c_char;
+    lp = crate::xmalloc::xmalloc(
+        (100 as libc::c_int + 8192 as libc::c_int + 1 as libc::c_int) as size_t,
+    ) as *mut libc::c_char;
     while !(fgets(
         lp,
         100 as libc::c_int + 8192 as libc::c_int + 1 as libc::c_int,

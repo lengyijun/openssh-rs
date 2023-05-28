@@ -69,7 +69,6 @@ extern "C" {
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -3733,7 +3732,8 @@ pub unsafe extern "C" fn sink(
                                         .wrapping_add(250 as libc::c_int as libc::c_ulong);
                                     if need > cursize {
                                         libc::free(namebuf as *mut libc::c_void);
-                                        namebuf = xmalloc(need) as *mut libc::c_char;
+                                        namebuf =
+                                            crate::xmalloc::xmalloc(need) as *mut libc::c_char;
                                         cursize = need;
                                     }
                                     libc::snprintf(

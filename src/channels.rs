@@ -82,7 +82,6 @@ extern "C" {
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshbuf_read(_: libc::c_int, _: *mut sshbuf, _: size_t, _: *mut size_t) -> libc::c_int;
@@ -9562,7 +9561,7 @@ unsafe extern "C" fn connect_to_helper(
             );
             return -(1 as libc::c_int);
         }
-        ai = xmalloc(
+        ai = crate::xmalloc::xmalloc(
             (::core::mem::size_of::<addrinfo>() as libc::c_ulong)
                 .wrapping_add(::core::mem::size_of::<sockaddr_un>() as libc::c_ulong),
         ) as *mut addrinfo;
@@ -10738,7 +10737,7 @@ pub unsafe extern "C" fn x11_request_forwarding_with_spoofing(
     }
     if ((*sc).x11_saved_proto).is_null() {
         (*sc).x11_saved_proto = crate::xmalloc::xstrdup(proto);
-        (*sc).x11_saved_data = xmalloc(data_len as size_t) as *mut libc::c_char;
+        (*sc).x11_saved_data = crate::xmalloc::xmalloc(data_len as size_t) as *mut libc::c_char;
         i = 0 as libc::c_int as u_int;
         while i < data_len {
             if sscanf(
@@ -10767,7 +10766,7 @@ pub unsafe extern "C" fn x11_request_forwarding_with_spoofing(
             i;
         }
         (*sc).x11_saved_data_len = data_len;
-        (*sc).x11_fake_data = xmalloc(data_len as size_t) as *mut u_char;
+        (*sc).x11_fake_data = crate::xmalloc::xmalloc(data_len as size_t) as *mut u_char;
         arc4random_buf((*sc).x11_fake_data as *mut libc::c_void, data_len as size_t);
         (*sc).x11_fake_data_len = data_len;
     }

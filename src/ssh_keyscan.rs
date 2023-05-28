@@ -81,7 +81,6 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
 
     fn sshkey_write(_: *const sshkey, _: *mut libc::FILE) -> libc::c_int;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
@@ -1673,7 +1672,7 @@ unsafe extern "C" fn conread(mut s: libc::c_int) {
                 (*c).c_plen = __bswap_32((*c).c_plen as __uint32_t) as libc::c_int;
                 (*c).c_len = (*c).c_plen + 8 as libc::c_int - ((*c).c_plen & 7 as libc::c_int);
                 (*c).c_off = 0 as libc::c_int;
-                (*c).c_data = xmalloc((*c).c_len as size_t) as *mut libc::c_char;
+                (*c).c_data = crate::xmalloc::xmalloc((*c).c_len as size_t) as *mut libc::c_char;
                 (*c).c_status = 3 as libc::c_int as u_char;
             }
             _ => {

@@ -147,7 +147,6 @@ extern "C" {
         u: *mut libc::c_void,
     ) -> libc::c_int;
 
-    fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshkey_new(_: libc::c_int) -> *mut sshkey;
@@ -5657,7 +5656,7 @@ unsafe extern "C" fn hash_to_blob(
     }
     cp = cp.offset(7 as libc::c_int as isize);
     tlen = strlen(cp);
-    tmp = xmalloc(
+    tmp = crate::xmalloc::xmalloc(
         tlen.wrapping_add(4 as libc::c_int as libc::c_ulong)
             .wrapping_add(1 as libc::c_int as libc::c_ulong),
     ) as *mut libc::c_char;
@@ -5701,7 +5700,7 @@ unsafe extern "C" fn hash_to_blob(
     }
     libc::free(tmp as *mut libc::c_void);
     *lenp = sshbuf_len(b);
-    *blobp = xmalloc(*lenp) as *mut u_char;
+    *blobp = crate::xmalloc::xmalloc(*lenp) as *mut u_char;
     memcpy(
         *blobp as *mut libc::c_void,
         sshbuf_ptr(b) as *const libc::c_void,
