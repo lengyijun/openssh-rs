@@ -37,7 +37,7 @@ extern "C" {
         _: *mut libc::c_char,
         _: libc::c_int,
     ) -> libc::c_int;
-    
+
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;

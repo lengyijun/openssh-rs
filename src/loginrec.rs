@@ -22,7 +22,7 @@ extern "C" {
     pub type session_state;
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
-    fn gettimeofday(__tv: *mut timeval, __tz: *mut libc::c_void) -> libc::c_int;
+    fn gettimeofday(__tv: *mut libc::timeval, __tz: *mut libc::c_void) -> libc::c_int;
     fn login(__entry: *const utmp);
     fn logout(__ut_line: *const libc::c_char) -> libc::c_int;
     fn logwtmp(
@@ -103,12 +103,6 @@ pub type size_t = libc::c_ulong;
 pub type int32_t = __int32_t;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timeval {
-    pub tv_sec: __time_t,
-    pub tv_usec: __suseconds_t,
-}
 
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
@@ -514,7 +508,7 @@ pub unsafe extern "C" fn login_init_entry(
     return 1 as libc::c_int;
 }
 pub unsafe extern "C" fn login_set_current_time(mut li: *mut logininfo) {
-    let mut tv: timeval = timeval {
+    let mut tv: libc::timeval = libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     };

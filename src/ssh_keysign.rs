@@ -12,7 +12,6 @@ extern "C" {
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
 
     fn getuid() -> __uid_t;
-    
 
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -779,7 +778,8 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"%s: crate::openbsd_compat::bsd_misc::pledge: %s\0" as *const u8 as *const libc::c_char,
+            b"%s: crate::openbsd_compat::bsd_misc::pledge: %s\0" as *const u8
+                as *const libc::c_char,
             __progname,
             strerror(*libc::__errno_location()),
         );
@@ -875,7 +875,8 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"%s: crate::openbsd_compat::bsd_misc::pledge: %s\0" as *const u8 as *const libc::c_char,
+            b"%s: crate::openbsd_compat::bsd_misc::pledge: %s\0" as *const u8
+                as *const libc::c_char,
             __progname,
             strerror(*libc::__errno_location()),
         );

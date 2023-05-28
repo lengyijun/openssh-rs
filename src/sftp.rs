@@ -77,10 +77,9 @@ extern "C" {
     fn fmt_scaled(number: libc::c_longlong, result: *mut libc::c_char) -> libc::c_int;
     fn scan_scaled(_: *mut libc::c_char, _: *mut libc::c_longlong) -> libc::c_int;
     static mut BSDoptreset: libc::c_int;
-    
 
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
-    
+
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __xpg_basename(__path: *mut libc::c_char) -> *mut libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
@@ -4186,7 +4185,8 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     let mut limit_kbps: libc::c_longlong = 0 as libc::c_int as libc::c_longlong;
     crate::misc::sanitise_stdfd();
     msetlocale();
-    __progname = crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
+    __progname =
+        crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
     memset(
         &mut args as *mut arglist as *mut libc::c_void,
         '\0' as i32,

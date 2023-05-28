@@ -40,7 +40,7 @@ extern "C" {
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;
-    fn gettimeofday(__tv: *mut timeval, __tz: *mut libc::c_void) -> libc::c_int;
+    fn gettimeofday(__tv: *mut libc::timeval, __tz: *mut libc::c_void) -> libc::c_int;
 
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
@@ -88,7 +88,7 @@ extern "C" {
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
-    
+
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
@@ -217,12 +217,6 @@ pub struct __sigset_t {
     pub __val: [libc::c_ulong; 16],
 }
 pub type sigset_t = __sigset_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timeval {
-    pub tv_sec: __time_t,
-    pub tv_usec: __suseconds_t,
-}
 
 pub type socklen_t = __socklen_t;
 pub type __socket_type = libc::c_uint;
@@ -567,8 +561,8 @@ pub struct bwlimit {
     pub rate: u_int64_t,
     pub thresh: u_int64_t,
     pub lamt: u_int64_t,
-    pub bwstart: timeval,
-    pub bwend: timeval,
+    pub bwstart: libc::timeval,
+    pub bwend: libc::timeval,
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -999,7 +993,7 @@ unsafe extern "C" fn waitfd(
         events: 0,
         revents: 0,
     };
-    let mut t_start: timeval = timeval {
+    let mut t_start: libc::timeval = libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     };
@@ -2780,12 +2774,12 @@ pub unsafe extern "C" fn put_u16(mut vp: *mut libc::c_void, mut v: u_int16_t) {
     *p.offset(1 as libc::c_int as isize) =
         (v as u_char as libc::c_int & 0xff as libc::c_int) as u_char;
 }
-pub unsafe extern "C" fn ms_subtract_diff(mut start: *mut timeval, mut ms: *mut libc::c_int) {
-    let mut diff: timeval = timeval {
+pub unsafe extern "C" fn ms_subtract_diff(mut start: *mut libc::timeval, mut ms: *mut libc::c_int) {
+    let mut diff: libc::timeval = libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     };
-    let mut finish: timeval = timeval {
+    let mut finish: libc::timeval = libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     };
@@ -2810,7 +2804,7 @@ pub unsafe extern "C" fn ms_to_timespec(mut ts: *mut libc::timespec, mut ms: lib
         (ms % 1000 as libc::c_int * 1000 as libc::c_int * 1000 as libc::c_int) as __syscall_slong_t;
 }
 pub unsafe extern "C" fn monotime_ts(mut ts: *mut libc::timespec) {
-    let mut tv: timeval = timeval {
+    let mut tv: libc::timeval = libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     };
@@ -2841,7 +2835,7 @@ pub unsafe extern "C" fn monotime_ts(mut ts: *mut libc::timespec) {
     (*ts).tv_sec = tv.tv_sec;
     (*ts).tv_nsec = tv.tv_usec * 1000 as libc::c_int as libc::c_long;
 }
-pub unsafe extern "C" fn monotime_tv(mut tv: *mut timeval) {
+pub unsafe extern "C" fn monotime_tv(mut tv: *mut libc::timeval) {
     let mut ts: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
@@ -5020,7 +5014,8 @@ pub unsafe extern "C" fn subprocess(
                 );
                 close(p[0 as libc::c_int as usize]);
                 kill(pid, 15 as libc::c_int);
-                while libc::waitpid(pid, 0 as *mut libc::c_int, 0 as libc::c_int) == -(1 as libc::c_int)
+                while libc::waitpid(pid, 0 as *mut libc::c_int, 0 as libc::c_int)
+                    == -(1 as libc::c_int)
                     && *libc::__errno_location() == 4 as libc::c_int
                 {}
                 return 0 as libc::c_int;

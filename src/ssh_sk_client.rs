@@ -16,7 +16,7 @@ extern "C" {
 
     fn fork() -> __pid_t;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    
+
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;

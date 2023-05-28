@@ -114,7 +114,7 @@ extern "C" {
     ) -> libc::c_int;
     fn setproctitle(fmt: *const libc::c_char, _: ...);
     fn compat_init_setproctitle(argc: libc::c_int, argv: *mut *mut libc::c_char);
-    
+
     fn ppoll(
         __fds: *mut pollfd,
         __nfds: nfds_t,
@@ -126,7 +126,7 @@ extern "C" {
 
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn seed_rng();
-    
+
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
     fn setgroups(__n: size_t, __groups: *const __gid_t) -> libc::c_int;
 
@@ -3696,7 +3696,8 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     let mut authctxt: *mut Authctxt = 0 as *mut Authctxt;
     let mut connection_info: *mut connection_info = 0 as *mut connection_info;
     let mut sigmask: sigset_t = sigset_t { __val: [0; 16] };
-    __progname = crate::openbsd_compat::bsd_misc::ssh_get_progname(*av.offset(0 as libc::c_int as isize));
+    __progname =
+        crate::openbsd_compat::bsd_misc::ssh_get_progname(*av.offset(0 as libc::c_int as isize));
     sigemptyset(&mut sigmask);
     sigprocmask(2 as libc::c_int, &mut sigmask, 0 as *mut sigset_t);
     saved_argc = ac;

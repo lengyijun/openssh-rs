@@ -6,7 +6,7 @@ use libc::close;
 extern "C" {
     pub type sshbuf;
     pub type __dirstream;
-    fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
+    fn utimes(__file: *const libc::c_char, __tvp: *const libc::timeval) -> libc::c_int;
 
     fn lseek(__fd: libc::c_int, __offset: __off_t, __whence: libc::c_int) -> __off_t;
 
@@ -101,8 +101,8 @@ extern "C" {
     fn stop_progress_meter();
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
     fn put_u32(_: *mut libc::c_void, _: u_int32_t);
-    
-    fn bandwidth_limit(_: *mut bwlimit, _: size_t);
+
+    fn bandwidth_limit(_: *mut crate::misc::bwlimit, _: size_t);
     fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn attrib_clear(_: *mut Attrib);
     fn stat_to_attrib(_: *const libc::stat, _: *mut Attrib);
@@ -147,12 +147,6 @@ pub type ssize_t = __ssize_t;
 pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timeval {
-    pub tv_sec: __time_t,
-    pub tv_usec: __suseconds_t,
-}
 
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -205,16 +199,7 @@ pub const SYSLOG_LEVEL_INFO: LogLevel = 3;
 pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct bwlimit {
-    pub buflen: size_t,
-    pub rate: u_int64_t,
-    pub thresh: u_int64_t,
-    pub lamt: u_int64_t,
-    pub bwstart: timeval,
-    pub bwend: timeval,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct SFTP_DIRENT {
@@ -257,8 +242,8 @@ pub struct sftp_conn {
     pub msg_id: u_int,
     pub exts: u_int,
     pub limit_kbps: u_int64_t,
-    pub bwlimit_in: bwlimit,
-    pub bwlimit_out: bwlimit,
+    pub bwlimit_in: crate::misc::bwlimit,
+    pub bwlimit_out: crate::misc::bwlimit,
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -309,7 +294,7 @@ unsafe extern "C" fn request_find(mut requests: *mut requests, mut id: u_int) ->
     return req;
 }
 unsafe extern "C" fn sftpio(mut _bwlimit: *mut libc::c_void, mut amount: size_t) -> libc::c_int {
-    let mut bwlimit: *mut bwlimit = _bwlimit as *mut bwlimit;
+    let mut bwlimit: *mut crate::misc::bwlimit = _bwlimit as *mut crate::misc::bwlimit;
     refresh_progress_meter(0 as libc::c_int);
     if !bwlimit.is_null() {
         bandwidth_limit(bwlimit, amount);
@@ -349,9 +334,9 @@ unsafe extern "C" fn send_msg(mut conn: *mut sftp_conn, mut m: *mut sshbuf) {
         2 as libc::c_int,
         Some(sftpio as unsafe extern "C" fn(*mut libc::c_void, size_t) -> libc::c_int),
         (if (*conn).limit_kbps > 0 as libc::c_int as libc::c_ulong {
-            &mut (*conn).bwlimit_out as *mut bwlimit
+            &mut (*conn).bwlimit_out as *mut crate::misc::bwlimit
         } else {
-            0 as *mut bwlimit
+            0 as *mut crate::misc::bwlimit
         }) as *mut libc::c_void,
     ) != (sshbuf_len(m)).wrapping_add(::core::mem::size_of::<[u_char; 4]>() as libc::c_ulong)
     {
@@ -397,9 +382,9 @@ unsafe extern "C" fn get_msg_extended(
         4 as libc::c_int as size_t,
         Some(sftpio as unsafe extern "C" fn(*mut libc::c_void, size_t) -> libc::c_int),
         (if (*conn).limit_kbps > 0 as libc::c_int as libc::c_ulong {
-            &mut (*conn).bwlimit_in as *mut bwlimit
+            &mut (*conn).bwlimit_in as *mut crate::misc::bwlimit
         } else {
-            0 as *mut bwlimit
+            0 as *mut crate::misc::bwlimit
         }) as *mut libc::c_void,
     ) != 4 as libc::c_int as libc::c_ulong
     {
@@ -491,9 +476,9 @@ unsafe extern "C" fn get_msg_extended(
         msg_len as size_t,
         Some(sftpio as unsafe extern "C" fn(*mut libc::c_void, size_t) -> libc::c_int),
         (if (*conn).limit_kbps > 0 as libc::c_int as libc::c_ulong {
-            &mut (*conn).bwlimit_in as *mut bwlimit
+            &mut (*conn).bwlimit_in as *mut crate::misc::bwlimit
         } else {
-            0 as *mut bwlimit
+            0 as *mut crate::misc::bwlimit
         }) as *mut libc::c_void,
     ) != msg_len as libc::c_ulong
     {
@@ -4638,7 +4623,7 @@ pub unsafe extern "C" fn do_download(
                         );
                     }
                     if preserve_flag != 0 && (*a).flags & 0x8 as libc::c_int as libc::c_uint != 0 {
-                        let mut tv: [timeval; 2] = [timeval {
+                        let mut tv: [libc::timeval; 2] = [libc::timeval {
                             tv_sec: 0,
                             tv_usec: 0,
                         }; 2];
@@ -4647,7 +4632,7 @@ pub unsafe extern "C" fn do_download(
                         tv[1 as libc::c_int as usize].tv_usec = 0 as libc::c_int as __suseconds_t;
                         tv[0 as libc::c_int as usize].tv_usec =
                             tv[1 as libc::c_int as usize].tv_usec;
-                        if utimes(local_path, tv.as_mut_ptr() as *const timeval)
+                        if utimes(local_path, tv.as_mut_ptr() as *const libc::timeval)
                             == -(1 as libc::c_int)
                         {
                             crate::log::sshlog(
@@ -4959,7 +4944,7 @@ unsafe extern "C" fn download_dir_internal(
     libc::free(new_src as *mut libc::c_void);
     if preserve_flag != 0 {
         if (*dirattrib).flags & 0x8 as libc::c_int as libc::c_uint != 0 {
-            let mut tv: [timeval; 2] = [timeval {
+            let mut tv: [libc::timeval; 2] = [libc::timeval {
                 tv_sec: 0,
                 tv_usec: 0,
             }; 2];
@@ -4967,7 +4952,7 @@ unsafe extern "C" fn download_dir_internal(
             tv[1 as libc::c_int as usize].tv_sec = (*dirattrib).mtime as __time_t;
             tv[1 as libc::c_int as usize].tv_usec = 0 as libc::c_int as __suseconds_t;
             tv[0 as libc::c_int as usize].tv_usec = tv[1 as libc::c_int as usize].tv_usec;
-            if utimes(dst, tv.as_mut_ptr() as *const timeval) == -(1 as libc::c_int) {
+            if utimes(dst, tv.as_mut_ptr() as *const libc::timeval) == -(1 as libc::c_int) {
                 crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(

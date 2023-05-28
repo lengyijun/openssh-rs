@@ -66,7 +66,7 @@ extern "C" {
 
     fn perror(__s: *const libc::c_char);
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    
+
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;

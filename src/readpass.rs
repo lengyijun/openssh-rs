@@ -31,7 +31,6 @@ extern "C" {
         _: *const libc::c_char,
         _: ::core::ffi::VaList,
     ) -> libc::c_int;
-    
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 

@@ -11,8 +11,8 @@ extern "C" {
     pub type sshbuf;
     pub type __dirstream;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
-    fn futimes(__fd: libc::c_int, __tvp: *const timeval) -> libc::c_int;
+    fn utimes(__file: *const libc::c_char, __tvp: *const libc::timeval) -> libc::c_int;
+    fn futimes(__fd: libc::c_int, __tvp: *const libc::timeval) -> libc::c_int;
 
     fn lstat(__file: *const libc::c_char, __buf: *mut libc::stat) -> libc::c_int;
     fn fchmodat(
@@ -69,7 +69,7 @@ extern "C" {
 
     static mut stderr: *mut libc::FILE;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    
+
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn getrlimit(__resource: __rlimit_resource_t, __rlimits: *mut rlimit) -> libc::c_int;
     fn statvfs(__file: *const libc::c_char, __buf: *mut statvfs) -> libc::c_int;
@@ -204,12 +204,6 @@ pub type size_t = libc::c_ulong;
 pub type int32_t = __int32_t;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timeval {
-    pub tv_sec: __time_t,
-    pub tv_usec: __suseconds_t,
-}
 
 pub type uint64_t = __uint64_t;
 
@@ -2277,8 +2271,8 @@ unsafe extern "C" fn process_fstat(mut id: u_int32_t) {
         send_status(id, status as u_int32_t);
     }
 }
-unsafe extern "C" fn attrib_to_tv(mut a: *const Attrib) -> *mut timeval {
-    static mut tv: [timeval; 2] = [timeval {
+unsafe extern "C" fn attrib_to_tv(mut a: *const Attrib) -> *mut libc::timeval {
+    static mut tv: [libc::timeval; 2] = [libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     }; 2];
@@ -2396,7 +2390,7 @@ unsafe extern "C" fn process_setstat(mut id: u_int32_t) {
             name,
             buf.as_mut_ptr(),
         );
-        r = utimes(name, attrib_to_tv(&mut a) as *const timeval);
+        r = utimes(name, attrib_to_tv(&mut a) as *const libc::timeval);
         if r == -(1 as libc::c_int) {
             status = errno_to_portable(*libc::__errno_location());
         }
@@ -2526,7 +2520,7 @@ unsafe extern "C" fn process_fsetstat(mut id: u_int32_t) {
                 name,
                 buf.as_mut_ptr(),
             );
-            r = futimes(fd, attrib_to_tv(&mut a) as *const timeval);
+            r = futimes(fd, attrib_to_tv(&mut a) as *const libc::timeval);
             if r == -(1 as libc::c_int) {
                 status = errno_to_portable(*libc::__errno_location());
             }

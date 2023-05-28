@@ -38,7 +38,7 @@ extern "C" {
 
     fn vfprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ::core::ffi::VaList) -> libc::c_int;
 
-    fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
+    fn utimes(__file: *const libc::c_char, __tvp: *const libc::timeval) -> libc::c_int;
 
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
 
@@ -61,10 +61,7 @@ extern "C" {
     fn ftruncate(__fd: libc::c_int, __length: __off_t) -> libc::c_int;
     fn perror(__s: *const libc::c_char);
     fn scan_scaled(_: *mut libc::c_char, _: *mut libc::c_longlong) -> libc::c_int;
-    
-    
 
-    
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn opendir(__name: *const libc::c_char) -> *mut DIR;
     fn closedir(__dirp: *mut DIR) -> libc::c_int;
@@ -77,7 +74,6 @@ extern "C" {
     fn _ssh__compat_globfree(_: *mut _ssh_compat_glob_t);
     fn __xpg_basename(__path: *mut libc::c_char) -> *mut libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
-
 
     fn reallocarray(__ptr: *mut libc::c_void, __nmemb: size_t, __size: size_t)
         -> *mut libc::c_void;
@@ -117,8 +113,7 @@ extern "C" {
         _: ...
     ) -> !;
 
-    
-    fn bandwidth_limit(_: *mut bwlimit, _: size_t);
+    fn bandwidth_limit(_: *mut crate::misc::bwlimit, _: size_t);
     fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
     fn start_progress_meter(_: *const libc::c_char, _: off_t, _: *mut off_t);
     fn refresh_progress_meter(_: libc::c_int);
@@ -171,12 +166,6 @@ pub type time_t = __time_t;
 pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timeval {
-    pub tv_sec: __time_t,
-    pub tv_usec: __suseconds_t,
-}
 
 pub type __socket_type = libc::c_uint;
 pub const SOCK_NONBLOCK: __socket_type = 2048;
@@ -268,16 +257,6 @@ pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct bwlimit {
-    pub buflen: size_t,
-    pub rate: u_int64_t,
-    pub thresh: u_int64_t,
-    pub lamt: u_int64_t,
-    pub bwstart: timeval,
-    pub bwend: timeval,
-}
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 
 #[derive(Copy, Clone)]
@@ -300,16 +279,16 @@ pub static mut remote_remote_args: arglist = arglist {
     nalloc: 0,
 };
 pub static mut limit_kbps: libc::c_longlong = 0 as libc::c_int as libc::c_longlong;
-pub static mut bwlimit: bwlimit = bwlimit {
+pub static mut bwlimit: crate::misc::bwlimit = crate::misc::bwlimit {
     buflen: 0,
     rate: 0,
     thresh: 0,
     lamt: 0,
-    bwstart: timeval {
+    bwstart: libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     },
-    bwend: timeval {
+    bwend: libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     },
@@ -778,7 +757,8 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
         n;
     }
     argv = newargv;
-    __progname = crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
+    __progname =
+        crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
     log_init(argv0, log_level, SYSLOG_FACILITY_USER, 2 as libc::c_int);
     memset(
         &mut args as *mut arglist as *mut libc::c_void,
@@ -1096,7 +1076,9 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
             0 as *mut *const libc::c_char,
         ) == -(1 as libc::c_int)
         {
-            perror(b"crate::openbsd_compat::bsd_misc::pledge\0" as *const u8 as *const libc::c_char);
+            perror(
+                b"crate::openbsd_compat::bsd_misc::pledge\0" as *const u8 as *const libc::c_char,
+            );
             libc::exit(1 as libc::c_int);
         }
     }
@@ -3327,7 +3309,7 @@ pub unsafe extern "C" fn sink(
     let mut patterns: *mut *mut libc::c_char = 0 as *mut *mut libc::c_char;
     let mut n: size_t = 0;
     let mut npatterns: size_t = 0 as libc::c_int as size_t;
-    let mut tv: [timeval; 2] = [timeval {
+    let mut tv: [libc::timeval; 2] = [libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     }; 2];
@@ -3898,7 +3880,7 @@ pub unsafe extern "C" fn sink(
                                                     setimes = 0 as libc::c_int;
                                                     utimes(
                                                         vect[0 as libc::c_int as usize],
-                                                        tv.as_mut_ptr() as *const timeval,
+                                                        tv.as_mut_ptr() as *const libc::timeval,
                                                     );
                                                 }
                                                 if mod_flag != 0 {
@@ -4167,8 +4149,10 @@ pub unsafe extern "C" fn sink(
                                             }
                                             if setimes != 0 && wrerr == 0 {
                                                 setimes = 0 as libc::c_int;
-                                                if utimes(np, tv.as_mut_ptr() as *const timeval)
-                                                    == -(1 as libc::c_int)
+                                                if utimes(
+                                                    np,
+                                                    tv.as_mut_ptr() as *const libc::timeval,
+                                                ) == -(1 as libc::c_int)
                                                 {
                                                     note_err(
                                                         b"%s: set times: %s\0" as *const u8

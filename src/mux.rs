@@ -33,7 +33,7 @@ extern "C" {
     fn getpid() -> __pid_t;
     fn arc4random_uniform(_: uint32_t) -> uint32_t;
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
-    
+
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;

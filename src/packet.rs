@@ -157,9 +157,9 @@ extern "C" {
     fn get_rdomain(_: libc::c_int) -> *mut libc::c_char;
     fn get_sock_af(_: libc::c_int) -> libc::c_int;
     fn set_sock_tos(_: libc::c_int, _: libc::c_int);
-    fn ms_subtract_diff(_: *mut timeval, _: *mut libc::c_int);
+    fn ms_subtract_diff(_: *mut libc::timeval, _: *mut libc::c_int);
     fn ms_to_timespec(_: *mut libc::timespec, _: libc::c_int);
-    fn monotime_tv(_: *mut timeval);
+    fn monotime_tv(_: *mut libc::timeval);
     fn monotime() -> time_t;
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_froms(buf: *mut sshbuf, bufp: *mut *mut sshbuf) -> libc::c_int;
@@ -244,12 +244,6 @@ pub type u_int64_t = __uint64_t;
 #[repr(C)]
 pub struct __sigset_t {
     pub __val: [libc::c_ulong; 16],
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timeval {
-    pub tv_sec: __time_t,
-    pub tv_usec: __suseconds_t,
 }
 
 pub type socklen_t = __socklen_t;
@@ -2048,7 +2042,7 @@ pub unsafe extern "C" fn ssh_packet_read_seqnr(
         revents: 0,
     };
     let mut buf: [libc::c_char; 8192] = [0; 8192];
-    let mut start: timeval = timeval {
+    let mut start: libc::timeval = libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     };
@@ -3320,7 +3314,7 @@ pub unsafe extern "C" fn ssh_packet_write_wait(mut ssh: *mut ssh) -> libc::c_int
     let mut ret: libc::c_int = 0;
     let mut r: libc::c_int = 0;
     let mut ms_remain: libc::c_int = 0 as libc::c_int;
-    let mut start: timeval = timeval {
+    let mut start: libc::timeval = libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     };

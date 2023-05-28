@@ -36,7 +36,6 @@ extern "C" {
     ) -> libc::c_int;
     fn freezero(_: *mut libc::c_void, _: size_t);
 
-    
     static mut stdin: *mut libc::FILE;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
@@ -83,7 +82,6 @@ extern "C" {
     fn EVP_PKEY_free(pkey: *mut EVP_PKEY);
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
     fn strtoul(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_ulong;
-
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn qsort(__base: *mut libc::c_void, __nmemb: size_t, __size: size_t, __compar: __compar_fn_t);
@@ -8382,7 +8380,8 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         static mut BSDoptarg_0: *mut libc::c_char;
     }
     crate::misc::sanitise_stdfd();
-    __progname = crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
+    __progname =
+        crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
     seed_rng();
     log_init(
         *argv.offset(0 as libc::c_int as isize),

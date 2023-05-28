@@ -20,7 +20,6 @@ extern "C" {
     ) -> libc::c_int;
     static mut stderr: *mut libc::FILE;
 
-    
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn seed_rng();
 
@@ -807,7 +806,8 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         events: 0,
         revents: 0,
     }; 2];
-    __progname = crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
+    __progname =
+        crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
     seed_rng();
     pkcs11_keylist.tqh_first = 0 as *mut pkcs11_keyinfo;
     pkcs11_keylist.tqh_last = &mut pkcs11_keylist.tqh_first;

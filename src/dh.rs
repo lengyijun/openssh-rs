@@ -17,7 +17,6 @@ extern "C" {
     fn rewind(__stream: *mut libc::FILE);
     fn arc4random_uniform(_: uint32_t) -> uint32_t;
 
-
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
