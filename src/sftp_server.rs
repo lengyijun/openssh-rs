@@ -58,7 +58,7 @@ extern "C" {
 
     fn fsync(__fd: libc::c_int) -> libc::c_int;
     fn truncate(__file: *const libc::c_char, __length: __off_t) -> libc::c_int;
-    fn ftruncate(__fd: libc::c_int, __length: __off_t) -> libc::c_int;
+    
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
 
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
@@ -2462,7 +2462,7 @@ unsafe extern "C" fn process_fsetstat(mut id: u_int32_t) {
                 name,
                 a.size as libc::c_ulonglong,
             );
-            r = ftruncate(fd, a.size as __off_t);
+            r = libc::ftruncate(fd, a.size as __off_t);
             if r == -(1 as libc::c_int) {
                 status = errno_to_portable(*libc::__errno_location());
             }

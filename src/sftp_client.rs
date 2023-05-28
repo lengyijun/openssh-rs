@@ -12,7 +12,7 @@ extern "C" {
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn fsync(__fd: libc::c_int) -> libc::c_int;
-    fn ftruncate(__fd: libc::c_int, __length: __off_t) -> libc::c_int;
+    
     fn vsnprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -4546,7 +4546,7 @@ pub unsafe extern "C" fn do_download(
                         b"truncating at %llu\0" as *const u8 as *const libc::c_char,
                         highwater as libc::c_ulonglong,
                     );
-                    if ftruncate(local_fd, highwater as __off_t) == -(1 as libc::c_int) {
+                    if libc::ftruncate(local_fd, highwater as __off_t) == -(1 as libc::c_int) {
                         crate::log::sshlog(
                             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(
@@ -4557,7 +4557,7 @@ pub unsafe extern "C" fn do_download(
                             0 as libc::c_int,
                             SYSLOG_LEVEL_ERROR,
                             0 as *const libc::c_char,
-                            b"local ftruncate \"%s\": %s\0" as *const u8 as *const libc::c_char,
+                            b"local libc::ftruncate \"%s\": %s\0" as *const u8 as *const libc::c_char,
                             local_path,
                             strerror(*libc::__errno_location()),
                         );

@@ -52,7 +52,7 @@ extern "C" {
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
 
-    fn ftruncate(__fd: libc::c_int, __length: __off_t) -> libc::c_int;
+    
     fn perror(__s: *const libc::c_char);
     fn scan_scaled(_: *mut libc::c_char, _: *mut libc::c_longlong) -> libc::c_int;
 
@@ -4089,7 +4089,7 @@ pub unsafe extern "C" fn sink(
                                                     || stb.st_mode
                                                         & 0o170000 as libc::c_int as libc::c_uint
                                                         == 0o100000 as libc::c_int as libc::c_uint)
-                                                && ftruncate(ofd, size) != 0 as libc::c_int
+                                                && libc::ftruncate(ofd, size) != 0 as libc::c_int
                                             {
                                                 note_err(
                                                     b"%s: truncate: %s\0" as *const u8
