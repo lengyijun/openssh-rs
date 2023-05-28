@@ -60,7 +60,6 @@ extern "C" {
     ) -> libc::c_int;
     fn _ssh__compat_globfree(_: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t);
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
@@ -2400,7 +2399,7 @@ unsafe extern "C" fn rm_env(
         }
     }
     if onum_send_env != (*options).num_send_env {
-        (*options).send_env = xrecallocarray(
+        (*options).send_env = crate::xmalloc::xrecallocarray(
             (*options).send_env as *mut libc::c_void,
             onum_send_env as size_t,
             (*options).num_send_env as size_t,
@@ -3988,7 +3987,7 @@ unsafe extern "C" fn process_config_line_depth(
                     i = i.wrapping_add(1);
                     i;
                     if *activep != 0 && *uintptr == 0 as libc::c_int as libc::c_uint {
-                        *cppptr = xrecallocarray(
+                        *cppptr = crate::xmalloc::xrecallocarray(
                             *cppptr as *mut libc::c_void,
                             *uintptr as size_t,
                             (*uintptr).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,

@@ -71,7 +71,6 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -4651,7 +4650,7 @@ pub unsafe extern "C" fn allocbuf(
     if (*bp).cnt >= size {
         return bp;
     }
-    (*bp).buf = xrecallocarray(
+    (*bp).buf = crate::xmalloc::xrecallocarray(
         (*bp).buf as *mut libc::c_void,
         (*bp).cnt,
         size,

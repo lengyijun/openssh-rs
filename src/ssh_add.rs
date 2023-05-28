@@ -49,7 +49,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -1488,7 +1487,7 @@ unsafe extern "C" fn stringlist_append(
             i = i.wrapping_add(1);
             i;
         }
-        *listp = xrecallocarray(
+        *listp = crate::xmalloc::xrecallocarray(
             *listp as *mut libc::c_void,
             i.wrapping_add(1 as libc::c_int as libc::c_ulong),
             i.wrapping_add(2 as libc::c_int as libc::c_ulong),
@@ -1633,13 +1632,13 @@ unsafe extern "C" fn parse_dest_constraint_hop(
                 (*hke).line,
                 (*dch).nkeys,
             );
-            (*dch).keys = xrecallocarray(
+            (*dch).keys = crate::xmalloc::xrecallocarray(
                 (*dch).keys as *mut libc::c_void,
                 (*dch).nkeys as size_t,
                 ((*dch).nkeys).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,
                 ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
             ) as *mut *mut sshkey;
-            (*dch).key_is_ca = xrecallocarray(
+            (*dch).key_is_ca = crate::xmalloc::xrecallocarray(
                 (*dch).key_is_ca as *mut libc::c_void,
                 (*dch).nkeys as size_t,
                 ((*dch).nkeys).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,
@@ -1772,7 +1771,7 @@ unsafe extern "C" fn parse_dest_constraint(
         },
         (*dc).to.nkeys,
     );
-    *dcp = xrecallocarray(
+    *dcp = crate::xmalloc::xrecallocarray(
         *dcp as *mut libc::c_void,
         *ndcp,
         (*ndcp).wrapping_add(1 as libc::c_int as libc::c_ulong),

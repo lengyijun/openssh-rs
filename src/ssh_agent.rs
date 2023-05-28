@@ -88,7 +88,6 @@ extern "C" {
     fn mkdtemp(__template: *mut libc::c_char) -> *mut libc::c_char;
     fn realpath(__name: *const libc::c_char, __resolved: *mut libc::c_char) -> *mut libc::c_char;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_fromb(buf: *mut sshbuf) -> *mut sshbuf;
@@ -2238,13 +2237,13 @@ unsafe extern "C" fn parse_dest_constraint_hop(
                 current_block = 5783071609795492627;
                 break;
             }
-            (*dch).keys = xrecallocarray(
+            (*dch).keys = crate::xmalloc::xrecallocarray(
                 (*dch).keys as *mut libc::c_void,
                 (*dch).nkeys as size_t,
                 ((*dch).nkeys).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,
                 ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
             ) as *mut *mut sshkey;
-            (*dch).key_is_ca = xrecallocarray(
+            (*dch).key_is_ca = crate::xmalloc::xrecallocarray(
                 (*dch).key_is_ca as *mut libc::c_void,
                 (*dch).nkeys as size_t,
                 ((*dch).nkeys).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,
@@ -2629,7 +2628,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
                             current_block = 4252588936699793226;
                             break;
                         } else {
-                            *dcsp = xrecallocarray(
+                            *dcsp = crate::xmalloc::xrecallocarray(
                                 *dcsp as *mut libc::c_void,
                                 *ndcsp,
                                 (*ndcsp).wrapping_add(1 as libc::c_int as libc::c_ulong),
@@ -3802,7 +3801,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
                             b"too many session IDs recorded\0" as *const u8 as *const libc::c_char,
                         );
                     } else {
-                        (*e).session_ids = xrecallocarray(
+                        (*e).session_ids = crate::xmalloc::xrecallocarray(
                             (*e).session_ids as *mut libc::c_void,
                             (*e).nsession_ids,
                             ((*e).nsession_ids).wrapping_add(1 as libc::c_int as libc::c_ulong),
@@ -4150,7 +4149,7 @@ unsafe extern "C" fn new_socket(mut type_0: sock_type, mut fd: libc::c_int) {
     }
     old_alloc = sockets_alloc;
     new_alloc = sockets_alloc.wrapping_add(10 as libc::c_int as libc::c_uint);
-    sockets = xrecallocarray(
+    sockets = crate::xmalloc::xrecallocarray(
         sockets as *mut libc::c_void,
         old_alloc as size_t,
         new_alloc as size_t,

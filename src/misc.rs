@@ -134,7 +134,6 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn xvasprintf(
         _: *mut *mut libc::c_char,
@@ -1917,7 +1916,7 @@ pub unsafe extern "C" fn addargs(
         nalloc = (nalloc as libc::c_uint).wrapping_mul(2 as libc::c_int as libc::c_uint) as u_int
             as u_int;
     }
-    (*args).list = xrecallocarray(
+    (*args).list = crate::xmalloc::xrecallocarray(
         (*args).list as *mut libc::c_void,
         (*args).nalloc as size_t,
         nalloc as size_t,
@@ -4438,7 +4437,7 @@ pub unsafe extern "C" fn opt_array_append2(
         );
     }
     if !iarray.is_null() {
-        *iarray = xrecallocarray(
+        *iarray = crate::xmalloc::xrecallocarray(
             *iarray as *mut libc::c_void,
             *lp as size_t,
             (*lp).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,
@@ -4446,7 +4445,7 @@ pub unsafe extern "C" fn opt_array_append2(
         ) as *mut libc::c_int;
         *(*iarray).offset(*lp as isize) = i;
     }
-    *array = xrecallocarray(
+    *array = crate::xmalloc::xrecallocarray(
         *array as *mut libc::c_void,
         *lp as size_t,
         (*lp).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,

@@ -18,7 +18,6 @@ extern "C" {
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn can_get_users_groups_by_id(conn: *mut sftp_conn) -> libc::c_int;
     fn do_get_users_groups_by_id(
@@ -509,7 +508,7 @@ unsafe extern "C" fn collect_ids_from_glob(
         match current_block_4 {
             7351195479953500246 => {
                 if !(has_id(id, ids, n) != 0) {
-                    ids = xrecallocarray(
+                    ids = crate::xmalloc::xrecallocarray(
                         ids as *mut libc::c_void,
                         n as size_t,
                         n.wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,
@@ -574,7 +573,7 @@ unsafe extern "C" fn collect_ids_from_dirents(
         match current_block_4 {
             7351195479953500246 => {
                 if !(has_id(id, ids, n) != 0) {
-                    ids = xrecallocarray(
+                    ids = crate::xmalloc::xrecallocarray(
                         ids as *mut libc::c_void,
                         n as size_t,
                         n.wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,

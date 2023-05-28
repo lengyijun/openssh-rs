@@ -209,7 +209,6 @@ extern "C" {
     fn sshkey_ecdsa_key_to_nid(_: *mut EC_KEY) -> libc::c_int;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
 }
 pub type __u_char = libc::c_uchar;
@@ -3097,7 +3096,7 @@ unsafe extern "C" fn pkcs11_fetch_certs(
                                     );
                                     sshkey_free(key);
                                 } else {
-                                    *keysp = xrecallocarray(
+                                    *keysp = crate::xmalloc::xrecallocarray(
                                         *keysp as *mut libc::c_void,
                                         *nkeys as size_t,
                                         (*nkeys + 1 as libc::c_int) as size_t,
@@ -3107,7 +3106,7 @@ unsafe extern "C" fn pkcs11_fetch_certs(
                                     let ref mut fresh0 = *(*keysp).offset(*nkeys as isize);
                                     *fresh0 = key;
                                     if !labelsp.is_null() {
-                                        *labelsp = xrecallocarray(
+                                        *labelsp = crate::xmalloc::xrecallocarray(
                                             *labelsp as *mut libc::c_void,
                                             *nkeys as size_t,
                                             (*nkeys + 1 as libc::c_int) as size_t,
@@ -3375,7 +3374,7 @@ unsafe extern "C" fn pkcs11_fetch_keys(
                             );
                             sshkey_free(key);
                         } else {
-                            *keysp = xrecallocarray(
+                            *keysp = crate::xmalloc::xrecallocarray(
                                 *keysp as *mut libc::c_void,
                                 *nkeys as size_t,
                                 (*nkeys + 1 as libc::c_int) as size_t,
@@ -3384,7 +3383,7 @@ unsafe extern "C" fn pkcs11_fetch_keys(
                             let ref mut fresh2 = *(*keysp).offset(*nkeys as isize);
                             *fresh2 = key;
                             if !labelsp.is_null() {
-                                *labelsp = xrecallocarray(
+                                *labelsp = crate::xmalloc::xrecallocarray(
                                     *labelsp as *mut libc::c_void,
                                     *nkeys as size_t,
                                     (*nkeys + 1 as libc::c_int) as size_t,

@@ -78,7 +78,6 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn getifaddrs(__ifap: *mut *mut ifaddrs) -> libc::c_int;
     fn freeifaddrs(__ifa: *mut ifaddrs);
-    fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn init_hostkeys() -> *mut hostkeys;
     fn load_hostkeys(_: *mut hostkeys, _: *const libc::c_char, _: *const libc::c_char, _: u_int);
@@ -2171,7 +2170,7 @@ unsafe extern "C" fn hostkeys_find_by_key_cb(
         path,
         (*l).linenum,
     );
-    (*ctx).names = xrecallocarray(
+    (*ctx).names = crate::xmalloc::xrecallocarray(
         (*ctx).names as *mut libc::c_void,
         (*ctx).nnames as size_t,
         ((*ctx).nnames).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,

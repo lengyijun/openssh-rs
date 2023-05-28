@@ -106,7 +106,6 @@ extern "C" {
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn mkdtemp(__template: *mut libc::c_char) -> *mut libc::c_char;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn pty_allocate(
         _: *mut libc::c_int,
@@ -2937,7 +2936,7 @@ pub unsafe extern "C" fn session_new() -> *mut Session {
             sessions_nalloc,
             options.max_sessions,
         );
-        tmp = xrecallocarray(
+        tmp = crate::xmalloc::xrecallocarray(
             sessions as *mut libc::c_void,
             sessions_nalloc as size_t,
             (sessions_nalloc + 1 as libc::c_int) as size_t,
@@ -3715,7 +3714,7 @@ unsafe extern "C" fn session_env_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
                     name,
                     val,
                 );
-                (*s).env = xrecallocarray(
+                (*s).env = crate::xmalloc::xrecallocarray(
                     (*s).env as *mut libc::c_void,
                     (*s).num_env as size_t,
                     ((*s).num_env).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,

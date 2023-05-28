@@ -149,7 +149,6 @@ extern "C" {
 
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshkey_new(_: libc::c_int) -> *mut sshkey;
     fn sshkey_free(_: *mut sshkey);
@@ -8559,7 +8558,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 check_krl = 1 as libc::c_int;
             }
             79 => {
-                opts = xrecallocarray(
+                opts = crate::xmalloc::xrecallocarray(
                     opts as *mut libc::c_void,
                     nopts,
                     nopts.wrapping_add(1 as libc::c_int as libc::c_ulong),

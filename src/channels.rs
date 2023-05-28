@@ -84,7 +84,6 @@ extern "C" {
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshbuf_read(_: libc::c_int, _: *mut sshbuf, _: size_t, _: *mut size_t) -> libc::c_int;
@@ -788,7 +787,7 @@ pub unsafe extern "C" fn channel_add_timeout(
         type_pattern,
         timeout_secs,
     );
-    (*sc).timeouts = xrecallocarray(
+    (*sc).timeouts = crate::xmalloc::xrecallocarray(
         (*sc).timeouts as *mut libc::c_void,
         (*sc).ntimeouts,
         ((*sc).ntimeouts).wrapping_add(1 as libc::c_int as libc::c_ulong),
@@ -1008,7 +1007,7 @@ pub unsafe extern "C" fn channel_new(
                 (*sc).channels_alloc,
             );
         }
-        (*sc).channels = xrecallocarray(
+        (*sc).channels = crate::xmalloc::xrecallocarray(
             (*sc).channels as *mut libc::c_void,
             (*sc).channels_alloc as size_t,
             ((*sc).channels_alloc).wrapping_add(10 as libc::c_int as libc::c_uint) as size_t,
@@ -1299,7 +1298,7 @@ unsafe extern "C" fn permission_set_add(
             fwd_ident(who, where_0),
         );
     }
-    *permp = xrecallocarray(
+    *permp = crate::xmalloc::xrecallocarray(
         *permp as *mut libc::c_void,
         *npermp as size_t,
         (*npermp).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,
@@ -5660,7 +5659,7 @@ pub unsafe extern "C" fn channel_prepare_poll(
         .wrapping_add(((*sc).channels_alloc).wrapping_mul(4 as libc::c_int as libc::c_uint))
         as u_int as u_int;
     if npfd > *npfd_allocp {
-        *pfdp = xrecallocarray(
+        *pfdp = crate::xmalloc::xrecallocarray(
             *pfdp as *mut libc::c_void,
             *npfd_allocp as size_t,
             npfd as size_t,
@@ -9253,7 +9252,7 @@ pub unsafe extern "C" fn channel_clear_permission(
     let mut permp: *mut *mut permission = 0 as *mut *mut permission;
     let mut npermp: *mut u_int = 0 as *mut u_int;
     permission_set_get_array(ssh, who, where_0, &mut permp, &mut npermp);
-    *permp = xrecallocarray(
+    *permp = crate::xmalloc::xrecallocarray(
         *permp as *mut libc::c_void,
         *npermp as size_t,
         0 as libc::c_int as size_t,
