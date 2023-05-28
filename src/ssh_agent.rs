@@ -192,7 +192,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn set_nonblock(_: libc::c_int) -> libc::c_int;
+    
     fn convtime(_: *const libc::c_char) -> libc::c_int;
 
     fn monotime() -> time_t;
@@ -4121,7 +4121,7 @@ unsafe extern "C" fn new_socket(mut type_0: sock_type, mut fd: libc::c_int) {
             b"UNKNOWN\0" as *const u8 as *const libc::c_char
         },
     );
-    set_nonblock(fd);
+    crate::misc::set_nonblock(fd);
     if fd > max_fd {
         max_fd = fd;
     }

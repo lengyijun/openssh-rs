@@ -176,7 +176,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn set_nonblock(_: libc::c_int) -> libc::c_int;
+    
     fn set_nodelay(_: libc::c_int);
     fn set_reuseaddr(_: libc::c_int) -> libc::c_int;
 
@@ -933,7 +933,7 @@ unsafe extern "C" fn channel_register_fds(
         {
             (*c).restore_flags[0 as libc::c_int as usize] = val;
             (*c).restore_block |= 0x1 as libc::c_int;
-            set_nonblock(rfd);
+            crate::misc::set_nonblock(rfd);
         }
         if wfd != -(1 as libc::c_int)
             && isatty(wfd) == 0
@@ -945,7 +945,7 @@ unsafe extern "C" fn channel_register_fds(
         {
             (*c).restore_flags[1 as libc::c_int as usize] = val;
             (*c).restore_block |= 0x2 as libc::c_int;
-            set_nonblock(wfd);
+            crate::misc::set_nonblock(wfd);
         }
         if efd != -(1 as libc::c_int)
             && isatty(efd) == 0
@@ -957,17 +957,17 @@ unsafe extern "C" fn channel_register_fds(
         {
             (*c).restore_flags[2 as libc::c_int as usize] = val;
             (*c).restore_block |= 0x4 as libc::c_int;
-            set_nonblock(efd);
+            crate::misc::set_nonblock(efd);
         }
     } else if nonblock != 0 {
         if rfd != -(1 as libc::c_int) {
-            set_nonblock(rfd);
+            crate::misc::set_nonblock(rfd);
         }
         if wfd != -(1 as libc::c_int) {
-            set_nonblock(wfd);
+            crate::misc::set_nonblock(wfd);
         }
         if efd != -(1 as libc::c_int) {
-            set_nonblock(efd);
+            crate::misc::set_nonblock(efd);
         }
     }
 }
@@ -9437,7 +9437,7 @@ unsafe extern "C" fn connect_next(mut cctx: *mut channel_connect) -> libc::c_int
                         );
                     }
                 } else {
-                    if set_nonblock(sock) == -(1 as libc::c_int) {
+                    if crate::misc::set_nonblock(sock) == -(1 as libc::c_int) {
                         sshfatal(
                             b"channels.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
@@ -9448,7 +9448,7 @@ unsafe extern "C" fn connect_next(mut cctx: *mut channel_connect) -> libc::c_int
                             1 as libc::c_int,
                             SYSLOG_LEVEL_FATAL,
                             0 as *const libc::c_char,
-                            b"set_nonblock(%d)\0" as *const u8 as *const libc::c_char,
+                            b"crate::misc::set_nonblock(%d)\0" as *const u8 as *const libc::c_char,
                             sock,
                         );
                     }

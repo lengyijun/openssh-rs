@@ -105,7 +105,7 @@ extern "C" {
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn chop(_: *mut libc::c_char) -> *mut libc::c_char;
-    fn set_nonblock(_: libc::c_int) -> libc::c_int;
+    
 
     fn put_host_port(_: *const libc::c_char, _: u_short) -> *mut libc::c_char;
     fn convtime(_: *const libc::c_char) -> libc::c_int;
@@ -1217,7 +1217,7 @@ unsafe extern "C" fn tcpconnect(mut host: *mut libc::c_char) -> libc::c_int {
                 strerror(*libc::__errno_location()),
             );
         } else {
-            if set_nonblock(s) == -(1 as libc::c_int) {
+            if crate::misc::set_nonblock(s) == -(1 as libc::c_int) {
                 sshfatal(
                     b"ssh-keyscan.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"tcpconnect\0"))
@@ -1226,7 +1226,7 @@ unsafe extern "C" fn tcpconnect(mut host: *mut libc::c_char) -> libc::c_int {
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     0 as *const libc::c_char,
-                    b"set_nonblock(%d)\0" as *const u8 as *const libc::c_char,
+                    b"crate::misc::set_nonblock(%d)\0" as *const u8 as *const libc::c_char,
                     s,
                 );
             }

@@ -152,7 +152,7 @@ extern "C" {
     fn get_peer_port(_: libc::c_int) -> libc::c_int;
     fn get_local_ipaddr(_: libc::c_int) -> *mut libc::c_char;
     fn get_local_port(_: libc::c_int) -> libc::c_int;
-    fn set_nonblock(_: libc::c_int) -> libc::c_int;
+    
     fn set_nodelay(_: libc::c_int);
     fn get_rdomain(_: libc::c_int) -> *mut libc::c_char;
     fn get_sock_af(_: libc::c_int) -> libc::c_int;
@@ -1016,9 +1016,9 @@ pub unsafe extern "C" fn ssh_packet_connection_af(mut ssh: *mut ssh) -> libc::c_
     return get_sock_af((*(*ssh).state).connection_out);
 }
 pub unsafe extern "C" fn ssh_packet_set_nonblocking(mut ssh: *mut ssh) {
-    set_nonblock((*(*ssh).state).connection_in);
+    crate::misc::set_nonblock((*(*ssh).state).connection_in);
     if (*(*ssh).state).connection_out != (*(*ssh).state).connection_in {
-        set_nonblock((*(*ssh).state).connection_out);
+        crate::misc::set_nonblock((*(*ssh).state).connection_out);
     }
 }
 pub unsafe extern "C" fn ssh_packet_get_connection_in(mut ssh: *mut ssh) -> libc::c_int {

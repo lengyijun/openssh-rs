@@ -64,7 +64,7 @@ extern "C" {
         _: ...
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn set_nonblock(_: libc::c_int) -> libc::c_int;
+    
     fn unix_listener(_: *const libc::c_char, _: libc::c_int, _: libc::c_int) -> libc::c_int;
     fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
     fn lookup_env_in_list(
@@ -3809,7 +3809,7 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
         unlink(options.control_path);
         libc::free(options.control_path as *mut libc::c_void);
         options.control_path = orig_control_path;
-        set_nonblock(muxserver_sock);
+        crate::misc::set_nonblock(muxserver_sock);
         mux_listener_channel = channel_new(
             ssh,
             b"mux listener\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
@@ -6802,7 +6802,7 @@ pub unsafe extern "C" fn muxclient(mut path: *const libc::c_char) -> libc::c_int
         close(sock);
         return -(1 as libc::c_int);
     }
-    set_nonblock(sock);
+    crate::misc::set_nonblock(sock);
     if mux_client_hello_exchange(sock) != 0 as libc::c_int {
         crate::log::sshlog(
             b"mux.c\0" as *const u8 as *const libc::c_char,

@@ -226,7 +226,7 @@ extern "C" {
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_dup_string(buf: *mut sshbuf) -> *mut libc::c_char;
     fn daemonized() -> libc::c_int;
-    fn set_nonblock(_: libc::c_int) -> libc::c_int;
+    
     fn unset_nonblock(_: libc::c_int) -> libc::c_int;
     fn set_reuseaddr(_: libc::c_int) -> libc::c_int;
     fn set_rdomain(_: libc::c_int, _: *const libc::c_char) -> libc::c_int;
@@ -2646,7 +2646,7 @@ unsafe extern "C" fn listen_on_addrs(mut la: *mut listenaddr) {
                         b"socket: %.100s\0" as *const u8 as *const libc::c_char,
                         strerror(*libc::__errno_location()),
                     );
-                } else if set_nonblock(listen_sock) == -(1 as libc::c_int) {
+                } else if crate::misc::set_nonblock(listen_sock) == -(1 as libc::c_int) {
                     close(listen_sock);
                 } else if fcntl(listen_sock, 2 as libc::c_int, 1 as libc::c_int)
                     == -(1 as libc::c_int)

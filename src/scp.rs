@@ -125,7 +125,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn set_nonblock(_: libc::c_int) -> libc::c_int;
+    
     fn unset_nonblock(_: libc::c_int) -> libc::c_int;
 
     fn bandwidth_limit_init(_: *mut bwlimit, _: u_int64_t, _: size_t);
@@ -2649,7 +2649,7 @@ pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc:
                                                 &mut statbytes,
                                             );
                                         }
-                                        set_nonblock(remout);
+                                        crate::misc::set_nonblock(remout);
                                         i = 0 as libc::c_int as off_t;
                                         haderr = i as libc::c_int;
                                         while i < stb.st_size {
@@ -3979,7 +3979,7 @@ pub unsafe extern "C" fn sink(
                                             if showprogress != 0 {
                                                 start_progress_meter(curfile, size, &mut statbytes);
                                             }
-                                            set_nonblock(remin);
+                                            crate::misc::set_nonblock(remin);
                                             i = 0 as libc::c_int as off_t;
                                             count = i as size_t;
                                             while i < size {
