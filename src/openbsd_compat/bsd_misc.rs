@@ -1,6 +1,6 @@
 use ::libc;
 extern "C" {
-    
+
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
 
 }

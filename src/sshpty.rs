@@ -63,7 +63,6 @@ pub struct termios {
     pub c_ospeed: speed_t,
 }
 
-
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct winsize {

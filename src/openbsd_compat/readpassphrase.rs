@@ -12,8 +12,6 @@ extern "C" {
         __termios_p: *const termios,
     ) -> libc::c_int;
 
-    
-
     fn sigaction(
         __sig: libc::c_int,
         __act: *const sigaction,

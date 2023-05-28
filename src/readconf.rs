@@ -7,7 +7,7 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
     pub type sshbuf;
-    
+
     pub type dsa_st;
     pub type rsa_st;
     pub type ec_key_st;
@@ -25,9 +25,6 @@ extern "C" {
     fn closefrom(__lowfd: libc::c_int);
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
-    
-    
-    
     fn gethostname(__name: *mut libc::c_char, __len: size_t) -> libc::c_int;
     fn getservbyname(__name: *const libc::c_char, __proto: *const libc::c_char) -> *mut servent;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
@@ -42,7 +39,6 @@ extern "C" {
     ) -> __ssize_t;
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    
 
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
@@ -215,8 +211,6 @@ pub struct sockaddr_un {
     pub sun_path: [libc::c_char; 108],
 }
 pub type uint8_t = __uint8_t;
-
-
 
 pub type _IO_lock_t = ();
 
@@ -3390,7 +3384,9 @@ unsafe extern "C" fn process_config_line_depth(
                 {
                     val64 = 0 as libc::c_int as libc::c_longlong;
                     current_block = 9521147444787763968;
-                } else if crate::openbsd_compat::fmt_scaled::scan_scaled(arg, &mut val64) == -(1 as libc::c_int) {
+                } else if crate::openbsd_compat::fmt_scaled::scan_scaled(arg, &mut val64)
+                    == -(1 as libc::c_int)
+                {
                     crate::log::sshlog(
                         b"readconf.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(

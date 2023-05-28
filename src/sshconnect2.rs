@@ -23,8 +23,7 @@ extern "C" {
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
 
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
-    
-    
+
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
 

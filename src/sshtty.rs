@@ -10,7 +10,7 @@ extern "C" {
         __termios_p: *const termios,
     ) -> libc::c_int;
     static mut stdin: *mut libc::FILE;
-    
+
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
 }
 pub type __off_t = libc::c_long;

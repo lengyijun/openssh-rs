@@ -3,7 +3,6 @@ use crate::sftp_common::Attrib;
 use ::libc;
 
 extern "C" {
-    
 
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn sshfatal(

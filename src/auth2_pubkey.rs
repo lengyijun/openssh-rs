@@ -137,7 +137,11 @@ extern "C" {
         _: libc::c_int,
     ) -> *mut libc::FILE;
     fn authorized_principals_file(_: *mut libc::passwd) -> *mut libc::c_char;
-    fn auth_openkeyfile(_: *const libc::c_char, _: *mut libc::passwd, _: libc::c_int) -> *mut libc::FILE;
+    fn auth_openkeyfile(
+        _: *const libc::c_char,
+        _: *mut libc::passwd,
+        _: libc::c_int,
+    ) -> *mut libc::FILE;
     fn expand_authorized_keys(_: *const libc::c_char, pw: *mut libc::passwd) -> *mut libc::c_char;
     fn auth_key_is_revoked(_: *mut sshkey) -> libc::c_int;
     fn auth_authorise_keyopts(
@@ -233,7 +237,6 @@ pub struct sockaddr {
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
-
 
 pub type _IO_lock_t = ();
 
@@ -1741,7 +1744,10 @@ unsafe extern "C" fn match_principals_command(
                                 | (1 as libc::c_int) << 2 as libc::c_int)
                                 as u_int,
                             runas_pw,
-                            Some(temporarily_use_uid as unsafe extern "C" fn(*mut libc::passwd) -> ()),
+                            Some(
+                                temporarily_use_uid
+                                    as unsafe extern "C" fn(*mut libc::passwd) -> (),
+                            ),
                             Some(restore_uid as unsafe extern "C" fn() -> ()),
                         );
                         if !(pid == 0 as libc::c_int) {

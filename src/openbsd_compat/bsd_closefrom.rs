@@ -4,14 +4,11 @@ extern "C" {
     pub type __dirstream;
 
     fn sysconf(__name: libc::c_int) -> libc::c_long;
-    
 
     fn close_range(__fd: libc::c_uint, __max_fd: libc::c_uint, __flags: libc::c_int)
         -> libc::c_int;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
-    
-    
-    
+
     fn dirfd(__dirp: *mut libc::DIR) -> libc::c_int;
 }
 pub type __ino_t = libc::c_ulong;
@@ -19,7 +16,6 @@ pub type __off_t = libc::c_long;
 pub type __pid_t = libc::c_int;
 pub type size_t = libc::c_ulong;
 pub const _SC_OPEN_MAX: C2RustUnnamed = 4;
-
 
 pub type C2RustUnnamed = libc::c_uint;
 pub const _SC_SIGSTKSZ: C2RustUnnamed = 250;

@@ -22,7 +22,6 @@ extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-    
 
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -40,9 +39,6 @@ extern "C" {
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
-    
-    
-    
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
@@ -71,7 +67,7 @@ extern "C" {
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn fmt_scaled(number: libc::c_longlong, result: *mut libc::c_char) -> libc::c_int;
-    
+
     static mut BSDoptreset: libc::c_int;
 
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
@@ -1096,7 +1092,11 @@ unsafe extern "C" fn parse_getput_flags(
     *fflag = *rflag;
     *aflag = *fflag;
     loop {
-        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"afPpRr\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(
+            argc,
+            argv,
+            b"afPpRr\0" as *const u8 as *const libc::c_char,
+        );
         if !(ch != -(1 as libc::c_int)) {
             break;
         }
@@ -1162,7 +1162,11 @@ unsafe extern "C" fn parse_link_flags(
     BSDopterr = 0 as libc::c_int;
     *sflag = 0 as libc::c_int;
     loop {
-        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"s\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(
+            argc,
+            argv,
+            b"s\0" as *const u8 as *const libc::c_char,
+        );
         if !(ch != -(1 as libc::c_int)) {
             break;
         }
@@ -1219,7 +1223,11 @@ unsafe extern "C" fn parse_rename_flags(
     BSDopterr = 0 as libc::c_int;
     *lflag = 0 as libc::c_int;
     loop {
-        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"l\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(
+            argc,
+            argv,
+            b"l\0" as *const u8 as *const libc::c_char,
+        );
         if !(ch != -(1 as libc::c_int)) {
             break;
         }
@@ -1369,7 +1377,11 @@ unsafe extern "C" fn parse_df_flags(
     *iflag = 0 as libc::c_int;
     *hflag = *iflag;
     loop {
-        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"hi\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(
+            argc,
+            argv,
+            b"hi\0" as *const u8 as *const libc::c_char,
+        );
         if !(ch != -(1 as libc::c_int)) {
             break;
         }
@@ -1429,7 +1441,11 @@ unsafe extern "C" fn parse_ch_flags(
     BSDopterr = 0 as libc::c_int;
     *hflag = 0 as libc::c_int;
     loop {
-        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"h\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(
+            argc,
+            argv,
+            b"h\0" as *const u8 as *const libc::c_char,
+        );
         if !(ch != -(1 as libc::c_int)) {
             break;
         }
@@ -1483,7 +1499,11 @@ unsafe extern "C" fn parse_no_flags(
     BSDoptreset = 1 as libc::c_int;
     BSDoptind = BSDoptreset;
     BSDopterr = 0 as libc::c_int;
-    ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"\0" as *const u8 as *const libc::c_char);
+    ch = crate::openbsd_compat::getopt_long::BSDgetopt(
+        argc,
+        argv,
+        b"\0" as *const u8 as *const libc::c_char,
+    );
     if ch != -(1 as libc::c_int) {
         match ch {
             _ => {}
@@ -4413,7 +4433,10 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     7 as libc::c_int as libc::c_ulong,
                 ) == 0 as libc::c_int
                 {
-                    r = crate::openbsd_compat::fmt_scaled::scan_scaled(BSDoptarg.offset(7 as libc::c_int as isize), &mut llv);
+                    r = crate::openbsd_compat::fmt_scaled::scan_scaled(
+                        BSDoptarg.offset(7 as libc::c_int as isize),
+                        &mut llv,
+                    );
                     if r == 0 as libc::c_int
                         && (llv <= 0 as libc::c_int as libc::c_longlong
                             || llv > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_longlong)

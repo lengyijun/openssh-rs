@@ -42,7 +42,6 @@ extern "C" {
         -> libc::c_int;
     fn gettimeofday(__tv: *mut libc::timeval, __tz: *mut libc::c_void) -> libc::c_int;
 
-    
     fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn platform_sys_dir_uid(_: uid_t) -> libc::c_int;
 
@@ -72,7 +71,7 @@ extern "C" {
     fn sys_tun_open(_: libc::c_int, _: libc::c_int, _: *mut *mut libc::c_char) -> libc::c_int;
     fn sys_get_rdomain(fd: libc::c_int) -> *mut libc::c_char;
     fn sys_set_rdomain(fd: libc::c_int, name: *const libc::c_char) -> libc::c_int;
-    
+
     fn setresgid(__rgid: __gid_t, __egid: __gid_t, __sgid: __gid_t) -> libc::c_int;
     fn execve(
         __path: *const libc::c_char,
@@ -81,10 +80,10 @@ extern "C" {
     ) -> libc::c_int;
     fn setresuid(__ruid: __uid_t, __euid: __uid_t, __suid: __uid_t) -> libc::c_int;
     fn geteuid() -> __uid_t;
-    
+
     fn getsid(__pid: __pid_t) -> __pid_t;
     fn getppid() -> __pid_t;
-    
+
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
@@ -353,7 +352,6 @@ pub const IPPROTO_IPIP: C2RustUnnamed_0 = 4;
 pub const IPPROTO_IGMP: C2RustUnnamed_0 = 2;
 pub const IPPROTO_ICMP: C2RustUnnamed_0 = 1;
 pub const IPPROTO_IP: C2RustUnnamed_0 = 0;
-
 
 pub type _IO_lock_t = ();
 

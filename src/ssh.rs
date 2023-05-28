@@ -20,13 +20,12 @@ extern "C" {
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
-    
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
 
     fn closefrom(__lowfd: libc::c_int);
     fn dup(__fd: libc::c_int) -> libc::c_int;
     static mut environ: *mut *mut libc::c_char;
-    
+
     fn seed_rng();
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
@@ -58,7 +57,6 @@ extern "C" {
     fn compat_init_setproctitle(argc: libc::c_int, argv: *mut *mut libc::c_char);
     static mut BSDoptreset: libc::c_int;
 
-    
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn daemon(__nochdir: libc::c_int, __noclose: libc::c_int) -> libc::c_int;
@@ -476,8 +474,6 @@ pub struct termios {
     pub c_ispeed: speed_t,
     pub c_ospeed: speed_t,
 }
-
-
 
 pub type _IO_lock_t = ();
 
@@ -5555,8 +5551,8 @@ unsafe extern "C" fn ssh_session2(
                 0 as libc::c_int,
                 SYSLOG_LEVEL_DEBUG1,
                 0 as *const libc::c_char,
-                b"deferring postauth libc::fork until remote forward confirmation received\0" as *const u8
-                    as *const libc::c_char,
+                b"deferring postauth libc::fork until remote forward confirmation received\0"
+                    as *const u8 as *const libc::c_char,
             );
         } else {
             fork_postauth();

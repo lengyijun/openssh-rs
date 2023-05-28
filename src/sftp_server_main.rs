@@ -3,11 +3,14 @@ extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-    
-    
+
     static mut stderr: *mut libc::FILE;
 
-    fn sftp_server_main(_: libc::c_int, _: *mut *mut libc::c_char, _: *mut libc::passwd) -> libc::c_int;
+    fn sftp_server_main(
+        _: libc::c_int,
+        _: *mut *mut libc::c_char,
+        _: *mut libc::passwd,
+    ) -> libc::c_int;
     fn sftp_server_cleanup_exit(_: libc::c_int) -> !;
 
 }
@@ -18,7 +21,6 @@ pub type __off_t = libc::c_long;
 pub type __off64_t = libc::c_long;
 pub type u_long = __u_long;
 pub type size_t = libc::c_ulong;
-
 
 pub type _IO_lock_t = ();
 

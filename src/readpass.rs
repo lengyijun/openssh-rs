@@ -21,7 +21,6 @@ extern "C" {
 
     fn execlp(__file: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
 
-    
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut stdout: *mut libc::FILE;
 

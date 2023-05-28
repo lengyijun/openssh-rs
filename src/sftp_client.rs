@@ -12,7 +12,7 @@ extern "C" {
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn fsync(__fd: libc::c_int) -> libc::c_int;
-    
+
     fn vsnprintf(
         _: *mut libc::c_char,
         _: libc::c_ulong,
@@ -25,9 +25,6 @@ extern "C" {
 
     fn lstat(__file: *const libc::c_char, __buf: *mut libc::stat) -> libc::c_int;
     fn writev(__fd: libc::c_int, __iovec: *const iovec, __count: libc::c_int) -> ssize_t;
-    
-    
-    
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -101,7 +98,6 @@ extern "C" {
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
     fn put_u32(_: *mut libc::c_void, _: u_int32_t);
 
-    
     fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn attrib_clear(_: *mut Attrib);
     fn stat_to_attrib(_: *const libc::stat, _: *mut Attrib);
@@ -178,7 +174,6 @@ pub const ST_NOEXEC: C2RustUnnamed = 8;
 pub const ST_NODEV: C2RustUnnamed = 4;
 pub const ST_NOSUID: C2RustUnnamed = 2;
 pub const ST_RDONLY: C2RustUnnamed = 1;
-
 
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;
@@ -4549,7 +4544,8 @@ pub unsafe extern "C" fn do_download(
                             0 as libc::c_int,
                             SYSLOG_LEVEL_ERROR,
                             0 as *const libc::c_char,
-                            b"local libc::ftruncate \"%s\": %s\0" as *const u8 as *const libc::c_char,
+                            b"local libc::ftruncate \"%s\": %s\0" as *const u8
+                                as *const libc::c_char,
                             local_path,
                             strerror(*libc::__errno_location()),
                         );

@@ -3,7 +3,7 @@ extern "C" {
     fn oom_adjust_setup();
     fn oom_adjust_restore();
     fn geteuid() -> __uid_t;
-    
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn auth_shadow_acctexpired(_: *mut spwd) -> libc::c_int;

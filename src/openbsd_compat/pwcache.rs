@@ -1,6 +1,5 @@
 use ::libc;
 extern "C" {
-    
 
     fn getgrgid(__gid: __gid_t) -> *mut group;
 

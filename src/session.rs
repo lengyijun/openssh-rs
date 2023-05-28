@@ -45,7 +45,7 @@ extern "C" {
         __stream: *mut libc::FILE,
     ) -> __ssize_t;
     fn fputs(__s: *const libc::c_char, __stream: *mut libc::FILE) -> libc::c_int;
-    
+
     fn pclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn popen(__command: *const libc::c_char, __modes: *const libc::c_char) -> *mut libc::FILE;
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
@@ -72,12 +72,12 @@ extern "C" {
         __envp: *const *mut libc::c_char,
     ) -> libc::c_int;
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
-    
+
     fn setsid() -> __pid_t;
-    
+
     fn geteuid() -> __uid_t;
     fn setgid(__gid: __gid_t) -> libc::c_int;
-    
+
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rmdir(__path: *const libc::c_char) -> libc::c_int;
     fn setlogin(__name: *const libc::c_char) -> libc::c_int;
@@ -267,7 +267,11 @@ extern "C" {
         _: size_t,
     ) -> libc::c_int;
     fn mm_session_pty_cleanup2(_: *mut Session);
-    fn sftp_server_main(_: libc::c_int, _: *mut *mut libc::c_char, _: *mut libc::passwd) -> libc::c_int;
+    fn sftp_server_main(
+        _: libc::c_int,
+        _: *mut *mut libc::c_char,
+        _: *mut libc::passwd,
+    ) -> libc::c_int;
 
     static mut options: ServerOptions;
     static mut __progname: *mut libc::c_char;
@@ -391,8 +395,6 @@ pub struct in_addr {
 }
 pub type in_addr_t = uint32_t;
 pub type uint64_t = __uint64_t;
-
-
 
 pub type _IO_lock_t = ();
 

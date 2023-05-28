@@ -11,8 +11,6 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
 
-    
-    
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
 
@@ -34,7 +32,7 @@ extern "C" {
         __delimiter: libc::c_int,
         __stream: *mut libc::FILE,
     ) -> __ssize_t;
-    
+
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
@@ -196,8 +194,6 @@ pub type u_int64_t = __uint64_t;
 
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
-
-
 
 pub type _IO_lock_t = ();
 

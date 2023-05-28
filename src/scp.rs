@@ -38,28 +38,17 @@ extern "C" {
 
     fn vfprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ::core::ffi::VaList) -> libc::c_int;
 
-    
-
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
 
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
-    
-    
-    
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
 
-    
-    
-    
-
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
-    
-    
-    
+
     fn fnmatch(
         __pattern: *const libc::c_char,
         __name: *const libc::c_char,
@@ -107,7 +96,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    
     fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
     fn start_progress_meter(_: *const libc::c_char, _: off_t, _: *mut off_t);
     fn refresh_progress_meter(_: libc::c_int);
@@ -172,8 +160,6 @@ pub const SOCK_RAW: __socket_type = 3;
 pub const SOCK_DGRAM: __socket_type = 2;
 pub const SOCK_STREAM: __socket_type = 1;
 
-
-
 pub type _IO_lock_t = ();
 
 pub type sig_atomic_t = __sig_atomic_t;
@@ -191,7 +177,6 @@ pub const _ISdigit: C2RustUnnamed = 2048;
 pub const _ISalpha: C2RustUnnamed = 1024;
 pub const _ISlower: C2RustUnnamed = 512;
 pub const _ISupper: C2RustUnnamed = 256;
-
 
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -936,7 +921,10 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
                     7 as libc::c_int as libc::c_ulong,
                 ) == 0 as libc::c_int
                 {
-                    r = crate::openbsd_compat::fmt_scaled::scan_scaled(BSDoptarg.offset(7 as libc::c_int as isize), &mut llv);
+                    r = crate::openbsd_compat::fmt_scaled::scan_scaled(
+                        BSDoptarg.offset(7 as libc::c_int as isize),
+                        &mut llv,
+                    );
                     if r == 0 as libc::c_int
                         && (llv <= 0 as libc::c_int as libc::c_longlong
                             || llv > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_longlong)

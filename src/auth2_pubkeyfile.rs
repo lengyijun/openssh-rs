@@ -115,8 +115,6 @@ pub type u_int64_t = __uint64_t;
 pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
 
-
-
 pub type _IO_lock_t = ();
 
 pub type LogLevel = libc::c_int;

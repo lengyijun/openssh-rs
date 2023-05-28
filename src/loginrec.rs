@@ -31,13 +31,12 @@ extern "C" {
         __ut_host: *const libc::c_char,
     );
 
-    
     fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn lseek(__fd: libc::c_int, __offset: __off_t, __whence: libc::c_int) -> __off_t;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
-    
+
     fn geteuid() -> __uid_t;
 
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
@@ -208,7 +207,6 @@ pub struct C2RustUnnamed_0 {
     pub tv_sec: int32_t,
     pub tv_usec: int32_t,
 }
-
 
 #[derive(Copy, Clone)]
 #[repr(C)]

@@ -11,7 +11,6 @@ extern "C" {
     pub type ec_key_st;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
 
-    
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
     fn asprintf(__ptr: *mut *mut libc::c_char, __fmt: *const libc::c_char, _: ...) -> libc::c_int;

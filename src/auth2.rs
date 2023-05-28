@@ -158,7 +158,6 @@ pub struct sockaddr {
 }
 pub type uint8_t = __uint8_t;
 
-
 pub type sig_atomic_t = __sig_atomic_t;
 #[derive(Copy, Clone)]
 #[repr(C)]

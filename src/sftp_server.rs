@@ -29,7 +29,6 @@ extern "C" {
         __flags: libc::c_int,
     ) -> libc::c_int;
 
-    
     fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn platform_disable_tracing(_: libc::c_int);
     fn platform_pledge_sftp_server();
@@ -58,7 +57,7 @@ extern "C" {
 
     fn fsync(__fd: libc::c_int) -> libc::c_int;
     fn truncate(__file: *const libc::c_char, __length: __off_t) -> libc::c_int;
-    
+
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
 
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
@@ -70,9 +69,6 @@ extern "C" {
     fn getrlimit(__resource: __rlimit_resource_t, __rlimits: *mut rlimit) -> libc::c_int;
     fn statvfs(__file: *const libc::c_char, __buf: *mut statvfs) -> libc::c_int;
     fn fstatvfs(__fildes: libc::c_int, __buf: *mut statvfs) -> libc::c_int;
-    
-    
-    
 
     fn getgrgid(__gid: __gid_t) -> *mut group;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
@@ -203,8 +199,6 @@ pub type u_int64_t = __uint64_t;
 
 pub type uint64_t = __uint64_t;
 
-
-
 pub type _IO_lock_t = ();
 
 pub type nfds_t = libc::c_ulong;
@@ -272,7 +266,6 @@ pub const ST_NOEXEC: C2RustUnnamed = 8;
 pub const ST_NODEV: C2RustUnnamed = 4;
 pub const ST_NOSUID: C2RustUnnamed = 2;
 pub const ST_RDONLY: C2RustUnnamed = 1;
-
 
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -1811,7 +1804,13 @@ unsafe extern "C" fn process_open(mut id: u_int32_t) {
         if fd == -(1 as libc::c_int) {
             status = errno_to_portable(*libc::__errno_location());
         } else {
-            handle = handle_new(HANDLE_FILE as libc::c_int, name, fd, flags, 0 as *mut libc::DIR);
+            handle = handle_new(
+                HANDLE_FILE as libc::c_int,
+                name,
+                fd,
+                flags,
+                0 as *mut libc::DIR,
+            );
             if handle < 0 as libc::c_int {
                 close(fd);
             } else {

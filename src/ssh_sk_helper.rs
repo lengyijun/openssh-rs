@@ -832,7 +832,11 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         log_stderr as libc::c_int,
     );
     loop {
-        ch = crate::openbsd_compat::getopt_long::BSDgetopt(argc, argv, b"v\0" as *const u8 as *const libc::c_char);
+        ch = crate::openbsd_compat::getopt_long::BSDgetopt(
+            argc,
+            argv,
+            b"v\0" as *const u8 as *const libc::c_char,
+        );
         if !(ch != -(1 as libc::c_int)) {
             break;
         }

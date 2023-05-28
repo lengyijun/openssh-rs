@@ -3839,7 +3839,11 @@ pub unsafe extern "C" fn mm_answer_keyverify(
     sshkey_free(key);
     return (ret == 0 as libc::c_int) as libc::c_int;
 }
-unsafe extern "C" fn mm_record_login(mut ssh: *mut ssh, mut s: *mut Session, mut pw: *mut libc::passwd) {
+unsafe extern "C" fn mm_record_login(
+    mut ssh: *mut ssh,
+    mut s: *mut Session,
+    mut pw: *mut libc::passwd,
+) {
     let mut fromlen: socklen_t = 0;
     let mut from: sockaddr_storage = sockaddr_storage {
         ss_family: 0,

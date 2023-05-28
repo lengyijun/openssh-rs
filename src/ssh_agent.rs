@@ -28,10 +28,9 @@ extern "C" {
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
-    
     fn getppid() -> __pid_t;
     fn setsid() -> __pid_t;
-    
+
     fn getgid() -> __gid_t;
     fn setgid(__gid: __gid_t) -> libc::c_int;
     fn accept(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __addr_len: *mut socklen_t)
@@ -42,7 +41,7 @@ extern "C" {
     fn platform_pledge_agent();
 
     fn setegid(__gid: __gid_t) -> libc::c_int;
-    
+
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rmdir(__path: *const libc::c_char) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
@@ -53,7 +52,6 @@ extern "C" {
 
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
 
-    
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 

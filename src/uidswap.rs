@@ -1,7 +1,6 @@
 use ::libc;
 extern "C" {
 
-    
     fn geteuid() -> __uid_t;
     fn getgid() -> __gid_t;
     fn getegid() -> __gid_t;

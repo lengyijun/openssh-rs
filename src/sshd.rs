@@ -86,12 +86,11 @@ extern "C" {
 
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
-    
     fn getpgid(__pid: __pid_t) -> __pid_t;
     fn setsid() -> __pid_t;
-    
+
     fn geteuid() -> __uid_t;
-    
+
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
@@ -578,7 +577,6 @@ pub const IPPROTO_IPIP: C2RustUnnamed_0 = 4;
 pub const IPPROTO_IGMP: C2RustUnnamed_0 = 2;
 pub const IPPROTO_ICMP: C2RustUnnamed_0 = 1;
 pub const IPPROTO_IP: C2RustUnnamed_0 = 0;
-
 
 pub type _IO_lock_t = ();
 
@@ -3252,8 +3250,8 @@ unsafe extern "C" fn server_accept_loop(
                             0 as libc::c_int,
                             SYSLOG_LEVEL_DEBUG1,
                             0 as *const libc::c_char,
-                            b"Server will not libc::fork when running in debugging mode.\0" as *const u8
-                                as *const libc::c_char,
+                            b"Server will not libc::fork when running in debugging mode.\0"
+                                as *const u8 as *const libc::c_char,
                         );
                         close_listen_socks();
                         *sock_in = *newsock;

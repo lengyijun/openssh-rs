@@ -4,14 +4,11 @@ extern "C" {
 
     fn lstat(__file: *const libc::c_char, __buf: *mut libc::stat) -> libc::c_int;
 
-    
     fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
-    
+
     fn geteuid() -> __uid_t;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    
-    
-    
+
     fn isalnum(_: libc::c_int) -> libc::c_int;
     fn isalpha(_: libc::c_int) -> libc::c_int;
     fn iscntrl(_: libc::c_int) -> libc::c_int;
@@ -51,7 +48,6 @@ pub type __syscall_slong_t = libc::c_long;
 pub type u_char = __u_char;
 pub type u_short = __u_short;
 pub type size_t = libc::c_ulong;
-
 
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -933,7 +929,8 @@ unsafe extern "C" fn glob3(
     let mut dirp: *mut libc::DIR = 0 as *mut libc::DIR;
     let mut err: libc::c_int = 0;
     let mut buf: [libc::c_char; 4096] = [0; 4096];
-    let mut readdirfunc: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent> = None;
+    let mut readdirfunc: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent> =
+        None;
     if pathend > pathend_last {
         return 1 as libc::c_int;
     }
@@ -1387,7 +1384,10 @@ pub unsafe extern "C" fn _ssh__compat_globfree(mut pglob: *mut _ssh_compat_glob_
         (*pglob).gl_statv = 0 as *mut *mut libc::stat;
     }
 }
-unsafe extern "C" fn g_opendir(mut str: *mut Char, mut pglob: *mut _ssh_compat_glob_t) -> *mut libc::DIR {
+unsafe extern "C" fn g_opendir(
+    mut str: *mut Char,
+    mut pglob: *mut _ssh_compat_glob_t,
+) -> *mut libc::DIR {
     let mut buf: [libc::c_char; 4096] = [0; 4096];
     if *str == 0 {
         strlcpy(
@@ -1405,7 +1405,8 @@ unsafe extern "C" fn g_opendir(mut str: *mut Char, mut pglob: *mut _ssh_compat_g
     }
     if (*pglob).gl_flags & 0x40 as libc::c_int != 0 {
         return (Some(((*pglob).gl_opendir).expect("non-null function pointer")))
-            .expect("non-null function pointer")(buf.as_mut_ptr()) as *mut libc::DIR;
+            .expect("non-null function pointer")(buf.as_mut_ptr())
+            as *mut libc::DIR;
     }
     return libc::opendir(buf.as_mut_ptr());
 }

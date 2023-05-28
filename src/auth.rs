@@ -267,7 +267,6 @@ pub struct in_addr {
 pub type in_addr_t = uint32_t;
 pub type uint64_t = __uint64_t;
 
-
 pub type sig_atomic_t = __sig_atomic_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -1206,7 +1205,9 @@ pub unsafe extern "C" fn expand_authorized_keys(
     libc::free(file as *mut libc::c_void);
     return xstrdup(ret.as_mut_ptr());
 }
-pub unsafe extern "C" fn authorized_principals_file(mut pw: *mut libc::passwd) -> *mut libc::c_char {
+pub unsafe extern "C" fn authorized_principals_file(
+    mut pw: *mut libc::passwd,
+) -> *mut libc::c_char {
     if (options.authorized_principals_file).is_null() {
         return 0 as *mut libc::c_char;
     }
