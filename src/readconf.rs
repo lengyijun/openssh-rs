@@ -7,7 +7,7 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
     pub type sshbuf;
-    pub type dirent;
+    
     pub type dsa_st;
     pub type rsa_st;
     pub type ec_key_st;
@@ -253,7 +253,7 @@ pub struct _ssh_compat_glob_t {
     pub gl_statv: *mut *mut libc::stat,
     pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
     pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
-    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
+    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
     pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
     pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
     pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,

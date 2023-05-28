@@ -44,15 +44,7 @@ pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct dirent {
-    pub d_ino: __ino_t,
-    pub d_off: __off_t,
-    pub d_reclen: libc::c_ushort,
-    pub d_type: libc::c_uchar,
-    pub d_name: [libc::c_char; 256],
-}
+
 
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -65,7 +57,7 @@ pub struct _ssh_compat_glob_t {
     pub gl_statv: *mut *mut libc::stat,
     pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
     pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
-    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
+    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
     pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
     pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
     pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
@@ -104,12 +96,12 @@ unsafe extern "C" fn fudge_opendir(mut path: *const libc::c_char) -> *mut libc::
     (*r).offset = 0 as libc::c_int;
     return r as *mut libc::c_void;
 }
-unsafe extern "C" fn fudge_readdir(mut od: *mut SFTP_OPENDIR) -> *mut dirent {
+unsafe extern "C" fn fudge_readdir(mut od: *mut SFTP_OPENDIR) -> *mut libc::dirent {
     static mut buf: [libc::c_char; 4376] = [0; 4376];
-    let mut ret: *mut dirent = buf.as_mut_ptr() as *mut dirent;
+    let mut ret: *mut libc::dirent = buf.as_mut_ptr() as *mut libc::dirent;
     static mut inum: libc::c_int = 1 as libc::c_int;
     if (*((*od).dir).offset((*od).offset as isize)).is_null() {
-        return 0 as *mut dirent;
+        return 0 as *mut libc::dirent;
     }
     memset(
         buf.as_mut_ptr() as *mut libc::c_void,
@@ -173,10 +165,10 @@ pub unsafe extern "C" fn remote_glob(
     (*pglob).gl_opendir =
         Some(fudge_opendir as unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void);
     (*pglob).gl_readdir = ::core::mem::transmute::<
-        Option<unsafe extern "C" fn(*mut SFTP_OPENDIR) -> *mut dirent>,
-        Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
+        Option<unsafe extern "C" fn(*mut SFTP_OPENDIR) -> *mut libc::dirent>,
+        Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
     >(Some(
-        fudge_readdir as unsafe extern "C" fn(*mut SFTP_OPENDIR) -> *mut dirent,
+        fudge_readdir as unsafe extern "C" fn(*mut SFTP_OPENDIR) -> *mut libc::dirent,
     ));
     (*pglob).gl_closedir = ::core::mem::transmute::<
         Option<unsafe extern "C" fn(*mut SFTP_OPENDIR) -> ()>,

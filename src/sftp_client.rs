@@ -27,7 +27,7 @@ extern "C" {
     fn writev(__fd: libc::c_int, __iovec: *const iovec, __count: libc::c_int) -> ssize_t;
     
     
-    fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
+    
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -178,15 +178,7 @@ pub const ST_NOEXEC: C2RustUnnamed = 8;
 pub const ST_NODEV: C2RustUnnamed = 4;
 pub const ST_NOSUID: C2RustUnnamed = 2;
 pub const ST_RDONLY: C2RustUnnamed = 1;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct dirent {
-    pub d_ino: __ino_t,
-    pub d_off: __off_t,
-    pub d_reclen: libc::c_ushort,
-    pub d_type: libc::c_uchar,
-    pub d_name: [libc::c_char; 256],
-}
+
 
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;
@@ -1892,7 +1884,7 @@ unsafe extern "C" fn do_lsreaddir(
         conn,
         id,
         &mut handle_len as *mut size_t,
-        b"remote readdir(\"%s\")\0" as *const u8 as *const libc::c_char,
+        b"remote libc::readdir(\"%s\")\0" as *const u8 as *const libc::c_char,
         path,
     );
     if handle.is_null() {
@@ -2157,7 +2149,7 @@ unsafe extern "C" fn do_lsreaddir(
                             0 as libc::c_int,
                             SYSLOG_LEVEL_ERROR,
                             0 as *const libc::c_char,
-                            b"Server sent suspect path \"%s\" during readdir of \"%s\"\0"
+                            b"Server sent suspect path \"%s\" during libc::readdir of \"%s\"\0"
                                 as *const u8 as *const libc::c_char,
                             filename,
                             path,
@@ -4843,7 +4835,7 @@ unsafe extern "C" fn download_dir_internal(
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"remote readdir \"%s\" failed\0" as *const u8 as *const libc::c_char,
+            b"remote libc::readdir \"%s\" failed\0" as *const u8 as *const libc::c_char,
             src,
         );
         return -(1 as libc::c_int);
@@ -5557,7 +5549,7 @@ unsafe extern "C" fn upload_dir_internal(
 ) -> libc::c_int {
     let mut ret: libc::c_int = 0 as libc::c_int;
     let mut dirp: *mut libc::DIR = 0 as *mut libc::DIR;
-    let mut dp: *mut dirent = 0 as *mut dirent;
+    let mut dp: *mut libc::dirent = 0 as *mut libc::dirent;
     let mut filename: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut new_src: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut new_dst: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -5684,7 +5676,7 @@ unsafe extern "C" fn upload_dir_internal(
         return -(1 as libc::c_int);
     }
     loop {
-        dp = readdir(dirp);
+        dp = libc::readdir(dirp);
         if !(!dp.is_null() && interrupted == 0) {
             break;
         }
@@ -6728,7 +6720,7 @@ unsafe extern "C" fn crossload_dir_internal(
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"origin readdir \"%s\" failed\0" as *const u8 as *const libc::c_char,
+            b"origin libc::readdir \"%s\" failed\0" as *const u8 as *const libc::c_char,
             from_path,
         );
         return -(1 as libc::c_int);

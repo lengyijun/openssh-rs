@@ -3,7 +3,7 @@ use crate::sftp_common::Attrib;
 use ::libc;
 
 extern "C" {
-    pub type dirent;
+    
 
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn sshfatal(
@@ -75,7 +75,7 @@ pub struct _ssh_compat_glob_t {
     pub gl_statv: *mut *mut libc::stat,
     pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
     pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
-    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
+    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
     pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
     pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
     pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,

@@ -11,7 +11,7 @@ extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     
     
-    fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
+    
     fn isalnum(_: libc::c_int) -> libc::c_int;
     fn isalpha(_: libc::c_int) -> libc::c_int;
     fn iscntrl(_: libc::c_int) -> libc::c_int;
@@ -64,20 +64,12 @@ pub struct _ssh_compat_glob_t {
     pub gl_statv: *mut *mut libc::stat,
     pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
     pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
-    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
+    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
     pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
     pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
     pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct dirent {
-    pub d_ino: __ino_t,
-    pub d_off: __off_t,
-    pub d_reclen: libc::c_ushort,
-    pub d_type: libc::c_uchar,
-    pub d_name: [libc::c_char; 256],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct glob_lim {
@@ -937,11 +929,11 @@ unsafe extern "C" fn glob3(
     mut pglob: *mut _ssh_compat_glob_t,
     mut limitp: *mut glob_lim,
 ) -> libc::c_int {
-    let mut dp: *mut dirent = 0 as *mut dirent;
+    let mut dp: *mut libc::dirent = 0 as *mut libc::dirent;
     let mut dirp: *mut libc::DIR = 0 as *mut libc::DIR;
     let mut err: libc::c_int = 0;
     let mut buf: [libc::c_char; 4096] = [0; 4096];
-    let mut readdirfunc: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent> = None;
+    let mut readdirfunc: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent> = None;
     if pathend > pathend_last {
         return 1 as libc::c_int;
     }
@@ -974,10 +966,10 @@ unsafe extern "C" fn glob3(
         readdirfunc = (*pglob).gl_readdir;
     } else {
         readdirfunc = ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut libc::DIR) -> *mut dirent>,
-            Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
+            Option<unsafe extern "C" fn(*mut libc::DIR) -> *mut libc::dirent>,
+            Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
         >(Some(
-            readdir as unsafe extern "C" fn(*mut libc::DIR) -> *mut dirent,
+            libc::readdir as unsafe extern "C" fn(*mut libc::DIR) -> *mut libc::dirent,
         ));
     }
     loop {

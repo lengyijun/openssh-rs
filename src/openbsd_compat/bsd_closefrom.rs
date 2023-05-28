@@ -11,7 +11,7 @@ extern "C" {
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
     
     
-    fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
+    
     fn dirfd(__dirp: *mut libc::DIR) -> libc::c_int;
 }
 pub type __ino_t = libc::c_ulong;
@@ -20,15 +20,7 @@ pub type __pid_t = libc::c_int;
 pub type size_t = libc::c_ulong;
 pub const _SC_OPEN_MAX: C2RustUnnamed = 4;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct dirent {
-    pub d_ino: __ino_t,
-    pub d_off: __off_t,
-    pub d_reclen: libc::c_ushort,
-    pub d_type: libc::c_uchar,
-    pub d_name: [libc::c_char; 256],
-}
+
 pub type C2RustUnnamed = libc::c_uint;
 pub const _SC_SIGSTKSZ: C2RustUnnamed = 250;
 pub const _SC_MINSIGSTKSZ: C2RustUnnamed = 249;
@@ -265,7 +257,7 @@ pub unsafe extern "C" fn closefrom(mut lowfd: libc::c_int) {
     let mut fd: libc::c_long = 0;
     let mut fdpath: [libc::c_char; 4096] = [0; 4096];
     let mut endp: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut dent: *mut dirent = 0 as *mut dirent;
+    let mut dent: *mut libc::dirent = 0 as *mut libc::dirent;
     let mut dirp: *mut libc::DIR = 0 as *mut libc::DIR;
     let mut len: libc::c_int = 0;
     if close_range(
@@ -290,7 +282,7 @@ pub unsafe extern "C" fn closefrom(mut lowfd: libc::c_int) {
         }
     {
         loop {
-            dent = readdir(dirp);
+            dent = libc::readdir(dirp);
             if dent.is_null() {
                 break;
             }

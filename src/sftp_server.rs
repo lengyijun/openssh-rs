@@ -72,7 +72,7 @@ extern "C" {
     fn fstatvfs(__fildes: libc::c_int, __buf: *mut statvfs) -> libc::c_int;
     
     
-    fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
+    
 
     fn getgrgid(__gid: __gid_t) -> *mut group;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
@@ -272,15 +272,7 @@ pub const ST_NOEXEC: C2RustUnnamed = 8;
 pub const ST_NODEV: C2RustUnnamed = 4;
 pub const ST_NOSUID: C2RustUnnamed = 2;
 pub const ST_RDONLY: C2RustUnnamed = 1;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct dirent {
-    pub d_ino: __ino_t,
-    pub d_off: __off_t,
-    pub d_reclen: libc::c_ushort,
-    pub d_type: libc::c_uchar,
-    pub d_name: [libc::c_char; 256],
-}
+
 
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -465,7 +457,7 @@ static mut handlers: [sftp_handler; 19] = unsafe {
         },
         {
             let mut init = sftp_handler {
-                name: b"readdir\0" as *const u8 as *const libc::c_char,
+                name: b"libc::readdir\0" as *const u8 as *const libc::c_char,
                 ext_name: 0 as *const libc::c_char,
                 type_0: 12 as libc::c_int as u_int,
                 handler: Some(process_readdir as unsafe extern "C" fn(u_int32_t) -> ()),
@@ -2597,7 +2589,7 @@ unsafe extern "C" fn process_opendir(mut id: u_int32_t) {
 }
 unsafe extern "C" fn process_readdir(mut id: u_int32_t) {
     let mut dirp: *mut libc::DIR = 0 as *mut libc::DIR;
-    let mut dp: *mut dirent = 0 as *mut dirent;
+    let mut dp: *mut libc::dirent = 0 as *mut libc::dirent;
     let mut path: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
     let mut handle: libc::c_int = 0;
@@ -2621,7 +2613,7 @@ unsafe extern "C" fn process_readdir(mut id: u_int32_t) {
         0 as libc::c_int,
         SYSLOG_LEVEL_DEBUG1,
         0 as *const libc::c_char,
-        b"request %u: readdir \"%s\" (handle %d)\0" as *const u8 as *const libc::c_char,
+        b"request %u: libc::readdir \"%s\" (handle %d)\0" as *const u8 as *const libc::c_char,
         id,
         handle_to_name(handle),
         handle,
@@ -2642,7 +2634,7 @@ unsafe extern "C" fn process_readdir(mut id: u_int32_t) {
             ::core::mem::size_of::<Stat>() as libc::c_ulong,
         ) as *mut Stat;
         loop {
-            dp = readdir(dirp);
+            dp = libc::readdir(dirp);
             if dp.is_null() {
                 break;
             }

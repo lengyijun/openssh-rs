@@ -59,7 +59,7 @@ extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     
     
-    fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
+    
     fn fnmatch(
         __pattern: *const libc::c_char,
         __name: *const libc::c_char,
@@ -191,15 +191,7 @@ pub const _ISdigit: C2RustUnnamed = 2048;
 pub const _ISalpha: C2RustUnnamed = 1024;
 pub const _ISlower: C2RustUnnamed = 512;
 pub const _ISupper: C2RustUnnamed = 256;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct dirent {
-    pub d_ino: __ino_t,
-    pub d_off: __off_t,
-    pub d_reclen: libc::c_ushort,
-    pub d_type: libc::c_uchar,
-    pub d_name: [libc::c_char; 256],
-}
+
 
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -212,7 +204,7 @@ pub struct _ssh_compat_glob_t {
     pub gl_statv: *mut *mut libc::stat,
     pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
     pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
-    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
+    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
     pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
     pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
     pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
@@ -2834,7 +2826,7 @@ pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc:
 }
 pub unsafe extern "C" fn rsource(mut name: *mut libc::c_char, mut statp: *mut libc::stat) {
     let mut dirp: *mut libc::DIR = 0 as *mut libc::DIR;
-    let mut dp: *mut dirent = 0 as *mut dirent;
+    let mut dp: *mut libc::dirent = 0 as *mut libc::dirent;
     let mut last: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut vect: [*mut libc::c_char; 1] = [0 as *mut libc::c_char; 1];
     let mut path: [libc::c_char; 4096] = [0; 4096];
@@ -2899,7 +2891,7 @@ pub unsafe extern "C" fn rsource(mut name: *mut libc::c_char, mut statp: *mut li
         return;
     }
     loop {
-        dp = readdir(dirp);
+        dp = libc::readdir(dirp);
         if dp.is_null() {
             break;
         }
