@@ -187,20 +187,14 @@ extern "C" {
         _: *const libc::c_char,
         _: libc::c_int,
         _: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-        _: *mut _ssh_compat_glob_t,
+        _: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t,
     ) -> libc::c_int;
-    fn _ssh__compat_globfree(_: *mut _ssh_compat_glob_t);
-    fn get_remote_user_groups_from_glob(conn: *mut sftp_conn, g: *mut _ssh_compat_glob_t);
+    fn _ssh__compat_globfree(_: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t);
+    fn get_remote_user_groups_from_glob(conn: *mut sftp_conn, g: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t);
     fn get_remote_user_groups_from_dirents(conn: *mut sftp_conn, d: *mut *mut SFTP_DIRENT);
     fn ruser_name(uid: uid_t) -> *const libc::c_char;
     fn rgroup_name(gid: uid_t) -> *const libc::c_char;
-    fn remote_glob(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-        _: *mut _ssh_compat_glob_t,
-    ) -> libc::c_int;
+
     static mut __progname: *mut libc::c_char;
 }
 pub type __u_int = libc::c_uint;
@@ -407,22 +401,7 @@ pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _ssh_compat_glob_t {
-    pub gl_pathc: size_t,
-    pub gl_matchc: size_t,
-    pub gl_offs: size_t,
-    pub gl_flags: libc::c_int,
-    pub gl_pathv: *mut *mut libc::c_char,
-    pub gl_statv: *mut *mut libc::stat,
-    pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-    pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
-    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
-    pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
-    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
-    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct SFTP_DIRENT {
@@ -498,8 +477,8 @@ pub static mut global_pflag: libc::c_int = 0 as libc::c_int;
 pub static mut global_fflag: libc::c_int = 0 as libc::c_int;
 pub static mut interrupted: sig_atomic_t = 0 as libc::c_int;
 pub static mut sort_flag: libc::c_int = 0;
-pub static mut sort_glob: *mut _ssh_compat_glob_t =
-    0 as *const _ssh_compat_glob_t as *mut _ssh_compat_glob_t;
+pub static mut sort_glob: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t =
+    0 as *const crate::openbsd_compat::glob::_ssh_compat_glob_t as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t;
 static mut cmds: [CMD; 38] = [
     {
         let mut init = CMD {
@@ -1585,7 +1564,7 @@ unsafe extern "C" fn process_get(
     let mut abs_src: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut abs_dst: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut g: _ssh_compat_glob_t = _ssh_compat_glob_t {
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
         gl_pathc: 0,
         gl_matchc: 0,
         gl_offs: 0,
@@ -1604,9 +1583,9 @@ unsafe extern "C" fn process_get(
     let mut err: libc::c_int = 0 as libc::c_int;
     abs_src = make_absolute_pwd_glob(xstrdup(src), pwd);
     memset(
-        &mut g as *mut _ssh_compat_glob_t as *mut libc::c_void,
+        &mut g as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t as *mut libc::c_void,
         0 as libc::c_int,
-        ::core::mem::size_of::<_ssh_compat_glob_t>() as libc::c_ulong,
+        ::core::mem::size_of::<crate::openbsd_compat::glob::_ssh_compat_glob_t>() as libc::c_ulong,
     );
     crate::log::sshlog(
         b"sftp.c\0" as *const u8 as *const libc::c_char,
@@ -1618,7 +1597,7 @@ unsafe extern "C" fn process_get(
         b"Looking up %s\0" as *const u8 as *const libc::c_char,
         abs_src,
     );
-    r = remote_glob(conn, abs_src, 0x8 as libc::c_int, None, &mut g);
+    r = crate::sftp_glob::remote_glob(conn, abs_src, 0x8 as libc::c_int, None, &mut g);
     if r != 0 as libc::c_int {
         if r == -(1 as libc::c_int) {
             crate::log::sshlog(
@@ -1766,7 +1745,7 @@ unsafe extern "C" fn process_put(
     let mut abs_dst: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut filename: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut g: _ssh_compat_glob_t = _ssh_compat_glob_t {
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
         gl_pathc: 0,
         gl_matchc: 0,
         gl_offs: 0,
@@ -1789,9 +1768,9 @@ unsafe extern "C" fn process_put(
         tmp_dst = make_absolute(tmp_dst, pwd);
     }
     memset(
-        &mut g as *mut _ssh_compat_glob_t as *mut libc::c_void,
+        &mut g as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t as *mut libc::c_void,
         0 as libc::c_int,
-        ::core::mem::size_of::<_ssh_compat_glob_t>() as libc::c_ulong,
+        ::core::mem::size_of::<crate::openbsd_compat::glob::_ssh_compat_glob_t>() as libc::c_ulong,
     );
     crate::log::sshlog(
         b"sftp.c\0" as *const u8 as *const libc::c_char,
@@ -2206,7 +2185,7 @@ unsafe extern "C" fn do_globbed_ls(
 ) -> libc::c_int {
     let mut fname: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut lname: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut g: _ssh_compat_glob_t = _ssh_compat_glob_t {
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
         gl_pathc: 0,
         gl_matchc: 0,
         gl_offs: 0,
@@ -2238,11 +2217,11 @@ unsafe extern "C" fn do_globbed_ls(
     let mut m: u_int = 0 as libc::c_int as u_int;
     let mut width: u_int = 80 as libc::c_int as u_int;
     memset(
-        &mut g as *mut _ssh_compat_glob_t as *mut libc::c_void,
+        &mut g as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t as *mut libc::c_void,
         0 as libc::c_int,
-        ::core::mem::size_of::<_ssh_compat_glob_t>() as libc::c_ulong,
+        ::core::mem::size_of::<crate::openbsd_compat::glob::_ssh_compat_glob_t>() as libc::c_ulong,
     );
-    r = remote_glob(
+    r = crate::sftp_glob::remote_glob(
         conn,
         path,
         0x8 as libc::c_int
@@ -2361,7 +2340,7 @@ unsafe extern "C" fn do_globbed_ls(
                         ) -> libc::c_int,
                 ),
             );
-            sort_glob = 0 as *mut _ssh_compat_glob_t;
+            sort_glob = 0 as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t;
         }
         get_remote_user_groups_from_glob(conn, &mut g);
         let mut current_block_55: u64;
@@ -3310,7 +3289,7 @@ unsafe extern "C" fn parse_dispatch_command(
     let mut aa: *mut Attrib = 0 as *mut Attrib;
     let mut path_buf: [libc::c_char; 4096] = [0; 4096];
     let mut err: libc::c_int = 0 as libc::c_int;
-    let mut g: _ssh_compat_glob_t = _ssh_compat_glob_t {
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
         gl_pathc: 0,
         gl_matchc: 0,
         gl_offs: 0,
@@ -3349,9 +3328,9 @@ unsafe extern "C" fn parse_dispatch_command(
         mprintf(b"sftp> %s\n\0" as *const u8 as *const libc::c_char, ocmd);
     }
     memset(
-        &mut g as *mut _ssh_compat_glob_t as *mut libc::c_void,
+        &mut g as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t as *mut libc::c_void,
         0 as libc::c_int,
-        ::core::mem::size_of::<_ssh_compat_glob_t>() as libc::c_ulong,
+        ::core::mem::size_of::<crate::openbsd_compat::glob::_ssh_compat_glob_t>() as libc::c_ulong,
     );
     let mut current_block_116: u64;
     match cmdnum {
@@ -3397,7 +3376,7 @@ unsafe extern "C" fn parse_dispatch_command(
         }
         23 => {
             path1 = make_absolute_pwd_glob(path1, *pwd);
-            remote_glob(conn, path1, 0x10 as libc::c_int, None, &mut g);
+            crate::sftp_glob::remote_glob(conn, path1, 0x10 as libc::c_int, None, &mut g);
             i = 0 as libc::c_int;
             while !(*(g.gl_pathv).offset(i as isize)).is_null() && interrupted == 0 {
                 if quiet == 0 {
@@ -3573,7 +3552,7 @@ unsafe extern "C" fn parse_dispatch_command(
             attrib_clear(&mut a);
             a.flags |= 0x4 as libc::c_int as libc::c_uint;
             a.perm = n_arg as u_int32_t;
-            remote_glob(conn, path1, 0x10 as libc::c_int, None, &mut g);
+            crate::sftp_glob::remote_glob(conn, path1, 0x10 as libc::c_int, None, &mut g);
             i = 0 as libc::c_int;
             while !(*(g.gl_pathv).offset(i as isize)).is_null() && interrupted == 0 {
                 if quiet == 0 {
@@ -3616,7 +3595,7 @@ unsafe extern "C" fn parse_dispatch_command(
         }
         4 | 2 => {
             path1 = make_absolute_pwd_glob(path1, *pwd);
-            remote_glob(conn, path1, 0x10 as libc::c_int, None, &mut g);
+            crate::sftp_glob::remote_glob(conn, path1, 0x10 as libc::c_int, None, &mut g);
             i = 0 as libc::c_int;
             while !(*(g.gl_pathv).offset(i as isize)).is_null() && interrupted == 0 {
                 aa = if hflag != 0 {

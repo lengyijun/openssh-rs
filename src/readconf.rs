@@ -56,9 +56,9 @@ extern "C" {
         _: *const libc::c_char,
         _: libc::c_int,
         _: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-        _: *mut _ssh_compat_glob_t,
+        _: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t,
     ) -> libc::c_int;
-    fn _ssh__compat_globfree(_: *mut _ssh_compat_glob_t);
+    fn _ssh__compat_globfree(_: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t);
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
@@ -236,22 +236,7 @@ pub const _ISdigit: C2RustUnnamed = 2048;
 pub const _ISalpha: C2RustUnnamed = 1024;
 pub const _ISlower: C2RustUnnamed = 512;
 pub const _ISupper: C2RustUnnamed = 256;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _ssh_compat_glob_t {
-    pub gl_pathc: size_t,
-    pub gl_matchc: size_t,
-    pub gl_offs: size_t,
-    pub gl_flags: libc::c_int,
-    pub gl_pathv: *mut *mut libc::c_char,
-    pub gl_statv: *mut *mut libc::stat,
-    pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-    pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
-    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
-    pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
-    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
-    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
-}
+
 pub type DSA = dsa_st;
 pub type RSA = rsa_st;
 pub type EC_KEY = ec_key_st;
@@ -3099,7 +3084,7 @@ unsafe extern "C" fn process_config_line_depth(
     };
     let mut multistate_ptr: *const multistate = 0 as *const multistate;
     let mut cname: *mut allowed_cname = 0 as *mut allowed_cname;
-    let mut gl: _ssh_compat_glob_t = _ssh_compat_glob_t {
+    let mut gl: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
         gl_pathc: 0,
         gl_matchc: 0,
         gl_offs: 0,
@@ -4837,9 +4822,9 @@ unsafe extern "C" fn process_config_line_depth(
                             arg2 = xstrdup(arg);
                         }
                         memset(
-                            &mut gl as *mut _ssh_compat_glob_t as *mut libc::c_void,
+                            &mut gl as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t as *mut libc::c_void,
                             0 as libc::c_int,
-                            ::core::mem::size_of::<_ssh_compat_glob_t>() as libc::c_ulong,
+                            ::core::mem::size_of::<crate::openbsd_compat::glob::_ssh_compat_glob_t>() as libc::c_ulong,
                         );
                         r = _ssh__compat_glob(arg2, 0x800 as libc::c_int, None, &mut gl);
                         if r == -(3 as libc::c_int) {

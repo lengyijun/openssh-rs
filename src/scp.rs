@@ -52,7 +52,7 @@ extern "C" {
         __name: *const libc::c_char,
         __flags: libc::c_int,
     ) -> libc::c_int;
-    fn _ssh__compat_globfree(_: *mut _ssh_compat_glob_t);
+    fn _ssh__compat_globfree(_: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t);
     fn __xpg_basename(__path: *mut libc::c_char) -> *mut libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
 
@@ -87,13 +87,6 @@ extern "C" {
     ) -> !;
 
     static mut __progname: *mut libc::c_char;
-    fn remote_glob(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-        _: *mut _ssh_compat_glob_t,
-    ) -> libc::c_int;
 }
 pub type __builtin_va_list = [__va_list_tag; 1];
 #[derive(Copy, Clone)]
@@ -163,22 +156,7 @@ pub const _ISalpha: C2RustUnnamed = 1024;
 pub const _ISlower: C2RustUnnamed = 512;
 pub const _ISupper: C2RustUnnamed = 256;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _ssh_compat_glob_t {
-    pub gl_pathc: size_t,
-    pub gl_matchc: size_t,
-    pub gl_offs: size_t,
-    pub gl_flags: libc::c_int,
-    pub gl_pathv: *mut *mut libc::c_char,
-    pub gl_statv: *mut *mut libc::stat,
-    pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-    pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
-    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
-    pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
-    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
-    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
-}
+
 pub type SyslogFacility = libc::c_int;
 pub const SYSLOG_FACILITY_NOT_SET: SyslogFacility = -1;
 pub const SYSLOG_FACILITY_LOCAL7: SyslogFacility = 10;
@@ -2928,7 +2906,7 @@ pub unsafe extern "C" fn sink_sftp(
     let mut current_block: u64;
     let mut abs_src: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut abs_dst: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut g: _ssh_compat_glob_t = _ssh_compat_glob_t {
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
         gl_pathc: 0,
         gl_matchc: 0,
         gl_offs: 0,
@@ -2950,9 +2928,9 @@ pub unsafe extern "C" fn sink_sftp(
     let mut dst_is_dir: libc::c_int = 0;
     let mut st: libc::stat = unsafe { std::mem::zeroed() };
     memset(
-        &mut g as *mut _ssh_compat_glob_t as *mut libc::c_void,
+        &mut g as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t as *mut libc::c_void,
         0 as libc::c_int,
-        ::core::mem::size_of::<_ssh_compat_glob_t>() as libc::c_ulong,
+        ::core::mem::size_of::<crate::openbsd_compat::glob::_ssh_compat_glob_t>() as libc::c_ulong,
     );
     abs_src = prepare_remote_path(conn, src);
     if abs_src.is_null() {
@@ -2969,7 +2947,7 @@ pub unsafe extern "C" fn sink_sftp(
             abs_src,
             dst,
         );
-        r = remote_glob(
+        r = crate::sftp_glob::remote_glob(
             conn,
             abs_src,
             0x10 as libc::c_int | 0x8 as libc::c_int,
@@ -4213,7 +4191,7 @@ pub unsafe extern "C" fn throughlocal_sftp(
     let mut abs_dst: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut abs_src: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut g: _ssh_compat_glob_t = _ssh_compat_glob_t {
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
         gl_pathc: 0,
         gl_matchc: 0,
         gl_offs: 0,
@@ -4254,9 +4232,9 @@ pub unsafe extern "C" fn throughlocal_sftp(
         cleanup_exit(255 as libc::c_int);
     }
     memset(
-        &mut g as *mut _ssh_compat_glob_t as *mut libc::c_void,
+        &mut g as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t as *mut libc::c_void,
         0 as libc::c_int,
-        ::core::mem::size_of::<_ssh_compat_glob_t>() as libc::c_ulong,
+        ::core::mem::size_of::<crate::openbsd_compat::glob::_ssh_compat_glob_t>() as libc::c_ulong,
     );
     targetisdir = remote_is_dir(to, target);
     if targetisdir == 0 && targetshouldbedirectory != 0 {
@@ -4285,7 +4263,7 @@ pub unsafe extern "C" fn throughlocal_sftp(
             abs_src,
             target,
         );
-        r = remote_glob(
+        r = crate::sftp_glob::remote_glob(
             from,
             abs_src,
             0x10 as libc::c_int | 0x8 as libc::c_int,

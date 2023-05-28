@@ -63,22 +63,7 @@ pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _ssh_compat_glob_t {
-    pub gl_pathc: size_t,
-    pub gl_matchc: size_t,
-    pub gl_offs: size_t,
-    pub gl_flags: libc::c_int,
-    pub gl_pathv: *mut *mut libc::c_char,
-    pub gl_statv: *mut *mut libc::stat,
-    pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-    pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
-    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
-    pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
-    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
-    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct SFTP_DIRENT {
@@ -497,7 +482,7 @@ unsafe extern "C" fn has_id(mut id: u_int, mut ids: *mut u_int, mut nids: u_int)
     return (i < nids) as libc::c_int;
 }
 unsafe extern "C" fn collect_ids_from_glob(
-    mut g: *mut _ssh_compat_glob_t,
+    mut g: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t,
     mut user: libc::c_int,
     mut idsp: *mut *mut u_int,
     mut nidsp: *mut u_int,
@@ -546,7 +531,7 @@ unsafe extern "C" fn collect_ids_from_glob(
 }
 pub unsafe extern "C" fn get_remote_user_groups_from_glob(
     mut conn: *mut sftp_conn,
-    mut g: *mut _ssh_compat_glob_t,
+    mut g: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t,
 ) {
     let mut uids: *mut u_int = 0 as *mut u_int;
     let mut nuids: u_int = 0 as libc::c_int as u_int;

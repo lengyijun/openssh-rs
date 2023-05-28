@@ -24,7 +24,7 @@ extern "C" {
         _: *const libc::c_char,
         _: libc::c_int,
         _: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-        _: *mut _ssh_compat_glob_t,
+        _: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t,
     ) -> libc::c_int;
 }
 pub type __uint32_t = libc::c_uint;
@@ -44,22 +44,7 @@ pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _ssh_compat_glob_t {
-    pub gl_pathc: size_t,
-    pub gl_matchc: size_t,
-    pub gl_offs: size_t,
-    pub gl_flags: libc::c_int,
-    pub gl_pathv: *mut *mut libc::c_char,
-    pub gl_statv: *mut *mut libc::stat,
-    pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-    pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
-    pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut libc::dirent>,
-    pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
-    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
-    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct SFTP_DIRENT {
@@ -154,7 +139,7 @@ pub unsafe extern "C" fn remote_glob(
     mut pattern: *const libc::c_char,
     mut flags: libc::c_int,
     mut errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-    mut pglob: *mut _ssh_compat_glob_t,
+    mut pglob: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     let mut l: size_t = 0;
