@@ -76,14 +76,7 @@ extern "C" {
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn atomicio6(
-        f: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        fd: libc::c_int,
-        _s: *mut libc::c_void,
-        n: size_t,
-        cb: Option<unsafe extern "C" fn(*mut libc::c_void, size_t) -> libc::c_int>,
-        _: *mut libc::c_void,
-    ) -> size_t;
+
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -2650,7 +2643,7 @@ pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc:
                                                     0 as libc::c_int,
                                                     amt,
                                                 );
-                                            } else if atomicio6(
+                                            } else if crate::atomicio::atomicio6(
                                                 ::core::mem::transmute::<
                                                     Option<
                                                         unsafe extern "C" fn(
@@ -3926,7 +3919,7 @@ pub unsafe extern "C" fn sink(
                                                     as size_t
                                                     as size_t;
                                                 loop {
-                                                    j = atomicio6(
+                                                    j = crate::atomicio::atomicio6(
                                                         Some(
                                                             read
                                                                 as unsafe extern "C" fn(

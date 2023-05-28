@@ -75,14 +75,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn atomicio6(
-        f: Option<unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t>,
-        fd: libc::c_int,
-        _s: *mut libc::c_void,
-        n: size_t,
-        cb: Option<unsafe extern "C" fn(*mut libc::c_void, size_t) -> libc::c_int>,
-        _: *mut libc::c_void,
-    ) -> size_t;
+
 
     fn atomiciov6(
         f: Option<unsafe extern "C" fn(libc::c_int, *const iovec, libc::c_int) -> ssize_t>,
@@ -359,7 +352,7 @@ unsafe extern "C" fn get_msg_extended(
             b"reserve\0" as *const u8 as *const libc::c_char,
         );
     }
-    if atomicio6(
+    if crate::atomicio::atomicio6(
         Some(read as unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t),
         (*conn).fd_in,
         p as *mut libc::c_void,
@@ -453,7 +446,7 @@ unsafe extern "C" fn get_msg_extended(
             b"reserve\0" as *const u8 as *const libc::c_char,
         );
     }
-    if atomicio6(
+    if crate::atomicio::atomicio6(
         Some(read as unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t),
         (*conn).fd_in,
         p as *mut libc::c_void,
