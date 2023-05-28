@@ -43,7 +43,7 @@ extern "C" {
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn scan_scaled(_: *mut libc::c_char, _: *mut libc::c_longlong) -> libc::c_int;
-    fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
+    
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -1865,7 +1865,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             strerror(*libc::__errno_location()),
         );
     }
-    while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
+    while libc::waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
         if *libc::__errno_location() != 4 as libc::c_int
             && *libc::__errno_location() != 11 as libc::c_int
         {
@@ -1877,7 +1877,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"waitpid: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::waitpid: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }

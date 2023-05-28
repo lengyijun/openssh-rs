@@ -67,7 +67,7 @@ extern "C" {
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn daemon(__nochdir: libc::c_int, __noclose: libc::c_int) -> libc::c_int;
     fn gethostname(__name: *mut libc::c_char, __len: size_t) -> libc::c_int;
-    fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
+    
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn setenv(
@@ -5887,7 +5887,7 @@ unsafe extern "C" fn main_sigchld_handler(mut _sig: libc::c_int) {
     let mut pid: pid_t = 0;
     let mut status: libc::c_int = 0;
     loop {
-        pid = waitpid(-(1 as libc::c_int), &mut status, 1 as libc::c_int);
+        pid = libc::waitpid(-(1 as libc::c_int), &mut status, 1 as libc::c_int);
         if !(pid > 0 as libc::c_int
             || pid == -(1 as libc::c_int) && *libc::__errno_location() == 4 as libc::c_int)
         {

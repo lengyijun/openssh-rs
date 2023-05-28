@@ -31,7 +31,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ::core::ffi::VaList,
     ) -> libc::c_int;
-    fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
+    
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
@@ -238,7 +238,7 @@ unsafe extern "C" fn ssh_askpass(
     buf[len as usize] = '\0' as i32 as libc::c_char;
     close(p[0 as libc::c_int as usize]);
     loop {
-        ret = waitpid(pid, &mut status, 0 as libc::c_int);
+        ret = libc::waitpid(pid, &mut status, 0 as libc::c_int);
         if !(ret == -(1 as libc::c_int)) {
             break;
         }
@@ -625,7 +625,7 @@ pub unsafe extern "C" fn notify_complete(
     }
     kill((*ctx).pid, 15 as libc::c_int);
     loop {
-        ret = waitpid((*ctx).pid, 0 as *mut libc::c_int, 0 as libc::c_int);
+        ret = libc::waitpid((*ctx).pid, 0 as *mut libc::c_int, 0 as libc::c_int);
         if !(ret == -(1 as libc::c_int)) {
             break;
         }
@@ -642,7 +642,7 @@ pub unsafe extern "C" fn notify_complete(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"waitpid: %s\0" as *const u8 as *const libc::c_char,
+            b"libc::waitpid: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
     }

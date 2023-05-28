@@ -80,7 +80,7 @@ extern "C" {
     
 
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
-    fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
+    
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __xpg_basename(__path: *mut libc::c_char) -> *mut libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
@@ -859,14 +859,14 @@ unsafe extern "C" fn killchild(mut _signo: libc::c_int) {
     pid = sshpid;
     if pid > 1 as libc::c_int {
         kill(pid, 15 as libc::c_int);
-        waitpid(pid, 0 as *mut libc::c_int, 0 as libc::c_int);
+        libc::waitpid(pid, 0 as *mut libc::c_int, 0 as libc::c_int);
     }
     libc::_exit(1 as libc::c_int);
 }
 unsafe extern "C" fn suspchild(mut signo: libc::c_int) {
     if sshpid > 1 as libc::c_int {
         kill(sshpid, signo);
-        while waitpid(sshpid, 0 as *mut libc::c_int, 2 as libc::c_int) == -(1 as libc::c_int)
+        while libc::waitpid(sshpid, 0 as *mut libc::c_int, 2 as libc::c_int) == -(1 as libc::c_int)
             && *libc::__errno_location() == 4 as libc::c_int
         {}
     }
@@ -894,7 +894,7 @@ unsafe extern "C" fn sigchld_handler(mut _sig: libc::c_int) {
     let msg: [libc::c_char; 23] =
         *::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(b"\rConnection closed.  \n\0");
     loop {
-        pid = waitpid(sshpid, 0 as *mut libc::c_int, 1 as libc::c_int);
+        pid = libc::waitpid(sshpid, 0 as *mut libc::c_int, 1 as libc::c_int);
         if !(pid == -(1 as libc::c_int) && *libc::__errno_location() == 4 as libc::c_int) {
             break;
         }
@@ -986,7 +986,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
         );
         libc::_exit(1 as libc::c_int);
     }
-    while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
+    while libc::waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
         if *libc::__errno_location() != 4 as libc::c_int {
             sshfatal(
                 b"sftp.c\0" as *const u8 as *const libc::c_char,
@@ -4661,7 +4661,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     if batchmode != 0 {
         fclose(infile);
     }
-    while waitpid(sshpid, 0 as *mut libc::c_int, 0 as libc::c_int) == -(1 as libc::c_int)
+    while libc::waitpid(sshpid, 0 as *mut libc::c_int, 0 as libc::c_int) == -(1 as libc::c_int)
         && sshpid > 1 as libc::c_int
     {
         if *libc::__errno_location() != 4 as libc::c_int {

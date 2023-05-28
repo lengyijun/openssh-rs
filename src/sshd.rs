@@ -126,7 +126,7 @@ extern "C" {
 
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn seed_rng();
-    fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
+    
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
     fn setgroups(__n: size_t, __groups: *const __gid_t) -> libc::c_int;
 
@@ -1366,7 +1366,7 @@ unsafe extern "C" fn main_sigchld_handler(mut _sig: libc::c_int) {
     let mut pid: pid_t = 0;
     let mut status: libc::c_int = 0;
     loop {
-        pid = waitpid(-(1 as libc::c_int), &mut status, 1 as libc::c_int);
+        pid = libc::waitpid(-(1 as libc::c_int), &mut status, 1 as libc::c_int);
         if !(pid > 0 as libc::c_int
             || pid == -(1 as libc::c_int) && *libc::__errno_location() == 4 as libc::c_int)
         {
@@ -1600,7 +1600,7 @@ unsafe extern "C" fn privsep_preauth(mut ssh: *mut ssh) -> libc::c_int {
             ssh_sandbox_parent_preauth(box_0, pid);
         }
         monitor_child_preauth(ssh, pmonitor);
-        while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
+        while libc::waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
             if *libc::__errno_location() == 4 as libc::c_int {
                 continue;
             }
@@ -1613,7 +1613,7 @@ unsafe extern "C" fn privsep_preauth(mut ssh: *mut ssh) -> libc::c_int {
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"waitpid: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::waitpid: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }

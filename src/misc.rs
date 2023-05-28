@@ -88,7 +88,7 @@ extern "C" {
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
-    fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
+    
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
@@ -3757,7 +3757,7 @@ pub unsafe extern "C" fn exited_cleanly(
     mut quiet: libc::c_int,
 ) -> libc::c_int {
     let mut status: libc::c_int = 0;
-    while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
+    while libc::waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
         if *libc::__errno_location() != 4 as libc::c_int {
             crate::log::sshlog(
                 b"misc.c\0" as *const u8 as *const libc::c_char,
@@ -3767,7 +3767,7 @@ pub unsafe extern "C" fn exited_cleanly(
                 0 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"%s waitpid: %s\0" as *const u8 as *const libc::c_char,
+                b"%s libc::waitpid: %s\0" as *const u8 as *const libc::c_char,
                 tag,
                 strerror(*libc::__errno_location()),
             );
@@ -5020,7 +5020,7 @@ pub unsafe extern "C" fn subprocess(
                 );
                 close(p[0 as libc::c_int as usize]);
                 kill(pid, 15 as libc::c_int);
-                while waitpid(pid, 0 as *mut libc::c_int, 0 as libc::c_int) == -(1 as libc::c_int)
+                while libc::waitpid(pid, 0 as *mut libc::c_int, 0 as libc::c_int) == -(1 as libc::c_int)
                     && *libc::__errno_location() == 4 as libc::c_int
                 {}
                 return 0 as libc::c_int;

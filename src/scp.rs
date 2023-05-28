@@ -64,7 +64,7 @@ extern "C" {
     
     
 
-    fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
+    
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn opendir(__name: *const libc::c_char) -> *mut DIR;
     fn closedir(__dirp: *mut DIR) -> libc::c_int;
@@ -337,14 +337,14 @@ unsafe extern "C" fn killchild(mut signo: libc::c_int) {
             do_cmd_pid,
             if signo != 0 { signo } else { 15 as libc::c_int },
         );
-        waitpid(do_cmd_pid, 0 as *mut libc::c_int, 0 as libc::c_int);
+        libc::waitpid(do_cmd_pid, 0 as *mut libc::c_int, 0 as libc::c_int);
     }
     if do_cmd_pid2 > 1 as libc::c_int {
         kill(
             do_cmd_pid2,
             if signo != 0 { signo } else { 15 as libc::c_int },
         );
-        waitpid(do_cmd_pid2, 0 as *mut libc::c_int, 0 as libc::c_int);
+        libc::waitpid(do_cmd_pid2, 0 as *mut libc::c_int, 0 as libc::c_int);
     }
     if signo != 0 {
         libc::_exit(1 as libc::c_int);
@@ -355,7 +355,7 @@ unsafe extern "C" fn suspone(mut pid: libc::c_int, mut signo: libc::c_int) {
     let mut status: libc::c_int = 0;
     if pid > 1 as libc::c_int {
         kill(pid, signo);
-        while waitpid(pid, &mut status, 2 as libc::c_int) == -(1 as libc::c_int)
+        while libc::waitpid(pid, &mut status, 2 as libc::c_int) == -(1 as libc::c_int)
             && *libc::__errno_location() == 4 as libc::c_int
         {}
     }
@@ -428,7 +428,7 @@ unsafe extern "C" fn do_local_cmd(mut a: *mut arglist) -> libc::c_int {
         1 as libc::c_int,
         Some(killchild as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
+    while libc::waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
         if *libc::__errno_location() != 4 as libc::c_int {
             sshfatal(
                 b"scp.c\0" as *const u8 as *const libc::c_char,
@@ -438,7 +438,7 @@ unsafe extern "C" fn do_local_cmd(mut a: *mut arglist) -> libc::c_int {
                 0 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"do_local_cmd: waitpid: %s\0" as *const u8 as *const libc::c_char,
+                b"do_local_cmd: libc::waitpid: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -713,7 +713,7 @@ pub unsafe extern "C" fn do_cmd2(
             strerror(*libc::__errno_location()),
         );
     }
-    while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
+    while libc::waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
         if *libc::__errno_location() != 4 as libc::c_int {
             sshfatal(
                 b"scp.c\0" as *const u8 as *const libc::c_char,
@@ -722,7 +722,7 @@ pub unsafe extern "C" fn do_cmd2(
                 0 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"do_cmd2: waitpid: %s\0" as *const u8 as *const libc::c_char,
+                b"do_cmd2: libc::waitpid: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -1171,7 +1171,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
         if remout != -(1 as libc::c_int) {
             close(remout);
         }
-        if waitpid(do_cmd_pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
+        if libc::waitpid(do_cmd_pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
             errs = 1 as libc::c_int;
         } else if !(status & 0x7f as libc::c_int == 0 as libc::c_int)
             || (status & 0xff00 as libc::c_int) >> 8 as libc::c_int != 0 as libc::c_int
@@ -1838,7 +1838,7 @@ pub unsafe extern "C" fn toremote(
                                 close(remout2);
                                 remout2 = -(1 as libc::c_int);
                                 remin2 = remout2;
-                                if waitpid(do_cmd_pid2, &mut status, 0 as libc::c_int)
+                                if libc::waitpid(do_cmd_pid2, &mut status, 0 as libc::c_int)
                                     == -(1 as libc::c_int)
                                 {
                                     errs += 1;
@@ -4777,10 +4777,10 @@ pub unsafe extern "C" fn cleanup_exit(mut i: libc::c_int) -> ! {
         close(remout2);
     }
     if do_cmd_pid > 0 as libc::c_int {
-        waitpid(do_cmd_pid, 0 as *mut libc::c_int, 0 as libc::c_int);
+        libc::waitpid(do_cmd_pid, 0 as *mut libc::c_int, 0 as libc::c_int);
     }
     if do_cmd_pid2 > 0 as libc::c_int {
-        waitpid(do_cmd_pid2, 0 as *mut libc::c_int, 0 as libc::c_int);
+        libc::waitpid(do_cmd_pid2, 0 as *mut libc::c_int, 0 as libc::c_int);
     }
     libc::exit(i);
 }

@@ -66,7 +66,7 @@ extern "C" {
 
     fn perror(__s: *const libc::c_char);
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
+    
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
@@ -1083,7 +1083,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
         );
     }
     close(sp[1 as libc::c_int as usize]);
-    while waitpid(pid, 0 as *mut libc::c_int, 0 as libc::c_int) == -(1 as libc::c_int) {
+    while libc::waitpid(pid, 0 as *mut libc::c_int, 0 as libc::c_int) == -(1 as libc::c_int) {
         if *libc::__errno_location() != 4 as libc::c_int {
             sshfatal(
                 b"sshconnect.c\0" as *const u8 as *const libc::c_char,
@@ -4636,7 +4636,7 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
             strerror(*libc::__errno_location()),
         );
     }
-    while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
+    while libc::waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
         if *libc::__errno_location() != 4 as libc::c_int {
             sshfatal(
                 b"sshconnect.c\0" as *const u8 as *const libc::c_char,

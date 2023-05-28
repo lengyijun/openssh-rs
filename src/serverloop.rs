@@ -37,7 +37,7 @@ extern "C" {
         _: *mut libc::c_char,
         _: libc::c_int,
     ) -> libc::c_int;
-    fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
+    
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
@@ -1200,7 +1200,7 @@ unsafe extern "C" fn collect_children(mut ssh: *mut ssh) {
             b"Received SIGCHLD.\0" as *const u8 as *const libc::c_char,
         );
         loop {
-            pid = waitpid(-(1 as libc::c_int), &mut status, 1 as libc::c_int);
+            pid = libc::waitpid(-(1 as libc::c_int), &mut status, 1 as libc::c_int);
             if !(pid > 0 as libc::c_int
                 || pid == -(1 as libc::c_int) && *libc::__errno_location() == 4 as libc::c_int)
             {

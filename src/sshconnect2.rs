@@ -30,7 +30,7 @@ extern "C" {
 
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
+    
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
@@ -4258,7 +4258,7 @@ unsafe extern "C" fn ssh_keysign(
     } else {
         *libc::__errno_location() = 0 as libc::c_int;
         loop {
-            if !(waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int)) {
+            if !(libc::waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int)) {
                 current_block = 1622411330066726685;
                 break;
             }
@@ -4273,7 +4273,7 @@ unsafe extern "C" fn ssh_keysign(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"waitpid %ld: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::waitpid %ld: %s\0" as *const u8 as *const libc::c_char,
                 pid as libc::c_long,
                 strerror(*libc::__errno_location()),
             );

@@ -16,7 +16,7 @@ extern "C" {
 
     fn fork() -> __pid_t;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
+    
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
@@ -301,7 +301,7 @@ unsafe extern "C" fn reap_helper(mut pid: pid_t) -> libc::c_int {
         pid as libc::c_long,
     );
     *libc::__errno_location() = 0 as libc::c_int;
-    while waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
+    while libc::waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
         if *libc::__errno_location() == 4 as libc::c_int {
             *libc::__errno_location() = 0 as libc::c_int;
         } else {
@@ -314,7 +314,7 @@ unsafe extern "C" fn reap_helper(mut pid: pid_t) -> libc::c_int {
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"waitpid: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::waitpid: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
             *libc::__errno_location() = oerrno;
