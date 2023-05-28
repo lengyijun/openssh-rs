@@ -190,7 +190,10 @@ extern "C" {
         _: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t,
     ) -> libc::c_int;
     fn _ssh__compat_globfree(_: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t);
-    fn get_remote_user_groups_from_glob(conn: *mut sftp_conn, g: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t);
+    fn get_remote_user_groups_from_glob(
+        conn: *mut sftp_conn,
+        g: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t,
+    );
     fn get_remote_user_groups_from_dirents(conn: *mut sftp_conn, d: *mut *mut SFTP_DIRENT);
     fn ruser_name(uid: uid_t) -> *const libc::c_char;
     fn rgroup_name(gid: uid_t) -> *const libc::c_char;
@@ -401,7 +404,6 @@ pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 
-
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct SFTP_DIRENT {
@@ -477,8 +479,9 @@ pub static mut global_pflag: libc::c_int = 0 as libc::c_int;
 pub static mut global_fflag: libc::c_int = 0 as libc::c_int;
 pub static mut interrupted: sig_atomic_t = 0 as libc::c_int;
 pub static mut sort_flag: libc::c_int = 0;
-pub static mut sort_glob: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t =
-    0 as *const crate::openbsd_compat::glob::_ssh_compat_glob_t as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t;
+pub static mut sort_glob: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t = 0
+    as *const crate::openbsd_compat::glob::_ssh_compat_glob_t
+    as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t;
 static mut cmds: [CMD; 38] = [
     {
         let mut init = CMD {
@@ -1564,20 +1567,21 @@ unsafe extern "C" fn process_get(
     let mut abs_src: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut abs_dst: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
-        gl_pathc: 0,
-        gl_matchc: 0,
-        gl_offs: 0,
-        gl_flags: 0,
-        gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut libc::stat,
-        gl_errfunc: None,
-        gl_closedir: None,
-        gl_readdir: None,
-        gl_opendir: None,
-        gl_lstat: None,
-        gl_stat: None,
-    };
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t =
+        crate::openbsd_compat::glob::_ssh_compat_glob_t {
+            gl_pathc: 0,
+            gl_matchc: 0,
+            gl_offs: 0,
+            gl_flags: 0,
+            gl_pathv: 0 as *mut *mut libc::c_char,
+            gl_statv: 0 as *mut *mut libc::stat,
+            gl_errfunc: None,
+            gl_closedir: None,
+            gl_readdir: None,
+            gl_opendir: None,
+            gl_lstat: None,
+            gl_stat: None,
+        };
     let mut i: libc::c_int = 0;
     let mut r: libc::c_int = 0;
     let mut err: libc::c_int = 0 as libc::c_int;
@@ -1745,20 +1749,21 @@ unsafe extern "C" fn process_put(
     let mut abs_dst: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut filename: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
-        gl_pathc: 0,
-        gl_matchc: 0,
-        gl_offs: 0,
-        gl_flags: 0,
-        gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut libc::stat,
-        gl_errfunc: None,
-        gl_closedir: None,
-        gl_readdir: None,
-        gl_opendir: None,
-        gl_lstat: None,
-        gl_stat: None,
-    };
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t =
+        crate::openbsd_compat::glob::_ssh_compat_glob_t {
+            gl_pathc: 0,
+            gl_matchc: 0,
+            gl_offs: 0,
+            gl_flags: 0,
+            gl_pathv: 0 as *mut *mut libc::c_char,
+            gl_statv: 0 as *mut *mut libc::stat,
+            gl_errfunc: None,
+            gl_closedir: None,
+            gl_readdir: None,
+            gl_opendir: None,
+            gl_lstat: None,
+            gl_stat: None,
+        };
     let mut err: libc::c_int = 0 as libc::c_int;
     let mut i: libc::c_int = 0;
     let mut dst_is_dir: libc::c_int = 1 as libc::c_int;
@@ -2185,20 +2190,21 @@ unsafe extern "C" fn do_globbed_ls(
 ) -> libc::c_int {
     let mut fname: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut lname: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
-        gl_pathc: 0,
-        gl_matchc: 0,
-        gl_offs: 0,
-        gl_flags: 0,
-        gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut libc::stat,
-        gl_errfunc: None,
-        gl_closedir: None,
-        gl_readdir: None,
-        gl_opendir: None,
-        gl_lstat: None,
-        gl_stat: None,
-    };
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t =
+        crate::openbsd_compat::glob::_ssh_compat_glob_t {
+            gl_pathc: 0,
+            gl_matchc: 0,
+            gl_offs: 0,
+            gl_flags: 0,
+            gl_pathv: 0 as *mut *mut libc::c_char,
+            gl_statv: 0 as *mut *mut libc::stat,
+            gl_errfunc: None,
+            gl_closedir: None,
+            gl_readdir: None,
+            gl_opendir: None,
+            gl_lstat: None,
+            gl_stat: None,
+        };
     let mut err: libc::c_int = 0;
     let mut r: libc::c_int = 0;
     let mut ws: winsize = winsize {
@@ -3289,20 +3295,21 @@ unsafe extern "C" fn parse_dispatch_command(
     let mut aa: *mut Attrib = 0 as *mut Attrib;
     let mut path_buf: [libc::c_char; 4096] = [0; 4096];
     let mut err: libc::c_int = 0 as libc::c_int;
-    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
-        gl_pathc: 0,
-        gl_matchc: 0,
-        gl_offs: 0,
-        gl_flags: 0,
-        gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut libc::stat,
-        gl_errfunc: None,
-        gl_closedir: None,
-        gl_readdir: None,
-        gl_opendir: None,
-        gl_lstat: None,
-        gl_stat: None,
-    };
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t =
+        crate::openbsd_compat::glob::_ssh_compat_glob_t {
+            gl_pathc: 0,
+            gl_matchc: 0,
+            gl_offs: 0,
+            gl_flags: 0,
+            gl_pathv: 0 as *mut *mut libc::c_char,
+            gl_statv: 0 as *mut *mut libc::stat,
+            gl_errfunc: None,
+            gl_closedir: None,
+            gl_readdir: None,
+            gl_opendir: None,
+            gl_lstat: None,
+            gl_stat: None,
+        };
     path2 = 0 as *mut libc::c_char;
     path1 = path2;
     cmdnum = parse_args(

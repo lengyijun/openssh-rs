@@ -50,7 +50,7 @@ extern "C" {
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn cleanup_exit(_: libc::c_int) -> !;
 
     fn sshfatal(
@@ -1850,7 +1850,7 @@ unsafe extern "C" fn format_forward(mut ftype: u_int, mut fwd: *mut Forward) -> 
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
     match ftype {
         1 => {
-            xasprintf(
+            crate::xmalloc::xasprintf(
                 &mut ret as *mut *mut libc::c_char,
                 b"local forward %.200s:%d -> %.200s:%d\0" as *const u8 as *const libc::c_char,
                 if !((*fwd).listen_path).is_null() {
@@ -1874,7 +1874,7 @@ unsafe extern "C" fn format_forward(mut ftype: u_int, mut fwd: *mut Forward) -> 
             );
         }
         3 => {
-            xasprintf(
+            crate::xmalloc::xasprintf(
                 &mut ret as *mut *mut libc::c_char,
                 b"dynamic forward %.200s:%d -> *\0" as *const u8 as *const libc::c_char,
                 if ((*fwd).listen_host).is_null() {
@@ -1890,7 +1890,7 @@ unsafe extern "C" fn format_forward(mut ftype: u_int, mut fwd: *mut Forward) -> 
             );
         }
         2 => {
-            xasprintf(
+            crate::xmalloc::xasprintf(
                 &mut ret as *mut *mut libc::c_char,
                 b"remote forward %.200s:%d -> %.200s:%d\0" as *const u8 as *const libc::c_char,
                 if !((*fwd).listen_path).is_null() {
@@ -2007,7 +2007,7 @@ unsafe extern "C" fn mux_confirm_remote_forward(
         || ((*(options.remote_forwards).offset((*fctx).fid as isize)).connect_path).is_null()
             && ((*(options.remote_forwards).offset((*fctx).fid as isize)).connect_host).is_null()
     {
-        xasprintf(
+        crate::xmalloc::xasprintf(
             &mut failmsg as *mut *mut libc::c_char,
             b"unknown forwarding id %d\0" as *const u8 as *const libc::c_char,
             (*fctx).fid,
@@ -2125,14 +2125,14 @@ unsafe extern "C" fn mux_confirm_remote_forward(
                 channel_update_permission(ssh, (*rfwd).handle, -(1 as libc::c_int));
             }
             if !((*rfwd).listen_path).is_null() {
-                xasprintf(
+                crate::xmalloc::xasprintf(
                     &mut failmsg as *mut *mut libc::c_char,
                     b"remote port forwarding failed for listen path %s\0" as *const u8
                         as *const libc::c_char,
                     (*rfwd).listen_path,
                 );
             } else {
-                xasprintf(
+                crate::xmalloc::xasprintf(
                     &mut failmsg as *mut *mut libc::c_char,
                     b"remote port forwarding failed for listen port %d\0" as *const u8
                         as *const libc::c_char,
@@ -3739,7 +3739,7 @@ pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
     rbuf[(::core::mem::size_of::<[libc::c_char; 17]>() as libc::c_ulong)
         .wrapping_sub(1 as libc::c_int as libc::c_ulong) as usize] = '\0' as i32 as libc::c_char;
     options.control_path = 0 as *mut libc::c_char;
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut options.control_path as *mut *mut libc::c_char,
         b"%s.%s\0" as *const u8 as *const libc::c_char,
         orig_control_path,

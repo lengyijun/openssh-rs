@@ -80,7 +80,7 @@ extern "C" {
     fn freeifaddrs(__ifa: *mut ifaddrs);
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn init_hostkeys() -> *mut hostkeys;
     fn load_hostkeys(_: *mut hostkeys, _: *const libc::c_char, _: *const libc::c_char, _: u_int);
     fn load_hostkeys_file(
@@ -911,7 +911,7 @@ unsafe extern "C" fn expand_proxy_command(
         b"%d\0" as *const u8 as *const libc::c_char,
         port,
     );
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut tmp as *mut *mut libc::c_char,
         b"exec %s\0" as *const u8 as *const libc::c_char,
         proxy_command,
@@ -2136,7 +2136,7 @@ unsafe extern "C" fn try_tilde_unexpand(mut path: *const libc::c_char) -> *mut l
         l = l.wrapping_add(1);
         l;
     }
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut ret as *mut *mut libc::c_char,
         b"~/%s\0" as *const u8 as *const libc::c_char,
         path.offset(l as isize),
@@ -2177,7 +2177,7 @@ unsafe extern "C" fn hostkeys_find_by_key_cb(
         ((*ctx).nnames).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,
         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
     ) as *mut *mut libc::c_char;
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut *((*ctx).names).offset((*ctx).nnames as isize) as *mut *mut libc::c_char,
         b"%s:%lu: %s\0" as *const u8 as *const libc::c_char,
         path,
@@ -2387,7 +2387,7 @@ unsafe extern "C" fn other_hostkeys_message(
             b"This key is not known by any other names.\0" as *const u8 as *const libc::c_char,
         );
     }
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut ret as *mut *mut libc::c_char,
         b"This host key is known by the following other names/addresses:\0" as *const u8
             as *const libc::c_char,
@@ -2444,7 +2444,7 @@ pub unsafe extern "C" fn load_hostkeys_command(
     let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut pid: pid_t = 0;
     let mut osigchld: Option<unsafe extern "C" fn(libc::c_int) -> ()> = None;
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut tag as *mut *mut libc::c_char,
         b"KnownHostsCommand-%s\0" as *const u8 as *const libc::c_char,
         invocation,
@@ -3150,7 +3150,7 @@ unsafe extern "C" fn check_host_key(
                             if options.strict_host_key_checking == 3 as libc::c_int {
                                 let mut msg1: *mut libc::c_char = 0 as *mut libc::c_char;
                                 let mut msg2: *mut libc::c_char = 0 as *mut libc::c_char;
-                                xasprintf(
+                                crate::xmalloc::xasprintf(
                                     &mut msg1 as *mut *mut libc::c_char,
                                     b"The authenticity of host '%.200s (%s)' can't be established\0"
                                         as *const u8

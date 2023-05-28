@@ -30,7 +30,6 @@ extern "C" {
     fn temporarily_use_uid(_: *mut libc::passwd);
     fn restore_uid();
 
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn auth_debug_add(fmt: *const libc::c_char, _: ...);
     static mut options: ServerOptions;
 }
@@ -459,7 +458,7 @@ pub unsafe extern "C" fn auth_rhosts2(
     temporarily_use_uid(pw);
     rhosts_file_index = 0 as libc::c_int as u_int;
     while !(rhosts_files[rhosts_file_index as usize]).is_null() {
-        xasprintf(
+        crate::xmalloc::xasprintf(
             &mut path as *mut *mut libc::c_char,
             b"%s/%s\0" as *const u8 as *const libc::c_char,
             (*pw).pw_dir,
@@ -589,7 +588,7 @@ pub unsafe extern "C" fn auth_rhosts2(
     temporarily_use_uid(pw);
     rhosts_file_index = 0 as libc::c_int as u_int;
     while !(rhosts_files[rhosts_file_index as usize]).is_null() {
-        xasprintf(
+        crate::xmalloc::xasprintf(
             &mut path as *mut *mut libc::c_char,
             b"%s/%s\0" as *const u8 as *const libc::c_char,
             (*pw).pw_dir,

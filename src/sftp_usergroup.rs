@@ -63,7 +63,6 @@ pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 
-
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct SFTP_DIRENT {

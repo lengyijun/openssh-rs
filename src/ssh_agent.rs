@@ -90,7 +90,7 @@ extern "C" {
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_fromb(buf: *mut sshbuf) -> *mut sshbuf;
     fn sshbuf_froms(buf: *mut sshbuf, bufp: *mut *mut sshbuf) -> libc::c_int;
@@ -1793,7 +1793,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                         );
                         current_block = 13457127675253637570;
                     } else {
-                        xasprintf(
+                        crate::xmalloc::xasprintf(
                             &mut sig_dest as *mut *mut libc::c_char,
                             b"public key authentication request for user \"%s\" to listed host\0"
                                 as *const u8 as *const libc::c_char,
@@ -1891,7 +1891,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                                     {
                                         notify_complete(notifier, 0 as *const libc::c_char);
                                         notifier = 0 as *mut notifier_ctx;
-                                        xasprintf(
+                                        crate::xmalloc::xasprintf(
                                             &mut prompt as *mut *mut libc::c_char,
                                             b"Enter PIN%sfor %s key %s: \0" as *const u8
                                                 as *const libc::c_char,

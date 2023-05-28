@@ -23,7 +23,7 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_getb_froms(ssh: *mut ssh, valp: *mut *mut sshbuf) -> libc::c_int;
     fn sshpkt_get_cstring(
@@ -707,7 +707,7 @@ unsafe extern "C" fn format_key(mut key: *const sshkey) -> *mut libc::c_char {
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut fp: *mut libc::c_char =
         sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut ret as *mut *mut libc::c_char,
         b"%s %s\0" as *const u8 as *const libc::c_char,
         sshkey_type(key),
@@ -1100,7 +1100,7 @@ unsafe extern "C" fn userauth_pubkey(
                                     as *const libc::c_char,
                             );
                         } else {
-                            xasprintf(
+                            crate::xmalloc::xasprintf(
                                 &mut userstyle as *mut *mut libc::c_char,
                                 b"%s%s%s\0" as *const u8 as *const libc::c_char,
                                 (*authctxt).user,
@@ -2225,7 +2225,7 @@ unsafe extern "C" fn user_key_command_allowed2(
                     let ref mut fresh3 = *av.offset(2 as libc::c_int as isize);
                     *fresh3 = 0 as *mut libc::c_char;
                     libc::free(command as *mut libc::c_void);
-                    xasprintf(
+                    crate::xmalloc::xasprintf(
                         &mut command as *mut *mut libc::c_char,
                         b"%s %s\0" as *const u8 as *const libc::c_char,
                         *av.offset(0 as libc::c_int as isize),

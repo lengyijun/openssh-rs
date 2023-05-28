@@ -53,7 +53,7 @@ extern "C" {
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn match_user(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -917,7 +917,7 @@ unsafe extern "C" fn format_method_key(mut authctxt: *mut Authctxt) -> *mut libc
             options.fingerprint_hash,
             SSH_FP_DEFAULT,
         );
-        xasprintf(
+        crate::xmalloc::xasprintf(
             &mut ret as *mut *mut libc::c_char,
             b"%s %s ID %s (serial %llu) CA %s %s%s%s\0" as *const u8 as *const libc::c_char,
             sshkey_type(key),
@@ -949,7 +949,7 @@ unsafe extern "C" fn format_method_key(mut authctxt: *mut Authctxt) -> *mut libc
         libc::free(cafp as *mut libc::c_void);
     } else {
         fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
-        xasprintf(
+        crate::xmalloc::xasprintf(
             &mut ret as *mut *mut libc::c_char,
             b"%s %s%s%s\0" as *const u8 as *const libc::c_char,
             sshkey_type(key),

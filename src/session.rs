@@ -108,7 +108,7 @@ extern "C" {
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn pty_allocate(
         _: *mut libc::c_int,
         _: *mut libc::c_int,
@@ -1039,7 +1039,7 @@ unsafe extern "C" fn auth_input_request_forwarding(
         libc::free(auth_sock_dir as *mut libc::c_void);
         auth_sock_dir = 0 as *mut libc::c_char;
     } else {
-        xasprintf(
+        crate::xmalloc::xasprintf(
             &mut auth_sock_name as *mut *mut libc::c_char,
             b"%s/agent.%ld\0" as *const u8 as *const libc::c_char,
             auth_sock_dir,
@@ -2215,7 +2215,7 @@ unsafe extern "C" fn do_rc_files(
     do_xauth = (!((*s).display).is_null()
         && !((*s).auth_proto).is_null()
         && !((*s).auth_data).is_null()) as libc::c_int;
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut user_rc as *mut *mut libc::c_char,
         b"%s/%s\0" as *const u8 as *const libc::c_char,
         (*(*s).pw).pw_dir,
@@ -2227,7 +2227,7 @@ unsafe extern "C" fn do_rc_files(
         && options.permit_user_rc != 0
         && libc::stat(user_rc, &mut st) >= 0 as libc::c_int
     {
-        if xasprintf(
+        if crate::xmalloc::xasprintf(
             &mut cmd as *mut *mut libc::c_char,
             b"%s -c '%s %s'\0" as *const u8 as *const libc::c_char,
             shell,
@@ -2243,7 +2243,7 @@ unsafe extern "C" fn do_rc_files(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"xasprintf: %s\0" as *const u8 as *const libc::c_char,
+                b"crate::xmalloc::xasprintf: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -2323,7 +2323,7 @@ unsafe extern "C" fn do_rc_files(
                 (*s).auth_data,
             );
         }
-        if xasprintf(
+        if crate::xmalloc::xasprintf(
             &mut cmd as *mut *mut libc::c_char,
             b"%s -q -\0" as *const u8 as *const libc::c_char,
             options.xauth_location,
@@ -2337,7 +2337,7 @@ unsafe extern "C" fn do_rc_files(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"xasprintf: %s\0" as *const u8 as *const libc::c_char,
+                b"crate::xmalloc::xasprintf: %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -3490,7 +3490,7 @@ unsafe extern "C" fn session_subsystem_req(mut ssh: *mut ssh, mut s: *mut Sessio
                     cmd,
                 );
             }
-            xasprintf(
+            crate::xmalloc::xasprintf(
                 &mut type_0 as *mut *mut libc::c_char,
                 b"session:subsystem:%s\0" as *const u8 as *const libc::c_char,
                 options.subsystem_name[i as usize],

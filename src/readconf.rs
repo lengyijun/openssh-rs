@@ -62,7 +62,7 @@ extern "C" {
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
 
@@ -1684,7 +1684,7 @@ pub unsafe extern "C" fn add_identity_file(
     }
     if dir.is_null() {
         path = xstrdup(filename);
-    } else if xasprintf(
+    } else if crate::xmalloc::xasprintf(
         &mut path as *mut *mut libc::c_char,
         b"%s%s\0" as *const u8 as *const libc::c_char,
         dir,
@@ -3084,20 +3084,21 @@ unsafe extern "C" fn process_config_line_depth(
     };
     let mut multistate_ptr: *const multistate = 0 as *const multistate;
     let mut cname: *mut allowed_cname = 0 as *mut allowed_cname;
-    let mut gl: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
-        gl_pathc: 0,
-        gl_matchc: 0,
-        gl_offs: 0,
-        gl_flags: 0,
-        gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut libc::stat,
-        gl_errfunc: None,
-        gl_closedir: None,
-        gl_readdir: None,
-        gl_opendir: None,
-        gl_lstat: None,
-        gl_stat: None,
-    };
+    let mut gl: crate::openbsd_compat::glob::_ssh_compat_glob_t =
+        crate::openbsd_compat::glob::_ssh_compat_glob_t {
+            gl_pathc: 0,
+            gl_matchc: 0,
+            gl_offs: 0,
+            gl_flags: 0,
+            gl_pathv: 0 as *mut *mut libc::c_char,
+            gl_statv: 0 as *mut *mut libc::stat,
+            gl_errfunc: None,
+            gl_closedir: None,
+            gl_readdir: None,
+            gl_opendir: None,
+            gl_lstat: None,
+            gl_stat: None,
+        };
     let mut errstr: *const libc::c_char = 0 as *const libc::c_char;
     let mut oav: *mut *mut libc::c_char = 0 as *mut *mut libc::c_char;
     let mut av: *mut *mut libc::c_char = 0 as *mut *mut libc::c_char;
@@ -4808,7 +4809,7 @@ unsafe extern "C" fn process_config_line_depth(
                         break;
                     } else {
                         if path_absolute(arg) == 0 && *arg as libc::c_int != '~' as i32 {
-                            xasprintf(
+                            crate::xmalloc::xasprintf(
                                 &mut arg2 as *mut *mut libc::c_char,
                                 b"%s/%s\0" as *const u8 as *const libc::c_char,
                                 if flags & 2 as libc::c_int != 0 {
@@ -4822,9 +4823,11 @@ unsafe extern "C" fn process_config_line_depth(
                             arg2 = xstrdup(arg);
                         }
                         memset(
-                            &mut gl as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t as *mut libc::c_void,
+                            &mut gl as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t
+                                as *mut libc::c_void,
                             0 as libc::c_int,
-                            ::core::mem::size_of::<crate::openbsd_compat::glob::_ssh_compat_glob_t>() as libc::c_ulong,
+                            ::core::mem::size_of::<crate::openbsd_compat::glob::_ssh_compat_glob_t>(
+                            ) as libc::c_ulong,
                         );
                         r = _ssh__compat_glob(arg2, 0x800 as libc::c_int, None, &mut gl);
                         if r == -(3 as libc::c_int) {

@@ -73,7 +73,6 @@ extern "C" {
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -155,7 +154,6 @@ pub const _ISdigit: C2RustUnnamed = 2048;
 pub const _ISalpha: C2RustUnnamed = 1024;
 pub const _ISlower: C2RustUnnamed = 512;
 pub const _ISupper: C2RustUnnamed = 256;
-
 
 pub type SyslogFacility = libc::c_int;
 pub const SYSLOG_FACILITY_NOT_SET: SyslogFacility = -1;
@@ -1757,7 +1755,7 @@ pub unsafe extern "C" fn toremote(
                                 }
                                 do_cmd_pid2 = -(1 as libc::c_int);
                             } else {
-                                xasprintf(
+                                crate::xmalloc::xasprintf(
                                     &mut bp as *mut *mut libc::c_char,
                                     b"%s -f %s%s\0" as *const u8 as *const libc::c_char,
                                     cmd.as_mut_ptr(),
@@ -1783,7 +1781,7 @@ pub unsafe extern "C" fn toremote(
                                     libc::exit(1 as libc::c_int);
                                 }
                                 libc::free(bp as *mut libc::c_void);
-                                xasprintf(
+                                crate::xmalloc::xasprintf(
                                     &mut bp as *mut *mut libc::c_char,
                                     b"%s -t %s%s\0" as *const u8 as *const libc::c_char,
                                     cmd.as_mut_ptr(),
@@ -1977,7 +1975,7 @@ pub unsafe extern "C" fn toremote(
                             source_sftp(1 as libc::c_int, *argv.offset(i as isize), targ, conn);
                         } else {
                             if remin == -(1 as libc::c_int) {
-                                xasprintf(
+                                crate::xmalloc::xasprintf(
                                     &mut bp as *mut *mut libc::c_char,
                                     b"%s -t %s%s\0" as *const u8 as *const libc::c_char,
                                     cmd.as_mut_ptr(),
@@ -2152,7 +2150,7 @@ pub unsafe extern "C" fn tolocal(
                     remin = remout;
                 }
             } else {
-                xasprintf(
+                crate::xmalloc::xasprintf(
                     &mut bp as *mut *mut libc::c_char,
                     b"%s -f %s%s\0" as *const u8 as *const libc::c_char,
                     cmd.as_mut_ptr(),
@@ -2906,20 +2904,21 @@ pub unsafe extern "C" fn sink_sftp(
     let mut current_block: u64;
     let mut abs_src: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut abs_dst: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
-        gl_pathc: 0,
-        gl_matchc: 0,
-        gl_offs: 0,
-        gl_flags: 0,
-        gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut libc::stat,
-        gl_errfunc: None,
-        gl_closedir: None,
-        gl_readdir: None,
-        gl_opendir: None,
-        gl_lstat: None,
-        gl_stat: None,
-    };
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t =
+        crate::openbsd_compat::glob::_ssh_compat_glob_t {
+            gl_pathc: 0,
+            gl_matchc: 0,
+            gl_offs: 0,
+            gl_flags: 0,
+            gl_pathv: 0 as *mut *mut libc::c_char,
+            gl_statv: 0 as *mut *mut libc::stat,
+            gl_errfunc: None,
+            gl_closedir: None,
+            gl_readdir: None,
+            gl_opendir: None,
+            gl_lstat: None,
+            gl_stat: None,
+        };
     let mut filename: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut i: libc::c_int = 0;
@@ -4191,20 +4190,21 @@ pub unsafe extern "C" fn throughlocal_sftp(
     let mut abs_dst: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut abs_src: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t = crate::openbsd_compat::glob::_ssh_compat_glob_t {
-        gl_pathc: 0,
-        gl_matchc: 0,
-        gl_offs: 0,
-        gl_flags: 0,
-        gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut libc::stat,
-        gl_errfunc: None,
-        gl_closedir: None,
-        gl_readdir: None,
-        gl_opendir: None,
-        gl_lstat: None,
-        gl_stat: None,
-    };
+    let mut g: crate::openbsd_compat::glob::_ssh_compat_glob_t =
+        crate::openbsd_compat::glob::_ssh_compat_glob_t {
+            gl_pathc: 0,
+            gl_matchc: 0,
+            gl_offs: 0,
+            gl_flags: 0,
+            gl_pathv: 0 as *mut *mut libc::c_char,
+            gl_statv: 0 as *mut *mut libc::stat,
+            gl_errfunc: None,
+            gl_closedir: None,
+            gl_readdir: None,
+            gl_opendir: None,
+            gl_lstat: None,
+            gl_stat: None,
+        };
     let mut i: libc::c_int = 0;
     let mut r: libc::c_int = 0;
     let mut targetisdir: libc::c_int = 0;

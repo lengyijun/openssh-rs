@@ -41,7 +41,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn sshpkt_fmt_connection_id(ssh: *mut ssh, s: *mut libc::c_char, l: size_t);
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_get_cstring(
@@ -1731,7 +1731,7 @@ unsafe extern "C" fn server_request_tun(mut ssh: *mut ssh) -> *mut Channel {
                         );
                     }
                     tmp = tun_fwd_ifnames;
-                    xasprintf(
+                    crate::xmalloc::xasprintf(
                         &mut tun_fwd_ifnames as *mut *mut libc::c_char,
                         b"%s%s%s\0" as *const u8 as *const libc::c_char,
                         if tun_fwd_ifnames.is_null() {

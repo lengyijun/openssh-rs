@@ -55,7 +55,7 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn match_hostname(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn sshkey_ssh_name(_: *const sshkey) -> *const libc::c_char;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
@@ -459,7 +459,7 @@ pub unsafe extern "C" fn host_hash(
             b"__b64_ntop failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut encoded as *mut *mut libc::c_char,
         b"%s%s%c%s\0" as *const u8 as *const libc::c_char,
         b"|1|\0" as *const u8 as *const libc::c_char,

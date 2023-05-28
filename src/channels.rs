@@ -86,7 +86,7 @@ extern "C" {
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshbuf_read(_: libc::c_int, _: *mut sshbuf, _: size_t, _: *mut size_t) -> libc::c_int;
     fn sshbuf_dup_string(buf: *mut sshbuf) -> *mut libc::c_char;
@@ -1743,7 +1743,7 @@ pub unsafe extern "C" fn channel_format_extended_usage(
 }
 unsafe extern "C" fn channel_format_status(mut c: *const Channel) -> *mut libc::c_char {
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut ret as *mut *mut libc::c_char,
         b"t%d [%s] %s%u i%u/%zu o%u/%zu e[%s]/%zu fd %d/%d/%d sock %d cc %d io 0x%02x/0x%02x\0"
             as *const u8 as *const libc::c_char,
@@ -3727,7 +3727,7 @@ unsafe extern "C" fn port_open_helper(
         remote_port = 65535 as libc::c_int;
     }
     libc::free((*c).remote_name as *mut libc::c_void);
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut (*c).remote_name as *mut *mut libc::c_char,
         b"%s: listening port %d for %.100s port %d, connect from %.200s port %d to %.100s port %d\0"
             as *const u8 as *const libc::c_char,

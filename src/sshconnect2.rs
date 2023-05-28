@@ -42,7 +42,7 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn sshbuf_dup_string(buf: *mut sshbuf) -> *mut libc::c_char;
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
@@ -1001,7 +1001,7 @@ unsafe extern "C" fn order_hostkeyalgs(
                 strlcat(last, alg, maxlen);
             }
         }
-        xasprintf(
+        crate::xmalloc::xasprintf(
             &mut ret as *mut *mut libc::c_char,
             b"%s%s%s\0" as *const u8 as *const libc::c_char,
             first,
@@ -1709,7 +1709,7 @@ unsafe extern "C" fn format_identity(mut id: *mut Identity) -> *mut libc::c_char
             note = b" authenticator\0" as *const u8 as *const libc::c_char;
         }
     }
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut ret as *mut *mut libc::c_char,
         b"%s %s%s%s%s%s%s\0" as *const u8 as *const libc::c_char,
         (*id).filename,
@@ -1956,7 +1956,7 @@ unsafe extern "C" fn userauth_passwd(mut ssh: *mut ssh) -> libc::c_int {
             b"Permission denied, please try again.\0" as *const u8 as *const libc::c_char,
         );
     }
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut prompt as *mut *mut libc::c_char,
         b"%s@%s's password: \0" as *const u8 as *const libc::c_char,
         (*authctxt).server_user,
@@ -2386,7 +2386,7 @@ unsafe extern "C" fn identity_sign(
                     }
                     notify_complete(notifier, 0 as *const libc::c_char);
                     notifier = 0 as *mut notifier_ctx;
-                    xasprintf(
+                    crate::xmalloc::xasprintf(
                         &mut prompt as *mut *mut libc::c_char,
                         b"Enter PIN for %s key %s: \0" as *const u8 as *const libc::c_char,
                         sshkey_type(sign_key),
@@ -4495,7 +4495,7 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
                     b"cannot get local ipaddr/name\0" as *const u8 as *const libc::c_char,
                 );
             } else {
-                xasprintf(
+                crate::xmalloc::xasprintf(
                     &mut chost as *mut *mut libc::c_char,
                     b"%s.\0" as *const u8 as *const libc::c_char,
                     lname,

@@ -136,7 +136,7 @@ extern "C" {
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn xvasprintf(
         _: *mut *mut libc::c_char,
         _: *const libc::c_char,
@@ -2091,7 +2091,7 @@ pub unsafe extern "C" fn tilde_expand(
                     .offset(len.wrapping_sub(1 as libc::c_int as libc::c_ulong) as isize)
                     as libc::c_int
                     != '/' as i32) as libc::c_int;
-            r = xasprintf(
+            r = crate::xmalloc::xasprintf(
                 &mut s as *mut *mut libc::c_char,
                 b"%s%s%s\0" as *const u8 as *const libc::c_char,
                 (*pw).pw_dir,
@@ -2115,7 +2115,7 @@ pub unsafe extern "C" fn tilde_expand(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"xasprintf failed\0" as *const u8 as *const libc::c_char,
+                    b"crate::xmalloc::xasprintf failed\0" as *const u8 as *const libc::c_char,
                 );
             } else if r >= 4096 as libc::c_int {
                 crate::log::sshlog(
@@ -2658,7 +2658,7 @@ pub unsafe extern "C" fn xextendf(
         *sp = tmp1;
         return;
     }
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut tmp2 as *mut *mut libc::c_char,
         b"%s%s%s\0" as *const u8 as *const libc::c_char,
         *sp,

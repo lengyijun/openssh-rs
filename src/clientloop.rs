@@ -68,7 +68,7 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn xvasprintf(
         _: *mut *mut libc::c_char,
         _: *const libc::c_char,
@@ -1327,7 +1327,7 @@ pub unsafe extern "C" fn client_x11_get_proto(
                 return -(1 as libc::c_int);
             }
             if timeout == 0 as libc::c_int as libc::c_uint {
-                xasprintf(
+                crate::xmalloc::xasprintf(
                     &mut cmd as *mut *mut libc::c_char,
                     b"%s -f %s generate %s %s untrusted 2>%s\0" as *const u8 as *const libc::c_char,
                     xauth_path,
@@ -1349,7 +1349,7 @@ pub unsafe extern "C" fn client_x11_get_proto(
                         .wrapping_mul(2 as libc::c_uint)
                         .wrapping_add(1 as libc::c_uint);
                 }
-                xasprintf(
+                crate::xmalloc::xasprintf(
                     &mut cmd as *mut *mut libc::c_char,
                     b"%s -f %s generate %s %s untrusted timeout %u 2>%s\0" as *const u8
                         as *const libc::c_char,
@@ -1393,7 +1393,7 @@ pub unsafe extern "C" fn client_x11_get_proto(
             libc::free(cmd as *mut libc::c_void);
         }
         if trusted != 0 || generated != 0 {
-            xasprintf(
+            crate::xmalloc::xasprintf(
                 &mut cmd as *mut *mut libc::c_char,
                 b"%s %s%s list %s 2>/dev/null\0" as *const u8 as *const libc::c_char,
                 xauth_path,

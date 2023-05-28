@@ -81,7 +81,7 @@ extern "C" {
     fn OpenSSL_version(type_0: libc::c_int) -> *const libc::c_char;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn ciphers_valid(_: *const libc::c_char) -> libc::c_int;
     fn cipher_alg_list(_: libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn compression_alg_list(_: libc::c_int) -> *const libc::c_char;
@@ -1740,7 +1740,7 @@ unsafe extern "C" fn resolve_canonicalize(
                 current_block = 17524704725112814263;
                 break;
             }
-            xasprintf(
+            crate::xmalloc::xasprintf(
                 &mut fullhost as *mut *mut libc::c_char,
                 b"%s.%s.\0" as *const u8 as *const libc::c_char,
                 *hostp,
@@ -3101,7 +3101,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             b"%d\0" as *const u8 as *const libc::c_char,
             options.jump_port,
         );
-        xasprintf(
+        crate::xmalloc::xasprintf(
             &mut options.proxy_command as *mut *mut libc::c_char,
             b"%s%s%s%s%s%s%s%s%s%s%.*s -W '[%%h]:%%p' %s\0" as *const u8 as *const libc::c_char,
             sshbin,
@@ -3340,12 +3340,12 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         b".\0" as *const u8 as *const libc::c_char,
     ) as usize] = '\0' as i32 as libc::c_char;
     (*cinfo).shorthost = xstrdup(thishost.as_mut_ptr());
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut (*cinfo).portstr as *mut *mut libc::c_char,
         b"%d\0" as *const u8 as *const libc::c_char,
         options.port,
     );
-    xasprintf(
+    crate::xmalloc::xasprintf(
         &mut (*cinfo).uidstr as *mut *mut libc::c_char,
         b"%llu\0" as *const u8 as *const libc::c_char,
         (*pw).pw_uid as libc::c_ulonglong,
@@ -5693,7 +5693,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
             n_ids = n_ids.wrapping_add(1);
             if !(n_ids >= 100 as libc::c_int as libc::c_uint) {
                 if !(options.num_certificate_files != 0 as libc::c_int) {
-                    xasprintf(
+                    crate::xmalloc::xasprintf(
                         &mut cp as *mut *mut libc::c_char,
                         b"%s-cert\0" as *const u8 as *const libc::c_char,
                         filename,

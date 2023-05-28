@@ -151,7 +151,7 @@ extern "C" {
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn sshkey_new(_: libc::c_int) -> *mut sshkey;
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_equal_public(_: *const sshkey, _: *const sshkey) -> libc::c_int;
@@ -2864,7 +2864,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut libc::passwd) {
         prv_file = pub_file;
         pub_tmp = prv_file;
         prv_tmp = pub_tmp;
-        xasprintf(
+        crate::xmalloc::xasprintf(
             &mut prv_file as *mut *mut libc::c_char,
             b"%s%s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
@@ -2897,19 +2897,19 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut libc::passwd) {
         }
         match current_block {
             11650488183268122163 => {
-                xasprintf(
+                crate::xmalloc::xasprintf(
                     &mut prv_tmp as *mut *mut libc::c_char,
                     b"%s%s.XXXXXXXXXX\0" as *const u8 as *const libc::c_char,
                     identity_file.as_mut_ptr(),
                     key_types[i as usize].path,
                 );
-                xasprintf(
+                crate::xmalloc::xasprintf(
                     &mut pub_tmp as *mut *mut libc::c_char,
                     b"%s%s.pub.XXXXXXXXXX\0" as *const u8 as *const libc::c_char,
                     identity_file.as_mut_ptr(),
                     key_types[i as usize].path,
                 );
-                xasprintf(
+                crate::xmalloc::xasprintf(
                     &mut pub_file as *mut *mut libc::c_char,
                     b"%s%s.pub\0" as *const u8 as *const libc::c_char,
                     identity_file.as_mut_ptr(),
@@ -4805,7 +4805,7 @@ unsafe extern "C" fn do_ca_sign(
         {
             *cp = '\0' as i32 as libc::c_char;
         }
-        xasprintf(
+        crate::xmalloc::xasprintf(
             &mut out as *mut *mut libc::c_char,
             b"%s-cert.pub\0" as *const u8 as *const libc::c_char,
             tmp,
@@ -6565,7 +6565,7 @@ unsafe extern "C" fn sign_one(
     }
     if signer.is_none() && sshkey_is_sk(signkey) != 0 {
         if (*signkey).sk_flags as libc::c_int & 0x4 as libc::c_int != 0 {
-            xasprintf(
+            crate::xmalloc::xasprintf(
                 &mut prompt as *mut *mut libc::c_char,
                 b"Enter PIN for %s key: \0" as *const u8 as *const libc::c_char,
                 sshkey_type(signkey),
@@ -6661,7 +6661,7 @@ unsafe extern "C" fn sign_one(
                     libc::fflush(stdout);
                     current_block = 14832935472441733737;
                 } else {
-                    xasprintf(
+                    crate::xmalloc::xasprintf(
                         &mut wfile as *mut *mut libc::c_char,
                         b"%s.sig\0" as *const u8 as *const libc::c_char,
                         filename,
@@ -8101,7 +8101,7 @@ unsafe extern "C" fn do_download_sk(
                 (**srks.offset(i as isize)).user_id,
                 (**srks.offset(i as isize)).user_id_len,
             );
-            xasprintf(
+            crate::xmalloc::xasprintf(
                 &mut path as *mut *mut libc::c_char,
                 b"id_%s_rk%s%s\0" as *const u8 as *const libc::c_char,
                 if (*key).type_0 == KEY_ECDSA_SK as libc::c_int {
@@ -8166,7 +8166,7 @@ unsafe extern "C" fn do_download_sk(
                             path,
                         );
                     }
-                    xasprintf(
+                    crate::xmalloc::xasprintf(
                         &mut pubpath as *mut *mut libc::c_char,
                         b"%s.pub\0" as *const u8 as *const libc::c_char,
                         path,

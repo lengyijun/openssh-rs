@@ -51,7 +51,6 @@ extern "C" {
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -500,7 +499,7 @@ unsafe extern "C" fn delete_file(
     if !(key_only != 0) {
         libc::free(comment as *mut libc::c_void);
         comment = 0 as *mut libc::c_char;
-        xasprintf(
+        crate::xmalloc::xasprintf(
             &mut certpath as *mut *mut libc::c_char,
             b"%s-cert.pub\0" as *const u8 as *const libc::c_char,
             filename,
@@ -869,7 +868,7 @@ unsafe extern "C" fn add_file(
                                                 );
                                             }
                                             if !(key_only != 0) {
-                                                xasprintf(
+                                                crate::xmalloc::xasprintf(
                                                     &mut certpath as *mut *mut libc::c_char,
                                                     b"%s-cert.pub\0" as *const u8
                                                         as *const libc::c_char,

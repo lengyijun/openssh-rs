@@ -92,7 +92,7 @@ extern "C" {
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_string(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
@@ -3715,7 +3715,7 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
             {
                 npath = xstrdup(path.offset(2 as libc::c_int as isize));
                 libc::free(path as *mut libc::c_void);
-                xasprintf(
+                crate::xmalloc::xasprintf(
                     &mut path as *mut *mut libc::c_char,
                     b"%s/%s\0" as *const u8 as *const libc::c_char,
                     cwd.as_mut_ptr(),
@@ -3737,7 +3737,7 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
             }
         } else {
             if *path as libc::c_int != '/' as i32 {
-                xasprintf(
+                crate::xmalloc::xasprintf(
                     &mut npath as *mut *mut libc::c_char,
                     b"%s/%s\0" as *const u8 as *const libc::c_char,
                     cwd.as_mut_ptr(),
