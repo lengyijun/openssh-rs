@@ -2,6 +2,7 @@ use crate::log::log_init;
 use crate::utf8::msetlocale;
 use ::libc;
 use libc::close;
+use libc::isatty;
 
 extern "C" {
     pub type _IO_wide_data;
@@ -57,7 +58,6 @@ extern "C" {
     fn compat_init_setproctitle(argc: libc::c_int, argv: *mut *mut libc::c_char);
     static mut BSDoptreset: libc::c_int;
 
-    fn isatty(__fd: libc::c_int) -> libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn daemon(__nochdir: libc::c_int, __noclose: libc::c_int) -> libc::c_int;
     fn gethostname(__name: *mut libc::c_char, __len: size_t) -> libc::c_int;

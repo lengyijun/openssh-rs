@@ -16,6 +16,7 @@ use crate::sftp_common::Attrib;
 use crate::utf8::msetlocale;
 use ::libc;
 use libc::close;
+use libc::isatty;
 use libc::kill;
 
 extern "C" {
@@ -38,7 +39,6 @@ extern "C" {
 
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
 
-    fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
     static mut BSDopterr: libc::c_int;

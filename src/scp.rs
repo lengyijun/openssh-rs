@@ -27,6 +27,7 @@ use crate::utf8::vasnmprintf;
 use crate::utf8::vfmprintf;
 use ::libc;
 use libc::close;
+use libc::isatty;
 use libc::kill;
 
 extern "C" {
@@ -41,7 +42,6 @@ extern "C" {
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
 
-    fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
 
