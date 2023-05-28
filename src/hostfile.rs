@@ -10,7 +10,6 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
     pub type ssh_hmac_ctx;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
     fn getuid() -> __uid_t;
     fn link(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
@@ -128,25 +127,6 @@ pub struct timespec {
     pub tv_nsec: __syscall_slong_t,
 }
 pub type uint8_t = __uint8_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
 
 pub type _IO_lock_t = ();
 
@@ -981,32 +961,7 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
     let mut dotsshdir: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut p: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut len: size_t = 0;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     p = strrchr(filename, '/' as i32);
     if p.is_null() {
         return;
@@ -1014,7 +969,7 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
     len = p.offset_from(filename) as libc::c_long as size_t;
     dotsshdir = tilde_expand_filename(b"~/.ssh\0" as *const u8 as *const libc::c_char, getuid());
     if !(strlen(dotsshdir) > len || strncmp(filename, dotsshdir, len) != 0 as libc::c_int) {
-        if !(stat(dotsshdir, &mut st) == 0 as libc::c_int) {
+        if !(libc::stat(dotsshdir, &mut st) == 0 as libc::c_int) {
             if *libc::__errno_location() != 2 as libc::c_int {
                 crate::log::sshlog(
                     b"hostfile.c\0" as *const u8 as *const libc::c_char,
@@ -1026,7 +981,7 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
                     0 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"Could not stat %s: %s\0" as *const u8 as *const libc::c_char,
+                    b"Could not libc::stat %s: %s\0" as *const u8 as *const libc::c_char,
                     dotsshdir,
                     strerror(*libc::__errno_location()),
                 );

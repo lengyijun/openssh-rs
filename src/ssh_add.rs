@@ -11,8 +11,6 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
 
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn getuid() -> __uid_t;
     static mut BSDoptarg: *mut libc::c_char;
@@ -212,25 +210,7 @@ pub struct timespec {
 }
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -2208,32 +2188,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 } else if argc == 0 as libc::c_int {
                     let mut buf: [libc::c_char; 4096] = [0; 4096];
                     let mut pw: *mut passwd = 0 as *mut passwd;
-                    let mut st: stat = stat {
-                        st_dev: 0,
-                        st_ino: 0,
-                        st_nlink: 0,
-                        st_mode: 0,
-                        st_uid: 0,
-                        st_gid: 0,
-                        __pad0: 0,
-                        st_rdev: 0,
-                        st_size: 0,
-                        st_blksize: 0,
-                        st_blocks: 0,
-                        st_atim: timespec {
-                            tv_sec: 0,
-                            tv_nsec: 0,
-                        },
-                        st_mtim: timespec {
-                            tv_sec: 0,
-                            tv_nsec: 0,
-                        },
-                        st_ctim: timespec {
-                            tv_sec: 0,
-                            tv_nsec: 0,
-                        },
-                        __glibc_reserved: [0; 3],
-                    };
+                    let mut st: libc::stat = unsafe { std::mem::zeroed() };
                     let mut count: libc::c_int = 0 as libc::c_int;
                     pw = getpwuid(getuid());
                     if pw.is_null() {
@@ -2253,7 +2208,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                                 (*pw).pw_dir,
                                 default_files[i as usize],
                             );
-                            if !(stat(buf.as_mut_ptr(), &mut st) == -(1 as libc::c_int)) {
+                            if !(libc::stat(buf.as_mut_ptr(), &mut st) == -(1 as libc::c_int)) {
                                 if do_file(
                                     agent_fd,
                                     deleting,

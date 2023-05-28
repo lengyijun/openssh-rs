@@ -11,8 +11,6 @@ extern "C" {
     pub type ec_key_st;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
-    fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-
     fn __getdelim(
         __lineptr: *mut *mut libc::c_char,
         __n: *mut size_t,
@@ -121,25 +119,7 @@ pub struct timespec {
 }
 pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -1077,32 +1057,7 @@ unsafe extern "C" fn auth_openfile(
     mut file_type: *mut libc::c_char,
 ) -> *mut libc::FILE {
     let mut line: [libc::c_char; 1024] = [0; 1024];
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut fd: libc::c_int = 0;
     let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     fd = libc::open(file, 0 as libc::c_int | 0o4000 as libc::c_int);
@@ -1140,7 +1095,7 @@ unsafe extern "C" fn auth_openfile(
         }
         return 0 as *mut libc::FILE;
     }
-    if fstat(fd, &mut st) == -(1 as libc::c_int) {
+    if libc::fstat(fd, &mut st) == -(1 as libc::c_int) {
         close(fd);
         return 0 as *mut libc::FILE;
     }

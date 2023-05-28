@@ -6,8 +6,6 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
 
     fn innetgr(
         __netgroup: *const libc::c_char,
@@ -72,25 +70,7 @@ pub struct sockaddr {
     pub sa_family: sa_family_t,
     pub sa_data: [libc::c_char; 14],
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -298,37 +278,12 @@ unsafe extern "C" fn check_rhosts_file(
     let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut buf: [libc::c_char; 1024] = [0; 1024];
     let mut fd: libc::c_int = 0;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     fd = libc::open(filename, 0 as libc::c_int | 0o4000 as libc::c_int);
     if fd == -(1 as libc::c_int) {
         return 0 as libc::c_int;
     }
-    if fstat(fd, &mut st) == -(1 as libc::c_int) {
+    if libc::fstat(fd, &mut st) == -(1 as libc::c_int) {
         close(fd);
         return 0 as libc::c_int;
     }
@@ -499,32 +454,7 @@ pub unsafe extern "C" fn auth_rhosts2(
     mut ipaddr: *const libc::c_char,
 ) -> libc::c_int {
     let mut path: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     static mut rhosts_files: [*const libc::c_char; 3] = [
         b".shosts\0" as *const u8 as *const libc::c_char,
         b".rhosts\0" as *const u8 as *const libc::c_char,
@@ -553,7 +483,7 @@ pub unsafe extern "C" fn auth_rhosts2(
             (*pw).pw_dir,
             rhosts_files[rhosts_file_index as usize],
         );
-        r = stat(path, &mut st);
+        r = libc::stat(path, &mut st);
         libc::free(path as *mut libc::c_void);
         if r >= 0 as libc::c_int {
             break;
@@ -563,11 +493,11 @@ pub unsafe extern "C" fn auth_rhosts2(
     }
     restore_uid();
     if (rhosts_files[rhosts_file_index as usize]).is_null()
-        && stat(
+        && libc::stat(
             b"/etc/hosts.equiv\0" as *const u8 as *const libc::c_char,
             &mut st,
         ) == -(1 as libc::c_int)
-        && stat(
+        && libc::stat(
             b"/usr/local/etc/shosts.equiv\0" as *const u8 as *const libc::c_char,
             &mut st,
         ) == -(1 as libc::c_int)
@@ -627,7 +557,7 @@ pub unsafe extern "C" fn auth_rhosts2(
             return 1 as libc::c_int;
         }
     }
-    if stat((*pw).pw_dir, &mut st) == -(1 as libc::c_int) {
+    if libc::stat((*pw).pw_dir, &mut st) == -(1 as libc::c_int) {
         crate::log::sshlog(
             b"auth-rhosts.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"auth_rhosts2\0")).as_ptr(),
@@ -683,7 +613,7 @@ pub unsafe extern "C" fn auth_rhosts2(
             (*pw).pw_dir,
             rhosts_files[rhosts_file_index as usize],
         );
-        if stat(path, &mut st) == -(1 as libc::c_int) {
+        if libc::stat(path, &mut st) == -(1 as libc::c_int) {
             crate::log::sshlog(
                 b"auth-rhosts.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"auth_rhosts2\0"))
@@ -692,7 +622,7 @@ pub unsafe extern "C" fn auth_rhosts2(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_DEBUG3,
                 0 as *const libc::c_char,
-                b"stat %s: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::stat %s: %s\0" as *const u8 as *const libc::c_char,
                 path,
                 strerror(*libc::__errno_location()),
             );

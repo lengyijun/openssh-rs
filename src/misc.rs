@@ -16,7 +16,7 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
     pub type sshbuf;
-    
+
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
     fn bind(__fd: libc::c_int, __addr: __CONST_SOCKADDR_ARG, __len: socklen_t) -> libc::c_int;
     fn getsockname(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
@@ -41,8 +41,6 @@ extern "C" {
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;
     fn gettimeofday(__tv: *mut timeval, __tz: *mut libc::c_void) -> libc::c_int;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
 
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
@@ -93,7 +91,7 @@ extern "C" {
     fn getppid() -> __pid_t;
     fn getpid() -> __pid_t;
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
-    
+
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -338,25 +336,7 @@ pub union __CONST_SOCKADDR_ARG {
     pub __sockaddr_x25__: *const sockaddr_x25,
 }
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 pub type C2RustUnnamed_0 = libc::c_uint;
 pub const IPPROTO_MAX: C2RustUnnamed_0 = 263;
 pub const IPPROTO_MPTCP: C2RustUnnamed_0 = 262;
@@ -413,7 +393,6 @@ pub struct siginfo_t {
     pub si_signo: libc::c_int,
     pub si_errno: libc::c_int,
     pub si_code: libc::c_int,
-    pub __pad0: libc::c_int,
     pub _sifields: C2RustUnnamed_1,
 }
 #[derive(Copy, Clone)]
@@ -3844,7 +3823,7 @@ pub unsafe extern "C" fn exited_cleanly(
 }
 pub unsafe extern "C" fn safe_path(
     mut name: *const libc::c_char,
-    mut stp: *mut stat,
+    mut stp: *mut libc::stat,
     mut pw_dir: *const libc::c_char,
     mut uid: uid_t,
     mut err: *mut libc::c_char,
@@ -3854,32 +3833,7 @@ pub unsafe extern "C" fn safe_path(
     let mut homedir: [libc::c_char; 4096] = [0; 4096];
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut comparehome: libc::c_int = 0 as libc::c_int;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     if (realpath(name, buf.as_mut_ptr())).is_null() {
         libc::snprintf(
             err,
@@ -3930,7 +3884,7 @@ pub unsafe extern "C" fn safe_path(
             cp,
             ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
         );
-        if stat(buf.as_mut_ptr(), &mut st) == -(1 as libc::c_int)
+        if libc::stat(buf.as_mut_ptr(), &mut st) == -(1 as libc::c_int)
             || platform_sys_dir_uid(st.st_uid) == 0 && st.st_uid != uid
             || st.st_mode & 0o22 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint
         {
@@ -3961,37 +3915,12 @@ pub unsafe extern "C" fn safe_path_fd(
     mut err: *mut libc::c_char,
     mut errlen: size_t,
 ) -> libc::c_int {
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
-    if fstat(fd, &mut st) == -(1 as libc::c_int) {
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
+    if libc::fstat(fd, &mut st) == -(1 as libc::c_int) {
         libc::snprintf(
             err,
             errlen as usize,
-            b"cannot stat file %s: %s\0" as *const u8 as *const libc::c_char,
+            b"cannot libc::stat file %s: %s\0" as *const u8 as *const libc::c_char,
             file,
             strerror(*libc::__errno_location()),
         );
@@ -4672,32 +4601,7 @@ pub unsafe extern "C" fn subprocess(
     mut restore_privs: Option<privrestore_fn>,
 ) -> pid_t {
     let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut fd: libc::c_int = 0;
     let mut devnull: libc::c_int = 0;
     let mut p: [libc::c_int; 2] = [0; 2];
@@ -4798,7 +4702,7 @@ pub unsafe extern "C" fn subprocess(
     if drop_privs.is_some() {
         drop_privs.expect("non-null function pointer")(pw);
     }
-    if stat(*av.offset(0 as libc::c_int as isize), &mut st) == -(1 as libc::c_int) {
+    if libc::stat(*av.offset(0 as libc::c_int as isize), &mut st) == -(1 as libc::c_int) {
         crate::log::sshlog(
             b"misc.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"subprocess\0")).as_ptr(),
@@ -4806,7 +4710,7 @@ pub unsafe extern "C" fn subprocess(
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"Could not stat %s \"%s\": %s\0" as *const u8 as *const libc::c_char,
+            b"Could not libc::stat %s \"%s\": %s\0" as *const u8 as *const libc::c_char,
             tag,
             *av.offset(0 as libc::c_int as isize),
             strerror(*libc::__errno_location()),
@@ -4968,7 +4872,9 @@ pub unsafe extern "C" fn subprocess(
                 {
                     fd = devnull;
                 }
-                if fd != -(1 as libc::c_int) && libc::dup2(fd, 1 as libc::c_int) == -(1 as libc::c_int) {
+                if fd != -(1 as libc::c_int)
+                    && libc::dup2(fd, 1 as libc::c_int) == -(1 as libc::c_int)
+                {
                     crate::log::sshlog(
                         b"misc.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(

@@ -52,7 +52,6 @@ extern "C" {
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn tcsendbreak(__fd: libc::c_int, __duration: libc::c_int) -> libc::c_int;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
     fn endpwent();
     fn platform_privileged_uidswap() -> libc::c_int;
@@ -65,7 +64,7 @@ extern "C" {
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn dup(__fd: libc::c_int) -> libc::c_int;
-    
+
     static mut environ: *mut *mut libc::c_char;
     fn execve(
         __path: *const libc::c_char,
@@ -397,25 +396,7 @@ pub struct in_addr {
 }
 pub type in_addr_t = uint32_t;
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -1484,12 +1465,14 @@ pub unsafe extern "C" fn do_exec_no_pty(
             }
             close(pin[0 as libc::c_int as usize]);
             close(pout[0 as libc::c_int as usize]);
-            if libc::dup2(pout[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int) {
+            if libc::dup2(pout[1 as libc::c_int as usize], 1 as libc::c_int) == -(1 as libc::c_int)
+            {
                 perror(b"libc::dup2 stdout\0" as *const u8 as *const libc::c_char);
             }
             close(pout[1 as libc::c_int as usize]);
             close(perr[0 as libc::c_int as usize]);
-            if libc::dup2(perr[1 as libc::c_int as usize], 2 as libc::c_int) == -(1 as libc::c_int) {
+            if libc::dup2(perr[1 as libc::c_int as usize], 2 as libc::c_int) == -(1 as libc::c_int)
+            {
                 perror(b"libc::dup2 stderr\0" as *const u8 as *const libc::c_char);
             }
             close(perr[1 as libc::c_int as usize]);
@@ -1877,32 +1860,7 @@ pub unsafe extern "C" fn check_quietlogin(
 ) -> libc::c_int {
     let mut buf: [libc::c_char; 256] = [0; 256];
     let mut pw: *mut passwd = (*s).pw;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     if !command.is_null() {
         return 1 as libc::c_int;
     }
@@ -1912,7 +1870,7 @@ pub unsafe extern "C" fn check_quietlogin(
         b"%.200s/.hushlogin\0" as *const u8 as *const libc::c_char,
         (*pw).pw_dir,
     );
-    if stat(buf.as_mut_ptr(), &mut st) >= 0 as libc::c_int {
+    if libc::stat(buf.as_mut_ptr(), &mut st) >= 0 as libc::c_int {
         return 1 as libc::c_int;
     }
     return 0 as libc::c_int;
@@ -2266,32 +2224,7 @@ unsafe extern "C" fn do_rc_files(
     let mut cmd: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut user_rc: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut do_xauth: libc::c_int = 0;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     do_xauth = (!((*s).display).is_null()
         && !((*s).auth_proto).is_null()
         && !((*s).auth_data).is_null()) as libc::c_int;
@@ -2305,7 +2238,7 @@ unsafe extern "C" fn do_rc_files(
         && (options.adm_forced_command).is_null()
         && (*auth_opts).permit_user_rc != 0
         && options.permit_user_rc != 0
-        && stat(user_rc, &mut st) >= 0 as libc::c_int
+        && libc::stat(user_rc, &mut st) >= 0 as libc::c_int
     {
         if xasprintf(
             &mut cmd as *mut *mut libc::c_char,
@@ -2352,7 +2285,7 @@ unsafe extern "C" fn do_rc_files(
                 user_rc,
             );
         }
-    } else if stat(
+    } else if libc::stat(
         b"/usr/local/etc/sshrc\0" as *const u8 as *const libc::c_char,
         &mut st,
     ) >= 0 as libc::c_int
@@ -2453,37 +2386,12 @@ unsafe extern "C" fn do_nologin(mut pw: *mut passwd) {
     let mut nl: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut def_nl: *mut libc::c_char =
         b"/etc/nologin\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
-    let mut sb: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
     if (*pw).pw_uid == 0 as libc::c_int as libc::c_uint {
         return;
     }
     nl = def_nl;
-    if stat(nl, &mut sb) == -(1 as libc::c_int) {
+    if libc::stat(nl, &mut sb) == -(1 as libc::c_int) {
         return;
     }
     crate::log::sshlog(
@@ -2515,32 +2423,7 @@ unsafe extern "C" fn do_nologin(mut pw: *mut passwd) {
 unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut _uid: uid_t) {
     let mut cp: *const libc::c_char = 0 as *const libc::c_char;
     let mut component: [libc::c_char; 4096] = [0; 4096];
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     if path_absolute(path) == 0 {
         sshfatal(
             b"session.c\0" as *const u8 as *const libc::c_char,
@@ -2595,7 +2478,7 @@ unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut _uid: uid_
             b"checking '%s'\0" as *const u8 as *const libc::c_char,
             component.as_mut_ptr(),
         );
-        if stat(component.as_mut_ptr(), &mut st) != 0 as libc::c_int {
+        if libc::stat(component.as_mut_ptr(), &mut st) != 0 as libc::c_int {
             sshfatal(
                 b"session.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"safely_chroot\0"))
@@ -2604,7 +2487,7 @@ unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut _uid: uid_
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"stat(\"%s\"): %s\0" as *const u8 as *const libc::c_char,
+                b"libc::stat(\"%s\"): %s\0" as *const u8 as *const libc::c_char,
                 component.as_mut_ptr(),
                 strerror(*libc::__errno_location()),
             );
@@ -3533,32 +3416,7 @@ unsafe extern "C" fn session_pty_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn session_subsystem_req(mut ssh: *mut ssh, mut s: *mut Session) -> libc::c_int {
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut r: libc::c_int = 0;
     let mut success: libc::c_int = 0 as libc::c_int;
     let mut prog: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -3613,7 +3471,7 @@ unsafe extern "C" fn session_subsystem_req(mut ssh: *mut ssh, mut s: *mut Sessio
                     prog,
                 );
             } else {
-                if stat(prog, &mut st) == -(1 as libc::c_int) {
+                if libc::stat(prog, &mut st) == -(1 as libc::c_int) {
                     crate::log::sshlog(
                         b"session.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
@@ -3624,7 +3482,8 @@ unsafe extern "C" fn session_subsystem_req(mut ssh: *mut ssh, mut s: *mut Sessio
                         0 as libc::c_int,
                         SYSLOG_LEVEL_DEBUG1,
                         0 as *const libc::c_char,
-                        b"subsystem: cannot stat %s: %s\0" as *const u8 as *const libc::c_char,
+                        b"subsystem: cannot libc::stat %s: %s\0" as *const u8
+                            as *const libc::c_char,
                         prog,
                         strerror(*libc::__errno_location()),
                     );
@@ -4785,32 +4644,7 @@ pub unsafe extern "C" fn session_setup_x11fwd(
     mut ssh: *mut ssh,
     mut s: *mut Session,
 ) -> libc::c_int {
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut display: [libc::c_char; 512] = [0; 512];
     let mut auth_display: [libc::c_char; 512] = [0; 512];
     let mut hostname: [libc::c_char; 1025] = [0; 1025];
@@ -4837,7 +4671,7 @@ pub unsafe extern "C" fn session_setup_x11fwd(
         return 0 as libc::c_int;
     }
     if (options.xauth_location).is_null()
-        || stat(options.xauth_location, &mut st) == -(1 as libc::c_int)
+        || libc::stat(options.xauth_location, &mut st) == -(1 as libc::c_int)
     {
         ssh_packet_send_debug(
             ssh,

@@ -10,7 +10,6 @@ extern "C" {
     pub type rsa_st;
     pub type kex;
     pub type session_state;
-    fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn freezero(_: *mut libc::c_void, _: size_t);
@@ -160,25 +159,7 @@ pub struct sockaddr {
     pub sa_data: [libc::c_char; 14],
 }
 pub type uint8_t = __uint8_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -519,32 +500,7 @@ pub static mut authmethods: [*mut Authmethod; 6] = unsafe {
     ]
 };
 pub unsafe extern "C" fn auth2_read_banner() -> *mut libc::c_char {
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut banner: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut len: size_t = 0;
     let mut n: size_t = 0;
@@ -553,7 +509,7 @@ pub unsafe extern "C" fn auth2_read_banner() -> *mut libc::c_char {
     if fd == -(1 as libc::c_int) {
         return 0 as *mut libc::c_char;
     }
-    if fstat(fd, &mut st) == -(1 as libc::c_int) {
+    if libc::fstat(fd, &mut st) == -(1 as libc::c_int) {
         close(fd);
         return 0 as *mut libc::c_char;
     }

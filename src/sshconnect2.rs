@@ -18,11 +18,10 @@ extern "C" {
     pub type sshcipher;
     pub type session_state;
     pub type notifier_ctx;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
     fn closefrom(__lowfd: libc::c_int);
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
-    
+
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     fn getpid() -> __pid_t;
     fn fork() -> __pid_t;
@@ -306,25 +305,6 @@ pub struct sockaddr {
     pub sa_data: [libc::c_char; 14],
 }
 pub type uint8_t = __uint8_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
 
 pub type _IO_lock_t = ();
 
@@ -3020,33 +3000,8 @@ unsafe extern "C" fn load_identity_file(mut id: *mut Identity) -> *mut sshkey {
     let mut r: libc::c_int = 0;
     let mut quit: libc::c_int = 0 as libc::c_int;
     let mut i: libc::c_int = 0;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
-    if stat((*id).filename, &mut st) == -(1 as libc::c_int) {
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
+    if libc::stat((*id).filename, &mut st) == -(1 as libc::c_int) {
         crate::log::sshlog(
             b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"load_identity_file\0"))
@@ -4080,32 +4035,7 @@ unsafe extern "C" fn ssh_keysign(
 ) -> libc::c_int {
     let mut current_block: u64;
     let mut b: *mut sshbuf = 0 as *mut sshbuf;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut pid: pid_t = 0;
     let mut r: libc::c_int = 0;
     let mut to: [libc::c_int; 2] = [0; 2];
@@ -4117,7 +4047,7 @@ unsafe extern "C" fn ssh_keysign(
     let mut osigchld: Option<unsafe extern "C" fn(libc::c_int) -> ()> = None;
     *sigp = 0 as *mut u_char;
     *lenp = 0 as libc::c_int as size_t;
-    if stat(
+    if libc::stat(
         b"/usr/local/libexec/ssh-keysign\0" as *const u8 as *const libc::c_char,
         &mut st,
     ) == -(1 as libc::c_int)

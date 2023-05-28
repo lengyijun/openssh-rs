@@ -26,7 +26,6 @@ extern "C" {
 
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
     fn sigaction(
         __sig: libc::c_int,
@@ -37,10 +36,10 @@ extern "C" {
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn getcwd(__buf: *mut libc::c_char, __size: size_t) -> *mut libc::c_char;
-    
+
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
-    
+
     fn getpid() -> __pid_t;
     fn getuid() -> __uid_t;
     fn fork() -> __pid_t;
@@ -147,10 +146,10 @@ extern "C" {
     fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
 
     fn attrib_clear(_: *mut Attrib);
-    fn attrib_to_stat(_: *const Attrib, _: *mut stat);
+    fn attrib_to_stat(_: *const Attrib, _: *mut libc::stat);
     fn ls_file(
         _: *const libc::c_char,
-        _: *const stat,
+        _: *const libc::stat,
         _: libc::c_int,
         _: libc::c_int,
         _: *const libc::c_char,
@@ -270,25 +269,6 @@ pub type C2RustUnnamed = libc::c_uint;
 pub const SHUT_RDWR: C2RustUnnamed = 2;
 pub const SHUT_WR: C2RustUnnamed = 1;
 pub const SHUT_RD: C2RustUnnamed = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
 
 pub type _IO_lock_t = ();
 
@@ -306,7 +286,6 @@ pub struct siginfo_t {
     pub si_signo: libc::c_int,
     pub si_errno: libc::c_int,
     pub si_code: libc::c_int,
-    pub __pad0: libc::c_int,
     pub _sifields: C2RustUnnamed_0,
 }
 #[derive(Copy, Clone)]
@@ -456,13 +435,13 @@ pub struct _ssh_compat_glob_t {
     pub gl_offs: size_t,
     pub gl_flags: libc::c_int,
     pub gl_pathv: *mut *mut libc::c_char,
-    pub gl_statv: *mut *mut stat,
+    pub gl_statv: *mut *mut libc::stat,
     pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
     pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
     pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
     pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
-    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut stat) -> libc::c_int>,
-    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut stat) -> libc::c_int>,
+    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
+    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -1608,7 +1587,7 @@ unsafe extern "C" fn process_get(
         gl_offs: 0,
         gl_flags: 0,
         gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut stat,
+        gl_statv: 0 as *mut *mut libc::stat,
         gl_errfunc: None,
         gl_closedir: None,
         gl_readdir: None,
@@ -1789,7 +1768,7 @@ unsafe extern "C" fn process_put(
         gl_offs: 0,
         gl_flags: 0,
         gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut stat,
+        gl_statv: 0 as *mut *mut libc::stat,
         gl_errfunc: None,
         gl_closedir: None,
         gl_readdir: None,
@@ -1800,32 +1779,7 @@ unsafe extern "C" fn process_put(
     let mut err: libc::c_int = 0 as libc::c_int;
     let mut i: libc::c_int = 0;
     let mut dst_is_dir: libc::c_int = 1 as libc::c_int;
-    let mut sb: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
     if !dst.is_null() {
         tmp_dst = xstrdup(dst);
         tmp_dst = make_absolute(tmp_dst, pwd);
@@ -1879,7 +1833,7 @@ unsafe extern "C" fn process_put(
         } else {
             i = 0 as libc::c_int;
             while !(*(g.gl_pathv).offset(i as isize)).is_null() && interrupted == 0 {
-                if stat(*(g.gl_pathv).offset(i as isize), &mut sb) == -(1 as libc::c_int) {
+                if libc::stat(*(g.gl_pathv).offset(i as isize), &mut sb) == -(1 as libc::c_int) {
                     err = -(1 as libc::c_int);
                     crate::log::sshlog(
                         b"sftp.c\0" as *const u8 as *const libc::c_char,
@@ -1891,7 +1845,7 @@ unsafe extern "C" fn process_put(
                         0 as libc::c_int,
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
-                        b"stat %s: %s\0" as *const u8 as *const libc::c_char,
+                        b"libc::stat %s: %s\0" as *const u8 as *const libc::c_char,
                         *(g.gl_pathv).offset(i as isize),
                         strerror(*libc::__errno_location()),
                     );
@@ -2134,36 +2088,11 @@ unsafe extern "C" fn do_ls_dir(
                     || can_get_users_groups_by_id(conn) != 0
                 {
                     let mut lname: *mut libc::c_char = 0 as *mut libc::c_char;
-                    let mut sb: stat = stat {
-                        st_dev: 0,
-                        st_ino: 0,
-                        st_nlink: 0,
-                        st_mode: 0,
-                        st_uid: 0,
-                        st_gid: 0,
-                        __pad0: 0,
-                        st_rdev: 0,
-                        st_size: 0,
-                        st_blksize: 0,
-                        st_blocks: 0,
-                        st_atim: timespec {
-                            tv_sec: 0,
-                            tv_nsec: 0,
-                        },
-                        st_mtim: timespec {
-                            tv_sec: 0,
-                            tv_nsec: 0,
-                        },
-                        st_ctim: timespec {
-                            tv_sec: 0,
-                            tv_nsec: 0,
-                        },
-                        __glibc_reserved: [0; 3],
-                    };
+                    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
                     memset(
-                        &mut sb as *mut stat as *mut libc::c_void,
+                        &mut sb as *mut libc::stat as *mut libc::c_void,
                         0 as libc::c_int,
-                        ::core::mem::size_of::<stat>() as libc::c_ulong,
+                        ::core::mem::size_of::<libc::stat>() as libc::c_ulong,
                     );
                     attrib_to_stat(&mut (**d.offset(n as isize)).a, &mut sb);
                     lname = ls_file(
@@ -2215,8 +2144,8 @@ unsafe extern "C" fn sglob_comp(
     let mut b: u_int = *(bb as *const u_int);
     let mut ap: *const libc::c_char = *((*sort_glob).gl_pathv).offset(a as isize);
     let mut bp: *const libc::c_char = *((*sort_glob).gl_pathv).offset(b as isize);
-    let mut as_0: *const stat = *((*sort_glob).gl_statv).offset(a as isize);
-    let mut bs: *const stat = *((*sort_glob).gl_statv).offset(b as isize);
+    let mut as_0: *const libc::stat = *((*sort_glob).gl_statv).offset(a as isize);
+    let mut bs: *const libc::stat = *((*sort_glob).gl_statv).offset(b as isize);
     let mut rmul: libc::c_int = if sort_flag & 0x40 as libc::c_int != 0 {
         -(1 as libc::c_int)
     } else {
@@ -2225,18 +2154,18 @@ unsafe extern "C" fn sglob_comp(
     if sort_flag & 0x8 as libc::c_int != 0 {
         return rmul * strcmp(ap, bp);
     } else if sort_flag & 0x10 as libc::c_int != 0 {
-        if if (*as_0).st_mtim.tv_sec == (*bs).st_mtim.tv_sec {
-            ((*as_0).st_mtim.tv_nsec == (*bs).st_mtim.tv_nsec) as libc::c_int
+        if if (*as_0).st_mtime == (*bs).st_mtime {
+            ((*as_0).st_mtime_nsec == (*bs).st_mtime_nsec) as libc::c_int
         } else {
-            ((*as_0).st_mtim.tv_sec == (*bs).st_mtim.tv_sec) as libc::c_int
+            ((*as_0).st_mtime == (*bs).st_mtime) as libc::c_int
         } != 0
         {
             return 0 as libc::c_int;
         }
-        return if if (*as_0).st_mtim.tv_sec == (*bs).st_mtim.tv_sec {
-            ((*as_0).st_mtim.tv_nsec < (*bs).st_mtim.tv_nsec) as libc::c_int
+        return if if (*as_0).st_mtime == (*bs).st_mtime {
+            ((*as_0).st_mtime_nsec < (*bs).st_mtime_nsec) as libc::c_int
         } else {
-            ((*as_0).st_mtim.tv_sec < (*bs).st_mtim.tv_sec) as libc::c_int
+            ((*as_0).st_mtime < (*bs).st_mtime) as libc::c_int
         } != 0
         {
             rmul
@@ -2279,7 +2208,7 @@ unsafe extern "C" fn do_globbed_ls(
         gl_offs: 0,
         gl_flags: 0,
         gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut stat,
+        gl_statv: 0 as *mut *mut libc::stat,
         gl_errfunc: None,
         gl_closedir: None,
         gl_readdir: None,
@@ -2448,7 +2377,7 @@ unsafe extern "C" fn do_globbed_ls(
                         0 as libc::c_int,
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
-                        b"no stat information for %s\0" as *const u8 as *const libc::c_char,
+                        b"no libc::stat information for %s\0" as *const u8 as *const libc::c_char,
                         fname,
                     );
                     libc::free(fname as *mut libc::c_void);
@@ -3383,7 +3312,7 @@ unsafe extern "C" fn parse_dispatch_command(
         gl_offs: 0,
         gl_flags: 0,
         gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut stat,
+        gl_statv: 0 as *mut *mut libc::stat,
         gl_errfunc: None,
         gl_closedir: None,
         gl_readdir: None,

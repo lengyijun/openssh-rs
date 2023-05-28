@@ -18,7 +18,6 @@ extern "C" {
     pub type sshcipher;
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
     fn sys_tun_outfilter(
         _: *mut ssh,
@@ -56,7 +55,7 @@ extern "C" {
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn fork() -> __pid_t;
     fn getpid() -> __pid_t;
-    
+
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
@@ -431,25 +430,6 @@ pub struct termios {
     pub c_cc: [cc_t; 32],
     pub c_ispeed: speed_t,
     pub c_ospeed: speed_t,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
 }
 
 pub type _IO_lock_t = ();
@@ -1234,32 +1214,7 @@ pub unsafe extern "C" fn client_x11_get_proto(
     let mut generated: libc::c_int = 0 as libc::c_int;
     let mut do_unlink: libc::c_int = 0 as libc::c_int;
     let mut r: libc::c_int = 0;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut now: u_int = 0;
     let mut x11_timeout_real: u_int = 0;
     *_proto = proto.as_mut_ptr();
@@ -1287,7 +1242,7 @@ pub unsafe extern "C" fn client_x11_get_proto(
         }
         return -(1 as libc::c_int);
     }
-    if !xauth_path.is_null() && stat(xauth_path, &mut st) == -(1 as libc::c_int) {
+    if !xauth_path.is_null() && libc::stat(xauth_path, &mut st) == -(1 as libc::c_int) {
         crate::log::sshlog(
             b"clientloop.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"client_x11_get_proto\0"))
@@ -5105,32 +5060,7 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
     let mut fp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut response: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut i: size_t = 0;
-    let mut sb: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
     i = 0 as libc::c_int as size_t;
     while i < (*ctx).nkeys {
         if !(*((*ctx).keys_verified).offset(i as isize) == 0) {
@@ -5273,7 +5203,7 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
     }
     i = 0 as libc::c_int as size_t;
     while i < options.num_user_hostfiles as libc::c_ulong {
-        if stat(options.user_hostfiles[i as usize], &mut sb) != 0 as libc::c_int {
+        if libc::stat(options.user_hostfiles[i as usize], &mut sb) != 0 as libc::c_int {
             if *libc::__errno_location() == 2 as libc::c_int {
                 crate::log::sshlog(
                     b"clientloop.c\0" as *const u8 as *const libc::c_char,

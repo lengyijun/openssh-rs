@@ -21,7 +21,6 @@ extern "C" {
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
 
@@ -531,25 +530,7 @@ pub struct timespec {
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -919,33 +900,8 @@ unsafe extern "C" fn type_bits_valid(
 }
 unsafe extern "C" fn confirm_overwrite(mut filename: *const libc::c_char) -> libc::c_int {
     let mut yesno: [libc::c_char; 3] = [0; 3];
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
-    if stat(filename, &mut st) != 0 as libc::c_int {
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
+    if libc::stat(filename, &mut st) != 0 as libc::c_int {
         return 1 as libc::c_int;
     }
     printf(
@@ -1317,32 +1273,7 @@ unsafe extern "C" fn do_convert_to_pem(mut k: *mut sshkey) {
 }
 unsafe extern "C" fn do_convert_to(mut pw: *mut passwd) {
     let mut k: *mut sshkey = 0 as *mut sshkey;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut r: libc::c_int = 0;
     if have_identity == 0 {
         ask_filename(
@@ -1350,7 +1281,7 @@ unsafe extern "C" fn do_convert_to(mut pw: *mut passwd) {
             b"Enter file in which the key is\0" as *const u8 as *const libc::c_char,
         );
     }
-    if stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
+    if libc::stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"do_convert_to\0"))
@@ -2344,39 +2275,14 @@ unsafe extern "C" fn do_convert_from(mut pw: *mut passwd) {
     let mut r: libc::c_int = 0;
     let mut private: libc::c_int = 0 as libc::c_int;
     let mut ok: libc::c_int = 0 as libc::c_int;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     if have_identity == 0 {
         ask_filename(
             pw,
             b"Enter file in which the key is\0" as *const u8 as *const libc::c_char,
         );
     }
-    if stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
+    if libc::stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"do_convert_from\0"))
@@ -2492,32 +2398,7 @@ unsafe extern "C" fn do_convert_from(mut pw: *mut passwd) {
 }
 unsafe extern "C" fn do_print_public(mut pw: *mut passwd) {
     let mut prv: *mut sshkey = 0 as *mut sshkey;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut r: libc::c_int = 0;
     let mut comment: *mut libc::c_char = 0 as *mut libc::c_char;
     if have_identity == 0 {
@@ -2526,7 +2407,7 @@ unsafe extern "C" fn do_print_public(mut pw: *mut passwd) {
             b"Enter file in which the key is\0" as *const u8 as *const libc::c_char,
         );
     }
-    if stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
+    if libc::stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"do_print_public\0"))
@@ -2740,37 +2621,12 @@ unsafe extern "C" fn fingerprint_one_key(
     libc::free(fp as *mut libc::c_void);
 }
 unsafe extern "C" fn fingerprint_private(mut path: *const libc::c_char) {
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut comment: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut privkey: *mut sshkey = 0 as *mut sshkey;
     let mut pubkey: *mut sshkey = 0 as *mut sshkey;
     let mut r: libc::c_int = 0;
-    if stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
+    if libc::stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"fingerprint_private\0"))
@@ -3022,32 +2878,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
     ];
     let mut bits: u_int32_t = 0 as libc::c_int as u_int32_t;
     let mut first: libc::c_int = 0 as libc::c_int;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut private: *mut sshkey = 0 as *mut sshkey;
     let mut public: *mut sshkey = 0 as *mut sshkey;
     let mut comment: [libc::c_char; 1024] = [0; 1024];
@@ -3073,7 +2904,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
             identity_file.as_mut_ptr(),
             key_types[i as usize].path,
         );
-        if stat(prv_file, &mut st) == 0 as libc::c_int {
+        if libc::stat(prv_file, &mut st) == 0 as libc::c_int {
             if st.st_size != 0 as libc::c_int as libc::c_long {
                 current_block = 5360600777957461733;
             } else {
@@ -3090,7 +2921,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut passwd) {
                 0 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"Could not stat %s: %s\0" as *const u8 as *const libc::c_char,
+                b"Could not libc::stat %s: %s\0" as *const u8 as *const libc::c_char,
                 key_types[i as usize].path,
                 strerror(*libc::__errno_location()),
             );
@@ -3569,32 +3400,7 @@ unsafe extern "C" fn do_known_hosts(
         delete_host: 0,
     };
     let mut foreach_options: u_int = 0;
-    let mut sb: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
     if have_identity == 0 {
         cp = tilde_expand_filename(
             b"~/.ssh/known_hosts\0" as *const u8 as *const libc::c_char,
@@ -3620,7 +3426,7 @@ unsafe extern "C" fn do_known_hosts(
         libc::free(cp as *mut libc::c_void);
         have_identity = 1 as libc::c_int;
     }
-    if stat(identity_file.as_mut_ptr(), &mut sb) != 0 as libc::c_int {
+    if libc::stat(identity_file.as_mut_ptr(), &mut sb) != 0 as libc::c_int {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"do_known_hosts\0"))
@@ -3629,7 +3435,7 @@ unsafe extern "C" fn do_known_hosts(
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"Cannot stat %s: %s\0" as *const u8 as *const libc::c_char,
+            b"Cannot libc::stat %s: %s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
             strerror(*libc::__errno_location()),
         );
@@ -3897,32 +3703,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut passwd) {
     let mut old_passphrase: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut passphrase1: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut passphrase2: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut private: *mut sshkey = 0 as *mut sshkey;
     let mut r: libc::c_int = 0;
     if have_identity == 0 {
@@ -3931,7 +3712,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut passwd) {
             b"Enter file in which the key is\0" as *const u8 as *const libc::c_char,
         );
     }
-    if stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
+    if libc::stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(b"do_change_passphrase\0"))
@@ -4072,32 +3853,7 @@ unsafe extern "C" fn do_print_resource_record(
 ) -> libc::c_int {
     let mut public: *mut sshkey = 0 as *mut sshkey;
     let mut comment: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut r: libc::c_int = 0;
     let mut hash: libc::c_int = -(1 as libc::c_int);
     let mut i: size_t = 0;
@@ -4159,7 +3915,7 @@ unsafe extern "C" fn do_print_resource_record(
             b"no filename\0" as *const u8 as *const libc::c_char,
         );
     }
-    if stat(fname, &mut st) == -(1 as libc::c_int) {
+    if libc::stat(fname, &mut st) == -(1 as libc::c_int) {
         if *libc::__errno_location() == 2 as libc::c_int {
             return 0 as libc::c_int;
         }
@@ -4208,32 +3964,7 @@ unsafe extern "C" fn do_change_comment(
     let mut passphrase: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut private: *mut sshkey = 0 as *mut sshkey;
     let mut public: *mut sshkey = 0 as *mut sshkey;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut r: libc::c_int = 0;
     if have_identity == 0 {
         ask_filename(
@@ -4241,7 +3972,7 @@ unsafe extern "C" fn do_change_comment(
             b"Enter file in which the key is\0" as *const u8 as *const libc::c_char,
         );
     }
-    if stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
+    if libc::stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int) {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"do_change_comment\0"))
@@ -5763,32 +5494,7 @@ unsafe extern "C" fn print_cert(mut key: *mut sshkey) {
 }
 unsafe extern "C" fn do_show_cert(mut pw: *mut passwd) {
     let mut key: *mut sshkey = 0 as *mut sshkey;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut r: libc::c_int = 0;
     let mut is_stdin: libc::c_int = 0 as libc::c_int;
     let mut ok: libc::c_int = 0 as libc::c_int;
@@ -5808,7 +5514,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut passwd) {
         identity_file.as_mut_ptr(),
         b"-\0" as *const u8 as *const libc::c_char,
     ) != 0 as libc::c_int
-        && stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int)
+        && libc::stat(identity_file.as_mut_ptr(), &mut st) == -(1 as libc::c_int)
     {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -6481,32 +6187,7 @@ unsafe extern "C" fn do_gen_krl(
     mut argv: *mut *mut libc::c_char,
 ) {
     let mut krl: *mut ssh_krl = 0 as *mut ssh_krl;
-    let mut sb: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
     let mut ca: *mut sshkey = 0 as *mut sshkey;
     let mut i: libc::c_int = 0;
     let mut r: libc::c_int = 0;
@@ -6524,7 +6205,7 @@ unsafe extern "C" fn do_gen_krl(
             b"KRL generation requires an output file\0" as *const u8 as *const libc::c_char,
         );
     }
-    if stat(identity_file.as_mut_ptr(), &mut sb) == -(1 as libc::c_int) {
+    if libc::stat(identity_file.as_mut_ptr(), &mut sb) == -(1 as libc::c_int) {
         if *libc::__errno_location() != 2 as libc::c_int {
             sshfatal(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -6742,32 +6423,7 @@ unsafe extern "C" fn load_sign_key(
     let mut privkey: *mut sshkey = 0 as *mut sshkey;
     let mut r: libc::c_int = 0;
     let mut waspub: libc::c_int = 0 as libc::c_int;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     i = 0 as libc::c_int as size_t;
     while !(suffixes[i as usize]).is_null() {
         slen = strlen(suffixes[i as usize]);
@@ -6797,7 +6453,7 @@ unsafe extern "C" fn load_sign_key(
         i;
     }
     if waspub != 0
-        && stat(privpath, &mut st) != 0 as libc::c_int
+        && libc::stat(privpath, &mut st) != 0 as libc::c_int
         && *libc::__errno_location() == 2 as libc::c_int
     {
         sshfatal(

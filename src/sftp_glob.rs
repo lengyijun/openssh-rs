@@ -11,7 +11,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn attrib_to_stat(_: *const Attrib, _: *mut stat);
+    fn attrib_to_stat(_: *const Attrib, _: *mut libc::stat);
     fn do_readdir(
         _: *mut sftp_conn,
         _: *const libc::c_char,
@@ -49,25 +49,7 @@ pub struct timespec {
     pub tv_sec: __time_t,
     pub tv_nsec: __syscall_slong_t,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct dirent {
@@ -86,13 +68,13 @@ pub struct _ssh_compat_glob_t {
     pub gl_offs: size_t,
     pub gl_flags: libc::c_int,
     pub gl_pathv: *mut *mut libc::c_char,
-    pub gl_statv: *mut *mut stat,
+    pub gl_statv: *mut *mut libc::stat,
     pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
     pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
     pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
     pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
-    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut stat) -> libc::c_int>,
-    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut stat) -> libc::c_int>,
+    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
+    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -159,7 +141,10 @@ unsafe extern "C" fn fudge_closedir(mut od: *mut SFTP_OPENDIR) {
     free_sftp_dirents((*od).dir);
     libc::free(od as *mut libc::c_void);
 }
-unsafe extern "C" fn fudge_lstat(mut path: *const libc::c_char, mut st: *mut stat) -> libc::c_int {
+unsafe extern "C" fn fudge_lstat(
+    mut path: *const libc::c_char,
+    mut st: *mut libc::stat,
+) -> libc::c_int {
     let mut a: *mut Attrib = 0 as *mut Attrib;
     a = do_lstat(cur.conn, path, 1 as libc::c_int);
     if a.is_null() {
@@ -168,7 +153,10 @@ unsafe extern "C" fn fudge_lstat(mut path: *const libc::c_char, mut st: *mut sta
     attrib_to_stat(a, st);
     return 0 as libc::c_int;
 }
-unsafe extern "C" fn fudge_stat(mut path: *const libc::c_char, mut st: *mut stat) -> libc::c_int {
+unsafe extern "C" fn fudge_stat(
+    mut path: *const libc::c_char,
+    mut st: *mut libc::stat,
+) -> libc::c_int {
     let mut a: *mut Attrib = 0 as *mut Attrib;
     a = do_stat(cur.conn, path, 1 as libc::c_int);
     if a.is_null() {
@@ -187,32 +175,7 @@ pub unsafe extern "C" fn remote_glob(
     let mut r: libc::c_int = 0;
     let mut l: size_t = 0;
     let mut s: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut sb: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
     (*pglob).gl_opendir =
         Some(fudge_opendir as unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void);
     (*pglob).gl_readdir = ::core::mem::transmute::<
@@ -227,10 +190,12 @@ pub unsafe extern "C" fn remote_glob(
     >(Some(
         fudge_closedir as unsafe extern "C" fn(*mut SFTP_OPENDIR) -> (),
     ));
-    (*pglob).gl_lstat =
-        Some(fudge_lstat as unsafe extern "C" fn(*const libc::c_char, *mut stat) -> libc::c_int);
-    (*pglob).gl_stat =
-        Some(fudge_stat as unsafe extern "C" fn(*const libc::c_char, *mut stat) -> libc::c_int);
+    (*pglob).gl_lstat = Some(
+        fudge_lstat as unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int,
+    );
+    (*pglob).gl_stat = Some(
+        fudge_stat as unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int,
+    );
     memset(
         &mut cur as *mut C2RustUnnamed as *mut libc::c_void,
         0 as libc::c_int,

@@ -1,7 +1,6 @@
 use ::libc;
 use libc::close;
 extern "C" {
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
     fn chown(__file: *const libc::c_char, __owner: __uid_t, __group: __gid_t) -> libc::c_int;
     fn setsid() -> __pid_t;
@@ -68,25 +67,7 @@ pub struct termios {
     pub c_ispeed: speed_t,
     pub c_ospeed: speed_t,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -319,32 +300,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
     let mut grp: *mut group = 0 as *mut group;
     let mut gid: gid_t = 0;
     let mut mode: mode_t = 0;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     grp = getgrnam(b"tty\0" as *const u8 as *const libc::c_char);
     if grp.is_null() {
         crate::log::sshlog(
@@ -368,7 +324,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
     } else {
         0o600 as libc::c_int
     }) as mode_t;
-    if stat(tty, &mut st) == -(1 as libc::c_int) {
+    if libc::stat(tty, &mut st) == -(1 as libc::c_int) {
         sshfatal(
             b"sshpty.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"pty_setowner\0")).as_ptr(),
@@ -376,7 +332,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc:
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"stat(%.100s) failed: %.100s\0" as *const u8 as *const libc::c_char,
+            b"libc::stat(%.100s) failed: %.100s\0" as *const u8 as *const libc::c_char,
             tty,
             strerror(*libc::__errno_location()),
         );

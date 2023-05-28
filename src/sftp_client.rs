@@ -23,9 +23,8 @@ extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn lstat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
+
+    fn lstat(__file: *const libc::c_char, __buf: *mut libc::stat) -> libc::c_int;
     fn writev(__fd: libc::c_int, __iovec: *const iovec, __count: libc::c_int) -> ssize_t;
     fn opendir(__name: *const libc::c_char) -> *mut DIR;
     fn closedir(__dirp: *mut DIR) -> libc::c_int;
@@ -106,7 +105,7 @@ extern "C" {
     fn bandwidth_limit(_: *mut bwlimit, _: size_t);
     fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn attrib_clear(_: *mut Attrib);
-    fn stat_to_attrib(_: *const stat, _: *mut Attrib);
+    fn stat_to_attrib(_: *const libc::stat, _: *mut Attrib);
     fn decode_attrib(_: *mut sshbuf, _: *mut Attrib) -> libc::c_int;
     fn encode_attrib(_: *mut sshbuf, _: *const Attrib) -> libc::c_int;
     fn fx2txt(_: libc::c_int) -> *const libc::c_char;
@@ -167,25 +166,7 @@ pub struct iovec {
     pub iov_len: size_t,
 }
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 pub type sig_atomic_t = __sig_atomic_t;
 pub type va_list = __builtin_va_list;
 pub type nfds_t = libc::c_ulong;
@@ -988,7 +969,7 @@ unsafe extern "C" fn get_decode_stat(
                 0 as libc::c_int,
                 SYSLOG_LEVEL_DEBUG1,
                 0 as *const libc::c_char,
-                b"stat remote: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::stat remote: %s\0" as *const u8 as *const libc::c_char,
                 fx2txt(status as libc::c_int),
             );
         } else {
@@ -1000,7 +981,7 @@ unsafe extern "C" fn get_decode_stat(
                 0 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"stat remote: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::stat remote: %s\0" as *const u8 as *const libc::c_char,
                 fx2txt(status as libc::c_int),
             );
         }
@@ -1042,7 +1023,8 @@ unsafe extern "C" fn get_decode_stat(
         0 as libc::c_int,
         SYSLOG_LEVEL_DEBUG3,
         0 as *const libc::c_char,
-        b"Received stat reply T:%u I:%u F:0x%04x M:%05o\0" as *const u8 as *const libc::c_char,
+        b"Received libc::stat reply T:%u I:%u F:0x%04x M:%05o\0" as *const u8
+            as *const libc::c_char,
         type_0 as libc::c_int,
         id,
         a.flags,
@@ -4031,32 +4013,7 @@ pub unsafe extern "C" fn do_download(
     let mut status: u_int = 0 as libc::c_int as u_int;
     let mut progress_counter: off_t = 0;
     let mut handle_len: size_t = 0;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut requests: requests = requests {
         tqh_first: 0 as *mut request,
         tqh_last: 0 as *mut *mut request,
@@ -4146,7 +4103,7 @@ pub unsafe extern "C" fn do_download(
         );
     } else {
         if resume_flag != 0 {
-            if fstat(local_fd, &mut st) == -(1 as libc::c_int) {
+            if libc::fstat(local_fd, &mut st) == -(1 as libc::c_int) {
                 crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"do_download\0"))
@@ -4155,7 +4112,7 @@ pub unsafe extern "C" fn do_download(
                     0 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"stat local \"%s\": %s\0" as *const u8 as *const libc::c_char,
+                    b"libc::stat local \"%s\": %s\0" as *const u8 as *const libc::c_char,
                     local_path,
                     strerror(*libc::__errno_location()),
                 );
@@ -4837,7 +4794,7 @@ unsafe extern "C" fn download_dir_internal(
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"stat remote \"%s\" directory failed\0" as *const u8 as *const libc::c_char,
+            b"libc::stat remote \"%s\" directory failed\0" as *const u8 as *const libc::c_char,
             src,
         );
         return -(1 as libc::c_int);
@@ -5130,32 +5087,7 @@ pub unsafe extern "C" fn do_upload(
     let mut handle: *mut u_char = 0 as *mut u_char;
     let mut data: *mut u_char = 0 as *mut u_char;
     let mut msg: *mut sshbuf = 0 as *mut sshbuf;
-    let mut sb: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
     let mut a: Attrib = Attrib {
         flags: 0,
         size: 0,
@@ -5213,7 +5145,7 @@ pub unsafe extern "C" fn do_upload(
         );
         return -(1 as libc::c_int);
     }
-    if fstat(local_fd, &mut sb) == -(1 as libc::c_int) {
+    if libc::fstat(local_fd, &mut sb) == -(1 as libc::c_int) {
         crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 10], &[libc::c_char; 10]>(b"do_upload\0")).as_ptr(),
@@ -5221,7 +5153,7 @@ pub unsafe extern "C" fn do_upload(
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"fstat local \"%s\": %s\0" as *const u8 as *const libc::c_char,
+            b"libc::fstat local \"%s\": %s\0" as *const u8 as *const libc::c_char,
             local_path,
             strerror(*libc::__errno_location()),
         );
@@ -5650,32 +5582,7 @@ unsafe extern "C" fn upload_dir_internal(
     let mut filename: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut new_src: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut new_dst: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut sb: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
     let mut a: Attrib = Attrib {
         flags: 0,
         size: 0,
@@ -5713,7 +5620,7 @@ unsafe extern "C" fn upload_dir_internal(
         );
         return -(1 as libc::c_int);
     }
-    if stat(src, &mut sb) == -(1 as libc::c_int) {
+    if libc::stat(src, &mut sb) == -(1 as libc::c_int) {
         crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"upload_dir_internal\0"))
@@ -5722,7 +5629,7 @@ unsafe extern "C" fn upload_dir_internal(
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"stat local \"%s\": %s\0" as *const u8 as *const libc::c_char,
+            b"libc::stat local \"%s\": %s\0" as *const u8 as *const libc::c_char,
             src,
             strerror(*libc::__errno_location()),
         );
@@ -6754,7 +6661,7 @@ unsafe extern "C" fn crossload_dir_internal(
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"stat remote \"%s\" failed\0" as *const u8 as *const libc::c_char,
+            b"libc::stat remote \"%s\" failed\0" as *const u8 as *const libc::c_char,
             from_path,
         );
         return -(1 as libc::c_int);
@@ -7390,33 +7297,8 @@ pub unsafe extern "C" fn remote_is_dir(
         == 0o40000 as libc::c_int as libc::c_uint) as libc::c_int;
 }
 pub unsafe extern "C" fn local_is_dir(mut path: *const libc::c_char) -> libc::c_int {
-    let mut sb: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
-    if stat(path, &mut sb) == -(1 as libc::c_int) {
+    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
+    if libc::stat(path, &mut sb) == -(1 as libc::c_int) {
         return 0 as libc::c_int;
     }
     return (sb.st_mode & 0o170000 as libc::c_int as libc::c_uint

@@ -58,7 +58,6 @@ extern "C" {
     fn accept(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __addr_len: *mut socklen_t)
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
     fn endpwent();
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
@@ -84,9 +83,9 @@ extern "C" {
     fn usleep(__useconds: __useconds_t) -> libc::c_int;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn dup(__fd: libc::c_int) -> libc::c_int;
-    
+
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
-    
+
     fn getpid() -> __pid_t;
     fn getpgid(__pid: __pid_t) -> __pid_t;
     fn setsid() -> __pid_t;
@@ -564,25 +563,7 @@ pub union __CONST_SOCKADDR_ARG {
     pub __sockaddr_x25__: *const sockaddr_x25,
 }
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 pub type C2RustUnnamed_0 = libc::c_uint;
 pub const IPPROTO_MAX: C2RustUnnamed_0 = 263;
 pub const IPPROTO_MPTCP: C2RustUnnamed_0 = 262;
@@ -4547,33 +4528,9 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         i;
     }
     if privsep_chroot != 0 {
-        let mut st: stat = stat {
-            st_dev: 0,
-            st_ino: 0,
-            st_nlink: 0,
-            st_mode: 0,
-            st_uid: 0,
-            st_gid: 0,
-            __pad0: 0,
-            st_rdev: 0,
-            st_size: 0,
-            st_blksize: 0,
-            st_blocks: 0,
-            st_atim: timespec {
-                tv_sec: 0,
-                tv_nsec: 0,
-            },
-            st_mtim: timespec {
-                tv_sec: 0,
-                tv_nsec: 0,
-            },
-            st_ctim: timespec {
-                tv_sec: 0,
-                tv_nsec: 0,
-            },
-            __glibc_reserved: [0; 3],
-        };
-        if stat(b"/var/empty\0" as *const u8 as *const libc::c_char, &mut st) == -(1 as libc::c_int)
+        let mut st: libc::stat = unsafe { std::mem::zeroed() };
+        if libc::stat(b"/var/empty\0" as *const u8 as *const libc::c_char, &mut st)
+            == -(1 as libc::c_int)
             || (st.st_mode & 0o170000 as libc::c_int as libc::c_uint
                 == 0o40000 as libc::c_int as libc::c_uint) as libc::c_int
                 == 0 as libc::c_int
@@ -4836,7 +4793,8 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         if startup_pipe == -(1 as libc::c_int) {
             close(2 as libc::c_int + 2 as libc::c_int);
         } else if startup_pipe != 2 as libc::c_int + 2 as libc::c_int {
-            if libc::dup2(startup_pipe, 2 as libc::c_int + 2 as libc::c_int) == -(1 as libc::c_int) {
+            if libc::dup2(startup_pipe, 2 as libc::c_int + 2 as libc::c_int) == -(1 as libc::c_int)
+            {
                 crate::log::sshlog(
                     b"sshd.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),

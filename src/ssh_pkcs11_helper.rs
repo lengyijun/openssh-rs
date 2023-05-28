@@ -12,7 +12,7 @@ extern "C" {
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
-    
+
     fn BSDgetopt(
         ___argc: libc::c_int,
         ___argv: *const *mut libc::c_char,

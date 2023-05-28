@@ -1,8 +1,8 @@
 use ::libc;
 extern "C" {
     pub type __dirstream;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn lstat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
+
+    fn lstat(__file: *const libc::c_char, __buf: *mut libc::stat) -> libc::c_int;
 
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
@@ -57,25 +57,7 @@ pub struct timespec {
     pub tv_sec: __time_t,
     pub tv_nsec: __syscall_slong_t,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -95,13 +77,13 @@ pub struct _ssh_compat_glob_t {
     pub gl_offs: size_t,
     pub gl_flags: libc::c_int,
     pub gl_pathv: *mut *mut libc::c_char,
-    pub gl_statv: *mut *mut stat,
+    pub gl_statv: *mut *mut libc::stat,
     pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
     pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
     pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
     pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
-    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut stat) -> libc::c_int>,
-    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut stat) -> libc::c_int>,
+    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
+    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -126,7 +108,7 @@ pub type __compar_fn_t =
 #[repr(C)]
 pub struct glob_path_stat {
     pub gps_path: *mut libc::c_char,
-    pub gps_stat: *mut stat,
+    pub gps_stat: *mut libc::stat,
 }
 pub type DIR = __dirstream;
 #[derive(Copy, Clone)]
@@ -254,7 +236,7 @@ pub unsafe extern "C" fn _ssh__compat_glob(
     if flags & 0x1 as libc::c_int == 0 {
         (*pglob).gl_pathc = 0 as libc::c_int as size_t;
         (*pglob).gl_pathv = 0 as *mut *mut libc::c_char;
-        (*pglob).gl_statv = 0 as *mut *mut stat;
+        (*pglob).gl_statv = 0 as *mut *mut libc::stat;
         if flags & 0x2 as libc::c_int == 0 {
             (*pglob).gl_offs = 0 as libc::c_int as size_t;
         }
@@ -752,7 +734,7 @@ unsafe extern "C" fn glob0(
             || (*pglob).gl_flags & 0x200 as libc::c_int != 0
                 && (*pglob).gl_flags & 0x100 as libc::c_int == 0
         {
-            return globextend(pattern, pglob, limitp, 0 as *mut stat);
+            return globextend(pattern, pglob, limitp, 0 as *mut libc::stat);
         } else {
             return -(3 as libc::c_int);
         }
@@ -872,32 +854,7 @@ unsafe extern "C" fn glob2(
     mut pglob: *mut _ssh_compat_glob_t,
     mut limitp: *mut glob_lim,
 ) -> libc::c_int {
-    let mut sb: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
     let mut p: *mut Char = 0 as *mut Char;
     let mut q: *mut Char = 0 as *mut Char;
     let mut anymeta: libc::c_int = 0;
@@ -1111,7 +1068,7 @@ unsafe extern "C" fn globextend(
     mut path: *const Char,
     mut pglob: *mut _ssh_compat_glob_t,
     mut limitp: *mut glob_lim,
-    mut sb: *mut stat,
+    mut sb: *mut libc::stat,
 ) -> libc::c_int {
     let mut current_block: u64;
     let mut pathv: *mut *mut libc::c_char = 0 as *mut *mut libc::c_char;
@@ -1120,7 +1077,7 @@ unsafe extern "C" fn globextend(
     let mut len: size_t = 0;
     let mut copy: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut p: *const Char = 0 as *const Char;
-    let mut statv: *mut *mut stat = 0 as *mut *mut stat;
+    let mut statv: *mut *mut libc::stat = 0 as *mut *mut libc::stat;
     newn = (2 as libc::c_int as libc::c_ulong)
         .wrapping_add((*pglob).gl_pathc)
         .wrapping_add((*pglob).gl_offs);
@@ -1131,7 +1088,7 @@ unsafe extern "C" fn globextend(
             .wrapping_div(::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong)
             <= newn
         || (18446744073709551615 as libc::c_ulong)
-            .wrapping_div(::core::mem::size_of::<*mut stat>() as libc::c_ulong)
+            .wrapping_div(::core::mem::size_of::<*mut libc::stat>() as libc::c_ulong)
             <= newn)
     {
         pathv = reallocarray(
@@ -1156,8 +1113,8 @@ unsafe extern "C" fn globextend(
                 statv = reallocarray(
                     (*pglob).gl_statv as *mut libc::c_void,
                     newn,
-                    ::core::mem::size_of::<*mut stat>() as libc::c_ulong,
-                ) as *mut *mut stat;
+                    ::core::mem::size_of::<*mut libc::stat>() as libc::c_ulong,
+                ) as *mut *mut libc::stat;
                 if statv.is_null() {
                     current_block = 6471419056600271664;
                 } else {
@@ -1168,7 +1125,7 @@ unsafe extern "C" fn globextend(
                         i = (*pglob).gl_offs;
                         while i > 0 as libc::c_int as libc::c_ulong {
                             statv = statv.offset(-1);
-                            *statv = 0 as *mut stat;
+                            *statv = 0 as *mut libc::stat;
                             i = i.wrapping_sub(1);
                             i;
                         }
@@ -1177,11 +1134,11 @@ unsafe extern "C" fn globextend(
                     if sb.is_null() {
                         let ref mut fresh54 = *statv
                             .offset(((*pglob).gl_offs).wrapping_add((*pglob).gl_pathc) as isize);
-                        *fresh54 = 0 as *mut stat;
+                        *fresh54 = 0 as *mut libc::stat;
                         current_block = 7245201122033322888;
                     } else {
                         (*limitp).glim_malloc = ((*limitp).glim_malloc as libc::c_ulong)
-                            .wrapping_add(::core::mem::size_of::<stat>() as libc::c_ulong)
+                            .wrapping_add(::core::mem::size_of::<libc::stat>() as libc::c_ulong)
                             as size_t as size_t;
                         if (*pglob).gl_flags & 0x2000 as libc::c_int != 0
                             && (*limitp).glim_malloc >= 65536 as libc::c_int as libc::c_ulong
@@ -1191,8 +1148,8 @@ unsafe extern "C" fn globextend(
                         }
                         let ref mut fresh55 = *statv
                             .offset(((*pglob).gl_offs).wrapping_add((*pglob).gl_pathc) as isize);
-                        *fresh55 =
-                            libc::malloc(::core::mem::size_of::<stat>() as usize) as *mut stat;
+                        *fresh55 = libc::malloc(::core::mem::size_of::<libc::stat>() as usize)
+                            as *mut libc::stat;
                         if (*fresh55).is_null() {
                             current_block = 15014530240646645919;
                         } else {
@@ -1201,7 +1158,7 @@ unsafe extern "C" fn globextend(
                                     ((*pglob).gl_offs).wrapping_add((*pglob).gl_pathc) as isize
                                 ) as *mut libc::c_void,
                                 sb as *const libc::c_void,
-                                ::core::mem::size_of::<stat>() as libc::c_ulong,
+                                ::core::mem::size_of::<libc::stat>() as libc::c_ulong,
                             );
                             current_block = 7245201122033322888;
                         }
@@ -1215,7 +1172,7 @@ unsafe extern "C" fn globextend(
                                     .wrapping_add(1 as libc::c_int as libc::c_ulong)
                                     as isize,
                             );
-                            *fresh56 = 0 as *mut stat;
+                            *fresh56 = 0 as *mut libc::stat;
                             current_block = 11048769245176032998;
                         }
                     }
@@ -1297,7 +1254,7 @@ unsafe extern "C" fn globextend(
     libc::free((*pglob).gl_pathv as *mut libc::c_void);
     (*pglob).gl_pathv = 0 as *mut *mut libc::c_char;
     libc::free((*pglob).gl_statv as *mut libc::c_void);
-    (*pglob).gl_statv = 0 as *mut *mut stat;
+    (*pglob).gl_statv = 0 as *mut *mut libc::stat;
     return -(1 as libc::c_int);
 }
 unsafe extern "C" fn match_0(
@@ -1451,7 +1408,7 @@ pub unsafe extern "C" fn _ssh__compat_globfree(mut pglob: *mut _ssh_compat_glob_
             i;
         }
         libc::free((*pglob).gl_statv as *mut libc::c_void);
-        (*pglob).gl_statv = 0 as *mut *mut stat;
+        (*pglob).gl_statv = 0 as *mut *mut libc::stat;
     }
 }
 unsafe extern "C" fn g_opendir(mut str: *mut Char, mut pglob: *mut _ssh_compat_glob_t) -> *mut DIR {
@@ -1478,7 +1435,7 @@ unsafe extern "C" fn g_opendir(mut str: *mut Char, mut pglob: *mut _ssh_compat_g
 }
 unsafe extern "C" fn g_lstat(
     mut fn_0: *mut Char,
-    mut sb: *mut stat,
+    mut sb: *mut libc::stat,
     mut pglob: *mut _ssh_compat_glob_t,
 ) -> libc::c_int {
     let mut buf: [libc::c_char; 4096] = [0; 4096];
@@ -1498,7 +1455,7 @@ unsafe extern "C" fn g_lstat(
 }
 unsafe extern "C" fn g_stat(
     mut fn_0: *mut Char,
-    mut sb: *mut stat,
+    mut sb: *mut libc::stat,
     mut pglob: *mut _ssh_compat_glob_t,
 ) -> libc::c_int {
     let mut buf: [libc::c_char; 4096] = [0; 4096];
@@ -1514,7 +1471,7 @@ unsafe extern "C" fn g_stat(
         return (Some(((*pglob).gl_stat).expect("non-null function pointer")))
             .expect("non-null function pointer")(buf.as_mut_ptr(), sb);
     }
-    return stat(buf.as_mut_ptr(), sb);
+    return libc::stat(buf.as_mut_ptr(), sb);
 }
 unsafe extern "C" fn g_strchr(mut str: *const Char, mut ch: libc::c_int) -> *mut Char {
     loop {

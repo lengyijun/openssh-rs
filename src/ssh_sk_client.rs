@@ -11,9 +11,9 @@ extern "C" {
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
 
     fn closefrom(__lowfd: libc::c_int);
-    
+
     fn execlp(__file: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
-    
+
     fn fork() -> __pid_t;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;

@@ -41,10 +41,10 @@ extern "C" {
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
     fn sleep(__seconds: libc::c_uint) -> libc::c_uint;
     fn dup(__fd: libc::c_int) -> libc::c_int;
-    
+
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
-    
+
     fn fork() -> __pid_t;
     fn getaddrinfo(
         __name: *const libc::c_char,

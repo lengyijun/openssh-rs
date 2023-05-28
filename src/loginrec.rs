@@ -30,8 +30,6 @@ extern "C" {
         __ut_name: *const libc::c_char,
         __ut_host: *const libc::c_char,
     );
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
 
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
@@ -214,7 +212,6 @@ pub struct utmp {
     pub ut_session: int32_t,
     pub ut_tv: C2RustUnnamed_0,
     pub ut_addr_v6: [int32_t; 4],
-    pub __glibc_reserved: [libc::c_char; 20],
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -222,25 +219,7 @@ pub struct C2RustUnnamed_0 {
     pub tv_sec: int32_t,
     pub tv_usec: int32_t,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -818,33 +797,8 @@ unsafe extern "C" fn lastlog_openseek(
 ) -> libc::c_int {
     let mut offset: off_t = 0;
     let mut lastlog_file: [libc::c_char; 1024] = [0; 1024];
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
-    if stat(
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
+    if libc::stat(
         b"/var/log/lastlog\0" as *const u8 as *const libc::c_char,
         &mut st,
     ) != 0 as libc::c_int
@@ -857,7 +811,7 @@ unsafe extern "C" fn lastlog_openseek(
             0 as libc::c_int,
             SYSLOG_LEVEL_INFO,
             0 as *const libc::c_char,
-            b"%s: Couldn't stat %s: %s\0" as *const u8 as *const libc::c_char,
+            b"%s: Couldn't libc::stat %s: %s\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"lastlog_openseek\0"))
                 .as_ptr(),
             b"/var/log/lastlog\0" as *const u8 as *const libc::c_char,
@@ -1149,7 +1103,6 @@ pub unsafe extern "C" fn record_failed_login(
             tv_usec: 0,
         },
         ut_addr_v6: [0; 4],
-        __glibc_reserved: [0; 20],
     };
     let mut from: sockaddr_storage = sockaddr_storage {
         ss_family: 0,
@@ -1161,32 +1114,7 @@ pub unsafe extern "C" fn record_failed_login(
     let mut a4: *mut sockaddr_in = 0 as *mut sockaddr_in;
     let mut a6: *mut sockaddr_in6 = 0 as *mut sockaddr_in6;
     let mut t: time_t = 0;
-    let mut fst: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut fst: libc::stat = unsafe { std::mem::zeroed() };
     if geteuid() != 0 as libc::c_int as libc::c_uint {
         return;
     }
@@ -1209,7 +1137,7 @@ pub unsafe extern "C" fn record_failed_login(
         );
         return;
     }
-    if fstat(fd, &mut fst) < 0 as libc::c_int {
+    if libc::fstat(fd, &mut fst) < 0 as libc::c_int {
         crate::log::sshlog(
             b"loginrec.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"record_failed_login\0"))
@@ -1218,7 +1146,7 @@ pub unsafe extern "C" fn record_failed_login(
             0 as libc::c_int,
             SYSLOG_LEVEL_INFO,
             0 as *const libc::c_char,
-            b"%s: fstat of %s failed: %s\0" as *const u8 as *const libc::c_char,
+            b"%s: libc::fstat of %s failed: %s\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"record_failed_login\0"))
                 .as_ptr(),
             b"/var/log/btmp\0" as *const u8 as *const libc::c_char,

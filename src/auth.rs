@@ -20,7 +20,6 @@ extern "C" {
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
 
     fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
     fn platform_locked_account(_: *mut passwd) -> libc::c_int;
@@ -272,25 +271,7 @@ pub struct in_addr {
 }
 pub type in_addr_t = uint32_t;
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -694,32 +675,7 @@ pub struct Authctxt {
 }
 static mut auth_debug: *mut sshbuf = 0 as *const sshbuf as *mut sshbuf;
 pub unsafe extern "C" fn allowed_user(mut ssh: *mut ssh, mut pw: *mut passwd) -> libc::c_int {
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut hostname: *const libc::c_char = 0 as *const libc::c_char;
     let mut ipaddr: *const libc::c_char = 0 as *const libc::c_char;
     let mut i: u_int = 0;
@@ -754,7 +710,7 @@ pub unsafe extern "C" fn allowed_user(mut ssh: *mut ssh, mut pw: *mut passwd) ->
                 (*pw).pw_shell as *const libc::c_char
             },
         );
-        if stat(shell, &mut st) == -(1 as libc::c_int) {
+        if libc::stat(shell, &mut st) == -(1 as libc::c_int) {
             crate::log::sshlog(
                 b"auth.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"allowed_user\0"))
@@ -1279,32 +1235,7 @@ pub unsafe extern "C" fn check_key_in_hostfiles(
     mut userfile: *const libc::c_char,
 ) -> HostStatus {
     let mut user_hostfile: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut host_status: HostStatus = HOST_OK;
     let mut hostkeys: *mut hostkeys = 0 as *mut hostkeys;
     let mut found: *const hostkey_entry = 0 as *const hostkey_entry;
@@ -1313,7 +1244,7 @@ pub unsafe extern "C" fn check_key_in_hostfiles(
     if !userfile.is_null() {
         user_hostfile = tilde_expand_filename(userfile, (*pw).pw_uid);
         if options.strict_modes != 0
-            && stat(user_hostfile, &mut st) == 0 as libc::c_int
+            && libc::stat(user_hostfile, &mut st) == 0 as libc::c_int
             && (st.st_uid != 0 as libc::c_int as libc::c_uint && st.st_uid != (*pw).pw_uid
                 || st.st_mode & 0o22 as libc::c_int as libc::c_uint
                     != 0 as libc::c_int as libc::c_uint)

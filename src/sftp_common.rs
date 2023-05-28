@@ -64,25 +64,7 @@ pub struct timespec {
     pub tv_sec: __time_t,
     pub tv_nsec: __syscall_slong_t,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct tm {
@@ -128,7 +110,7 @@ pub unsafe extern "C" fn attrib_clear(mut a: *mut Attrib) {
     (*a).atime = 0 as libc::c_int as u_int32_t;
     (*a).mtime = 0 as libc::c_int as u_int32_t;
 }
-pub unsafe extern "C" fn stat_to_attrib(mut st: *const stat, mut a: *mut Attrib) {
+pub unsafe extern "C" fn stat_to_attrib(mut st: *const libc::stat, mut a: *mut Attrib) {
     attrib_clear(a);
     (*a).flags = 0 as libc::c_int as u_int32_t;
     (*a).flags |= 0x1 as libc::c_int as libc::c_uint;
@@ -139,14 +121,14 @@ pub unsafe extern "C" fn stat_to_attrib(mut st: *const stat, mut a: *mut Attrib)
     (*a).flags |= 0x4 as libc::c_int as libc::c_uint;
     (*a).perm = (*st).st_mode;
     (*a).flags |= 0x8 as libc::c_int as libc::c_uint;
-    (*a).atime = (*st).st_atim.tv_sec as u_int32_t;
-    (*a).mtime = (*st).st_mtim.tv_sec as u_int32_t;
+    (*a).atime = (*st).st_atime as u_int32_t;
+    (*a).mtime = (*st).st_mtime as u_int32_t;
 }
-pub unsafe extern "C" fn attrib_to_stat(mut a: *const Attrib, mut st: *mut stat) {
+pub unsafe extern "C" fn attrib_to_stat(mut a: *const Attrib, mut st: *mut libc::stat) {
     memset(
         st as *mut libc::c_void,
         0 as libc::c_int,
-        ::core::mem::size_of::<stat>() as libc::c_ulong,
+        ::core::mem::size_of::<libc::stat>() as libc::c_ulong,
     );
     if (*a).flags & 0x1 as libc::c_int as libc::c_uint != 0 {
         (*st).st_size = (*a).size as __off_t;
@@ -159,8 +141,8 @@ pub unsafe extern "C" fn attrib_to_stat(mut a: *const Attrib, mut st: *mut stat)
         (*st).st_mode = (*a).perm;
     }
     if (*a).flags & 0x8 as libc::c_int as libc::c_uint != 0 {
-        (*st).st_atim.tv_sec = (*a).atime as __time_t;
-        (*st).st_mtim.tv_sec = (*a).mtime as __time_t;
+        (*st).st_atime = (*a).atime as __time_t;
+        (*st).st_mtime = (*a).mtime as __time_t;
     }
 }
 pub unsafe extern "C" fn decode_attrib(mut b: *mut sshbuf, mut a: *mut Attrib) -> libc::c_int {
@@ -296,7 +278,7 @@ pub unsafe extern "C" fn fx2txt(mut status: libc::c_int) -> *const libc::c_char 
 }
 pub unsafe extern "C" fn ls_file(
     mut name: *const libc::c_char,
-    mut st: *const stat,
+    mut st: *const libc::stat,
     mut remote: libc::c_int,
     mut si_units: libc::c_int,
     mut user: *const libc::c_char,
@@ -305,7 +287,7 @@ pub unsafe extern "C" fn ls_file(
     let mut ulen: libc::c_int = 0;
     let mut glen: libc::c_int = 0;
     let mut sz: libc::c_int = 0 as libc::c_int;
-    let mut ltime: *mut tm = localtime(&(*st).st_mtim.tv_sec);
+    let mut ltime: *mut tm = localtime(&(*st).st_mtime);
     let mut buf: [libc::c_char; 1024] = [0; 1024];
     let mut lc: [libc::c_char; 8] = [0; 8];
     let mut mode: [libc::c_char; 12] = [0; 12];
@@ -354,8 +336,8 @@ pub unsafe extern "C" fn ls_file(
         if (now
             - (365 as libc::c_int * 24 as libc::c_int * 60 as libc::c_int * 60 as libc::c_int
                 / 2 as libc::c_int) as libc::c_long)
-            < (*st).st_mtim.tv_sec
-            && now >= (*st).st_mtim.tv_sec
+            < (*st).st_mtime
+            && now >= (*st).st_mtime
         {
             sz = strftime(
                 tbuf.as_mut_ptr(),

@@ -13,9 +13,8 @@ extern "C" {
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn utimes(__file: *const libc::c_char, __tvp: *const timeval) -> libc::c_int;
     fn futimes(__fd: libc::c_int, __tvp: *const timeval) -> libc::c_int;
-    fn stat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
-    fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
-    fn lstat(__file: *const libc::c_char, __buf: *mut stat) -> libc::c_int;
+
+    fn lstat(__file: *const libc::c_char, __buf: *mut libc::stat) -> libc::c_int;
     fn fchmodat(
         __fd: libc::c_int,
         __file: *const libc::c_char,
@@ -49,7 +48,7 @@ extern "C" {
     ) -> libc::c_int;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn getcwd(__buf: *mut libc::c_char, __size: size_t) -> *mut libc::c_char;
-    
+
     fn link(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
     fn symlink(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
     fn readlink(__path: *const libc::c_char, __buf: *mut libc::c_char, __len: size_t) -> ssize_t;
@@ -157,12 +156,12 @@ extern "C" {
         _: *mut u_int,
     ) -> *mut libc::c_char;
     fn attrib_clear(_: *mut Attrib);
-    fn stat_to_attrib(_: *const stat, _: *mut Attrib);
+    fn stat_to_attrib(_: *const libc::stat, _: *mut Attrib);
     fn decode_attrib(_: *mut sshbuf, _: *mut Attrib) -> libc::c_int;
     fn encode_attrib(_: *mut sshbuf, _: *const Attrib) -> libc::c_int;
     fn ls_file(
         _: *const libc::c_char,
-        _: *const stat,
+        _: *const libc::stat,
         _: libc::c_int,
         _: libc::c_int,
         _: *const libc::c_char,
@@ -218,25 +217,7 @@ pub struct timespec {
     pub tv_nsec: __syscall_slong_t,
 }
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -469,7 +450,7 @@ static mut handlers: [sftp_handler; 19] = unsafe {
         },
         {
             let mut init = sftp_handler {
-                name: b"fstat\0" as *const u8 as *const libc::c_char,
+                name: b"libc::fstat\0" as *const u8 as *const libc::c_char,
                 ext_name: 0 as *const libc::c_char,
                 type_0: 8 as libc::c_int as u_int,
                 handler: Some(process_fstat as unsafe extern "C" fn(u_int32_t) -> ()),
@@ -559,7 +540,7 @@ static mut handlers: [sftp_handler; 19] = unsafe {
         },
         {
             let mut init = sftp_handler {
-                name: b"stat\0" as *const u8 as *const libc::c_char,
+                name: b"libc::stat\0" as *const u8 as *const libc::c_char,
                 ext_name: 0 as *const libc::c_char,
                 type_0: 17 as libc::c_int as u_int,
                 handler: Some(process_stat as unsafe extern "C" fn(u_int32_t) -> ()),
@@ -2176,32 +2157,7 @@ unsafe extern "C" fn process_do_stat(mut id: u_int32_t, mut do_lstat: libc::c_in
         atime: 0,
         mtime: 0,
     };
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut name: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
     let mut status: libc::c_int = 4 as libc::c_int;
@@ -2251,7 +2207,7 @@ unsafe extern "C" fn process_do_stat(mut id: u_int32_t, mut do_lstat: libc::c_in
     r = if do_lstat != 0 {
         lstat(name, &mut st)
     } else {
-        stat(name, &mut st)
+        libc::stat(name, &mut st)
     };
     if r == -(1 as libc::c_int) {
         status = errno_to_portable(*libc::__errno_location());
@@ -2281,32 +2237,7 @@ unsafe extern "C" fn process_fstat(mut id: u_int32_t) {
         atime: 0,
         mtime: 0,
     };
-    let mut st: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut fd: libc::c_int = 0;
     let mut r: libc::c_int = 0;
     let mut handle: libc::c_int = 0;
@@ -2331,14 +2262,14 @@ unsafe extern "C" fn process_fstat(mut id: u_int32_t) {
         0 as libc::c_int,
         SYSLOG_LEVEL_DEBUG1,
         0 as *const libc::c_char,
-        b"request %u: fstat \"%s\" (handle %u)\0" as *const u8 as *const libc::c_char,
+        b"request %u: libc::fstat \"%s\" (handle %u)\0" as *const u8 as *const libc::c_char,
         id,
         handle_to_name(handle),
         handle,
     );
     fd = handle_to_fd(handle);
     if fd >= 0 as libc::c_int {
-        r = fstat(fd, &mut st);
+        r = libc::fstat(fd, &mut st);
         if r == -(1 as libc::c_int) {
             status = errno_to_portable(*libc::__errno_location());
         } else {
@@ -2725,32 +2656,7 @@ unsafe extern "C" fn process_readdir(mut id: u_int32_t) {
     if dirp.is_null() || path.is_null() {
         send_status(id, 4 as libc::c_int as u_int32_t);
     } else {
-        let mut st: stat = stat {
-            st_dev: 0,
-            st_ino: 0,
-            st_nlink: 0,
-            st_mode: 0,
-            st_uid: 0,
-            st_gid: 0,
-            __pad0: 0,
-            st_rdev: 0,
-            st_size: 0,
-            st_blksize: 0,
-            st_blocks: 0,
-            st_atim: timespec {
-                tv_sec: 0,
-                tv_nsec: 0,
-            },
-            st_mtim: timespec {
-                tv_sec: 0,
-                tv_nsec: 0,
-            },
-            st_ctim: timespec {
-                tv_sec: 0,
-                tv_nsec: 0,
-            },
-            __glibc_reserved: [0; 3],
-        };
+        let mut st: libc::stat = unsafe { std::mem::zeroed() };
         let mut pathname: [libc::c_char; 4096] = [0; 4096];
         let mut stats: *mut Stat = 0 as *mut Stat;
         let mut nstats: libc::c_int = 10 as libc::c_int;
@@ -3050,32 +2956,7 @@ unsafe extern "C" fn process_rename(mut id: u_int32_t) {
     let mut newpath: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
     let mut status: libc::c_int = 0;
-    let mut sb: stat = stat {
-        st_dev: 0,
-        st_ino: 0,
-        st_nlink: 0,
-        st_mode: 0,
-        st_uid: 0,
-        st_gid: 0,
-        __pad0: 0,
-        st_rdev: 0,
-        st_size: 0,
-        st_blksize: 0,
-        st_blocks: 0,
-        st_atim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_mtim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        st_ctim: timespec {
-            tv_sec: 0,
-            tv_nsec: 0,
-        },
-        __glibc_reserved: [0; 3],
-    };
+    let mut sb: libc::stat = unsafe { std::mem::zeroed() };
     r = sshbuf_get_cstring(iqueue, &mut oldpath, 0 as *mut size_t);
     if r != 0 as libc::c_int || {
         r = sshbuf_get_cstring(iqueue, &mut newpath, 0 as *mut size_t);
@@ -3125,33 +3006,8 @@ unsafe extern "C" fn process_rename(mut id: u_int32_t) {
                 || *libc::__errno_location() == 18 as libc::c_int
                 || *libc::__errno_location() == 1 as libc::c_int
             {
-                let mut st: stat = stat {
-                    st_dev: 0,
-                    st_ino: 0,
-                    st_nlink: 0,
-                    st_mode: 0,
-                    st_uid: 0,
-                    st_gid: 0,
-                    __pad0: 0,
-                    st_rdev: 0,
-                    st_size: 0,
-                    st_blksize: 0,
-                    st_blocks: 0,
-                    st_atim: timespec {
-                        tv_sec: 0,
-                        tv_nsec: 0,
-                    },
-                    st_mtim: timespec {
-                        tv_sec: 0,
-                        tv_nsec: 0,
-                    },
-                    st_ctim: timespec {
-                        tv_sec: 0,
-                        tv_nsec: 0,
-                    },
-                    __glibc_reserved: [0; 3],
-                };
-                if stat(newpath, &mut st) == -(1 as libc::c_int) {
+                let mut st: libc::stat = unsafe { std::mem::zeroed() };
+                if libc::stat(newpath, &mut st) == -(1 as libc::c_int) {
                     if rename(oldpath, newpath) == -(1 as libc::c_int) {
                         status = errno_to_portable(*libc::__errno_location());
                     } else {
@@ -3167,7 +3023,7 @@ unsafe extern "C" fn process_rename(mut id: u_int32_t) {
         } else {
             status = 0 as libc::c_int;
         }
-    } else if stat(newpath, &mut sb) == -(1 as libc::c_int) {
+    } else if libc::stat(newpath, &mut sb) == -(1 as libc::c_int) {
         if rename(oldpath, newpath) == -(1 as libc::c_int) {
             status = errno_to_portable(*libc::__errno_location());
         } else {

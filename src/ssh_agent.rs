@@ -27,7 +27,7 @@ extern "C" {
     fn usleep(__useconds: __useconds_t) -> libc::c_int;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
-    
+
     fn getpid() -> __pid_t;
     fn getppid() -> __pid_t;
     fn setsid() -> __pid_t;

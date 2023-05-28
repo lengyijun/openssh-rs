@@ -13,7 +13,6 @@ extern "C" {
     pub type ec_key_st;
     pub type ssh_digest_ctx;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn fstat(__fd: libc::c_int, __buf: *mut stat) -> libc::c_int;
 
     fn vis(
         _: *mut libc::c_char,
@@ -25,7 +24,7 @@ extern "C" {
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
     fn closefrom(__lowfd: libc::c_int);
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
-    
+
     fn getpid() -> __pid_t;
     fn getuid() -> __uid_t;
     fn fork() -> __pid_t;
@@ -221,25 +220,7 @@ pub struct sockaddr_un {
     pub sun_path: [libc::c_char; 108],
 }
 pub type uint8_t = __uint8_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct stat {
-    pub st_dev: __dev_t,
-    pub st_ino: __ino_t,
-    pub st_nlink: __nlink_t,
-    pub st_mode: __mode_t,
-    pub st_uid: __uid_t,
-    pub st_gid: __gid_t,
-    pub __pad0: libc::c_int,
-    pub st_rdev: __dev_t,
-    pub st_size: __off_t,
-    pub st_blksize: __blksize_t,
-    pub st_blocks: __blkcnt_t,
-    pub st_atim: timespec,
-    pub st_mtim: timespec,
-    pub st_ctim: timespec,
-    pub __glibc_reserved: [__syscall_slong_t; 3],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct passwd {
@@ -284,13 +265,13 @@ pub struct _ssh_compat_glob_t {
     pub gl_offs: size_t,
     pub gl_flags: libc::c_int,
     pub gl_pathv: *mut *mut libc::c_char,
-    pub gl_statv: *mut *mut stat,
+    pub gl_statv: *mut *mut libc::stat,
     pub gl_errfunc: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
     pub gl_closedir: Option<unsafe extern "C" fn(*mut libc::c_void) -> ()>,
     pub gl_readdir: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
     pub gl_opendir: Option<unsafe extern "C" fn(*const libc::c_char) -> *mut libc::c_void>,
-    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut stat) -> libc::c_int>,
-    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut stat) -> libc::c_int>,
+    pub gl_lstat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
+    pub gl_stat: Option<unsafe extern "C" fn(*const libc::c_char, *mut libc::stat) -> libc::c_int>,
 }
 pub type DSA = dsa_st;
 pub type RSA = rsa_st;
@@ -3145,7 +3126,7 @@ unsafe extern "C" fn process_config_line_depth(
         gl_offs: 0,
         gl_flags: 0,
         gl_pathv: 0 as *mut *mut libc::c_char,
-        gl_statv: 0 as *mut *mut stat,
+        gl_statv: 0 as *mut *mut libc::stat,
         gl_errfunc: None,
         gl_closedir: None,
         gl_readdir: None,
@@ -6040,33 +6021,8 @@ unsafe extern "C" fn read_config_file_depth(
         return 0 as libc::c_int;
     }
     if flags & 1 as libc::c_int != 0 {
-        let mut sb: stat = stat {
-            st_dev: 0,
-            st_ino: 0,
-            st_nlink: 0,
-            st_mode: 0,
-            st_uid: 0,
-            st_gid: 0,
-            __pad0: 0,
-            st_rdev: 0,
-            st_size: 0,
-            st_blksize: 0,
-            st_blocks: 0,
-            st_atim: timespec {
-                tv_sec: 0,
-                tv_nsec: 0,
-            },
-            st_mtim: timespec {
-                tv_sec: 0,
-                tv_nsec: 0,
-            },
-            st_ctim: timespec {
-                tv_sec: 0,
-                tv_nsec: 0,
-            },
-            __glibc_reserved: [0; 3],
-        };
-        if fstat(fileno(f), &mut sb) == -(1 as libc::c_int) {
+        let mut sb: libc::stat = unsafe { std::mem::zeroed() };
+        if libc::fstat(fileno(f), &mut sb) == -(1 as libc::c_int) {
             sshfatal(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
@@ -6077,7 +6033,7 @@ unsafe extern "C" fn read_config_file_depth(
                 0 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"fstat %s: %s\0" as *const u8 as *const libc::c_char,
+                b"libc::fstat %s: %s\0" as *const u8 as *const libc::c_char,
                 filename,
                 strerror(*libc::__errno_location()),
             );
