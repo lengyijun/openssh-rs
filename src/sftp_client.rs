@@ -101,7 +101,7 @@ extern "C" {
     fn stop_progress_meter();
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
     fn put_u32(_: *mut libc::c_void, _: u_int32_t);
-    fn bandwidth_limit_init(_: *mut bwlimit, _: u_int64_t, _: size_t);
+    
     fn bandwidth_limit(_: *mut bwlimit, _: size_t);
     fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn attrib_clear(_: *mut Attrib);
@@ -1592,12 +1592,12 @@ pub unsafe extern "C" fn do_init(
     }
     (*ret).limit_kbps = limit_kbps;
     if (*ret).limit_kbps > 0 as libc::c_int as libc::c_ulong {
-        bandwidth_limit_init(
+        crate::misc::bandwidth_limit_init(
             &mut (*ret).bwlimit_in,
             (*ret).limit_kbps,
             (*ret).download_buflen as size_t,
         );
-        bandwidth_limit_init(
+        crate::misc::bandwidth_limit_init(
             &mut (*ret).bwlimit_out,
             (*ret).limit_kbps,
             (*ret).upload_buflen as size_t,

@@ -117,7 +117,7 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn bandwidth_limit_init(_: *mut bwlimit, _: u_int64_t, _: size_t);
+    
     fn bandwidth_limit(_: *mut bwlimit, _: size_t);
     fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
     fn start_progress_meter(_: *const libc::c_char, _: off_t, _: *mut off_t);
@@ -930,7 +930,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
                     usage();
                 }
                 limit_kbps *= 1024 as libc::c_int as libc::c_longlong;
-                bandwidth_limit_init(
+                crate::misc::bandwidth_limit_init(
                     &mut bwlimit,
                     limit_kbps as u_int64_t,
                     16384 as libc::c_int as size_t,
