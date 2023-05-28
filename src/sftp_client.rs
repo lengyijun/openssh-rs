@@ -29,7 +29,6 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strpbrk(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
@@ -3924,7 +3923,7 @@ unsafe extern "C" fn send_open(
 }
 unsafe extern "C" fn progress_meter_path(mut path: *const libc::c_char) -> *const libc::c_char {
     let mut progresspath: *const libc::c_char = 0 as *const libc::c_char;
-    progresspath = strrchr(path, '/' as i32);
+    progresspath = libc::strrchr(path, '/' as i32);
     if progresspath.is_null() {
         return path;
     }

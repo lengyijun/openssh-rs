@@ -19,7 +19,6 @@ extern "C" {
     ) -> __ssize_t;
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
 
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn time(__timer: *mut time_t) -> time_t;
@@ -477,9 +476,9 @@ pub unsafe extern "C" fn auth_check_principals_line(
         *fresh0 = '\0' as i32 as libc::c_char;
     }
     line_opts = 0 as *mut libc::c_char;
-    ep = strrchr(cp, ' ' as i32);
+    ep = libc::strrchr(cp, ' ' as i32);
     if !ep.is_null() || {
-        ep = strrchr(cp, '\t' as i32);
+        ep = libc::strrchr(cp, '\t' as i32);
         !ep.is_null()
     } {
         while *ep as libc::c_int == ' ' as i32 || *ep as libc::c_int == '\t' as i32 {

@@ -97,7 +97,6 @@ extern "C" {
     fn strstr(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
@@ -4797,7 +4796,7 @@ unsafe extern "C" fn do_ca_sign(
                 );
             }
         }
-        cp = strrchr(tmp, '.' as i32);
+        cp = libc::strrchr(tmp, '.' as i32);
         if !cp.is_null()
             && libc::strcmp(cp, b".pub\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
         {

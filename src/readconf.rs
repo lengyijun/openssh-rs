@@ -44,7 +44,6 @@ extern "C" {
         -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -7159,7 +7158,7 @@ pub unsafe extern "C" fn parse_jump(
             current_block = 1054647088692577877;
             break;
         }
-        cp = strrchr(sdup, ',' as i32);
+        cp = libc::strrchr(sdup, ',' as i32);
         if cp.is_null() {
             cp = sdup;
         } else {
@@ -7218,7 +7217,7 @@ pub unsafe extern "C" fn parse_jump(
                         crate::xmalloc::xstrdup(b"none\0" as *const u8 as *const libc::c_char);
                     host = 0 as *mut libc::c_char;
                     user = host;
-                    cp = strrchr(s, ',' as i32);
+                    cp = libc::strrchr(s, ',' as i32);
                     if !cp.is_null() && cp != s as *mut libc::c_char {
                         (*o).jump_extra = crate::xmalloc::xstrdup(s);
                         *((*o).jump_extra).offset(cp.offset_from(s) as libc::c_long as isize) =

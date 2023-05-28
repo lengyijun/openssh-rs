@@ -94,7 +94,6 @@ extern "C" {
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strtok(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -2830,7 +2829,7 @@ pub unsafe extern "C" fn do_child(
         libc::exit(sftp_server_main(i, argv.as_mut_ptr(), (*s).pw));
     }
     libc::fflush(0 as *mut libc::FILE);
-    shell0 = strrchr(shell, '/' as i32);
+    shell0 = libc::strrchr(shell, '/' as i32);
     if !shell0.is_null() {
         shell0 = shell0.offset(1);
         shell0;
@@ -4580,7 +4579,7 @@ unsafe extern "C" fn session_tty_list() -> *mut libc::c_char {
                 5 as libc::c_int as libc::c_ulong,
             ) != 0 as libc::c_int
             {
-                cp = strrchr(((*s).tty).as_mut_ptr(), '/' as i32);
+                cp = libc::strrchr(((*s).tty).as_mut_ptr(), '/' as i32);
                 cp = if cp.is_null() {
                     ((*s).tty).as_mut_ptr()
                 } else {

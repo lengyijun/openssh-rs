@@ -5,7 +5,7 @@ extern "C" {
     fn getpwent() -> *mut libc::passwd;
     fn crypt(__key: *const libc::c_char, __salt: *const libc::c_char) -> *mut libc::c_char;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn getspnam(__name: *const libc::c_char) -> *mut spwd;
@@ -52,7 +52,7 @@ unsafe extern "C" fn pick_salt() -> *const libc::c_char {
             continue;
         }
         if !(*passwd.offset(0 as libc::c_int as isize) as libc::c_int == '$' as i32 && {
-            p = strrchr(passwd.offset(1 as libc::c_int as isize), '$' as i32);
+            p = libc::strrchr(passwd.offset(1 as libc::c_int as isize), '$' as i32);
             !p.is_null()
         }) {
             continue;

@@ -11,7 +11,6 @@ extern "C" {
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
 
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 }
 pub type __dev_t = libc::c_ulong;
@@ -172,7 +171,7 @@ pub unsafe extern "C" fn sftp_realpath(
                         *resolved
                             .offset(resolved_len.wrapping_sub(1 as libc::c_int as libc::c_ulong)
                                 as isize) = '\0' as i32 as libc::c_char;
-                        q = (strrchr(resolved, '/' as i32)).offset(1 as libc::c_int as isize);
+                        q = (libc::strrchr(resolved, '/' as i32)).offset(1 as libc::c_int as isize);
                         *q = '\0' as i32 as libc::c_char;
                         resolved_len = q.offset_from(resolved) as libc::c_long as size_t;
                     }
@@ -226,7 +225,7 @@ pub unsafe extern "C" fn sftp_realpath(
                                     resolved_len.wrapping_sub(1 as libc::c_int as libc::c_ulong)
                                         as isize,
                                 ) = '\0' as i32 as libc::c_char;
-                                q = (strrchr(resolved, '/' as i32))
+                                q = (libc::strrchr(resolved, '/' as i32))
                                     .offset(1 as libc::c_int as isize);
                                 *q = '\0' as i32 as libc::c_char;
                                 resolved_len = q.offset_from(resolved) as libc::c_long as size_t;

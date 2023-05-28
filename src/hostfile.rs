@@ -46,7 +46,6 @@ extern "C" {
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -954,7 +953,7 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
     let mut p: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut len: size_t = 0;
     let mut st: libc::stat = unsafe { std::mem::zeroed() };
-    p = strrchr(filename, '/' as i32);
+    p = libc::strrchr(filename, '/' as i32);
     if p.is_null() {
         return;
     }

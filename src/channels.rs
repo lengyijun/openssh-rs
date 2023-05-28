@@ -68,7 +68,6 @@ extern "C" {
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn inet_ntoa(__in: in_addr) -> *mut libc::c_char;
@@ -10522,7 +10521,7 @@ pub unsafe extern "C" fn x11_connect_display(mut ssh: *mut ssh) -> libc::c_int {
         || *display.offset(0 as libc::c_int as isize) as libc::c_int == ':' as i32
     {
         if sscanf(
-            (strrchr(display, ':' as i32)).offset(1 as libc::c_int as isize),
+            (libc::strrchr(display, ':' as i32)).offset(1 as libc::c_int as isize),
             b"%u\0" as *const u8 as *const libc::c_char,
             &mut display_number as *mut u_int,
         ) != 1 as libc::c_int

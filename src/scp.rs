@@ -64,7 +64,6 @@ extern "C" {
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
@@ -1441,7 +1440,7 @@ unsafe extern "C" fn brace_expand(
             if expanded != 0 {
                 libc::free(cp as *mut libc::c_void);
             } else {
-                cp2 = strrchr(cp, '/' as i32);
+                cp2 = libc::strrchr(cp, '/' as i32);
                 if !cp2.is_null() {
                     let fresh2 = cp2;
                     cp2 = cp2.offset(1);
@@ -2443,7 +2442,7 @@ pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc:
                 crate::misc::unset_nonblock(fd);
                 match stb.st_mode & 0o170000 as libc::c_int as libc::c_uint {
                     32768 => {
-                        last = strrchr(name, '/' as i32);
+                        last = libc::strrchr(name, '/' as i32);
                         if last.is_null() {
                             last = name;
                         } else {
@@ -2782,7 +2781,7 @@ pub unsafe extern "C" fn rsource(mut name: *mut libc::c_char, mut statp: *mut li
         );
         return;
     }
-    last = strrchr(name, '/' as i32);
+    last = libc::strrchr(name, '/' as i32);
     if last.is_null() {
         last = name;
     } else {

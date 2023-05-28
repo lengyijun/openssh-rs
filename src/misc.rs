@@ -95,7 +95,6 @@ extern "C" {
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strpbrk(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -1522,7 +1521,7 @@ pub unsafe extern "C" fn parse_user_host_path(
             tmp = b".\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
         }
         path = crate::xmalloc::xstrdup(tmp);
-        tmp = strrchr(sdup, '@' as i32);
+        tmp = libc::strrchr(sdup, '@' as i32);
         if !tmp.is_null() {
             let fresh3 = tmp;
             tmp = tmp.offset(1);
@@ -1583,7 +1582,7 @@ pub unsafe extern "C" fn parse_user_host_port(
     if sdup.is_null() {
         return -(1 as libc::c_int);
     }
-    cp = strrchr(tmp, '@' as i32);
+    cp = libc::strrchr(tmp, '@' as i32);
     if !cp.is_null() {
         *cp = '\0' as i32 as libc::c_char;
         if *tmp as libc::c_int == '\0' as i32 {
