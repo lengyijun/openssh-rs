@@ -11,7 +11,7 @@ extern "C" {
     pub type sshbuf;
     pub type __dirstream;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn utimes(__file: *const libc::c_char, __tvp: *const libc::timeval) -> libc::c_int;
+
     fn futimes(__fd: libc::c_int, __tvp: *const libc::timeval) -> libc::c_int;
 
     fn lstat(__file: *const libc::c_char, __buf: *mut libc::stat) -> libc::c_int;
@@ -2390,7 +2390,7 @@ unsafe extern "C" fn process_setstat(mut id: u_int32_t) {
             name,
             buf.as_mut_ptr(),
         );
-        r = utimes(name, attrib_to_tv(&mut a) as *const libc::timeval);
+        r = libc::utimes(name, attrib_to_tv(&mut a) as *const libc::timeval);
         if r == -(1 as libc::c_int) {
             status = errno_to_portable(*libc::__errno_location());
         }

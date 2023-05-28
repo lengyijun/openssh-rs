@@ -38,8 +38,6 @@ extern "C" {
 
     fn vfprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ::core::ffi::VaList) -> libc::c_int;
 
-    fn utimes(__file: *const libc::c_char, __tvp: *const libc::timeval) -> libc::c_int;
-
     fn getpwuid(__uid: __uid_t) -> *mut passwd;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
@@ -3878,7 +3876,7 @@ pub unsafe extern "C" fn sink(
                                                 sink(1 as libc::c_int, vect.as_mut_ptr(), src);
                                                 if setimes != 0 {
                                                     setimes = 0 as libc::c_int;
-                                                    utimes(
+                                                    libc::utimes(
                                                         vect[0 as libc::c_int as usize],
                                                         tv.as_mut_ptr() as *const libc::timeval,
                                                     );
@@ -4149,7 +4147,7 @@ pub unsafe extern "C" fn sink(
                                             }
                                             if setimes != 0 && wrerr == 0 {
                                                 setimes = 0 as libc::c_int;
-                                                if utimes(
+                                                if libc::utimes(
                                                     np,
                                                     tv.as_mut_ptr() as *const libc::timeval,
                                                 ) == -(1 as libc::c_int)

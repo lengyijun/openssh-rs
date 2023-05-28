@@ -6,7 +6,6 @@ use libc::close;
 extern "C" {
     pub type sshbuf;
     pub type __dirstream;
-    fn utimes(__file: *const libc::c_char, __tvp: *const libc::timeval) -> libc::c_int;
 
     fn lseek(__fd: libc::c_int, __offset: __off_t, __whence: libc::c_int) -> __off_t;
 
@@ -4632,7 +4631,7 @@ pub unsafe extern "C" fn do_download(
                         tv[1 as libc::c_int as usize].tv_usec = 0 as libc::c_int as __suseconds_t;
                         tv[0 as libc::c_int as usize].tv_usec =
                             tv[1 as libc::c_int as usize].tv_usec;
-                        if utimes(local_path, tv.as_mut_ptr() as *const libc::timeval)
+                        if libc::utimes(local_path, tv.as_mut_ptr() as *const libc::timeval)
                             == -(1 as libc::c_int)
                         {
                             crate::log::sshlog(
@@ -4952,7 +4951,7 @@ unsafe extern "C" fn download_dir_internal(
             tv[1 as libc::c_int as usize].tv_sec = (*dirattrib).mtime as __time_t;
             tv[1 as libc::c_int as usize].tv_usec = 0 as libc::c_int as __suseconds_t;
             tv[0 as libc::c_int as usize].tv_usec = tv[1 as libc::c_int as usize].tv_usec;
-            if utimes(dst, tv.as_mut_ptr() as *const libc::timeval) == -(1 as libc::c_int) {
+            if libc::utimes(dst, tv.as_mut_ptr() as *const libc::timeval) == -(1 as libc::c_int) {
                 crate::log::sshlog(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
