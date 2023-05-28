@@ -33,7 +33,7 @@ extern "C" {
     fn getpid() -> __pid_t;
     fn arc4random_uniform(_: uint32_t) -> uint32_t;
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
-    fn pledge(promises: *const libc::c_char, paths: *mut *const libc::c_char) -> libc::c_int;
+    
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
@@ -5703,7 +5703,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
     }
     muxclient_request_id = muxclient_request_id.wrapping_add(1);
     muxclient_request_id;
-    if pledge(
+    if crate::openbsd_compat::bsd_misc::pledge(
         b"stdio proc tty\0" as *const u8 as *const libc::c_char,
         0 as *mut *const libc::c_char,
     ) == -(1 as libc::c_int)
@@ -5718,7 +5718,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"pledge(): %s\0" as *const u8 as *const libc::c_char,
+            b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
     }
@@ -6214,7 +6214,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
             b"send fds failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    if pledge(
+    if crate::openbsd_compat::bsd_misc::pledge(
         b"stdio proc tty\0" as *const u8 as *const libc::c_char,
         0 as *mut *const libc::c_char,
     ) == -(1 as libc::c_int)
@@ -6229,7 +6229,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"pledge(): %s\0" as *const u8 as *const libc::c_char,
+            b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
     }

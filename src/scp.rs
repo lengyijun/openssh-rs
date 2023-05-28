@@ -62,7 +62,7 @@ extern "C" {
     fn perror(__s: *const libc::c_char);
     fn scan_scaled(_: *mut libc::c_char, _: *mut libc::c_longlong) -> libc::c_int;
     
-    fn pledge(promises: *const libc::c_char, paths: *mut *const libc::c_char) -> libc::c_int;
+    
     fn strtonum(
         _: *const libc::c_char,
         _: libc::c_longlong,
@@ -1100,12 +1100,12 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
         showprogress = 0 as libc::c_int;
     }
     if !(pflag != 0) {
-        if pledge(
+        if crate::openbsd_compat::bsd_misc::pledge(
             b"stdio rpath wpath cpath fattr tty proc exec\0" as *const u8 as *const libc::c_char,
             0 as *mut *const libc::c_char,
         ) == -(1 as libc::c_int)
         {
-            perror(b"pledge\0" as *const u8 as *const libc::c_char);
+            perror(b"crate::openbsd_compat::bsd_misc::pledge\0" as *const u8 as *const libc::c_char);
             libc::exit(1 as libc::c_int);
         }
     }

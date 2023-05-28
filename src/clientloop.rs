@@ -34,7 +34,7 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
-    fn pledge(promises: *const libc::c_char, paths: *mut *const libc::c_char) -> libc::c_int;
+    
     fn setproctitle(fmt: *const libc::c_char, _: ...);
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
@@ -2033,9 +2033,9 @@ unsafe extern "C" fn client_repledge() {
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
-            b"pledge: network\0" as *const u8 as *const libc::c_char,
+            b"crate::openbsd_compat::bsd_misc::pledge: network\0" as *const u8 as *const libc::c_char,
         );
-        if pledge(
+        if crate::openbsd_compat::bsd_misc::pledge(
             b"stdio unix inet dns proc tty\0" as *const u8 as *const libc::c_char,
             0 as *mut *const libc::c_char,
         ) == -(1 as libc::c_int)
@@ -2048,7 +2048,7 @@ unsafe extern "C" fn client_repledge() {
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"pledge(): %s\0" as *const u8 as *const libc::c_char,
+                b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -2061,9 +2061,9 @@ unsafe extern "C" fn client_repledge() {
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
-            b"pledge: agent\0" as *const u8 as *const libc::c_char,
+            b"crate::openbsd_compat::bsd_misc::pledge: agent\0" as *const u8 as *const libc::c_char,
         );
-        if pledge(
+        if crate::openbsd_compat::bsd_misc::pledge(
             b"stdio unix proc tty\0" as *const u8 as *const libc::c_char,
             0 as *mut *const libc::c_char,
         ) == -(1 as libc::c_int)
@@ -2076,7 +2076,7 @@ unsafe extern "C" fn client_repledge() {
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"pledge(): %s\0" as *const u8 as *const libc::c_char,
+                b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -2089,9 +2089,9 @@ unsafe extern "C" fn client_repledge() {
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
-            b"pledge: fork\0" as *const u8 as *const libc::c_char,
+            b"crate::openbsd_compat::bsd_misc::pledge: fork\0" as *const u8 as *const libc::c_char,
         );
-        if pledge(
+        if crate::openbsd_compat::bsd_misc::pledge(
             b"stdio proc tty\0" as *const u8 as *const libc::c_char,
             0 as *mut *const libc::c_char,
         ) == -(1 as libc::c_int)
@@ -2104,7 +2104,7 @@ unsafe extern "C" fn client_repledge() {
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"pledge(): %s\0" as *const u8 as *const libc::c_char,
+                b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -3231,9 +3231,9 @@ pub unsafe extern "C" fn client_loop(
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
-            b"pledge: id\0" as *const u8 as *const libc::c_char,
+            b"crate::openbsd_compat::bsd_misc::pledge: id\0" as *const u8 as *const libc::c_char,
         );
-        if pledge(
+        if crate::openbsd_compat::bsd_misc::pledge(
             b"stdio rpath wpath cpath unix inet dns recvfd sendfd proc exec id tty\0" as *const u8
                 as *const libc::c_char,
             0 as *mut *const libc::c_char,
@@ -3247,7 +3247,7 @@ pub unsafe extern "C" fn client_loop(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"pledge(): %s\0" as *const u8 as *const libc::c_char,
+                b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -3259,9 +3259,9 @@ pub unsafe extern "C" fn client_loop(
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
-            b"pledge: exec\0" as *const u8 as *const libc::c_char,
+            b"crate::openbsd_compat::bsd_misc::pledge: exec\0" as *const u8 as *const libc::c_char,
         );
-        if pledge(
+        if crate::openbsd_compat::bsd_misc::pledge(
             b"stdio rpath wpath cpath unix inet dns proc exec tty\0" as *const u8
                 as *const libc::c_char,
             0 as *mut *const libc::c_char,
@@ -3275,7 +3275,7 @@ pub unsafe extern "C" fn client_loop(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"pledge(): %s\0" as *const u8 as *const libc::c_char,
+                b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -3287,9 +3287,9 @@ pub unsafe extern "C" fn client_loop(
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
-            b"pledge: filesystem\0" as *const u8 as *const libc::c_char,
+            b"crate::openbsd_compat::bsd_misc::pledge: filesystem\0" as *const u8 as *const libc::c_char,
         );
-        if pledge(
+        if crate::openbsd_compat::bsd_misc::pledge(
             b"stdio rpath wpath cpath unix inet dns proc tty\0" as *const u8 as *const libc::c_char,
             0 as *mut *const libc::c_char,
         ) == -(1 as libc::c_int)
@@ -3302,7 +3302,7 @@ pub unsafe extern "C" fn client_loop(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"pledge(): %s\0" as *const u8 as *const libc::c_char,
+                b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -3316,9 +3316,9 @@ pub unsafe extern "C" fn client_loop(
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
-            b"pledge: proc\0" as *const u8 as *const libc::c_char,
+            b"crate::openbsd_compat::bsd_misc::pledge: proc\0" as *const u8 as *const libc::c_char,
         );
-        if pledge(
+        if crate::openbsd_compat::bsd_misc::pledge(
             b"stdio cpath unix inet dns proc tty\0" as *const u8 as *const libc::c_char,
             0 as *mut *const libc::c_char,
         ) == -(1 as libc::c_int)
@@ -3331,7 +3331,7 @@ pub unsafe extern "C" fn client_loop(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"pledge(): %s\0" as *const u8 as *const libc::c_char,
+                b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }
@@ -3343,9 +3343,9 @@ pub unsafe extern "C" fn client_loop(
             0 as libc::c_int,
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
-            b"pledge: network\0" as *const u8 as *const libc::c_char,
+            b"crate::openbsd_compat::bsd_misc::pledge: network\0" as *const u8 as *const libc::c_char,
         );
-        if pledge(
+        if crate::openbsd_compat::bsd_misc::pledge(
             b"stdio unix inet dns proc tty\0" as *const u8 as *const libc::c_char,
             0 as *mut *const libc::c_char,
         ) == -(1 as libc::c_int)
@@ -3358,7 +3358,7 @@ pub unsafe extern "C" fn client_loop(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"pledge(): %s\0" as *const u8 as *const libc::c_char,
+                b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8 as *const libc::c_char,
                 strerror(*libc::__errno_location()),
             );
         }

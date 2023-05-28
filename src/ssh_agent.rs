@@ -61,7 +61,7 @@ extern "C" {
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     
-    fn pledge(promises: *const libc::c_char, paths: *mut *const libc::c_char) -> libc::c_int;
+    
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn getpeereid(_: libc::c_int, _: *mut uid_t, _: *mut gid_t) -> libc::c_int;
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
@@ -5163,7 +5163,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         15 as libc::c_int,
         Some(cleanup_handler as unsafe extern "C" fn(libc::c_int) -> ()),
     );
-    if pledge(
+    if crate::openbsd_compat::bsd_misc::pledge(
         b"stdio rpath cpath unix id proc exec\0" as *const u8 as *const libc::c_char,
         0 as *mut *const libc::c_char,
     ) == -(1 as libc::c_int)
@@ -5175,7 +5175,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"%s: pledge: %s\0" as *const u8 as *const libc::c_char,
+            b"%s: crate::openbsd_compat::bsd_misc::pledge: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             strerror(*libc::__errno_location()),
         );
