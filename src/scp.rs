@@ -99,7 +99,7 @@ extern "C" {
     
     
     
-    fn stop_progress_meter();
+    
 
     static mut __progname: *mut libc::c_char;
     fn remote_glob(
@@ -2755,7 +2755,7 @@ pub unsafe extern "C" fn source(mut argc: libc::c_int, mut argv: *mut *mut libc:
                                         }
                                         response();
                                         if showprogress != 0 {
-                                            stop_progress_meter();
+                                            crate::progressmeter::stop_progress_meter();
                                         }
                                         current_block = 4644295000439058019;
                                     }
@@ -4109,7 +4109,7 @@ pub unsafe extern "C" fn sink(
                                             }
                                             response();
                                             if showprogress != 0 {
-                                                stop_progress_meter();
+                                                crate::progressmeter::stop_progress_meter();
                                             }
                                             if setimes != 0 && wrerr == 0 {
                                                 setimes = 0 as libc::c_int;

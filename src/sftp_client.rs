@@ -94,7 +94,7 @@ extern "C" {
     ) -> size_t;
     
     
-    fn stop_progress_meter();
+    
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
     fn put_u32(_: *mut libc::c_void, _: u_int32_t);
 
@@ -4480,7 +4480,7 @@ pub unsafe extern "C" fn do_download(
                     }
                 }
                 if showprogress != 0 && size != 0 {
-                    stop_progress_meter();
+                    crate::progressmeter::stop_progress_meter();
                 }
                 if !(requests.tqh_first).is_null() {
                     sshfatal(
@@ -5463,7 +5463,7 @@ pub unsafe extern "C" fn do_upload(
     }
     sshbuf_free(msg);
     if showprogress != 0 {
-        stop_progress_meter();
+        crate::progressmeter::stop_progress_meter();
     }
     libc::free(data as *mut libc::c_void);
     if status == 0 as libc::c_int as libc::c_uint && interrupted == 0 {
@@ -6434,7 +6434,7 @@ pub unsafe extern "C" fn do_crossload(
         }
     }
     if showprogress != 0 && size != 0 {
-        stop_progress_meter();
+        crate::progressmeter::stop_progress_meter();
     }
     crate::log::sshlog(
         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
