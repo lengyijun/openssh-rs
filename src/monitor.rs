@@ -58,7 +58,6 @@ extern "C" {
 
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_fingerprint(_: *const sshkey, _: libc::c_int, _: sshkey_fp_rep) -> *mut libc::c_char;
@@ -2740,7 +2739,7 @@ unsafe extern "C" fn key_base_type_match(
 ) -> libc::c_int {
     let mut s: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut l: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut ol: *mut libc::c_char = xstrdup(list);
+    let mut ol: *mut libc::c_char = crate::xmalloc::xstrdup(list);
     let mut found: libc::c_int = 0 as libc::c_int;
     l = ol;
     s = strsep(&mut l, b",\0" as *const u8 as *const libc::c_char);

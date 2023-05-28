@@ -107,7 +107,6 @@ extern "C" {
     fn mkdtemp(__template: *mut libc::c_char) -> *mut libc::c_char;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn pty_allocate(
         _: *mut libc::c_int,
@@ -1027,7 +1026,8 @@ unsafe extern "C" fn auth_input_request_forwarding(
         return 0 as libc::c_int;
     }
     temporarily_use_uid(pw);
-    auth_sock_dir = xstrdup(b"/tmp/ssh-XXXXXXXXXX\0" as *const u8 as *const libc::c_char);
+    auth_sock_dir =
+        crate::xmalloc::xstrdup(b"/tmp/ssh-XXXXXXXXXX\0" as *const u8 as *const libc::c_char);
     if (mkdtemp(auth_sock_dir)).is_null() {
         ssh_packet_send_debug(
             ssh,
@@ -1061,7 +1061,7 @@ unsafe extern "C" fn auth_input_request_forwarding(
                 b"auth socket\0" as *const u8 as *const libc::c_char,
                 1 as libc::c_int,
             );
-            (*nc).path = xstrdup(auth_sock_name);
+            (*nc).path = crate::xmalloc::xstrdup(auth_sock_name);
             return 1 as libc::c_int;
         }
     }
@@ -1110,7 +1110,9 @@ unsafe extern "C" fn prepare_auth_info_file(mut pw: *mut libc::passwd, mut info:
         return;
     }
     temporarily_use_uid(pw);
-    auth_info_file = xstrdup(b"/tmp/sshauth.XXXXXXXXXXXXXXX\0" as *const u8 as *const libc::c_char);
+    auth_info_file = crate::xmalloc::xstrdup(
+        b"/tmp/sshauth.XXXXXXXXXXXXXXX\0" as *const u8 as *const libc::c_char,
+    );
     fd = _ssh_mkstemp(auth_info_file);
     if fd == -(1 as libc::c_int) {
         crate::log::sshlog(
@@ -1191,7 +1193,7 @@ unsafe extern "C" fn set_fwdpermit_from_authopts(mut ssh: *mut ssh, mut _opts: *
         );
         i = 0 as libc::c_int as size_t;
         while i < (*auth_opts).npermitopen {
-            cp = xstrdup(*((*auth_opts).permitopen).offset(i as isize));
+            cp = crate::xmalloc::xstrdup(*((*auth_opts).permitopen).offset(i as isize));
             tmp = cp;
             host = hpdelim2(&mut cp, 0 as *mut libc::c_char);
             if host.is_null() {
@@ -1242,7 +1244,7 @@ unsafe extern "C" fn set_fwdpermit_from_authopts(mut ssh: *mut ssh, mut _opts: *
         channel_clear_permission(ssh, 0x101 as libc::c_int, 1 as libc::c_int);
         i = 0 as libc::c_int as size_t;
         while i < (*auth_opts).npermitlisten {
-            cp = xstrdup(*((*auth_opts).permitlisten).offset(i as isize));
+            cp = crate::xmalloc::xstrdup(*((*auth_opts).permitlisten).offset(i as isize));
             tmp = cp;
             host = hpdelim(&mut cp);
             if host.is_null() {
@@ -2060,7 +2062,7 @@ unsafe extern "C" fn do_setup_env(
     if options.permit_user_env != 0 {
         n = 0 as libc::c_int as size_t;
         while n < (*auth_opts).nenv {
-            ocp = xstrdup(*((*auth_opts).env).offset(n as isize));
+            ocp = crate::xmalloc::xstrdup(*((*auth_opts).env).offset(n as isize));
             cp = strchr(ocp, '=' as i32);
             if !cp.is_null() {
                 *cp = '\0' as i32 as libc::c_char;
@@ -2098,7 +2100,7 @@ unsafe extern "C" fn do_setup_env(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_setenv {
-        cp = xstrdup(*(options.setenv).offset(i as isize));
+        cp = crate::xmalloc::xstrdup(*(options.setenv).offset(i as isize));
         value = strchr(cp, '=' as i32);
         if value.is_null() {
             sshfatal(
@@ -2805,7 +2807,7 @@ pub unsafe extern "C" fn do_child(
             (*(*s).pw).pw_name,
             b"internal-sftp\0" as *const u8 as *const libc::c_char,
         );
-        args = xstrdup(if !command.is_null() {
+        args = crate::xmalloc::xstrdup(if !command.is_null() {
             command
         } else {
             b"sftp-server\0" as *const u8 as *const libc::c_char
@@ -4751,8 +4753,8 @@ pub unsafe extern "C" fn session_setup_x11fwd(
             (*s).display_number,
             (*s).screen,
         );
-        (*s).display = xstrdup(display.as_mut_ptr());
-        (*s).auth_display = xstrdup(auth_display.as_mut_ptr());
+        (*s).display = crate::xmalloc::xstrdup(display.as_mut_ptr());
+        (*s).auth_display = crate::xmalloc::xstrdup(auth_display.as_mut_ptr());
     } else {
         libc::snprintf(
             display.as_mut_ptr(),
@@ -4762,8 +4764,8 @@ pub unsafe extern "C" fn session_setup_x11fwd(
             (*s).display_number,
             (*s).screen,
         );
-        (*s).display = xstrdup(display.as_mut_ptr());
-        (*s).auth_display = xstrdup(display.as_mut_ptr());
+        (*s).display = crate::xmalloc::xstrdup(display.as_mut_ptr());
+        (*s).auth_display = crate::xmalloc::xstrdup(display.as_mut_ptr());
     }
     return 1 as libc::c_int;
 }

@@ -5,8 +5,6 @@ extern "C" {
     pub type kex;
     pub type session_state;
 
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
-
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -316,7 +314,7 @@ pub unsafe extern "C" fn compat_kex_proposal(
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cp2: *mut libc::c_char = 0 as *mut libc::c_char;
     if (*ssh).compat & (0x10000000 as libc::c_int | 0x4000 as libc::c_int) == 0 as libc::c_int {
-        return xstrdup(p);
+        return crate::xmalloc::xstrdup(p);
     }
     crate::log::sshlog(
         b"compat.c\0" as *const u8 as *const libc::c_char,

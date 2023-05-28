@@ -11,7 +11,7 @@ extern "C" {
 
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn match_usergroup_pattern_list(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn sshfatal(
@@ -318,7 +318,7 @@ pub unsafe extern "C" fn ga_init(mut user: *const libc::c_char, mut base: gid_t)
             let fresh1 = j;
             j = j + 1;
             let ref mut fresh2 = *groups_byname.offset(fresh1 as isize);
-            *fresh2 = xstrdup((*gr).gr_name);
+            *fresh2 = crate::xmalloc::xstrdup((*gr).gr_name);
         }
         i += 1;
         i;

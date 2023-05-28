@@ -150,7 +150,6 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshkey_new(_: libc::c_int) -> *mut sshkey;
     fn sshkey_free(_: *mut sshkey);
@@ -1005,7 +1004,7 @@ unsafe extern "C" fn load_identity(
         );
     }
     if !identity_passphrase.is_null() {
-        pass = xstrdup(identity_passphrase);
+        pass = crate::xmalloc::xstrdup(identity_passphrase);
     } else {
         pass = read_passphrase(
             b"Enter passphrase: \0" as *const u8 as *const libc::c_char,
@@ -3157,7 +3156,7 @@ unsafe extern "C" fn known_hosts_hash(
                 }
                 return 0 as libc::c_int;
             }
-            hosts = xstrdup((*l).hosts);
+            hosts = crate::xmalloc::xstrdup((*l).hosts);
             ohosts = hosts;
             loop {
                 cp = strsep(&mut hosts, b",\0" as *const u8 as *const libc::c_char);
@@ -3701,7 +3700,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut libc::passwd) {
     let mut current_block_10: u64;
     if r == -(43 as libc::c_int) {
         if !identity_passphrase.is_null() {
-            old_passphrase = xstrdup(identity_passphrase);
+            old_passphrase = crate::xmalloc::xstrdup(identity_passphrase);
         } else {
             old_passphrase = read_passphrase(
                 b"Enter old passphrase: \0" as *const u8 as *const libc::c_char,
@@ -3750,7 +3749,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut libc::passwd) {
         );
     }
     if !identity_new_passphrase.is_null() {
-        passphrase1 = xstrdup(identity_new_passphrase);
+        passphrase1 = crate::xmalloc::xstrdup(identity_new_passphrase);
         passphrase2 = 0 as *mut libc::c_char;
     } else {
         passphrase1 = read_passphrase(
@@ -3959,7 +3958,7 @@ unsafe extern "C" fn do_change_comment(
         &mut comment,
     );
     if r == 0 as libc::c_int {
-        passphrase = xstrdup(b"\0" as *const u8 as *const libc::c_char);
+        passphrase = crate::xmalloc::xstrdup(b"\0" as *const u8 as *const libc::c_char);
     } else if r != -(43 as libc::c_int) {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -3974,9 +3973,9 @@ unsafe extern "C" fn do_change_comment(
         );
     } else {
         if !identity_passphrase.is_null() {
-            passphrase = xstrdup(identity_passphrase);
+            passphrase = crate::xmalloc::xstrdup(identity_passphrase);
         } else if !identity_new_passphrase.is_null() {
-            passphrase = xstrdup(identity_new_passphrase);
+            passphrase = crate::xmalloc::xstrdup(identity_new_passphrase);
         } else {
             passphrase = read_passphrase(
                 b"Enter passphrase: \0" as *const u8 as *const libc::c_char,
@@ -4146,12 +4145,12 @@ unsafe extern "C" fn cert_ext_add(
         ::core::mem::size_of::<cert_ext>() as libc::c_ulong,
     ) as *mut cert_ext;
     let ref mut fresh2 = (*cert_ext.offset(ncert_ext as isize)).key;
-    *fresh2 = xstrdup(key);
+    *fresh2 = crate::xmalloc::xstrdup(key);
     let ref mut fresh3 = (*cert_ext.offset(ncert_ext as isize)).val;
     *fresh3 = if value.is_null() {
         0 as *mut libc::c_char
     } else {
-        xstrdup(value)
+        crate::xmalloc::xstrdup(value)
     };
     (*cert_ext.offset(ncert_ext as isize)).crit = iscrit;
     ncert_ext = ncert_ext.wrapping_add(1);
@@ -4623,7 +4622,7 @@ unsafe extern "C" fn do_ca_sign(
     while i < argc {
         n = 0 as libc::c_int as u_int;
         if !cert_principals.is_null() {
-            tmp = xstrdup(cert_principals);
+            tmp = crate::xmalloc::xstrdup(cert_principals);
             otmp = tmp;
             plist = 0 as *mut *mut libc::c_char;
             loop {
@@ -4637,7 +4636,7 @@ unsafe extern "C" fn do_ca_sign(
                     ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
                 ) as *mut *mut libc::c_char;
                 let ref mut fresh4 = *plist.offset(n as isize);
-                *fresh4 = xstrdup(cp);
+                *fresh4 = crate::xmalloc::xstrdup(cp);
                 if **fresh4 as libc::c_int == '\0' as i32 {
                     sshfatal(
                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -4714,7 +4713,7 @@ unsafe extern "C" fn do_ca_sign(
         }
         (*(*public).cert).type_0 = cert_key_type;
         (*(*public).cert).serial = cert_serial as u_int64_t;
-        (*(*public).cert).key_id = xstrdup(cert_key_id);
+        (*(*public).cert).key_id = crate::xmalloc::xstrdup(cert_key_id);
         (*(*public).cert).nprincipals = n;
         (*(*public).cert).principals = plist;
         (*(*public).cert).valid_after = cert_valid_from;
@@ -4973,7 +4972,7 @@ unsafe extern "C" fn parse_cert_times(mut timespec: *mut libc::c_char) {
             * 60 as libc::c_int as libc::c_long) as u_int64_t;
         return;
     }
-    from = xstrdup(timespec);
+    from = crate::xmalloc::xstrdup(timespec);
     to = strchr(from, ':' as i32);
     if to.is_null()
         || from == to
@@ -5165,7 +5164,7 @@ unsafe extern "C" fn add_cert_option(mut opt: *mut libc::c_char) {
                 b"force-command already specified\0" as *const u8 as *const libc::c_char,
             );
         }
-        certflags_command = xstrdup(val);
+        certflags_command = crate::xmalloc::xstrdup(val);
     } else if strncasecmp(
         opt,
         b"source-address=\0" as *const u8 as *const libc::c_char,
@@ -5209,7 +5208,7 @@ unsafe extern "C" fn add_cert_option(mut opt: *mut libc::c_char) {
                 b"Invalid source-address list\0" as *const u8 as *const libc::c_char,
             );
         }
-        certflags_src_addr = xstrdup(val);
+        certflags_src_addr = crate::xmalloc::xstrdup(val);
     } else if strncasecmp(
         opt,
         b"extension:\0" as *const u8 as *const libc::c_char,
@@ -5224,7 +5223,7 @@ unsafe extern "C" fn add_cert_option(mut opt: *mut libc::c_char) {
             iscrit != 0
         }
     {
-        val = xstrdup((strchr(opt, ':' as i32)).offset(1 as libc::c_int as isize));
+        val = crate::xmalloc::xstrdup((strchr(opt, ':' as i32)).offset(1 as libc::c_int as isize));
         cp = strchr(val, '=' as i32);
         if !cp.is_null() {
             let fresh6 = cp;
@@ -5740,7 +5739,7 @@ unsafe extern "C" fn update_krl_from_file(
     if strcmp(path, b"-\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         krl_spec = stdin;
         libc::free(path as *mut libc::c_void);
-        path = xstrdup(b"(standard input)\0" as *const u8 as *const libc::c_char);
+        path = crate::xmalloc::xstrdup(b"(standard input)\0" as *const u8 as *const libc::c_char);
     } else {
         krl_spec = fopen(path, b"r\0" as *const u8 as *const libc::c_char);
         if krl_spec.is_null() {
@@ -6379,7 +6378,7 @@ unsafe extern "C" fn load_sign_key(
     let mut i: size_t = 0;
     let mut slen: size_t = 0;
     let mut plen: size_t = strlen(keypath);
-    let mut privpath: *mut libc::c_char = xstrdup(keypath);
+    let mut privpath: *mut libc::c_char = crate::xmalloc::xstrdup(keypath);
     static mut suffixes: [*const libc::c_char; 3] = [
         b"-cert.pub\0" as *const u8 as *const libc::c_char,
         b".pub\0" as *const u8 as *const libc::c_char,
@@ -6805,7 +6804,9 @@ unsafe extern "C" fn sig_process_opts(
                 8 as libc::c_int as libc::c_ulong,
             ) == 0 as libc::c_int
         {
-            *hashalgp = xstrdup((*opts.offset(i as isize)).offset(8 as libc::c_int as isize));
+            *hashalgp = crate::xmalloc::xstrdup(
+                (*opts.offset(i as isize)).offset(8 as libc::c_int as isize),
+            );
         } else if !verify_timep.is_null()
             && strncasecmp(
                 *opts.offset(i as isize),
@@ -7704,7 +7705,9 @@ unsafe extern "C" fn do_moduli_screen(
         ) == 0 as libc::c_int
         {
             libc::free(checkpoint as *mut libc::c_void);
-            checkpoint = xstrdup((*opts.offset(i as isize)).offset(11 as libc::c_int as isize));
+            checkpoint = crate::xmalloc::xstrdup(
+                (*opts.offset(i as isize)).offset(11 as libc::c_int as isize),
+            );
         } else if strncmp(
             *opts.offset(i as isize),
             b"generator=\0" as *const u8 as *const libc::c_char,
@@ -7880,10 +7883,10 @@ unsafe extern "C" fn read_check_passphrase(
 }
 unsafe extern "C" fn private_key_passphrase() -> *mut libc::c_char {
     if !identity_passphrase.is_null() {
-        return xstrdup(identity_passphrase);
+        return crate::xmalloc::xstrdup(identity_passphrase);
     }
     if !identity_new_passphrase.is_null() {
-        return xstrdup(identity_new_passphrase);
+        return crate::xmalloc::xstrdup(identity_new_passphrase);
     }
     return read_check_passphrase(
         b"Enter passphrase (empty for no passphrase): \0" as *const u8 as *const libc::c_char,
@@ -7906,16 +7909,16 @@ unsafe extern "C" fn sk_suffix(
         6 as libc::c_int as libc::c_ulong,
     ) == 0 as libc::c_int
     {
-        ret = xstrdup(application.offset(6 as libc::c_int as isize));
+        ret = crate::xmalloc::xstrdup(application.offset(6 as libc::c_int as isize));
     } else if strncmp(
         application,
         b"ssh:\0" as *const u8 as *const libc::c_char,
         4 as libc::c_int as libc::c_ulong,
     ) == 0 as libc::c_int
     {
-        ret = xstrdup(application.offset(4 as libc::c_int as isize));
+        ret = crate::xmalloc::xstrdup(application.offset(4 as libc::c_int as isize));
     } else {
-        ret = xstrdup(application);
+        ret = crate::xmalloc::xstrdup(application);
     }
     i = 0 as libc::c_int as size_t;
     while i < userlen {
@@ -8565,7 +8568,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 let fresh8 = nopts;
                 nopts = nopts.wrapping_add(1);
                 let ref mut fresh9 = *opts.offset(fresh8 as isize);
-                *fresh9 = xstrdup(BSDoptarg);
+                *fresh9 = crate::xmalloc::xstrdup(BSDoptarg);
             }
             90 => {
                 openssh_format_cipher = BSDoptarg;
@@ -9075,7 +9078,9 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 7 as libc::c_int as libc::c_ulong,
             ) == 0 as libc::c_int
             {
-                sk_device = xstrdup((*opts.offset(i as isize)).offset(7 as libc::c_int as isize));
+                sk_device = crate::xmalloc::xstrdup(
+                    (*opts.offset(i as isize)).offset(7 as libc::c_int as isize),
+                );
             } else {
                 sshfatal(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -9271,15 +9276,18 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     7 as libc::c_int as libc::c_ulong,
                 ) == 0 as libc::c_int
                 {
-                    sk_device =
-                        xstrdup((*opts.offset(i as isize)).offset(7 as libc::c_int as isize));
+                    sk_device = crate::xmalloc::xstrdup(
+                        (*opts.offset(i as isize)).offset(7 as libc::c_int as isize),
+                    );
                 } else if strncasecmp(
                     *opts.offset(i as isize),
                     b"user=\0" as *const u8 as *const libc::c_char,
                     5 as libc::c_int as libc::c_ulong,
                 ) == 0 as libc::c_int
                 {
-                    sk_user = xstrdup((*opts.offset(i as isize)).offset(5 as libc::c_int as isize));
+                    sk_user = crate::xmalloc::xstrdup(
+                        (*opts.offset(i as isize)).offset(5 as libc::c_int as isize),
+                    );
                 } else if strncasecmp(
                     *opts.offset(i as isize),
                     b"challenge=\0" as *const u8 as *const libc::c_char,
@@ -9318,8 +9326,9 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     12 as libc::c_int as libc::c_ulong,
                 ) == 0 as libc::c_int
                 {
-                    sk_application =
-                        xstrdup((*opts.offset(i as isize)).offset(12 as libc::c_int as isize));
+                    sk_application = crate::xmalloc::xstrdup(
+                        (*opts.offset(i as isize)).offset(12 as libc::c_int as isize),
+                    );
                     if strncmp(
                         sk_application,
                         b"ssh:\0" as *const u8 as *const libc::c_char,

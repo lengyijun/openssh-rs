@@ -135,7 +135,6 @@ extern "C" {
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn xvasprintf(
         _: *mut *mut libc::c_char,
@@ -1168,17 +1167,17 @@ pub unsafe extern "C" fn pwcopy(mut pw: *mut libc::passwd) -> *mut libc::passwd 
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<libc::passwd>() as libc::c_ulong,
     ) as *mut libc::passwd;
-    (*copy).pw_name = xstrdup((*pw).pw_name);
-    (*copy).pw_passwd = xstrdup(if ((*pw).pw_passwd).is_null() {
+    (*copy).pw_name = crate::xmalloc::xstrdup((*pw).pw_name);
+    (*copy).pw_passwd = crate::xmalloc::xstrdup(if ((*pw).pw_passwd).is_null() {
         b"*\0" as *const u8 as *const libc::c_char
     } else {
         (*pw).pw_passwd as *const libc::c_char
     });
-    (*copy).pw_gecos = xstrdup((*pw).pw_gecos);
+    (*copy).pw_gecos = crate::xmalloc::xstrdup((*pw).pw_gecos);
     (*copy).pw_uid = (*pw).pw_uid;
     (*copy).pw_gid = (*pw).pw_gid;
-    (*copy).pw_dir = xstrdup((*pw).pw_dir);
-    (*copy).pw_shell = xstrdup((*pw).pw_shell);
+    (*copy).pw_dir = crate::xmalloc::xstrdup((*pw).pw_dir);
+    (*copy).pw_shell = crate::xmalloc::xstrdup((*pw).pw_shell);
     return copy;
 }
 pub unsafe extern "C" fn a2port(mut s: *const libc::c_char) -> libc::c_int {
@@ -1210,7 +1209,7 @@ pub unsafe extern "C" fn a2tun(
     let mut tun: libc::c_int = 0;
     if !remote.is_null() {
         *remote = 0x7fffffff as libc::c_int;
-        sp = xstrdup(s);
+        sp = crate::xmalloc::xstrdup(s);
         ep = strchr(sp, ':' as i32);
         if ep.is_null() {
             libc::free(sp as *mut libc::c_void);
@@ -1369,7 +1368,7 @@ pub unsafe extern "C" fn put_host_port(
 ) -> *mut libc::c_char {
     let mut hoststr: *mut libc::c_char = 0 as *mut libc::c_char;
     if port as libc::c_int == 0 as libc::c_int || port as libc::c_int == 22 as libc::c_int {
-        return xstrdup(host);
+        return crate::xmalloc::xstrdup(host);
     }
     if asprintf(
         &mut hoststr as *mut *mut libc::c_char,
@@ -1516,7 +1515,7 @@ pub unsafe extern "C" fn parse_user_host_path(
     if !pathp.is_null() {
         *pathp = 0 as *mut libc::c_char;
     }
-    sdup = xstrdup(s);
+    sdup = crate::xmalloc::xstrdup(s);
     tmp = colon(sdup);
     if !tmp.is_null() {
         let fresh2 = tmp;
@@ -1525,18 +1524,18 @@ pub unsafe extern "C" fn parse_user_host_path(
         if *tmp as libc::c_int == '\0' as i32 {
             tmp = b".\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
         }
-        path = xstrdup(tmp);
+        path = crate::xmalloc::xstrdup(tmp);
         tmp = strrchr(sdup, '@' as i32);
         if !tmp.is_null() {
             let fresh3 = tmp;
             tmp = tmp.offset(1);
             *fresh3 = '\0' as i32 as libc::c_char;
-            host = xstrdup(cleanhostname(tmp));
+            host = crate::xmalloc::xstrdup(cleanhostname(tmp));
             if *sdup as libc::c_int != '\0' as i32 {
-                user = xstrdup(sdup);
+                user = crate::xmalloc::xstrdup(sdup);
             }
         } else {
-            host = xstrdup(cleanhostname(sdup));
+            host = crate::xmalloc::xstrdup(cleanhostname(sdup));
             user = 0 as *mut libc::c_char;
         }
         if !userp.is_null() {
@@ -1608,7 +1607,7 @@ pub unsafe extern "C" fn parse_user_host_port(
         12209867499936983673 => {
             cp = hpdelim(&mut tmp);
             if !(cp.is_null() || *cp as libc::c_int == '\0' as i32) {
-                host = xstrdup(cleanhostname(cp));
+                host = crate::xmalloc::xstrdup(cleanhostname(cp));
                 if !tmp.is_null() && *tmp as libc::c_int != '\0' as i32 {
                     port = a2port(tmp);
                     if port <= 0 as libc::c_int {
@@ -1768,7 +1767,7 @@ pub unsafe extern "C" fn parse_uri(
     if !pathp.is_null() {
         *pathp = 0 as *mut libc::c_char;
     }
-    tmp = xstrdup(uri);
+    tmp = crate::xmalloc::xstrdup(uri);
     uridup = tmp;
     cp = strchr(tmp, '@' as i32);
     if !cp.is_null() {
@@ -1796,7 +1795,7 @@ pub unsafe extern "C" fn parse_uri(
         6057473163062296781 => {
             cp = hpdelim2(&mut tmp, &mut ch);
             if !(cp.is_null() || *cp as libc::c_int == '\0' as i32) {
-                host = xstrdup(cleanhostname(cp));
+                host = crate::xmalloc::xstrdup(cleanhostname(cp));
                 if !(valid_domain(host, 0 as libc::c_int, 0 as *mut *const libc::c_char) == 0) {
                     if !tmp.is_null() && *tmp as libc::c_int != '\0' as i32 {
                         if ch as libc::c_int == ':' as i32 {
@@ -2018,10 +2017,10 @@ pub unsafe extern "C" fn tilde_expand(
     let mut slash: libc::c_int = 0;
     *retp = 0 as *mut libc::c_char;
     if *filename as libc::c_int != '~' as i32 {
-        *retp = xstrdup(filename);
+        *retp = crate::xmalloc::xstrdup(filename);
         return 0 as libc::c_int;
     }
-    copy = xstrdup(filename.offset(1 as libc::c_int as isize));
+    copy = crate::xmalloc::xstrdup(filename.offset(1 as libc::c_int as isize));
     ocopy = copy;
     if *copy as libc::c_int == '\0' as i32 {
         path = 0 as *const libc::c_char;
@@ -2622,7 +2621,9 @@ pub unsafe extern "C" fn tohex(mut vp: *const libc::c_void, mut l: size_t) -> *m
     let mut i: size_t = 0;
     let mut hl: size_t = 0;
     if l > 65536 as libc::c_int as libc::c_ulong {
-        return xstrdup(b"tohex: length > 65536\0" as *const u8 as *const libc::c_char);
+        return crate::xmalloc::xstrdup(
+            b"tohex: length > 65536\0" as *const u8 as *const libc::c_char,
+        );
     }
     hl = l
         .wrapping_mul(2 as libc::c_int as libc::c_ulong)
@@ -4452,7 +4453,7 @@ pub unsafe extern "C" fn opt_array_append2(
         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
     ) as *mut *mut libc::c_char;
     let ref mut fresh22 = *(*array).offset(*lp as isize);
-    *fresh22 = xstrdup(s);
+    *fresh22 = crate::xmalloc::xstrdup(s);
     *lp = (*lp).wrapping_add(1);
     *lp;
 }
@@ -5060,7 +5061,7 @@ pub unsafe extern "C" fn lookup_setenv_in_list(
     let mut name: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut ret: *const libc::c_char = 0 as *const libc::c_char;
-    name = xstrdup(env);
+    name = crate::xmalloc::xstrdup(env);
     cp = strchr(name, '=' as i32);
     if cp.is_null() {
         libc::free(name as *mut libc::c_void);

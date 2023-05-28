@@ -44,7 +44,7 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn xvasprintf(
         _: *mut *mut libc::c_char,
         _: *const libc::c_char,
@@ -259,7 +259,7 @@ unsafe extern "C" fn ssh_askpass(
         buf.as_mut_ptr(),
         b"\r\n\0" as *const u8 as *const libc::c_char,
     ) as usize] = '\0' as i32 as libc::c_char;
-    pass = xstrdup(buf.as_mut_ptr());
+    pass = crate::xmalloc::xstrdup(buf.as_mut_ptr());
     explicit_bzero(
         buf.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
@@ -362,7 +362,7 @@ pub unsafe extern "C" fn read_passphrase(
         return if flags & 0x4 as libc::c_int != 0 {
             0 as *mut libc::c_char
         } else {
-            xstrdup(b"\0" as *const u8 as *const libc::c_char)
+            crate::xmalloc::xstrdup(b"\0" as *const u8 as *const libc::c_char)
         };
     }
     if use_askpass != 0 && allow_askpass != 0 {
@@ -378,7 +378,7 @@ pub unsafe extern "C" fn read_passphrase(
         ret = ssh_askpass(askpass, prompt, askpass_hint);
         if ret.is_null() {
             if flags & 0x4 as libc::c_int == 0 {
-                return xstrdup(b"\0" as *const u8 as *const libc::c_char);
+                return crate::xmalloc::xstrdup(b"\0" as *const u8 as *const libc::c_char);
             }
         }
         return ret;
@@ -394,9 +394,9 @@ pub unsafe extern "C" fn read_passphrase(
         if flags & 0x4 as libc::c_int != 0 {
             return 0 as *mut libc::c_char;
         }
-        return xstrdup(b"\0" as *const u8 as *const libc::c_char);
+        return crate::xmalloc::xstrdup(b"\0" as *const u8 as *const libc::c_char);
     }
-    ret = xstrdup(buf.as_mut_ptr());
+    ret = crate::xmalloc::xstrdup(buf.as_mut_ptr());
     explicit_bzero(
         buf.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,

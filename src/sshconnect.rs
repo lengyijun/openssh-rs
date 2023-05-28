@@ -79,7 +79,6 @@ extern "C" {
     fn getifaddrs(__ifap: *mut *mut ifaddrs) -> libc::c_int;
     fn freeifaddrs(__ifa: *mut ifaddrs);
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn init_hostkeys() -> *mut hostkeys;
     fn load_hostkeys(_: *mut hostkeys, _: *const libc::c_char, _: *const libc::c_char, _: u_int);
@@ -2068,13 +2067,14 @@ pub unsafe extern "C" fn get_hostfile_hostname_ipaddr(
             }
             *hostfile_ipaddr = put_host_port(ntop.as_mut_ptr(), port);
         } else {
-            *hostfile_ipaddr =
-                xstrdup(b"<no hostip for proxy command>\0" as *const u8 as *const libc::c_char);
+            *hostfile_ipaddr = crate::xmalloc::xstrdup(
+                b"<no hostip for proxy command>\0" as *const u8 as *const libc::c_char,
+            );
         }
     }
     if !hostfile_hostname.is_null() {
         if !(options.host_key_alias).is_null() {
-            *hostfile_hostname = xstrdup(options.host_key_alias);
+            *hostfile_hostname = crate::xmalloc::xstrdup(options.host_key_alias);
             crate::log::sshlog(
                 b"sshconnect.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
@@ -2114,23 +2114,23 @@ unsafe extern "C" fn try_tilde_unexpand(mut path: *const libc::c_char) -> *mut l
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut l: size_t = 0;
     if *path as libc::c_int != '/' as i32 {
-        return xstrdup(path);
+        return crate::xmalloc::xstrdup(path);
     }
     home = getenv(b"HOME\0" as *const u8 as *const libc::c_char);
     if home.is_null() || {
         l = strlen(home);
         l == 0 as libc::c_int as libc::c_ulong
     } {
-        return xstrdup(path);
+        return crate::xmalloc::xstrdup(path);
     }
     if strncmp(path, home, l) != 0 as libc::c_int {
-        return xstrdup(path);
+        return crate::xmalloc::xstrdup(path);
     }
     if *home.offset(l.wrapping_sub(1 as libc::c_int as libc::c_ulong) as isize) as libc::c_int
         != '/' as i32
         && *path.offset(l as isize) as libc::c_int != '/' as i32
     {
-        return xstrdup(path);
+        return crate::xmalloc::xstrdup(path);
     }
     if *path.offset(l as isize) as libc::c_int == '/' as i32 {
         l = l.wrapping_add(1);
@@ -2383,7 +2383,7 @@ unsafe extern "C" fn other_hostkeys_message(
         &mut num_othernames,
     );
     if num_othernames == 0 as libc::c_int as libc::c_uint {
-        return xstrdup(
+        return crate::xmalloc::xstrdup(
             b"This key is not known by any other names.\0" as *const u8 as *const libc::c_char,
         );
     }
@@ -4342,13 +4342,13 @@ pub unsafe extern "C" fn ssh_login(
     let mut server_user: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut local_user: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
-    local_user = xstrdup((*pw).pw_name);
+    local_user = crate::xmalloc::xstrdup((*pw).pw_name);
     server_user = if !(options.user).is_null() {
         options.user
     } else {
         local_user
     };
-    host = xstrdup(orighost);
+    host = crate::xmalloc::xstrdup(orighost);
     lowercase(host);
     r = kex_exchange_identification(ssh, timeout_ms, 0 as *const libc::c_char);
     if r != 0 as libc::c_int {

@@ -41,7 +41,6 @@ extern "C" {
         -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshbuf_dup_string(buf: *mut sshbuf) -> *mut libc::c_char;
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
@@ -861,7 +860,7 @@ unsafe extern "C" fn verify_host_key_callback(
 unsafe extern "C" fn first_alg(mut algs: *const libc::c_char) -> *mut libc::c_char {
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
-    ret = xstrdup(algs);
+    ret = crate::xmalloc::xstrdup(algs);
     cp = strchr(ret, ',' as i32);
     if !cp.is_null() {
         *cp = '\0' as i32 as libc::c_char;
@@ -946,9 +945,9 @@ unsafe extern "C" fn order_hostkeyalgs(
                 as *const u8 as *const libc::c_char,
             best,
         );
-        ret = xstrdup(options.hostkeyalgorithms);
+        ret = crate::xmalloc::xstrdup(options.hostkeyalgorithms);
     } else {
-        avail = xstrdup(options.hostkeyalgorithms);
+        avail = crate::xmalloc::xstrdup(options.hostkeyalgorithms);
         oavail = avail;
         maxlen = (strlen(avail)).wrapping_add(1 as libc::c_int as libc::c_ulong);
         first = xmalloc(maxlen) as *mut libc::c_char;
@@ -2230,7 +2229,7 @@ unsafe extern "C" fn key_sig_algorithm(
     if (*key).type_0 == KEY_RSA as libc::c_int && (*ssh).compat & 0x4 as libc::c_int != 0 {
         server_sig_algs = b"rsa-sha2-256,rsa-sha2-512\0" as *const u8 as *const libc::c_char;
     }
-    allowed = xstrdup(options.pubkey_accepted_algos);
+    allowed = crate::xmalloc::xstrdup(options.pubkey_accepted_algos);
     oallowed = allowed;
     loop {
         cp = strsep(&mut allowed, b",\0" as *const u8 as *const libc::c_char);
@@ -2242,7 +2241,7 @@ unsafe extern "C" fn key_sig_algorithm(
         }
         tmp = match_list(sshkey_sigalg_by_name(cp), server_sig_algs, 0 as *mut u_int);
         if !tmp.is_null() {
-            alg = xstrdup(cp);
+            alg = crate::xmalloc::xstrdup(cp);
         }
         libc::free(tmp as *mut libc::c_void);
         if !alg.is_null() {
@@ -3384,7 +3383,7 @@ unsafe extern "C" fn pubkey_prepare(mut ssh: *mut ssh, mut authctxt: *mut Authct
             ) as *mut identity;
             (*id).agent_fd = -(1 as libc::c_int);
             (*id).key = key;
-            (*id).filename = xstrdup(options.identity_files[i as usize]);
+            (*id).filename = crate::xmalloc::xstrdup(options.identity_files[i as usize]);
             (*id).userprovided = options.identity_file_userprovided[i as usize];
             (*id).next.tqe_next = 0 as *mut identity;
             (*id).next.tqe_prev = files.tqh_last;
@@ -3436,7 +3435,7 @@ unsafe extern "C" fn pubkey_prepare(mut ssh: *mut ssh, mut authctxt: *mut Authct
             ) as *mut identity;
             (*id).agent_fd = -(1 as libc::c_int);
             (*id).key = key;
-            (*id).filename = xstrdup(options.certificate_files[i as usize]);
+            (*id).filename = crate::xmalloc::xstrdup(options.certificate_files[i as usize]);
             (*id).userprovided = options.certificate_file_userprovided[i as usize];
             (*id).next.tqe_next = 0 as *mut identity;
             (*id).next.tqe_prev = (*preferred_0).tqh_last;
@@ -4381,7 +4380,7 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
     let mut r: libc::c_int = 0;
     let mut success: libc::c_int = 0 as libc::c_int;
     if ((*authctxt).ktypes).is_null() {
-        (*authctxt).oktypes = xstrdup(options.hostbased_accepted_algos);
+        (*authctxt).oktypes = crate::xmalloc::xstrdup(options.hostbased_accepted_algos);
         (*authctxt).ktypes = (*authctxt).oktypes;
     }
     loop {
@@ -4774,7 +4773,7 @@ unsafe extern "C" fn authmethod_get(mut authlist: *mut libc::c_char) -> *mut Aut
             authlist,
         );
         libc::free(supported as *mut libc::c_void);
-        supported = xstrdup(authlist);
+        supported = crate::xmalloc::xstrdup(authlist);
         preferred = options.preferred_authentications;
         crate::log::sshlog(
             b"sshconnect2.c\0" as *const u8 as *const libc::c_char,

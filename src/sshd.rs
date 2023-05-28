@@ -143,7 +143,7 @@ extern "C" {
     fn RAND_poll() -> libc::c_int;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn disconnect_controlling_tty();
     fn ssh_packet_set_connection(_: *mut ssh, _: libc::c_int, _: libc::c_int) -> *mut ssh;
     fn ssh_packet_set_timeout(_: *mut ssh, _: libc::c_int, _: libc::c_int);
@@ -3693,7 +3693,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     i = 0 as libc::c_int as u_int;
     while (i as libc::c_int) < ac {
         let ref mut fresh4 = *saved_argv.offset(i as isize);
-        *fresh4 = xstrdup(*av.offset(i as isize));
+        *fresh4 = crate::xmalloc::xstrdup(*av.offset(i as isize));
         i = i.wrapping_add(1);
         i;
     }
@@ -3877,7 +3877,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 current_block_66 = 7178192492338286402;
             }
             111 => {
-                line = xstrdup(BSDoptarg);
+                line = crate::xmalloc::xstrdup(BSDoptarg);
                 if process_server_config_line(
                     &mut options,
                     line,
@@ -4141,7 +4141,8 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             (*privsep_pw).pw_passwd as *mut libc::c_void,
             strlen((*privsep_pw).pw_passwd),
         );
-        (*privsep_pw).pw_passwd = xstrdup(b"*\0" as *const u8 as *const libc::c_char);
+        (*privsep_pw).pw_passwd =
+            crate::xmalloc::xstrdup(b"*\0" as *const u8 as *const libc::c_char);
     }
     endpwent();
     sensitive_data.host_keys = xcalloc(

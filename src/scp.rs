@@ -72,7 +72,6 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -674,7 +673,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
     n = 0 as libc::c_int;
     while n < argc {
         let ref mut fresh0 = *newargv.offset(n as isize);
-        *fresh0 = xstrdup(*argv.offset(n as isize));
+        *fresh0 = crate::xmalloc::xstrdup(*argv.offset(n as isize));
         n += 1;
         n;
     }
@@ -845,7 +844,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
                 iamrecursive = 1 as libc::c_int;
             }
             83 => {
-                ssh_program = xstrdup(BSDoptarg);
+                ssh_program = crate::xmalloc::xstrdup(BSDoptarg);
             }
             118 => {
                 crate::misc::addargs(
@@ -1157,7 +1156,7 @@ unsafe extern "C" fn parse_scp_uri(
         pathp,
     );
     if r == 0 as libc::c_int && (*pathp).is_null() {
-        *pathp = xstrdup(b".\0" as *const u8 as *const libc::c_char);
+        *pathp = crate::xmalloc::xstrdup(b".\0" as *const u8 as *const libc::c_char);
     }
     return r;
 }
@@ -1455,7 +1454,7 @@ unsafe extern "C" fn brace_expand(
                 } else {
                     cp2 = cp;
                 }
-                if append(xstrdup(cp2), &mut done, &mut ndone) != 0 as libc::c_int {
+                if append(crate::xmalloc::xstrdup(cp2), &mut done, &mut ndone) != 0 as libc::c_int {
                     libc::free(cp as *mut libc::c_void);
                     current_block = 13913881577436039028;
                     break;
@@ -2205,10 +2204,10 @@ unsafe extern "C" fn prepare_remote_path(
     if *path as libc::c_int == '\0' as i32
         || strcmp(path, b"~\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
     {
-        return xstrdup(b".\0" as *const u8 as *const libc::c_char);
+        return crate::xmalloc::xstrdup(b".\0" as *const u8 as *const libc::c_char);
     }
     if *path as libc::c_int != '~' as i32 {
-        return xstrdup(path);
+        return crate::xmalloc::xstrdup(path);
     }
     if strncmp(
         path,
@@ -2221,9 +2220,9 @@ unsafe extern "C" fn prepare_remote_path(
             b"/\0" as *const u8 as *const libc::c_char,
         );
         if nslash == strlen(path.offset(2 as libc::c_int as isize)) {
-            return xstrdup(b".\0" as *const u8 as *const libc::c_char);
+            return crate::xmalloc::xstrdup(b".\0" as *const u8 as *const libc::c_char);
         }
-        return xstrdup(
+        return crate::xmalloc::xstrdup(
             path.offset(2 as libc::c_int as isize)
                 .offset(nslash as isize),
         );
@@ -3104,7 +3103,7 @@ pub unsafe extern "C" fn sink_sftp(
                             i = 0 as libc::c_int;
                             while !(*(g.gl_pathv).offset(i as isize)).is_null() && interrupted == 0
                             {
-                                tmp = xstrdup(*(g.gl_pathv).offset(i as isize));
+                                tmp = crate::xmalloc::xstrdup(*(g.gl_pathv).offset(i as isize));
                                 filename = __xpg_basename(tmp);
                                 if filename.is_null() {
                                     crate::log::sshlog(
@@ -3127,7 +3126,7 @@ pub unsafe extern "C" fn sink_sftp(
                                     if dst_is_dir != 0 {
                                         abs_dst = path_append(dst, filename);
                                     } else {
-                                        abs_dst = xstrdup(dst);
+                                        abs_dst = crate::xmalloc::xstrdup(dst);
                                     }
                                     crate::log::sshlog(
                                         b"scp.c\0" as *const u8 as *const libc::c_char,
@@ -3800,7 +3799,8 @@ pub unsafe extern "C" fn sink(
                                         match current_block {
                                             11551238854158739040 => {}
                                             _ => {
-                                                vect[0 as libc::c_int as usize] = xstrdup(np);
+                                                vect[0 as libc::c_int as usize] =
+                                                    crate::xmalloc::xstrdup(np);
                                                 sink(1 as libc::c_int, vect.as_mut_ptr(), src);
                                                 if setimes != 0 {
                                                     setimes = 0 as libc::c_int;
@@ -4341,7 +4341,7 @@ pub unsafe extern "C" fn throughlocal_sftp(
                 _ => {
                     i = 0 as libc::c_int;
                     while !(*(g.gl_pathv).offset(i as isize)).is_null() && interrupted == 0 {
-                        tmp = xstrdup(*(g.gl_pathv).offset(i as isize));
+                        tmp = crate::xmalloc::xstrdup(*(g.gl_pathv).offset(i as isize));
                         filename = __xpg_basename(tmp);
                         if filename.is_null() {
                             crate::log::sshlog(
@@ -4364,7 +4364,7 @@ pub unsafe extern "C" fn throughlocal_sftp(
                             if targetisdir != 0 {
                                 abs_dst = path_append(target, filename);
                             } else {
-                                abs_dst = xstrdup(target);
+                                abs_dst = crate::xmalloc::xstrdup(target);
                             }
                             crate::log::sshlog(
                                 b"scp.c\0" as *const u8 as *const libc::c_char,

@@ -54,7 +54,6 @@ extern "C" {
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn match_hostname(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn sshkey_ssh_name(_: *const sshkey) -> *const libc::c_char;
@@ -605,9 +604,9 @@ unsafe extern "C" fn record_hostkey(
     }
     (*hostkeys).entries = tmp;
     let ref mut fresh0 = (*((*hostkeys).entries).offset((*hostkeys).num_entries as isize)).host;
-    *fresh0 = xstrdup((*ctx).host);
+    *fresh0 = crate::xmalloc::xstrdup((*ctx).host);
     let ref mut fresh1 = (*((*hostkeys).entries).offset((*hostkeys).num_entries as isize)).file;
-    *fresh1 = xstrdup((*l).path);
+    *fresh1 = crate::xmalloc::xstrdup((*l).path);
     (*((*hostkeys).entries).offset((*hostkeys).num_entries as isize)).line = (*l).linenum;
     let ref mut fresh2 = (*((*hostkeys).entries).offset((*hostkeys).num_entries as isize)).key;
     *fresh2 = (*l).key;
@@ -896,7 +895,7 @@ unsafe extern "C" fn write_host_entry(
     let mut success: libc::c_int = 0 as libc::c_int;
     let mut hashed_host: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut lhost: *mut libc::c_char = 0 as *mut libc::c_char;
-    lhost = xstrdup(host);
+    lhost = crate::xmalloc::xstrdup(host);
     lowercase(lhost);
     if store_hash != 0 {
         hashed_host = host_hash(lhost, 0 as *const libc::c_char, 0 as libc::c_int as u_int);
@@ -1620,7 +1619,7 @@ pub unsafe extern "C" fn hostkeys_foreach_file(
         );
         lineinfo.path = path;
         lineinfo.linenum = linenum;
-        lineinfo.line = xstrdup(line);
+        lineinfo.line = crate::xmalloc::xstrdup(line);
         lineinfo.marker = MRK_NONE as libc::c_int;
         lineinfo.status = 0 as libc::c_int as u_int;
         lineinfo.keytype = KEY_UNSPEC as libc::c_int;

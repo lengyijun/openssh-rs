@@ -61,7 +61,6 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -924,7 +923,7 @@ unsafe extern "C" fn print_progress(
         .wrapping_mul(processed)
         .wrapping_div(num_to_process);
     eta = (time_per_line * remaining as libc::c_double) as libc::c_ulong;
-    eta_str = xstrdup(fmt_time(eta as time_t));
+    eta_str = crate::xmalloc::xstrdup(fmt_time(eta as time_t));
     crate::log::sshlog(
         b"moduli.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"print_progress\0")).as_ptr(),

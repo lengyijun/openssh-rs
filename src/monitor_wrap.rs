@@ -26,7 +26,7 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn dh_new_group(_: *mut BIGNUM, _: *mut BIGNUM) -> *mut DH;
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_free(buf: *mut sshbuf);
@@ -2770,8 +2770,8 @@ unsafe extern "C" fn mm_chall_setup(
     mut prompts: *mut *mut *mut libc::c_char,
     mut echo_on: *mut *mut u_int,
 ) {
-    *name = xstrdup(b"\0" as *const u8 as *const libc::c_char);
-    *infotxt = xstrdup(b"\0" as *const u8 as *const libc::c_char);
+    *name = crate::xmalloc::xstrdup(b"\0" as *const u8 as *const libc::c_char);
+    *infotxt = crate::xmalloc::xstrdup(b"\0" as *const u8 as *const libc::c_char);
     *numprompts = 1 as libc::c_int as u_int;
     *prompts = xcalloc(
         *numprompts as size_t,

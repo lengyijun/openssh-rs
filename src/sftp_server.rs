@@ -91,7 +91,6 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
@@ -934,7 +933,7 @@ unsafe extern "C" fn handle_new(
     (*handles.offset(i as isize)).fd = fd;
     (*handles.offset(i as isize)).flags = flags;
     let ref mut fresh1 = (*handles.offset(i as isize)).name;
-    *fresh1 = xstrdup(name);
+    *fresh1 = crate::xmalloc::xstrdup(name);
     let ref mut fresh2 = (*handles.offset(i as isize)).bytes_write;
     *fresh2 = 0 as libc::c_int as u_int64_t;
     (*handles.offset(i as isize)).bytes_read = *fresh2;
@@ -2662,7 +2661,7 @@ unsafe extern "C" fn process_readdir(mut id: u_int32_t) {
             }
             stat_to_attrib(&mut st, &mut (*stats.offset(count as isize)).attrib);
             let ref mut fresh5 = (*stats.offset(count as isize)).name;
-            *fresh5 = xstrdup(((*dp).d_name).as_mut_ptr());
+            *fresh5 = crate::xmalloc::xstrdup(((*dp).d_name).as_mut_ptr());
             let ref mut fresh6 = (*stats.offset(count as isize)).long_name;
             *fresh6 = ls_file(
                 ((*dp).d_name).as_mut_ptr(),
@@ -2869,7 +2868,7 @@ unsafe extern "C" fn process_realpath(mut id: u_int32_t) {
     }
     if *path.offset(0 as libc::c_int as isize) as libc::c_int == '\0' as i32 {
         libc::free(path as *mut libc::c_void);
-        path = xstrdup(b".\0" as *const u8 as *const libc::c_char);
+        path = crate::xmalloc::xstrdup(b".\0" as *const u8 as *const libc::c_char);
     }
     crate::log::sshlog(
         b"sftp-server.c\0" as *const u8 as *const libc::c_char,
@@ -3700,12 +3699,12 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
         );
         if *path.offset(0 as libc::c_int as isize) as libc::c_int == '\0' as i32 {
             libc::free(path as *mut libc::c_void);
-            path = xstrdup(b".\0" as *const u8 as *const libc::c_char);
+            path = crate::xmalloc::xstrdup(b".\0" as *const u8 as *const libc::c_char);
             current_block = 17478428563724192186;
         } else if *path as libc::c_int == '~' as i32 {
             if strcmp(path, b"~\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
                 libc::free(path as *mut libc::c_void);
-                path = xstrdup(cwd.as_mut_ptr());
+                path = crate::xmalloc::xstrdup(cwd.as_mut_ptr());
                 current_block = 17478428563724192186;
             } else if strncmp(
                 path,
@@ -3713,7 +3712,7 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
                 2 as libc::c_int as libc::c_ulong,
             ) == 0 as libc::c_int
             {
-                npath = xstrdup(path.offset(2 as libc::c_int as isize));
+                npath = crate::xmalloc::xstrdup(path.offset(2 as libc::c_int as isize));
                 libc::free(path as *mut libc::c_void);
                 crate::xmalloc::xasprintf(
                     &mut path as *mut *mut libc::c_char,

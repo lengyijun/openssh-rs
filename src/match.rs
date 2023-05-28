@@ -10,7 +10,7 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn addr_match_list(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn lowercase(s: *mut libc::c_char);
 }
@@ -189,7 +189,7 @@ pub unsafe extern "C" fn match_hostname(
     mut host: *const libc::c_char,
     mut pattern: *const libc::c_char,
 ) -> libc::c_int {
-    let mut hostcopy: *mut libc::c_char = xstrdup(host);
+    let mut hostcopy: *mut libc::c_char = crate::xmalloc::xstrdup(host);
     let mut r: libc::c_int = 0;
     lowercase(hostcopy);
     r = match_pattern_list(hostcopy, pattern, 1 as libc::c_int);
@@ -247,7 +247,7 @@ pub unsafe extern "C" fn match_user(
     if p.is_null() {
         return match_pattern(user, pattern);
     }
-    pat = xstrdup(pattern);
+    pat = crate::xmalloc::xstrdup(pattern);
     p = strchr(pat, '@' as i32);
     let fresh0 = p;
     p = p.offset(1);
@@ -274,9 +274,9 @@ pub unsafe extern "C" fn match_list(
     let mut i: libc::c_int = 0;
     let mut j: libc::c_int = 0;
     let mut nproposals: libc::c_int = 0;
-    cp = xstrdup(client);
+    cp = crate::xmalloc::xstrdup(client);
     c = cp;
-    sp = xstrdup(server);
+    sp = crate::xmalloc::xstrdup(server);
     s = sp;
     p = strsep(&mut sp, b",\0" as *const u8 as *const libc::c_char);
     i = 0 as libc::c_int;
@@ -296,7 +296,7 @@ pub unsafe extern "C" fn match_list(
         j = 0 as libc::c_int;
         while j < nproposals {
             if strcmp(p, sproposals[j as usize]) == 0 as libc::c_int {
-                ret = xstrdup(p);
+                ret = crate::xmalloc::xstrdup(p);
                 if !next.is_null() {
                     *next = (if cp.is_null() {
                         strlen(c)

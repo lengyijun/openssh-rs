@@ -210,7 +210,7 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -2686,7 +2686,8 @@ unsafe extern "C" fn pkcs11_fetch_x509_pubkey(
             subject = X509_NAME_oneline(x509_name, 0 as *mut libc::c_char, 0 as libc::c_int);
             subject.is_null()
         } {
-            subject = xstrdup(b"invalid subject\0" as *const u8 as *const libc::c_char);
+            subject =
+                crate::xmalloc::xstrdup(b"invalid subject\0" as *const u8 as *const libc::c_char);
         }
         X509_NAME_free(x509_name);
         cp = cert_attr[2 as libc::c_int as usize].pValue as *const u_char;
@@ -3115,7 +3116,7 @@ unsafe extern "C" fn pkcs11_fetch_certs(
                                         )
                                             as *mut *mut libc::c_char;
                                         let ref mut fresh1 = *(*labelsp).offset(*nkeys as isize);
-                                        *fresh1 = xstrdup(label);
+                                        *fresh1 = crate::xmalloc::xstrdup(label);
                                     }
                                     *nkeys = *nkeys + 1 as libc::c_int;
                                     crate::log::sshlog(
@@ -3391,7 +3392,9 @@ unsafe extern "C" fn pkcs11_fetch_keys(
                                 )
                                     as *mut *mut libc::c_char;
                                 let ref mut fresh3 = *(*labelsp).offset(*nkeys as isize);
-                                *fresh3 = xstrdup(label.as_mut_ptr() as *mut libc::c_char);
+                                *fresh3 = crate::xmalloc::xstrdup(
+                                    label.as_mut_ptr() as *mut libc::c_char
+                                );
                             }
                             *nkeys = *nkeys + 1 as libc::c_int;
                             crate::log::sshlog(
@@ -3522,7 +3525,7 @@ unsafe extern "C" fn pkcs11_register_provider(
                         1 as libc::c_int as size_t,
                         ::core::mem::size_of::<pkcs11_provider>() as libc::c_ulong,
                     ) as *mut pkcs11_provider;
-                    (*p).name = xstrdup(provider_id);
+                    (*p).name = crate::xmalloc::xstrdup(provider_id);
                     (*p).handle = handle;
                     rv = (Some(getfunctionlist.expect("non-null function pointer")))
                         .expect("non-null function pointer")(&mut f);

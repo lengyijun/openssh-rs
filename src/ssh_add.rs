@@ -50,7 +50,6 @@ extern "C" {
 
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -714,7 +713,7 @@ unsafe extern "C" fn add_file(
                     10441068446736761227 => {}
                     _ => {
                         if comment.is_null() || *comment as libc::c_int == '\0' as i32 {
-                            comment = xstrdup(filename);
+                            comment = crate::xmalloc::xstrdup(filename);
                         }
                         sshbuf_free(keyblob);
                         r = sshkey_set_filename(private, filename);
@@ -1497,7 +1496,7 @@ unsafe extern "C" fn stringlist_append(
         ) as *mut *mut libc::c_char;
     }
     let ref mut fresh0 = *(*listp).offset(i as isize);
-    *fresh0 = xstrdup(s);
+    *fresh0 = crate::xmalloc::xstrdup(s);
 }
 unsafe extern "C" fn parse_dest_constraint_hop(
     mut s: *const libc::c_char,
@@ -1518,7 +1517,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
         '\0' as i32,
         ::core::mem::size_of::<dest_constraint_hop>() as libc::c_ulong,
     );
-    os = xstrdup(s);
+    os = crate::xmalloc::xstrdup(s);
     host = strchr(os, '@' as i32);
     if host.is_null() {
         host = os;
@@ -1546,7 +1545,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
                 s,
             );
         }
-        (*dch).user = xstrdup(user);
+        (*dch).user = crate::xmalloc::xstrdup(user);
         libc::free(os as *mut libc::c_void);
         return;
     }
@@ -1590,9 +1589,9 @@ unsafe extern "C" fn parse_dest_constraint_hop(
     (*dch).user = if user.is_null() {
         0 as *mut libc::c_char
     } else {
-        xstrdup(user)
+        crate::xmalloc::xstrdup(user)
     };
-    (*dch).hostname = xstrdup(host);
+    (*dch).hostname = crate::xmalloc::xstrdup(host);
     i = 0 as libc::c_int as size_t;
     while i < (*hostkeys).num_entries as libc::c_ulong {
         hke = ((*hostkeys).entries).offset(i as isize);
@@ -1702,7 +1701,7 @@ unsafe extern "C" fn parse_dest_constraint(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<dest_constraint>() as libc::c_ulong,
     ) as *mut dest_constraint;
-    os = xstrdup(s);
+    os = crate::xmalloc::xstrdup(s);
     cp = strchr(os, '>' as i32);
     if cp.is_null() {
         parse_dest_constraint_hop(os, &mut (*dc).to, hostkey_files);

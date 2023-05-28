@@ -18,7 +18,7 @@ extern "C" {
         __tp: *const tm,
     ) -> size_t;
     fn localtime(__timer: *const time_t) -> *mut tm;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn sshbuf_get_cstring(
         buf: *mut sshbuf,
         valp: *mut *mut libc::c_char,
@@ -393,5 +393,5 @@ pub unsafe extern "C" fn ls_file(
             name,
         );
     }
-    return xstrdup(buf.as_mut_ptr());
+    return crate::xmalloc::xstrdup(buf.as_mut_ptr());
 }

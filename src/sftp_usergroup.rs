@@ -19,7 +19,7 @@ extern "C" {
 
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn can_get_users_groups_by_id(conn: *mut sftp_conn) -> libc::c_int;
     fn do_get_users_groups_by_id(
         conn: *mut sftp_conn,
@@ -312,7 +312,7 @@ unsafe extern "C" fn idname_enter(
         );
     }
     (*idname).id = id;
-    (*idname).name = xstrdup(name);
+    (*idname).name = crate::xmalloc::xstrdup(name);
     if !(idname_tree_RB_INSERT(tree, idname)).is_null() {
         idname_free(idname);
     }

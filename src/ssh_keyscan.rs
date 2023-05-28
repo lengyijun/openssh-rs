@@ -83,7 +83,7 @@ extern "C" {
         -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn sshkey_write(_: *const sshkey, _: *mut libc::FILE) -> libc::c_int;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn ssh_digest_alg_by_name(name: *const libc::c_char) -> libc::c_int;
@@ -1141,7 +1141,7 @@ unsafe extern "C" fn keyprint(mut c: *mut con, mut key: *mut sshkey) {
         keyprint_one(hosts, key);
         return;
     }
-    hosts = xstrdup(hosts);
+    hosts = crate::xmalloc::xstrdup(hosts);
     ohosts = hosts;
     loop {
         host = strsep(&mut hosts, b",\0" as *const u8 as *const libc::c_char);
@@ -1265,7 +1265,7 @@ unsafe extern "C" fn conalloc(
     let mut name: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut namelist: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut s: libc::c_int = 0;
-    namelist = xstrdup(iname);
+    namelist = crate::xmalloc::xstrdup(iname);
     namebase = namelist;
     loop {
         name = xstrsep(&mut namelist, b",\0" as *const u8 as *const libc::c_char);
@@ -1322,7 +1322,7 @@ unsafe extern "C" fn conalloc(
     let ref mut fresh3 = (*fdcon.offset(s as isize)).c_namelist;
     *fresh3 = namelist;
     let ref mut fresh4 = (*fdcon.offset(s as isize)).c_output_name;
-    *fresh4 = xstrdup(oname);
+    *fresh4 = crate::xmalloc::xstrdup(oname);
     let ref mut fresh5 = (*fdcon.offset(s as isize)).c_data;
     *fresh5 = &mut (*fdcon.offset(s as isize)).c_plen as *mut libc::c_int as *mut libc::c_char;
     (*fdcon.offset(s as isize)).c_len = 4 as libc::c_int;

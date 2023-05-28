@@ -70,7 +70,7 @@ extern "C" {
         version: *const libc::c_char,
         stream_size: libc::c_int,
     ) -> libc::c_int;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn cipher_by_name(_: *const libc::c_char) -> *const sshcipher;
     fn cipher_warning_message(_: *const sshcipher_ctx) -> *const libc::c_char;
     fn cipher_init(
@@ -1031,9 +1031,11 @@ pub unsafe extern "C" fn ssh_remote_ipaddr(mut ssh: *mut ssh) -> *const libc::c_
             (*ssh).local_ipaddr = get_local_ipaddr(sock);
             (*ssh).local_port = get_local_port(sock);
         } else {
-            (*ssh).remote_ipaddr = xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
+            (*ssh).remote_ipaddr =
+                crate::xmalloc::xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
             (*ssh).remote_port = 65535 as libc::c_int;
-            (*ssh).local_ipaddr = xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
+            (*ssh).local_ipaddr =
+                crate::xmalloc::xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
             (*ssh).local_port = 65535 as libc::c_int;
         }
     }

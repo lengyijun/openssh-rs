@@ -22,7 +22,6 @@ extern "C" {
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_getb_froms(ssh: *mut ssh, valp: *mut *mut sshbuf) -> libc::c_int;
@@ -2221,7 +2220,7 @@ unsafe extern "C" fn user_key_command_allowed2(
                         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
                     ) as *mut *mut libc::c_char;
                     let ref mut fresh2 = *av.offset(1 as libc::c_int as isize);
-                    *fresh2 = xstrdup((*user_pw).pw_name);
+                    *fresh2 = crate::xmalloc::xstrdup((*user_pw).pw_name);
                     let ref mut fresh3 = *av.offset(2 as libc::c_int as isize);
                     *fresh3 = 0 as *mut libc::c_char;
                     libc::free(command as *mut libc::c_void);

@@ -85,7 +85,6 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshbuf_read(_: libc::c_int, _: *mut sshbuf, _: size_t, _: *mut size_t) -> libc::c_int;
@@ -796,7 +795,7 @@ pub unsafe extern "C" fn channel_add_timeout(
         ::core::mem::size_of::<ssh_channel_timeout>() as libc::c_ulong,
     ) as *mut ssh_channel_timeout;
     let ref mut fresh0 = (*((*sc).timeouts).offset((*sc).ntimeouts as isize)).type_pattern;
-    *fresh0 = xstrdup(type_pattern);
+    *fresh0 = crate::xmalloc::xstrdup(type_pattern);
     (*((*sc).timeouts).offset((*sc).ntimeouts as isize)).timeout_secs = timeout_secs;
     (*sc).ntimeouts = ((*sc).ntimeouts).wrapping_add(1);
     (*sc).ntimeouts;
@@ -860,7 +859,7 @@ pub unsafe extern "C" fn channel_set_xtype(
     if !((*c).xctype).is_null() {
         libc::free((*c).xctype as *mut libc::c_void);
     }
-    (*c).xctype = xstrdup(xctype);
+    (*c).xctype = crate::xmalloc::xstrdup(xctype);
     (*c).inactive_deadline = lookup_timeout(ssh, (*c).xctype);
     crate::log::sshlog(
         b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -1080,7 +1079,7 @@ pub unsafe extern "C" fn channel_new(
     (*c).local_window = window;
     (*c).local_window_max = window;
     (*c).local_maxpacket = maxpack;
-    (*c).remote_name = xstrdup(remote_name);
+    (*c).remote_name = crate::xmalloc::xstrdup(remote_name);
     (*c).ctl_chan = -(1 as libc::c_int);
     (*c).delayed = 1 as libc::c_int;
     (*c).inactive_deadline = lookup_timeout(ssh, (*c).ctype);
@@ -1313,20 +1312,20 @@ unsafe extern "C" fn permission_set_add(
     *fresh3 = if host_to_connect.is_null() {
         0 as *mut libc::c_char
     } else {
-        xstrdup(host_to_connect)
+        crate::xmalloc::xstrdup(host_to_connect)
     };
     (*(*permp).offset(n as isize)).port_to_connect = port_to_connect;
     let ref mut fresh4 = (*(*permp).offset(n as isize)).listen_host;
     *fresh4 = if listen_host.is_null() {
         0 as *mut libc::c_char
     } else {
-        xstrdup(listen_host)
+        crate::xmalloc::xstrdup(listen_host)
     };
     let ref mut fresh5 = (*(*permp).offset(n as isize)).listen_path;
     *fresh5 = if listen_path.is_null() {
         0 as *mut libc::c_char
     } else {
-        xstrdup(listen_path)
+        crate::xmalloc::xstrdup(listen_path)
     };
     (*(*permp).offset(n as isize)).listen_port = listen_port;
     let ref mut fresh6 = (*(*permp).offset(n as isize)).downstream;
@@ -2818,7 +2817,7 @@ unsafe extern "C" fn channel_decode_socks4(
     (*c).path = 0 as *mut libc::c_char;
     if need == 1 as libc::c_int as libc::c_uint {
         host = inet_ntoa(s4_req.dest_addr);
-        (*c).path = xstrdup(host);
+        (*c).path = crate::xmalloc::xstrdup(host);
     } else {
         have = sshbuf_len(input) as u_int;
         p = sshbuf_ptr(input);
@@ -2872,7 +2871,7 @@ unsafe extern "C" fn channel_decode_socks4(
             );
             return -(1 as libc::c_int);
         }
-        (*c).path = xstrdup(p as *const libc::c_char);
+        (*c).path = crate::xmalloc::xstrdup(p as *const libc::c_char);
         r = sshbuf_consume(input, len as size_t);
         if r != 0 as libc::c_int {
             sshfatal(
@@ -3247,7 +3246,7 @@ unsafe extern "C" fn channel_decode_socks5(
             );
             return -(1 as libc::c_int);
         }
-        (*c).path = xstrdup(dest_addr.as_mut_ptr());
+        (*c).path = crate::xmalloc::xstrdup(dest_addr.as_mut_ptr());
     } else {
         if (inet_ntop(
             af as libc::c_int,
@@ -3259,7 +3258,7 @@ unsafe extern "C" fn channel_decode_socks5(
         {
             return -(1 as libc::c_int);
         }
-        (*c).path = xstrdup(ntop.as_mut_ptr());
+        (*c).path = crate::xmalloc::xstrdup(ntop.as_mut_ptr());
     }
     (*c).host_port = __bswap_16(dest_port) as libc::c_int;
     crate::log::sshlog(
@@ -3349,7 +3348,7 @@ pub unsafe extern "C" fn channel_connect_stdio_fwd(
         b"stdio-forward\0" as *const u8 as *const libc::c_char,
         nonblock,
     );
-    (*c).path = xstrdup(host_to_connect);
+    (*c).path = crate::xmalloc::xstrdup(host_to_connect);
     (*c).host_port = port_to_connect as libc::c_int;
     (*c).listening_port = 0 as libc::c_int;
     (*c).force_drain = 1 as libc::c_int;
@@ -3723,7 +3722,7 @@ unsafe extern "C" fn port_open_helper(
     let mut r: libc::c_int = 0;
     if remote_port == -(1 as libc::c_int) {
         libc::free(remote_ipaddr as *mut libc::c_void);
-        remote_ipaddr = xstrdup(b"127.0.0.1\0" as *const u8 as *const libc::c_char);
+        remote_ipaddr = crate::xmalloc::xstrdup(b"127.0.0.1\0" as *const u8 as *const libc::c_char);
         remote_port = 65535 as libc::c_int;
     }
     libc::free((*c).remote_name as *mut libc::c_void);
@@ -3983,7 +3982,7 @@ unsafe extern "C" fn channel_post_port_listener(mut ssh: *mut ssh, mut c: *mut C
     (*nc).listening_port = (*c).listening_port;
     (*nc).host_port = (*c).host_port;
     if !((*c).path).is_null() {
-        (*nc).path = xstrdup((*c).path);
+        (*nc).path = crate::xmalloc::xstrdup((*c).path);
     }
     if nextstate != 13 as libc::c_int {
         port_open_helper(ssh, nc, rtype);
@@ -8192,12 +8191,12 @@ unsafe extern "C" fn channel_setup_fwd_listener_tcpip(
                                 b"port listener\0" as *const u8 as *const libc::c_char,
                                 1 as libc::c_int,
                             );
-                            (*c).path = xstrdup(host);
+                            (*c).path = crate::xmalloc::xstrdup(host);
                             (*c).host_port = (*fwd).connect_port;
                             (*c).listening_addr = if addr.is_null() {
                                 0 as *mut libc::c_char
                             } else {
-                                xstrdup(addr)
+                                crate::xmalloc::xstrdup(addr)
                             };
                             if (*fwd).listen_port == 0 as libc::c_int
                                 && !allocated_listen_port.is_null()
@@ -8409,10 +8408,10 @@ unsafe extern "C" fn channel_setup_fwd_listener_streamlocal(
         b"unix listener\0" as *const u8 as *const libc::c_char,
         1 as libc::c_int,
     );
-    (*c).path = xstrdup(path);
+    (*c).path = crate::xmalloc::xstrdup(path);
     (*c).host_port = port;
     (*c).listening_port = -(2 as libc::c_int);
-    (*c).listening_addr = xstrdup((*fwd).listen_path);
+    (*c).listening_addr = crate::xmalloc::xstrdup((*fwd).listen_path);
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn channel_cancel_rport_listener_tcpip(
@@ -8670,7 +8669,7 @@ unsafe extern "C" fn remote_open_match(
     {
         return 0 as libc::c_int;
     }
-    lhost = xstrdup((*fwd).listen_host);
+    lhost = crate::xmalloc::xstrdup((*fwd).listen_host);
     lowercase(lhost);
     ret = match_pattern(lhost, (*allowed_open).listen_host);
     libc::free(lhost as *mut libc::c_void);
@@ -9625,7 +9624,7 @@ unsafe extern "C" fn connect_to_helper(
             return -(1 as libc::c_int);
         }
     }
-    (*cctx).host = xstrdup(name);
+    (*cctx).host = crate::xmalloc::xstrdup(name);
     (*cctx).port = port;
     (*cctx).ai = (*cctx).aitop;
     sock = connect_next(cctx);
@@ -9696,7 +9695,7 @@ unsafe extern "C" fn connect_to(
         1 as libc::c_int,
     );
     (*c).host_port = port;
-    (*c).path = xstrdup(host);
+    (*c).path = crate::xmalloc::xstrdup(host);
     (*c).connect_ctx = cctx;
     return c;
 }
@@ -9898,7 +9897,7 @@ pub unsafe extern "C" fn channel_connect_to_port(
         1 as libc::c_int,
     );
     (*c).host_port = port as libc::c_int;
-    (*c).path = xstrdup(host);
+    (*c).path = crate::xmalloc::xstrdup(host);
     (*c).connect_ctx = cctx;
     return c;
 }
@@ -10708,7 +10707,7 @@ pub unsafe extern "C" fn x11_request_forwarding_with_spoofing(
     let mut r: libc::c_int = 0;
     let mut screen_number: libc::c_int = 0;
     if ((*sc).x11_saved_display).is_null() {
-        (*sc).x11_saved_display = xstrdup(disp);
+        (*sc).x11_saved_display = crate::xmalloc::xstrdup(disp);
     } else if strcmp(disp, (*sc).x11_saved_display) != 0 as libc::c_int {
         crate::log::sshlog(
             b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -10740,7 +10739,7 @@ pub unsafe extern "C" fn x11_request_forwarding_with_spoofing(
         screen_number = 0 as libc::c_int;
     }
     if ((*sc).x11_saved_proto).is_null() {
-        (*sc).x11_saved_proto = xstrdup(proto);
+        (*sc).x11_saved_proto = crate::xmalloc::xstrdup(proto);
         (*sc).x11_saved_data = xmalloc(data_len as size_t) as *mut libc::c_char;
         i = 0 as libc::c_int as u_int;
         while i < data_len {

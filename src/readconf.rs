@@ -61,7 +61,6 @@ extern "C" {
     fn _ssh__compat_globfree(_: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t);
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
@@ -1659,7 +1658,7 @@ pub unsafe extern "C" fn add_certificate_file(
         userprovided;
     let fresh2 = (*options).num_certificate_files;
     (*options).num_certificate_files = (*options).num_certificate_files + 1;
-    (*options).certificate_files[fresh2 as usize] = xstrdup(path);
+    (*options).certificate_files[fresh2 as usize] = crate::xmalloc::xstrdup(path);
 }
 pub unsafe extern "C" fn add_identity_file(
     mut options: *mut Options,
@@ -1683,7 +1682,7 @@ pub unsafe extern "C" fn add_identity_file(
         );
     }
     if dir.is_null() {
-        path = xstrdup(filename);
+        path = crate::xmalloc::xstrdup(filename);
     } else if crate::xmalloc::xasprintf(
         &mut path as *mut *mut libc::c_char,
         b"%s%s\0" as *const u8 as *const libc::c_char,
@@ -1799,7 +1798,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
         argv[0 as libc::c_int as usize] = shell;
         argv[1 as libc::c_int as usize] =
             b"-c\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
-        argv[2 as libc::c_int as usize] = xstrdup(cmd);
+        argv[2 as libc::c_int as usize] = crate::xmalloc::xstrdup(cmd);
         argv[3 as libc::c_int as usize] = 0 as *mut libc::c_char;
         execv(
             argv[0 as libc::c_int as usize],
@@ -1918,7 +1917,7 @@ unsafe extern "C" fn match_cfg_line(
         (*options).user
     };
     if final_pass != 0 {
-        host = xstrdup((*options).hostname);
+        host = crate::xmalloc::xstrdup((*options).hostname);
     } else if !((*options).hostname).is_null() {
         host = percent_expand(
             (*options).hostname,
@@ -1927,7 +1926,7 @@ unsafe extern "C" fn match_cfg_line(
             0 as *mut libc::c_void as *mut libc::c_char,
         );
     } else {
-        host = xstrdup(host_arg);
+        host = crate::xmalloc::xstrdup(host_arg);
     }
     crate::log::sshlog(
         b"readconf.c\0" as *const u8 as *const libc::c_char,
@@ -2072,7 +2071,7 @@ unsafe extern "C" fn match_cfg_line(
                         if strcasecmp(attrib, b"host\0" as *const u8 as *const libc::c_char)
                             == 0 as libc::c_int
                         {
-                            criteria = xstrdup(host);
+                            criteria = crate::xmalloc::xstrdup(host);
                             r = (match_hostname(host, arg) == 1 as libc::c_int) as libc::c_int;
                             if r == (if negate != 0 {
                                 1 as libc::c_int
@@ -2087,7 +2086,7 @@ unsafe extern "C" fn match_cfg_line(
                             b"originalhost\0" as *const u8 as *const libc::c_char,
                         ) == 0 as libc::c_int
                         {
-                            criteria = xstrdup(original_host);
+                            criteria = crate::xmalloc::xstrdup(original_host);
                             r = (match_hostname(original_host, arg) == 1 as libc::c_int)
                                 as libc::c_int;
                             if r == (if negate != 0 {
@@ -2101,7 +2100,7 @@ unsafe extern "C" fn match_cfg_line(
                         } else if strcasecmp(attrib, b"user\0" as *const u8 as *const libc::c_char)
                             == 0 as libc::c_int
                         {
-                            criteria = xstrdup(ruser);
+                            criteria = crate::xmalloc::xstrdup(ruser);
                             r = (match_pattern_list(ruser, arg, 0 as libc::c_int)
                                 == 1 as libc::c_int) as libc::c_int;
                             if r == (if negate != 0 {
@@ -2117,7 +2116,7 @@ unsafe extern "C" fn match_cfg_line(
                             b"localuser\0" as *const u8 as *const libc::c_char,
                         ) == 0 as libc::c_int
                         {
-                            criteria = xstrdup((*pw).pw_name);
+                            criteria = crate::xmalloc::xstrdup((*pw).pw_name);
                             r = (match_pattern_list((*pw).pw_name, arg, 0 as libc::c_int)
                                 == 1 as libc::c_int) as libc::c_int;
                             if r == (if negate != 0 {
@@ -2250,7 +2249,7 @@ unsafe extern "C" fn match_cfg_line(
                                         cmd,
                                     );
                                 }
-                                criteria = xstrdup(cmd);
+                                criteria = crate::xmalloc::xstrdup(cmd);
                                 libc::free(cmd as *mut libc::c_void);
                                 r = (r == 0 as libc::c_int) as libc::c_int;
                                 if r == (if negate != 0 {
@@ -3740,7 +3739,7 @@ unsafe extern "C" fn process_config_line_depth(
                 current_block = 7482270440933722938;
             } else {
                 if *activep != 0 && ((*options).ciphers).is_null() {
-                    (*options).ciphers = xstrdup(arg);
+                    (*options).ciphers = crate::xmalloc::xstrdup(arg);
                 }
                 current_block = 3935247052025034411;
             }
@@ -3795,7 +3794,7 @@ unsafe extern "C" fn process_config_line_depth(
                 current_block = 7482270440933722938;
             } else {
                 if *activep != 0 && ((*options).macs).is_null() {
-                    (*options).macs = xstrdup(arg);
+                    (*options).macs = crate::xmalloc::xstrdup(arg);
                 }
                 current_block = 3935247052025034411;
             }
@@ -3850,7 +3849,7 @@ unsafe extern "C" fn process_config_line_depth(
                 current_block = 7482270440933722938;
             } else {
                 if *activep != 0 && ((*options).kex_algorithms).is_null() {
-                    (*options).kex_algorithms = xstrdup(arg);
+                    (*options).kex_algorithms = crate::xmalloc::xstrdup(arg);
                 }
                 current_block = 3935247052025034411;
             }
@@ -3998,7 +3997,7 @@ unsafe extern "C" fn process_config_line_depth(
                         let fresh9 = *uintptr;
                         *uintptr = (*uintptr).wrapping_add(1);
                         let ref mut fresh10 = *(*cppptr).offset(fresh9 as isize);
-                        *fresh10 = xstrdup(arg);
+                        *fresh10 = crate::xmalloc::xstrdup(arg);
                     }
                 }
             }
@@ -4115,7 +4114,7 @@ unsafe extern "C" fn process_config_line_depth(
                     current_block = 6226880432621243913;
                     break;
                 }
-                arg2 = xstrdup(arg);
+                arg2 = crate::xmalloc::xstrdup(arg);
                 if strcasecmp(arg, b"none\0" as *const u8 as *const libc::c_char)
                     == 0 as libc::c_int
                     || strcasecmp(arg, b"any\0" as *const u8 as *const libc::c_char)
@@ -4820,7 +4819,7 @@ unsafe extern "C" fn process_config_line_depth(
                                 arg,
                             );
                         } else {
-                            arg2 = xstrdup(arg);
+                            arg2 = crate::xmalloc::xstrdup(arg);
                         }
                         memset(
                             &mut gl as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t
@@ -5142,7 +5141,8 @@ unsafe extern "C" fn process_config_line_depth(
                         } else {
                             let fresh11 = (*options).num_canonical_domains;
                             (*options).num_canonical_domains = (*options).num_canonical_domains + 1;
-                            (*options).canonical_domains[fresh11 as usize] = xstrdup(arg);
+                            (*options).canonical_domains[fresh11 as usize] =
+                                crate::xmalloc::xstrdup(arg);
                         }
                     }
                 }
@@ -5245,8 +5245,8 @@ unsafe extern "C" fn process_config_line_depth(
                     cname = ((*options).permitted_cnames)
                         .as_mut_ptr()
                         .offset(fresh12 as isize);
-                    (*cname).source_list = xstrdup(arg);
-                    (*cname).target_list = xstrdup(arg2);
+                    (*cname).source_list = crate::xmalloc::xstrdup(arg);
+                    (*cname).target_list = crate::xmalloc::xstrdup(arg2);
                 }
             }
         }
@@ -5592,7 +5592,7 @@ unsafe extern "C" fn process_config_line_depth(
                 current_block = 7482270440933722938;
             } else {
                 if *activep != 0 && (*charptr).is_null() {
-                    *charptr = xstrdup(arg);
+                    *charptr = crate::xmalloc::xstrdup(arg);
                 }
                 current_block = 3935247052025034411;
             }
@@ -5644,7 +5644,7 @@ unsafe extern "C" fn process_config_line_depth(
             } else {
                 len = strspn(str, b" \t\r\n=\0" as *const u8 as *const libc::c_char);
                 if *activep != 0 && (*charptr).is_null() {
-                    *charptr = xstrdup(str.offset(len as isize));
+                    *charptr = crate::xmalloc::xstrdup(str.offset(len as isize));
                 }
                 argv_consume(&mut ac);
                 current_block = 3935247052025034411;
@@ -5732,7 +5732,7 @@ unsafe extern "C" fn process_config_line_depth(
                         let fresh7 = *uintptr;
                         *uintptr = (*uintptr).wrapping_add(1);
                         let ref mut fresh8 = *cpptr.offset(fresh7 as isize);
-                        *fresh8 = xstrdup(arg);
+                        *fresh8 = crate::xmalloc::xstrdup(arg);
                     }
                 }
             }
@@ -5757,7 +5757,7 @@ unsafe extern "C" fn process_config_line_depth(
                 current_block = 7482270440933722938;
             } else {
                 if *activep != 0 && (*charptr).is_null() {
-                    *charptr = xstrdup(arg);
+                    *charptr = crate::xmalloc::xstrdup(arg);
                 }
                 current_block = 3935247052025034411;
             }
@@ -5863,7 +5863,7 @@ unsafe extern "C" fn process_config_line_depth(
                     current_block = 7482270440933722938;
                 } else {
                     if *activep != 0 && (*charptr).is_null() {
-                        *charptr = xstrdup(arg);
+                        *charptr = crate::xmalloc::xstrdup(arg);
                     }
                     current_block = 3935247052025034411;
                 }
@@ -6282,7 +6282,7 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
     }
     if ((*options).xauth_location).is_null() {
         (*options).xauth_location =
-            xstrdup(b"/usr/bin/xauth\0" as *const u8 as *const libc::c_char);
+            crate::xmalloc::xstrdup(b"/usr/bin/xauth\0" as *const u8 as *const libc::c_char);
     }
     if (*options).fwd_opts.gateway_ports == -(1 as libc::c_int) {
         (*options).fwd_opts.gateway_ports = 0 as libc::c_int;
@@ -6392,12 +6392,14 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
     if (*options).num_system_hostfiles == 0 as libc::c_int as libc::c_uint {
         let fresh13 = (*options).num_system_hostfiles;
         (*options).num_system_hostfiles = ((*options).num_system_hostfiles).wrapping_add(1);
-        (*options).system_hostfiles[fresh13 as usize] =
-            xstrdup(b"/usr/local/etc/ssh_known_hosts\0" as *const u8 as *const libc::c_char);
+        (*options).system_hostfiles[fresh13 as usize] = crate::xmalloc::xstrdup(
+            b"/usr/local/etc/ssh_known_hosts\0" as *const u8 as *const libc::c_char,
+        );
         let fresh14 = (*options).num_system_hostfiles;
         (*options).num_system_hostfiles = ((*options).num_system_hostfiles).wrapping_add(1);
-        (*options).system_hostfiles[fresh14 as usize] =
-            xstrdup(b"/usr/local/etc/ssh_known_hosts2\0" as *const u8 as *const libc::c_char);
+        (*options).system_hostfiles[fresh14 as usize] = crate::xmalloc::xstrdup(
+            b"/usr/local/etc/ssh_known_hosts2\0" as *const u8 as *const libc::c_char,
+        );
     }
     if (*options).update_hostkeys == -(1 as libc::c_int) {
         if (*options).verify_host_key_dns <= 0 as libc::c_int
@@ -6417,11 +6419,11 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
         let fresh15 = (*options).num_user_hostfiles;
         (*options).num_user_hostfiles = ((*options).num_user_hostfiles).wrapping_add(1);
         (*options).user_hostfiles[fresh15 as usize] =
-            xstrdup(b"~/.ssh/known_hosts\0" as *const u8 as *const libc::c_char);
+            crate::xmalloc::xstrdup(b"~/.ssh/known_hosts\0" as *const u8 as *const libc::c_char);
         let fresh16 = (*options).num_user_hostfiles;
         (*options).num_user_hostfiles = ((*options).num_user_hostfiles).wrapping_add(1);
         (*options).user_hostfiles[fresh16 as usize] =
-            xstrdup(b"~/.ssh/known_hosts2\0" as *const u8 as *const libc::c_char);
+            crate::xmalloc::xstrdup(b"~/.ssh/known_hosts2\0" as *const u8 as *const libc::c_char);
     }
     if (*options).log_level as libc::c_int == SYSLOG_LEVEL_NOT_SET as libc::c_int {
         (*options).log_level = SYSLOG_LEVEL_INFO;
@@ -6512,7 +6514,8 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
         (*options).fingerprint_hash = 2 as libc::c_int;
     }
     if ((*options).sk_provider).is_null() {
-        (*options).sk_provider = xstrdup(b"$SSH_SK_PROVIDER\0" as *const u8 as *const libc::c_char);
+        (*options).sk_provider =
+            crate::xmalloc::xstrdup(b"$SSH_SK_PROVIDER\0" as *const u8 as *const libc::c_char);
     }
     if (*options).required_rsa_size == -(1 as libc::c_int) {
         (*options).required_rsa_size = 1024 as libc::c_int;
@@ -6989,55 +6992,67 @@ pub unsafe extern "C" fn parse_forward(
     match i {
         1 => {
             if fwdargs[0 as libc::c_int as usize].ispath != 0 {
-                (*fwd).listen_path = xstrdup(fwdargs[0 as libc::c_int as usize].arg);
+                (*fwd).listen_path =
+                    crate::xmalloc::xstrdup(fwdargs[0 as libc::c_int as usize].arg);
                 (*fwd).listen_port = -(2 as libc::c_int);
             } else {
                 (*fwd).listen_host = 0 as *mut libc::c_char;
                 (*fwd).listen_port = crate::misc::a2port(fwdargs[0 as libc::c_int as usize].arg);
             }
-            (*fwd).connect_host = xstrdup(b"socks\0" as *const u8 as *const libc::c_char);
+            (*fwd).connect_host =
+                crate::xmalloc::xstrdup(b"socks\0" as *const u8 as *const libc::c_char);
         }
         2 => {
             if fwdargs[0 as libc::c_int as usize].ispath != 0
                 && fwdargs[1 as libc::c_int as usize].ispath != 0
             {
-                (*fwd).listen_path = xstrdup(fwdargs[0 as libc::c_int as usize].arg);
+                (*fwd).listen_path =
+                    crate::xmalloc::xstrdup(fwdargs[0 as libc::c_int as usize].arg);
                 (*fwd).listen_port = -(2 as libc::c_int);
-                (*fwd).connect_path = xstrdup(fwdargs[1 as libc::c_int as usize].arg);
+                (*fwd).connect_path =
+                    crate::xmalloc::xstrdup(fwdargs[1 as libc::c_int as usize].arg);
                 (*fwd).connect_port = -(2 as libc::c_int);
             } else if fwdargs[1 as libc::c_int as usize].ispath != 0 {
                 (*fwd).listen_host = 0 as *mut libc::c_char;
                 (*fwd).listen_port = crate::misc::a2port(fwdargs[0 as libc::c_int as usize].arg);
-                (*fwd).connect_path = xstrdup(fwdargs[1 as libc::c_int as usize].arg);
+                (*fwd).connect_path =
+                    crate::xmalloc::xstrdup(fwdargs[1 as libc::c_int as usize].arg);
                 (*fwd).connect_port = -(2 as libc::c_int);
             } else {
-                (*fwd).listen_host = xstrdup(fwdargs[0 as libc::c_int as usize].arg);
+                (*fwd).listen_host =
+                    crate::xmalloc::xstrdup(fwdargs[0 as libc::c_int as usize].arg);
                 (*fwd).listen_port = crate::misc::a2port(fwdargs[1 as libc::c_int as usize].arg);
-                (*fwd).connect_host = xstrdup(b"socks\0" as *const u8 as *const libc::c_char);
+                (*fwd).connect_host =
+                    crate::xmalloc::xstrdup(b"socks\0" as *const u8 as *const libc::c_char);
             }
         }
         3 => {
             if fwdargs[0 as libc::c_int as usize].ispath != 0 {
-                (*fwd).listen_path = xstrdup(fwdargs[0 as libc::c_int as usize].arg);
+                (*fwd).listen_path =
+                    crate::xmalloc::xstrdup(fwdargs[0 as libc::c_int as usize].arg);
                 (*fwd).listen_port = -(2 as libc::c_int);
-                (*fwd).connect_host = xstrdup(fwdargs[1 as libc::c_int as usize].arg);
+                (*fwd).connect_host =
+                    crate::xmalloc::xstrdup(fwdargs[1 as libc::c_int as usize].arg);
                 (*fwd).connect_port = crate::misc::a2port(fwdargs[2 as libc::c_int as usize].arg);
             } else if fwdargs[2 as libc::c_int as usize].ispath != 0 {
-                (*fwd).listen_host = xstrdup(fwdargs[0 as libc::c_int as usize].arg);
+                (*fwd).listen_host =
+                    crate::xmalloc::xstrdup(fwdargs[0 as libc::c_int as usize].arg);
                 (*fwd).listen_port = crate::misc::a2port(fwdargs[1 as libc::c_int as usize].arg);
-                (*fwd).connect_path = xstrdup(fwdargs[2 as libc::c_int as usize].arg);
+                (*fwd).connect_path =
+                    crate::xmalloc::xstrdup(fwdargs[2 as libc::c_int as usize].arg);
                 (*fwd).connect_port = -(2 as libc::c_int);
             } else {
                 (*fwd).listen_host = 0 as *mut libc::c_char;
                 (*fwd).listen_port = crate::misc::a2port(fwdargs[0 as libc::c_int as usize].arg);
-                (*fwd).connect_host = xstrdup(fwdargs[1 as libc::c_int as usize].arg);
+                (*fwd).connect_host =
+                    crate::xmalloc::xstrdup(fwdargs[1 as libc::c_int as usize].arg);
                 (*fwd).connect_port = crate::misc::a2port(fwdargs[2 as libc::c_int as usize].arg);
             }
         }
         4 => {
-            (*fwd).listen_host = xstrdup(fwdargs[0 as libc::c_int as usize].arg);
+            (*fwd).listen_host = crate::xmalloc::xstrdup(fwdargs[0 as libc::c_int as usize].arg);
             (*fwd).listen_port = crate::misc::a2port(fwdargs[1 as libc::c_int as usize].arg);
-            (*fwd).connect_host = xstrdup(fwdargs[2 as libc::c_int as usize].arg);
+            (*fwd).connect_host = crate::xmalloc::xstrdup(fwdargs[2 as libc::c_int as usize].arg);
             (*fwd).connect_port = crate::misc::a2port(fwdargs[3 as libc::c_int as usize].arg);
         }
         _ => {
@@ -7127,7 +7142,7 @@ pub unsafe extern "C" fn parse_jump(
     let mut port: libc::c_int = -(1 as libc::c_int);
     let mut first: libc::c_int = 0;
     active &= (((*o).proxy_command).is_null() && ((*o).jump_host).is_null()) as libc::c_int;
-    sdup = xstrdup(s);
+    sdup = crate::xmalloc::xstrdup(s);
     orig = sdup;
     cp = strchr(orig, '#' as i32);
     if !cp.is_null() {
@@ -7188,18 +7203,20 @@ pub unsafe extern "C" fn parse_jump(
             if active != 0 {
                 if strcasecmp(s, b"none\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
                 {
-                    (*o).jump_host = xstrdup(b"none\0" as *const u8 as *const libc::c_char);
+                    (*o).jump_host =
+                        crate::xmalloc::xstrdup(b"none\0" as *const u8 as *const libc::c_char);
                     (*o).jump_port = 0 as libc::c_int;
                 } else {
                     (*o).jump_user = user;
                     (*o).jump_host = host;
                     (*o).jump_port = port;
-                    (*o).proxy_command = xstrdup(b"none\0" as *const u8 as *const libc::c_char);
+                    (*o).proxy_command =
+                        crate::xmalloc::xstrdup(b"none\0" as *const u8 as *const libc::c_char);
                     host = 0 as *mut libc::c_char;
                     user = host;
                     cp = strrchr(s, ',' as i32);
                     if !cp.is_null() && cp != s as *mut libc::c_char {
-                        (*o).jump_extra = xstrdup(s);
+                        (*o).jump_extra = crate::xmalloc::xstrdup(s);
                         *((*o).jump_extra).offset(cp.offset_from(s) as libc::c_long as isize) =
                             '\0' as i32 as libc::c_char;
                     }

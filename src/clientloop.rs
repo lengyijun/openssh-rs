@@ -67,7 +67,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn xvasprintf(
         _: *mut *mut libc::c_char,
@@ -6461,7 +6460,7 @@ pub unsafe extern "C" fn client_session2_setup(
         );
         i = 0 as libc::c_int as size_t;
         while !(*env.offset(i as isize)).is_null() {
-            name = xstrdup(*env.offset(i as isize));
+            name = crate::xmalloc::xstrdup(*env.offset(i as isize));
             val = strchr(name, '=' as i32);
             if val.is_null() {
                 libc::free(name as *mut libc::c_void);
@@ -6506,7 +6505,7 @@ pub unsafe extern "C" fn client_session2_setup(
     }
     i = 0 as libc::c_int as size_t;
     while i < options.num_setenv as libc::c_ulong {
-        name = xstrdup(*(options.setenv).offset(i as isize));
+        name = crate::xmalloc::xstrdup(*(options.setenv).offset(i as isize));
         val = strchr(name, '=' as i32);
         if val.is_null() {
             libc::free(name as *mut libc::c_void);

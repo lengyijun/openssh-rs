@@ -36,7 +36,7 @@ extern "C" {
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
@@ -2151,9 +2151,9 @@ unsafe extern "C" fn do_lsreaddir(
                             ::core::mem::size_of::<SFTP_DIRENT>() as libc::c_ulong,
                         ) as *mut SFTP_DIRENT;
                         let ref mut fresh6 = (**(*dir).offset(ents as isize)).filename;
-                        *fresh6 = xstrdup(filename);
+                        *fresh6 = crate::xmalloc::xstrdup(filename);
                         let ref mut fresh7 = (**(*dir).offset(ents as isize)).longname;
-                        *fresh7 = xstrdup(longname);
+                        *fresh7 = crate::xmalloc::xstrdup(longname);
                         memcpy(
                             &mut (**(*dir).offset(ents as isize)).a as *mut Attrib
                                 as *mut libc::c_void,

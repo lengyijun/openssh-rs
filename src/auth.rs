@@ -52,7 +52,6 @@ extern "C" {
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn match_user(
         _: *const libc::c_char,
@@ -687,7 +686,7 @@ pub unsafe extern "C" fn allowed_user(mut ssh: *mut ssh, mut pw: *mut libc::pass
             b"none\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
     {
-        let mut shell: *mut libc::c_char = xstrdup(
+        let mut shell: *mut libc::c_char = crate::xmalloc::xstrdup(
             if *((*pw).pw_shell).offset(0 as libc::c_int as isize) as libc::c_int == '\0' as i32 {
                 b"/bin/sh\0" as *const u8 as *const libc::c_char
             } else {
@@ -1008,7 +1007,7 @@ pub unsafe extern "C" fn auth_log(
     extra = format_method_key(authctxt);
     if extra.is_null() {
         if !((*authctxt).auth_method_info).is_null() {
-            extra = xstrdup((*authctxt).auth_method_info);
+            extra = crate::xmalloc::xstrdup((*authctxt).auth_method_info);
         }
     }
     crate::log::sshlog(
@@ -1203,7 +1202,7 @@ pub unsafe extern "C" fn expand_authorized_keys(
         );
     }
     libc::free(file as *mut libc::c_void);
-    return xstrdup(ret.as_mut_ptr());
+    return crate::xmalloc::xstrdup(ret.as_mut_ptr());
 }
 pub unsafe extern "C" fn authorized_principals_file(
     mut pw: *mut libc::passwd,
@@ -1535,7 +1534,7 @@ pub unsafe extern "C" fn fakepw() -> *mut libc::passwd {
         ::core::mem::size_of::<libc::passwd>() as libc::c_ulong,
     );
     fake.pw_name = b"NOUSER\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
-    fake.pw_passwd = xstrdup(
+    fake.pw_passwd = crate::xmalloc::xstrdup(
         b"$2a$10$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\0" as *const u8
             as *const libc::c_char,
     );
@@ -1611,7 +1610,7 @@ unsafe extern "C" fn remote_hostname(mut ssh: *mut ssh) -> *mut libc::c_char {
             b"getpeername failed: %.100s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
-        return xstrdup(ntop);
+        return crate::xmalloc::xstrdup(ntop);
     }
     ipv64_normalise_mapped(&mut from, &mut fromlen);
     if from.ss_family as libc::c_int == 10 as libc::c_int {
@@ -1637,7 +1636,7 @@ unsafe extern "C" fn remote_hostname(mut ssh: *mut ssh) -> *mut libc::c_char {
         8 as libc::c_int,
     ) != 0 as libc::c_int
     {
-        return xstrdup(ntop);
+        return crate::xmalloc::xstrdup(ntop);
     }
     memset(
         &mut hints as *mut addrinfo as *mut libc::c_void,
@@ -1667,7 +1666,7 @@ unsafe extern "C" fn remote_hostname(mut ssh: *mut ssh) -> *mut libc::c_char {
             ntop,
         );
         freeaddrinfo(ai);
-        return xstrdup(ntop);
+        return crate::xmalloc::xstrdup(ntop);
     }
     lowercase(name.as_mut_ptr());
     memset(
@@ -1697,7 +1696,7 @@ unsafe extern "C" fn remote_hostname(mut ssh: *mut ssh) -> *mut libc::c_char {
             name.as_mut_ptr(),
             ntop,
         );
-        return xstrdup(ntop);
+        return crate::xmalloc::xstrdup(ntop);
     }
     ai = aitop;
     while !ai.is_null() {
@@ -1731,9 +1730,9 @@ unsafe extern "C" fn remote_hostname(mut ssh: *mut ssh) -> *mut libc::c_char {
             ntop,
             name.as_mut_ptr(),
         );
-        return xstrdup(ntop);
+        return crate::xmalloc::xstrdup(ntop);
     }
-    return xstrdup(name.as_mut_ptr());
+    return crate::xmalloc::xstrdup(name.as_mut_ptr());
 }
 pub unsafe extern "C" fn auth_get_canonical_hostname(
     mut ssh: *mut ssh,

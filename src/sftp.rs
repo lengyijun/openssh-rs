@@ -93,7 +93,6 @@ extern "C" {
     fn strsignal(__sig: libc::c_int) -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -1023,7 +1022,7 @@ unsafe extern "C" fn path_strip(
 ) -> *mut libc::c_char {
     let mut len: size_t = 0;
     if strip.is_null() {
-        return xstrdup(path);
+        return crate::xmalloc::xstrdup(path);
     }
     len = strlen(strip);
     if strncmp(path, strip, len) == 0 as libc::c_int {
@@ -1035,9 +1034,9 @@ unsafe extern "C" fn path_strip(
             len = len.wrapping_add(1);
             len;
         }
-        return xstrdup(path.offset(len as isize));
+        return crate::xmalloc::xstrdup(path.offset(len as isize));
     }
-    return xstrdup(path);
+    return crate::xmalloc::xstrdup(path);
 }
 unsafe extern "C" fn parse_getput_flags(
     mut cmd: *const libc::c_char,
@@ -1585,7 +1584,7 @@ unsafe extern "C" fn process_get(
     let mut i: libc::c_int = 0;
     let mut r: libc::c_int = 0;
     let mut err: libc::c_int = 0 as libc::c_int;
-    abs_src = make_absolute_pwd_glob(xstrdup(src), pwd);
+    abs_src = make_absolute_pwd_glob(crate::xmalloc::xstrdup(src), pwd);
     memset(
         &mut g as *mut crate::openbsd_compat::glob::_ssh_compat_glob_t as *mut libc::c_void,
         0 as libc::c_int,
@@ -1648,7 +1647,7 @@ unsafe extern "C" fn process_get(
     } else {
         i = 0 as libc::c_int;
         while !(*(g.gl_pathv).offset(i as isize)).is_null() && interrupted == 0 {
-            tmp = xstrdup(*(g.gl_pathv).offset(i as isize));
+            tmp = crate::xmalloc::xstrdup(*(g.gl_pathv).offset(i as isize));
             filename = __xpg_basename(tmp);
             if filename.is_null() {
                 crate::log::sshlog(
@@ -1671,12 +1670,12 @@ unsafe extern "C" fn process_get(
                     if local_is_dir(dst) != 0 {
                         abs_dst = path_append(dst, filename);
                     } else {
-                        abs_dst = xstrdup(dst);
+                        abs_dst = crate::xmalloc::xstrdup(dst);
                     }
                 } else if !dst.is_null() {
                     abs_dst = path_append(dst, filename);
                 } else {
-                    abs_dst = xstrdup(filename);
+                    abs_dst = crate::xmalloc::xstrdup(filename);
                 }
                 libc::free(tmp as *mut libc::c_void);
                 resume |= global_aflag;
@@ -1769,7 +1768,7 @@ unsafe extern "C" fn process_put(
     let mut dst_is_dir: libc::c_int = 1 as libc::c_int;
     let mut sb: libc::stat = unsafe { std::mem::zeroed() };
     if !dst.is_null() {
-        tmp_dst = xstrdup(dst);
+        tmp_dst = crate::xmalloc::xstrdup(dst);
         tmp_dst = make_absolute(tmp_dst, pwd);
     }
     memset(
@@ -1838,7 +1837,7 @@ unsafe extern "C" fn process_put(
                         strerror(*libc::__errno_location()),
                     );
                 } else {
-                    tmp = xstrdup(*(g.gl_pathv).offset(i as isize));
+                    tmp = crate::xmalloc::xstrdup(*(g.gl_pathv).offset(i as isize));
                     filename = __xpg_basename(tmp);
                     if filename.is_null() {
                         crate::log::sshlog(
@@ -1865,12 +1864,12 @@ unsafe extern "C" fn process_put(
                             if dst_is_dir != 0 {
                                 abs_dst = path_append(tmp_dst, filename);
                             } else {
-                                abs_dst = xstrdup(tmp_dst);
+                                abs_dst = crate::xmalloc::xstrdup(tmp_dst);
                             }
                         } else if !tmp_dst.is_null() {
                             abs_dst = path_append(tmp_dst, filename);
                         } else {
-                            abs_dst = make_absolute(xstrdup(filename), pwd);
+                            abs_dst = make_absolute(crate::xmalloc::xstrdup(filename), pwd);
                         }
                         libc::free(tmp as *mut libc::c_void);
                         resume |= global_aflag;
@@ -3033,9 +3032,10 @@ unsafe extern "C" fn parse_args(
                 );
                 return -(1 as libc::c_int);
             }
-            *path1 = xstrdup(*argv.offset(optidx as isize));
+            *path1 = crate::xmalloc::xstrdup(*argv.offset(optidx as isize));
             if argc - optidx > 1 as libc::c_int {
-                *path2 = xstrdup(*argv.offset((optidx + 1 as libc::c_int) as isize));
+                *path2 =
+                    crate::xmalloc::xstrdup(*argv.offset((optidx + 1 as libc::c_int) as isize));
                 undo_glob_escape(*path2);
             }
             current_block = 17769492591016358583;
@@ -3083,7 +3083,7 @@ unsafe extern "C" fn parse_args(
             if argc - optidx < 1 as libc::c_int {
                 *path1 = 0 as *mut libc::c_char;
             } else {
-                *path1 = xstrdup(*argv.offset(optidx as isize));
+                *path1 = crate::xmalloc::xstrdup(*argv.offset(optidx as isize));
                 undo_glob_escape(*path1);
             }
             current_block = 17769492591016358583;
@@ -3094,7 +3094,7 @@ unsafe extern "C" fn parse_args(
                 return -(1 as libc::c_int);
             }
             if argc - optidx > 0 as libc::c_int {
-                *path1 = xstrdup(*argv.offset(optidx as isize));
+                *path1 = crate::xmalloc::xstrdup(*argv.offset(optidx as isize));
             }
             current_block = 17769492591016358583;
         }
@@ -3159,7 +3159,7 @@ unsafe extern "C" fn parse_args(
                     return -(1 as libc::c_int);
                 }
             } else {
-                *path1 = xstrdup(*argv.offset(optidx as isize));
+                *path1 = crate::xmalloc::xstrdup(*argv.offset(optidx as isize));
                 if cmdnum != I_RM as libc::c_int {
                     undo_glob_escape(*path1);
                 }
@@ -3181,8 +3181,8 @@ unsafe extern "C" fn parse_args(
                 );
                 return -(1 as libc::c_int);
             }
-            *path1 = xstrdup(*argv.offset(optidx as isize));
-            *path2 = xstrdup(*argv.offset((optidx + 1 as libc::c_int) as isize));
+            *path1 = crate::xmalloc::xstrdup(*argv.offset(optidx as isize));
+            *path2 = crate::xmalloc::xstrdup(*argv.offset((optidx + 1 as libc::c_int) as isize));
             undo_glob_escape(*path1);
             undo_glob_escape(*path2);
         }
@@ -3227,7 +3227,9 @@ unsafe extern "C" fn parse_args(
                             );
                             return -(1 as libc::c_int);
                         }
-                        *path1 = xstrdup(*argv.offset((optidx + 1 as libc::c_int) as isize));
+                        *path1 = crate::xmalloc::xstrdup(
+                            *argv.offset((optidx + 1 as libc::c_int) as isize),
+                        );
                         current_block = 17769492591016358583;
                     }
                 }
@@ -3416,7 +3418,7 @@ unsafe extern "C" fn parse_dispatch_command(
         }
         1 => {
             if path1.is_null() || *path1 as libc::c_int == '\0' as i32 {
-                path1 = xstrdup(startdir);
+                path1 = crate::xmalloc::xstrdup(startdir);
             }
             path1 = make_absolute(path1, *pwd);
             tmp = do_realpath(conn, path1);
@@ -3484,7 +3486,7 @@ unsafe extern "C" fn parse_dispatch_command(
         }
         6 => {
             if path1.is_null() {
-                path1 = xstrdup(*pwd);
+                path1 = crate::xmalloc::xstrdup(*pwd);
             }
             path1 = make_absolute(path1, *pwd);
             err = do_df(conn, path1, hflag, iflag);
@@ -3492,7 +3494,7 @@ unsafe extern "C" fn parse_dispatch_command(
         }
         9 => {
             if path1.is_null() || *path1 as libc::c_int == '\0' as i32 {
-                path1 = xstrdup(b"~\0" as *const u8 as *const libc::c_char);
+                path1 = crate::xmalloc::xstrdup(b"~\0" as *const u8 as *const libc::c_char);
             }
             tmp = tilde_expand_filename(path1, libc::getuid());
             libc::free(path1 as *mut libc::c_void);
@@ -3854,9 +3856,9 @@ unsafe extern "C" fn interactive_loop(
             b"Need cwd\0" as *const u8 as *const libc::c_char,
         );
     }
-    startdir = xstrdup(remote_path);
+    startdir = crate::xmalloc::xstrdup(remote_path);
     if !file1.is_null() {
-        dir = xstrdup(file1);
+        dir = crate::xmalloc::xstrdup(file1);
         dir = make_absolute(dir, remote_path);
         if remote_is_dir(conn, dir) != 0 && file2.is_null() {
             if quiet == 0 {
@@ -4534,7 +4536,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     if !(parse_user_host_port(*argv, &mut user, &mut host, 0 as *mut libc::c_int)
                         == 0 as libc::c_int)
                     {
-                        host = xstrdup(*argv);
+                        host = crate::xmalloc::xstrdup(*argv);
                         host = cleanhostname(host);
                     }
                 }

@@ -28,7 +28,6 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -277,10 +276,10 @@ unsafe extern "C" fn get_socket_address(
                 );
                 return 0 as *mut libc::c_char;
             }
-            return xstrdup(ntop.as_mut_ptr());
+            return crate::xmalloc::xstrdup(ntop.as_mut_ptr());
         }
         1 => {
-            return xstrdup(
+            return crate::xmalloc::xstrdup(
                 ((*(&mut addr as *mut sockaddr_storage as *mut sockaddr_un)).sun_path).as_mut_ptr(),
             );
         }
@@ -293,7 +292,7 @@ pub unsafe extern "C" fn get_peer_ipaddr(mut sock: libc::c_int) -> *mut libc::c_
     if !p.is_null() {
         return p;
     }
-    return xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
+    return crate::xmalloc::xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
 }
 pub unsafe extern "C" fn get_local_ipaddr(mut sock: libc::c_int) -> *mut libc::c_char {
     let mut p: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -301,7 +300,7 @@ pub unsafe extern "C" fn get_local_ipaddr(mut sock: libc::c_int) -> *mut libc::c
     if !p.is_null() {
         return p;
     }
-    return xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
+    return crate::xmalloc::xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
 }
 pub unsafe extern "C" fn get_local_name(mut fd: libc::c_int) -> *mut libc::c_char {
     let mut host: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -326,9 +325,9 @@ pub unsafe extern "C" fn get_local_name(mut fd: libc::c_int) -> *mut libc::c_cha
             b"gethostname: %s\0" as *const u8 as *const libc::c_char,
             strerror(*libc::__errno_location()),
         );
-        host = xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
+        host = crate::xmalloc::xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
     } else {
-        host = xstrdup(myname.as_mut_ptr());
+        host = crate::xmalloc::xstrdup(myname.as_mut_ptr());
     }
     return host;
 }

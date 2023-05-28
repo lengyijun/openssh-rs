@@ -132,7 +132,7 @@ extern "C" {
     fn ssh_digest_update_buffer(ctx: *mut ssh_digest_ctx, b: *const sshbuf) -> libc::c_int;
     fn ssh_digest_final(ctx: *mut ssh_digest_ctx, d: *mut u_char, dlen: size_t) -> libc::c_int;
     fn ssh_digest_free(ctx: *mut ssh_digest_ctx);
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -889,7 +889,7 @@ pub unsafe extern "C" fn kex_proposal_populate_entries(
             }
             2 | 3 => {
                 let ref mut fresh2 = *prop.offset(i as isize);
-                *fresh2 = xstrdup(if !ciphers.is_null() {
+                *fresh2 = crate::xmalloc::xstrdup(if !ciphers.is_null() {
                     ciphers
                 } else {
                     *defprop.offset(i as isize)
@@ -897,7 +897,7 @@ pub unsafe extern "C" fn kex_proposal_populate_entries(
             }
             4 | 5 => {
                 let ref mut fresh3 = *prop.offset(i as isize);
-                *fresh3 = xstrdup(if !macs.is_null() {
+                *fresh3 = crate::xmalloc::xstrdup(if !macs.is_null() {
                     macs
                 } else {
                     *defprop.offset(i as isize)
@@ -905,7 +905,7 @@ pub unsafe extern "C" fn kex_proposal_populate_entries(
             }
             6 | 7 => {
                 let ref mut fresh4 = *prop.offset(i as isize);
-                *fresh4 = xstrdup(if !comp.is_null() {
+                *fresh4 = crate::xmalloc::xstrdup(if !comp.is_null() {
                     comp
                 } else {
                     *defprop.offset(i as isize)
@@ -913,7 +913,7 @@ pub unsafe extern "C" fn kex_proposal_populate_entries(
             }
             1 => {
                 let ref mut fresh5 = *prop.offset(i as isize);
-                *fresh5 = xstrdup(if !hkalgs.is_null() {
+                *fresh5 = crate::xmalloc::xstrdup(if !hkalgs.is_null() {
                     hkalgs
                 } else {
                     *defprop.offset(i as isize)
@@ -921,7 +921,7 @@ pub unsafe extern "C" fn kex_proposal_populate_entries(
             }
             _ => {
                 let ref mut fresh6 = *prop.offset(i as isize);
-                *fresh6 = xstrdup(*defprop.offset(i as isize));
+                *fresh6 = crate::xmalloc::xstrdup(*defprop.offset(i as isize));
             }
         }
         i = i.wrapping_add(1);

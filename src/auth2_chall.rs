@@ -16,7 +16,7 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn userauth_finish(_: *mut ssh, _: libc::c_int, _: *const libc::c_char, _: *const libc::c_char);
     fn auth2_method_allowed(
         _: *mut Authctxt,
@@ -292,7 +292,7 @@ unsafe extern "C" fn kbdint_alloc(mut devs: *const libc::c_char) -> *mut KbdintA
         }
         sshbuf_free(b);
     } else {
-        (*kbdintctxt).devices = xstrdup(devs);
+        (*kbdintctxt).devices = crate::xmalloc::xstrdup(devs);
     }
     crate::log::sshlog(
         b"auth2-chall.c\0" as *const u8 as *const libc::c_char,
@@ -370,7 +370,7 @@ unsafe extern "C" fn kbdint_next_device(
         }
         t = (*kbdintctxt).devices;
         (*kbdintctxt).devices = if *t.offset(len as isize) as libc::c_int != 0 {
-            xstrdup(t.offset(len as isize).offset(1 as libc::c_int as isize))
+            crate::xmalloc::xstrdup(t.offset(len as isize).offset(1 as libc::c_int as isize))
         } else {
             0 as *mut libc::c_char
         };

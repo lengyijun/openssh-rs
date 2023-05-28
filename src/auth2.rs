@@ -35,7 +35,7 @@ extern "C" {
 
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_get_cstring(
         ssh: *mut ssh,
@@ -877,7 +877,7 @@ unsafe extern "C" fn input_userauth_request(
             } else {
                 getpwnamallow(ssh, user)
             };
-            (*authctxt).user = xstrdup(user);
+            (*authctxt).user = crate::xmalloc::xstrdup(user);
             if !((*authctxt).pw).is_null()
                 && strcmp(
                     service,
@@ -925,9 +925,9 @@ unsafe extern "C" fn input_userauth_request(
                     b"\0" as *const u8 as *const libc::c_char
                 },
             );
-            (*authctxt).service = xstrdup(service);
+            (*authctxt).service = crate::xmalloc::xstrdup(service);
             (*authctxt).style = if !style.is_null() {
-                xstrdup(style)
+                crate::xmalloc::xstrdup(style)
             } else {
                 0 as *mut libc::c_char
             };
@@ -1363,7 +1363,7 @@ pub unsafe extern "C" fn auth2_methods_valid(
         );
         return -(1 as libc::c_int);
     }
-    methods = xstrdup(_methods);
+    methods = crate::xmalloc::xstrdup(_methods);
     omethods = methods;
     's_23: loop {
         method = strsep(&mut methods, b",\0" as *const u8 as *const libc::c_char);
@@ -1503,7 +1503,7 @@ pub unsafe extern "C" fn auth2_setup_methods_lists(mut authctxt: *mut Authctxt) 
             let fresh3 = (*authctxt).num_auth_methods;
             (*authctxt).num_auth_methods = ((*authctxt).num_auth_methods).wrapping_add(1);
             let ref mut fresh4 = *((*authctxt).auth_methods).offset(fresh3 as isize);
-            *fresh4 = xstrdup(*(options.auth_methods).offset(i as isize));
+            *fresh4 = crate::xmalloc::xstrdup(*(options.auth_methods).offset(i as isize));
         }
         i = i.wrapping_add(1);
         i;
@@ -1577,7 +1577,7 @@ unsafe extern "C" fn remove_method(
         p = p.offset(1);
         p;
     }
-    *methods = xstrdup(p);
+    *methods = crate::xmalloc::xstrdup(p);
     libc::free(omethods as *mut libc::c_void);
     return 1 as libc::c_int;
 }

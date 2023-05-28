@@ -89,7 +89,6 @@ extern "C" {
     fn realpath(__name: *const libc::c_char, __resolved: *mut libc::c_char) -> *mut libc::c_char;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
-    fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_fromb(buf: *mut sshbuf) -> *mut sshbuf;
@@ -2999,7 +2998,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                 current_block = 12326576695480106577;
             } else {
                 libc::free(sk_provider as *mut libc::c_void);
-                sk_provider = xstrdup(canonical_provider.as_mut_ptr());
+                sk_provider = crate::xmalloc::xstrdup(canonical_provider.as_mut_ptr());
                 if match_pattern_list(sk_provider, allowed_providers, 0 as libc::c_int)
                     != 1 as libc::c_int
                 {
@@ -3481,13 +3480,13 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
                 (*id).key = k;
                 let ref mut fresh2 = *keys.offset(i as isize);
                 *fresh2 = 0 as *mut sshkey;
-                (*id).provider = xstrdup(canonical_provider.as_mut_ptr());
+                (*id).provider = crate::xmalloc::xstrdup(canonical_provider.as_mut_ptr());
                 if **comments.offset(i as isize) as libc::c_int != '\0' as i32 {
                     (*id).comment = *comments.offset(i as isize);
                     let ref mut fresh3 = *comments.offset(i as isize);
                     *fresh3 = 0 as *mut libc::c_char;
                 } else {
-                    (*id).comment = xstrdup(canonical_provider.as_mut_ptr());
+                    (*id).comment = crate::xmalloc::xstrdup(canonical_provider.as_mut_ptr());
                 }
                 (*id).death = death;
                 (*id).confirm = confirm as u_int;
@@ -4797,7 +4796,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         b"-P option already specified\0" as *const u8 as *const libc::c_char,
                     );
                 }
-                allowed_providers = xstrdup(BSDoptarg);
+                allowed_providers = crate::xmalloc::xstrdup(BSDoptarg);
             }
             115 => {
                 if c_flag != 0 {
@@ -4846,8 +4845,9 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         usage();
     }
     if allowed_providers.is_null() {
-        allowed_providers =
-            xstrdup(b"/usr/lib*/*,/usr/local/lib*/*\0" as *const u8 as *const libc::c_char);
+        allowed_providers = crate::xmalloc::xstrdup(
+            b"/usr/lib*/*,/usr/local/lib*/*\0" as *const u8 as *const libc::c_char,
+        );
     }
     if ac == 0 as libc::c_int && c_flag == 0 && s_flag == 0 {
         shell = getenv(b"SHELL\0" as *const u8 as *const libc::c_char);
