@@ -61,7 +61,7 @@ extern "C" {
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn compat_banner(_: *mut ssh, _: *const libc::c_char);
 
@@ -1028,7 +1028,7 @@ pub unsafe extern "C" fn _ssh_order_hostkeyalgs(mut ssh: *mut ssh) -> libc::c_in
         return r;
     }
     orig = *proposal.offset(PROPOSAL_SERVER_HOST_KEY_ALGS as libc::c_int as isize);
-    avail = strdup(orig);
+    avail = libc::strdup(orig);
     oavail = avail;
     if oavail.is_null() {
         r = -(2 as libc::c_int);

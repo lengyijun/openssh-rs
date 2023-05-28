@@ -25,7 +25,6 @@ extern "C" {
 
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
@@ -1877,7 +1876,7 @@ unsafe extern "C" fn parse_principals_key_and_options(
         );
         r = -(4 as libc::c_int);
     } else {
-        principals = strdup(tmp);
+        principals = libc::strdup(tmp);
         if principals.is_null() {
             crate::log::sshlog(
                 b"sshsig.c\0" as *const u8 as *const libc::c_char,
@@ -1889,7 +1888,7 @@ unsafe extern "C" fn parse_principals_key_and_options(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"strdup failed\0" as *const u8 as *const libc::c_char,
+                b"libc::strdup failed\0" as *const u8 as *const libc::c_char,
             );
             r = -(2 as libc::c_int);
         } else {

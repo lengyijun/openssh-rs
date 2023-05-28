@@ -1,7 +1,7 @@
 use ::libc;
 
 extern "C" {
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
@@ -108,7 +108,7 @@ pub unsafe extern "C" fn addr_match_list(
         );
         return 0 as libc::c_int;
     }
-    list = strdup(_list);
+    list = libc::strdup(_list);
     o = list;
     if o.is_null() {
         return -(1 as libc::c_int);
@@ -206,7 +206,7 @@ pub unsafe extern "C" fn addr_match_cidr_list(
         );
         return 0 as libc::c_int;
     }
-    list = strdup(_list);
+    list = libc::strdup(_list);
     o = list;
     if o.is_null() {
         return -(1 as libc::c_int);

@@ -21,7 +21,6 @@ extern "C" {
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
@@ -336,7 +335,7 @@ pub unsafe extern "C" fn log_verbose_add(mut s: *const libc::c_char) {
     if !tmp.is_null() {
         log_verbose = tmp;
         let ref mut fresh0 = *log_verbose.offset(nlog_verbose as isize);
-        *fresh0 = strdup(s);
+        *fresh0 = libc::strdup(s);
         if !(*fresh0).is_null() {
             nlog_verbose = nlog_verbose.wrapping_add(1);
             nlog_verbose;

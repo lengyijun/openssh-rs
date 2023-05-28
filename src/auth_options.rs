@@ -11,7 +11,7 @@ extern "C" {
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
@@ -168,7 +168,7 @@ unsafe extern "C" fn dup_strings(
     i = 0 as libc::c_int as size_t;
     while i < nsrc {
         let ref mut fresh0 = *dst.offset(i as isize);
-        *fresh0 = strdup(*src.offset(i as isize));
+        *fresh0 = libc::strdup(*src.offset(i as isize));
         if (*fresh0).is_null() {
             j = 0 as libc::c_int as size_t;
             while j < i {
@@ -584,7 +584,7 @@ unsafe extern "C" fn handle_permit(
         libc::free(opt as *mut libc::c_void);
         opt = tmp;
     }
-    tmp = strdup(opt);
+    tmp = libc::strdup(opt);
     if tmp.is_null() {
         libc::free(opt as *mut libc::c_void);
         *errstrp = b"memory allocation failed\0" as *const u8 as *const libc::c_char;
@@ -858,7 +858,7 @@ pub unsafe extern "C" fn sshauthopt_parse(
                                                         current_block = 2182509200741687066;
                                                         break;
                                                     } else {
-                                                        cp = strdup(opt);
+                                                        cp = libc::strdup(opt);
                                                         if cp.is_null() {
                                                             libc::free(opt as *mut libc::c_void);
                                                             current_block = 1642512663562863647;
@@ -1107,7 +1107,7 @@ pub unsafe extern "C" fn sshauthopt_merge(
             tmp = (*additional).required_from_host_cert;
         }
         if !tmp.is_null() && {
-            (*ret).required_from_host_cert = strdup(tmp);
+            (*ret).required_from_host_cert = libc::strdup(tmp);
             ((*ret).required_from_host_cert).is_null()
         } {
             current_block = 3334247120203540815;
@@ -1117,7 +1117,7 @@ pub unsafe extern "C" fn sshauthopt_merge(
                 tmp = (*additional).required_from_host_keys;
             }
             if !tmp.is_null() && {
-                (*ret).required_from_host_keys = strdup(tmp);
+                (*ret).required_from_host_keys = libc::strdup(tmp);
                 ((*ret).required_from_host_keys).is_null()
             } {
                 current_block = 3334247120203540815;
@@ -1274,7 +1274,7 @@ pub unsafe extern "C" fn sshauthopt_merge(
                                             ) == 0 as libc::c_int
                                             {
                                                 (*ret).force_command =
-                                                    strdup((*primary).force_command);
+                                                    libc::strdup((*primary).force_command);
                                                 if ((*ret).force_command).is_null() {
                                                     current_block = 3334247120203540815;
                                                 } else {
@@ -1287,7 +1287,8 @@ pub unsafe extern "C" fn sshauthopt_merge(
                                                 current_block = 13480256700474103225;
                                             }
                                         } else if !((*primary).force_command).is_null() {
-                                            (*ret).force_command = strdup((*primary).force_command);
+                                            (*ret).force_command =
+                                                libc::strdup((*primary).force_command);
                                             if ((*ret).force_command).is_null() {
                                                 current_block = 3334247120203540815;
                                             } else {
@@ -1295,7 +1296,7 @@ pub unsafe extern "C" fn sshauthopt_merge(
                                             }
                                         } else if !((*additional).force_command).is_null() {
                                             (*ret).force_command =
-                                                strdup((*additional).force_command);
+                                                libc::strdup((*additional).force_command);
                                             if ((*ret).force_command).is_null() {
                                                 current_block = 3334247120203540815;
                                             } else {
@@ -1353,28 +1354,28 @@ pub unsafe extern "C" fn sshauthopt_copy(mut orig: *const sshauthopt) -> *mut ss
     (*ret).no_require_user_presence = (*orig).no_require_user_presence;
     (*ret).require_verify = (*orig).require_verify;
     if !((*orig).cert_principals).is_null() && {
-        (*ret).cert_principals = strdup((*orig).cert_principals);
+        (*ret).cert_principals = libc::strdup((*orig).cert_principals);
         ((*ret).cert_principals).is_null()
     } {
         sshauthopt_free(ret);
         return 0 as *mut sshauthopt;
     }
     if !((*orig).force_command).is_null() && {
-        (*ret).force_command = strdup((*orig).force_command);
+        (*ret).force_command = libc::strdup((*orig).force_command);
         ((*ret).force_command).is_null()
     } {
         sshauthopt_free(ret);
         return 0 as *mut sshauthopt;
     }
     if !((*orig).required_from_host_cert).is_null() && {
-        (*ret).required_from_host_cert = strdup((*orig).required_from_host_cert);
+        (*ret).required_from_host_cert = libc::strdup((*orig).required_from_host_cert);
         ((*ret).required_from_host_cert).is_null()
     } {
         sshauthopt_free(ret);
         return 0 as *mut sshauthopt;
     }
     if !((*orig).required_from_host_keys).is_null() && {
-        (*ret).required_from_host_keys = strdup((*orig).required_from_host_keys);
+        (*ret).required_from_host_keys = libc::strdup((*orig).required_from_host_keys);
         ((*ret).required_from_host_keys).is_null()
     } {
         sshauthopt_free(ret);

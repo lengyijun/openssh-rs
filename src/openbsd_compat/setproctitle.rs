@@ -13,7 +13,7 @@ extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 }
 pub type __builtin_va_list = [__va_list_tag; 1];
@@ -83,7 +83,7 @@ pub unsafe extern "C" fn compat_init_setproctitle(
     i = 0 as libc::c_int;
     while !(*envp.offset(i as isize)).is_null() {
         let ref mut fresh1 = *environ.offset(i as isize);
-        *fresh1 = strdup(*envp.offset(i as isize));
+        *fresh1 = libc::strdup(*envp.offset(i as isize));
         i += 1;
         i;
     }

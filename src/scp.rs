@@ -63,7 +63,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -1403,7 +1403,7 @@ unsafe extern "C" fn brace_expand(
     let mut expanded: libc::c_int = 0 as libc::c_int;
     *patternsp = 0 as *mut *mut libc::c_char;
     *npatternsp = 0 as libc::c_int as size_t;
-    cp = strdup(pattern);
+    cp = libc::strdup(pattern);
     if cp.is_null() {
         return -(1 as libc::c_int);
     }

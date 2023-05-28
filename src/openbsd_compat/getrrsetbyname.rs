@@ -22,7 +22,7 @@ extern "C" {
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __uint8_t = libc::c_uchar;
@@ -375,7 +375,7 @@ pub unsafe extern "C" fn getrrsetbyname(
                     if ((*response).header).ad() as libc::c_int == 1 as libc::c_int {
                         (*rrset).rri_flags |= 1 as libc::c_int as libc::c_uint;
                     }
-                    (*rrset).rri_name = strdup((*(*response).answer).name);
+                    (*rrset).rri_name = libc::strdup((*(*response).answer).name);
                     if ((*rrset).rri_name).is_null() {
                         result = 1 as libc::c_int;
                     } else {
@@ -635,7 +635,7 @@ unsafe extern "C" fn parse_dns_qsection(
                     free_dns_query(head);
                     return 0 as *mut dns_query;
                 }
-                (*curr).name = strdup(name.as_mut_ptr());
+                (*curr).name = libc::strdup(name.as_mut_ptr());
                 if ((*curr).name).is_null() {
                     free_dns_query(head);
                     return 0 as *mut dns_query;
@@ -702,7 +702,7 @@ unsafe extern "C" fn parse_dns_rrsection(
                     free_dns_rr(head);
                     return 0 as *mut dns_rr;
                 }
-                (*curr).name = strdup(name.as_mut_ptr());
+                (*curr).name = libc::strdup(name.as_mut_ptr());
                 if ((*curr).name).is_null() {
                     free_dns_rr(head);
                     return 0 as *mut dns_rr;

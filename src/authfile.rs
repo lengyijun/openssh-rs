@@ -23,7 +23,7 @@ extern "C" {
     fn ferror(__stream: *mut libc::FILE) -> libc::c_int;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
 
     fn sshkey_new(_: libc::c_int) -> *mut sshkey;
@@ -456,7 +456,7 @@ unsafe extern "C" fn sshkey_try_load_public(
                 *cp.offset(strcspn(cp, b"\r\n\0" as *const u8 as *const libc::c_char) as isize) =
                     '\0' as i32 as libc::c_char;
                 if !commentp.is_null() {
-                    *commentp = strdup(if *cp as libc::c_int != 0 {
+                    *commentp = libc::strdup(if *cp as libc::c_int != 0 {
                         cp as *const libc::c_char
                     } else {
                         filename

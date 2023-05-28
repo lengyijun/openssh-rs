@@ -7,7 +7,6 @@ extern "C" {
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
 
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
@@ -542,7 +541,7 @@ pub unsafe extern "C" fn mac_valid(mut names: *const libc::c_char) -> libc::c_in
     {
         return 0 as libc::c_int;
     }
-    cp = strdup(names);
+    cp = libc::strdup(names);
     maclist = cp;
     if maclist.is_null() {
         return 0 as libc::c_int;

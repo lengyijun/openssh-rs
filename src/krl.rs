@@ -19,7 +19,6 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
 
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn time(__timer: *mut time_t) -> time_t;
     fn strftime(
         __s: *mut libc::c_char,
@@ -2004,7 +2003,7 @@ pub unsafe extern "C" fn ssh_krl_set_comment(
     mut comment: *const libc::c_char,
 ) -> libc::c_int {
     libc::free((*krl).comment as *mut libc::c_void);
-    (*krl).comment = strdup(comment);
+    (*krl).comment = libc::strdup(comment);
     if ((*krl).comment).is_null() {
         return -(2 as libc::c_int);
     }
@@ -2182,7 +2181,7 @@ pub unsafe extern "C" fn ssh_krl_revoke_cert_by_key_id(
         ::core::mem::size_of::<revoked_key_id>() as libc::c_ulong,
     ) as *mut revoked_key_id;
     if rki.is_null() || {
-        (*rki).key_id = strdup(key_id);
+        (*rki).key_id = libc::strdup(key_id);
         ((*rki).key_id).is_null()
     } {
         libc::free(rki as *mut libc::c_void);

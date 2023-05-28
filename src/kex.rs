@@ -29,7 +29,6 @@ extern "C" {
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
 
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
@@ -604,7 +603,7 @@ pub unsafe extern "C" fn kex_names_valid(mut names: *const libc::c_char) -> libc
     {
         return 0 as libc::c_int;
     }
-    cp = strdup(names);
+    cp = libc::strdup(names);
     s = cp;
     if s.is_null() {
         return 0 as libc::c_int;
@@ -652,10 +651,10 @@ pub unsafe extern "C" fn kex_names_cat(
     let mut m: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut len: size_t = 0;
     if a.is_null() || *a as libc::c_int == '\0' as i32 {
-        return strdup(b);
+        return libc::strdup(b);
     }
     if b.is_null() || *b as libc::c_int == '\0' as i32 {
-        return strdup(a);
+        return libc::strdup(a);
     }
     if strlen(b) > (1024 as libc::c_int * 1024 as libc::c_int) as libc::c_ulong {
         return 0 as *mut libc::c_char;
@@ -663,7 +662,7 @@ pub unsafe extern "C" fn kex_names_cat(
     len = (strlen(a))
         .wrapping_add(strlen(b))
         .wrapping_add(2 as libc::c_int as libc::c_ulong);
-    cp = strdup(b);
+    cp = libc::strdup(b);
     tmp = cp;
     if tmp.is_null() || {
         ret = calloc(1 as libc::c_int as libc::c_ulong, len) as *mut libc::c_char;
@@ -708,7 +707,7 @@ pub unsafe extern "C" fn kex_assemble_names(
         return -(10 as libc::c_int);
     }
     if (*listp).is_null() || **listp as libc::c_int == '\0' as i32 {
-        *listp = strdup(def);
+        *listp = libc::strdup(def);
         if (*listp).is_null() {
             return -(2 as libc::c_int);
         }
@@ -751,7 +750,7 @@ pub unsafe extern "C" fn kex_assemble_names(
     match current_block {
         5783071609795492627 => {
             ret = 0 as *mut libc::c_char;
-            opatterns = strdup(list);
+            opatterns = libc::strdup(list);
             patterns = opatterns;
             if patterns.is_null() {
                 r = -(2 as libc::c_int);

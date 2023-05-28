@@ -134,7 +134,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strndup(_: *const libc::c_char, _: libc::c_ulong) -> *mut libc::c_char;
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
 
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -751,7 +750,7 @@ pub unsafe extern "C" fn sshkey_names_valid2(
     {
         return 0 as libc::c_int;
     }
-    cp = strdup(names);
+    cp = libc::strdup(names);
     s = cp;
     if s.is_null() {
         return 0 as libc::c_int;
@@ -2119,7 +2118,7 @@ pub unsafe extern "C" fn sshkey_cert_copy(
             (*to).key_id = 0 as *mut libc::c_char;
             current_block = 11812396948646013369;
         } else {
-            (*to).key_id = strdup((*from).key_id);
+            (*to).key_id = libc::strdup((*from).key_id);
             if ((*to).key_id).is_null() {
                 r = -(2 as libc::c_int);
                 current_block = 4002001025471763709;
@@ -2147,7 +2146,7 @@ pub unsafe extern "C" fn sshkey_cert_copy(
                     4002001025471763709 => {}
                     _ => {
                         if !((*from).signature_type).is_null() && {
-                            (*to).signature_type = strdup((*from).signature_type);
+                            (*to).signature_type = libc::strdup((*from).signature_type);
                             ((*to).signature_type).is_null()
                         } {
                             r = -(2 as libc::c_int);
@@ -2172,7 +2171,8 @@ pub unsafe extern "C" fn sshkey_cert_copy(
                                         }
                                         let ref mut fresh26 =
                                             *((*to).principals).offset(i as isize);
-                                        *fresh26 = strdup(*((*from).principals).offset(i as isize));
+                                        *fresh26 =
+                                            libc::strdup(*((*from).principals).offset(i as isize));
                                         if (*((*to).principals).offset(i as isize)).is_null() {
                                             (*to).nprincipals = i;
                                             r = -(2 as libc::c_int);
@@ -2210,7 +2210,7 @@ pub unsafe extern "C" fn sshkey_copy_public_sk(
     mut from: *const sshkey,
     mut to: *mut sshkey,
 ) -> libc::c_int {
-    (*to).sk_application = strdup((*from).sk_application);
+    (*to).sk_application = libc::strdup((*from).sk_application);
     if ((*to).sk_application).is_null() {
         return -(2 as libc::c_int);
     }

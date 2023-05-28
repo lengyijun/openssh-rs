@@ -16,7 +16,7 @@ extern "C" {
     fn dlerror() -> *mut libc::c_char;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
@@ -271,7 +271,7 @@ unsafe extern "C" fn sshsk_open(mut path: *const libc::c_char) -> *mut sshsk_pro
         );
         return 0 as *mut sshsk_provider;
     }
-    (*ret).path = strdup(path);
+    (*ret).path = libc::strdup(path);
     if ((*ret).path).is_null() {
         crate::log::sshlog(
             b"ssh-sk.c\0" as *const u8 as *const libc::c_char,
@@ -280,7 +280,7 @@ unsafe extern "C" fn sshsk_open(mut path: *const libc::c_char) -> *mut sshsk_pro
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"strdup failed\0" as *const u8 as *const libc::c_char,
+            b"libc::strdup failed\0" as *const u8 as *const libc::c_char,
         );
     } else if strcasecmp(
         (*ret).path,
@@ -791,7 +791,7 @@ unsafe extern "C" fn sshsk_key_from_response(
                     );
                     r = -(2 as libc::c_int);
                 } else {
-                    (*key).sk_application = strdup(application);
+                    (*key).sk_application = libc::strdup(application);
                     if ((*key).sk_application).is_null() {
                         crate::log::sshlog(
                             b"ssh-sk.c\0" as *const u8 as *const libc::c_char,
@@ -803,7 +803,8 @@ unsafe extern "C" fn sshsk_key_from_response(
                             1 as libc::c_int,
                             SYSLOG_LEVEL_ERROR,
                             0 as *const libc::c_char,
-                            b"strdup application failed\0" as *const u8 as *const libc::c_char,
+                            b"libc::strdup application failed\0" as *const u8
+                                as *const libc::c_char,
                         );
                         r = -(2 as libc::c_int);
                     } else {
@@ -911,10 +912,10 @@ unsafe extern "C" fn sshsk_add_option(
         return -(2 as libc::c_int);
     }
     let ref mut fresh1 = (**opts.offset(nopts as isize)).name;
-    *fresh1 = strdup(name);
+    *fresh1 = libc::strdup(name);
     if (*fresh1).is_null() || {
         let ref mut fresh2 = (**opts.offset(nopts as isize)).value;
-        *fresh2 = strdup(value);
+        *fresh2 = libc::strdup(value);
         (*fresh2).is_null()
     } {
         crate::log::sshlog(

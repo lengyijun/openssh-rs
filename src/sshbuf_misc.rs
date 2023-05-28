@@ -20,7 +20,7 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn memmem(
         __haystack: *const libc::c_void,
         __haystacklen: size_t,
@@ -132,7 +132,7 @@ pub unsafe extern "C" fn sshbuf_dtob16(mut buf: *mut sshbuf) -> *mut libc::c_cha
     let hex: [libc::c_char; 17] =
         *::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"0123456789abcdef\0");
     if len == 0 as libc::c_int as libc::c_ulong {
-        return strdup(b"\0" as *const u8 as *const libc::c_char);
+        return libc::strdup(b"\0" as *const u8 as *const libc::c_char);
     }
     if (18446744073709551615 as libc::c_ulong).wrapping_div(2 as libc::c_int as libc::c_ulong)
         <= len

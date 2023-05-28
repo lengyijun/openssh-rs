@@ -3,7 +3,6 @@ extern "C" {
 
     fn getgrgid(__gid: __gid_t) -> *mut group;
 
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
 }
 pub type __u_long = libc::c_ulong;
 pub type __uid_t = libc::c_uint;
@@ -68,7 +67,7 @@ pub unsafe extern "C" fn user_from_uid(
         if !((*cp).name).is_null() {
             libc::free((*cp).name as *mut libc::c_void);
         }
-        (*cp).name = strdup(if !pw.is_null() {
+        (*cp).name = libc::strdup(if !pw.is_null() {
             (*pw).pw_name
         } else {
             nbuf.as_mut_ptr()
@@ -112,7 +111,7 @@ pub unsafe extern "C" fn group_from_gid(
         if !((*cp).name).is_null() {
             libc::free((*cp).name as *mut libc::c_void);
         }
-        (*cp).name = strdup(if !gr.is_null() {
+        (*cp).name = libc::strdup(if !gr.is_null() {
             (*gr).gr_name
         } else {
             nbuf.as_mut_ptr()

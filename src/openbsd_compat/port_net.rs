@@ -24,7 +24,7 @@ extern "C" {
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn sshfatal(
@@ -370,7 +370,7 @@ pub unsafe extern "C" fn sys_get_rdomain(mut fd: libc::c_int) -> *mut libc::c_ch
         return 0 as *mut libc::c_char;
     }
     dev[len as usize] = '\0' as i32 as libc::c_char;
-    return strdup(dev.as_mut_ptr());
+    return libc::strdup(dev.as_mut_ptr());
 }
 #[no_mangle]
 pub unsafe extern "C" fn sys_set_rdomain(
@@ -583,7 +583,7 @@ pub unsafe extern "C" fn sys_tun_open(
                     );
                 }
                 if !(!ifname.is_null() && {
-                    *ifname = strdup((ifr.ifr_ifrn.ifrn_name).as_mut_ptr());
+                    *ifname = libc::strdup((ifr.ifr_ifrn.ifrn_name).as_mut_ptr());
                     (*ifname).is_null()
                 }) {
                     return fd;

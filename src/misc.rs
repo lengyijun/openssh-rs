@@ -94,7 +94,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
+
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -1579,7 +1579,7 @@ pub unsafe extern "C" fn parse_user_host_port(
     if !portp.is_null() {
         *portp = -(1 as libc::c_int);
     }
-    tmp = strdup(s);
+    tmp = libc::strdup(s);
     sdup = tmp;
     if sdup.is_null() {
         return -(1 as libc::c_int);
@@ -1590,7 +1590,7 @@ pub unsafe extern "C" fn parse_user_host_port(
         if *tmp as libc::c_int == '\0' as i32 {
             current_block = 13070338142174459458;
         } else {
-            user = strdup(tmp);
+            user = libc::strdup(tmp);
             if user.is_null() {
                 current_block = 13070338142174459458;
             } else {

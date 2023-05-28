@@ -4,7 +4,6 @@ extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __ctype_tolower_loc() -> *mut *const __int32_t;
 
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
@@ -328,7 +327,7 @@ unsafe extern "C" fn filter_list(
 ) -> *mut libc::c_char {
     let mut len: size_t = (strlen(proposal)).wrapping_add(1 as libc::c_int as libc::c_ulong);
     let mut fix_prop: *mut libc::c_char = libc::malloc(len as usize) as *mut libc::c_char;
-    let mut orig_prop: *mut libc::c_char = strdup(proposal);
+    let mut orig_prop: *mut libc::c_char = libc::strdup(proposal);
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;

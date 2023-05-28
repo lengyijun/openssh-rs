@@ -6,7 +6,6 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
 
-    fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
@@ -374,7 +373,7 @@ pub unsafe extern "C" fn ciphers_valid(mut names: *const libc::c_char) -> libc::
     {
         return 0 as libc::c_int;
     }
-    cp = strdup(names);
+    cp = libc::strdup(names);
     cipher_list = cp;
     if cipher_list.is_null() {
         return 0 as libc::c_int;
