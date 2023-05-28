@@ -11,7 +11,7 @@ extern "C" {
     pub type ec_key_st;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
 
-    fn getuid() -> __uid_t;
+    
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
     fn asprintf(__ptr: *mut *mut libc::c_char, __fmt: *const libc::c_char, _: ...) -> libc::c_int;
@@ -223,7 +223,7 @@ pub unsafe extern "C" fn sshkey_perm_ok(
     if libc::fstat(fd, &mut st) == -(1 as libc::c_int) {
         return -(24 as libc::c_int);
     }
-    if st.st_uid == getuid()
+    if st.st_uid == libc::getuid()
         && st.st_mode & 0o77 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint
     {
         crate::log::sshlog(

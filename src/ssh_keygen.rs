@@ -25,7 +25,7 @@ extern "C" {
     fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
 
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
-    fn getuid() -> __uid_t;
+    
     fn seed_rng();
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
@@ -8380,7 +8380,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         1 as libc::c_int,
     );
     msetlocale();
-    pw = getpwuid(getuid());
+    pw = getpwuid(libc::getuid());
     if pw.is_null() {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -8390,7 +8390,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"No user exists for uid %lu\0" as *const u8 as *const libc::c_char,
-            getuid() as u_long,
+            libc::getuid() as u_long,
         );
     }
     pw = pwcopy(pw);

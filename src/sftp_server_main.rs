@@ -3,7 +3,7 @@ extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-    fn getuid() -> __uid_t;
+    
     fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
     static mut stderr: *mut libc::FILE;
 
@@ -28,12 +28,12 @@ pub unsafe extern "C" fn cleanup_exit(mut i: libc::c_int) -> ! {
 unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> libc::c_int {
     let mut user_pw: *mut libc::passwd = 0 as *mut libc::passwd;
     crate::misc::sanitise_stdfd();
-    user_pw = getpwuid(getuid());
+    user_pw = getpwuid(libc::getuid());
     if user_pw.is_null() {
         libc::fprintf(
             stderr,
             b"No user found for uid %lu\n\0" as *const u8 as *const libc::c_char,
-            getuid() as u_long,
+            libc::getuid() as u_long,
         );
         return 1 as libc::c_int;
     }

@@ -11,7 +11,7 @@ extern "C" {
     pub type ec_key_st;
     pub type ssh_hmac_ctx;
 
-    fn getuid() -> __uid_t;
+    
     fn link(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn rename(__old: *const libc::c_char, __new: *const libc::c_char) -> libc::c_int;
@@ -962,7 +962,7 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
         return;
     }
     len = p.offset_from(filename) as libc::c_long as size_t;
-    dotsshdir = tilde_expand_filename(b"~/.ssh\0" as *const u8 as *const libc::c_char, getuid());
+    dotsshdir = tilde_expand_filename(b"~/.ssh\0" as *const u8 as *const libc::c_char, libc::getuid());
     if !(strlen(dotsshdir) > len || strncmp(filename, dotsshdir, len) != 0 as libc::c_int) {
         if !(libc::stat(dotsshdir, &mut st) == 0 as libc::c_int) {
             if *libc::__errno_location() != 2 as libc::c_int {

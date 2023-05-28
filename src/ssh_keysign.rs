@@ -11,7 +11,7 @@ extern "C" {
 
     fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
 
-    fn getuid() -> __uid_t;
+    
 
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -815,7 +815,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
         b"/usr/local/etc/ssh_host_rsa_key\0" as *const u8 as *const libc::c_char,
         0 as libc::c_int,
     );
-    pw = getpwuid(getuid());
+    pw = getpwuid(libc::getuid());
     if pw.is_null() {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,

@@ -26,7 +26,7 @@ extern "C" {
     fn closefrom(__lowfd: libc::c_int);
     fn dup(__fd: libc::c_int) -> libc::c_int;
     static mut environ: *mut *mut libc::c_char;
-    fn getuid() -> __uid_t;
+    
     fn seed_rng();
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
@@ -1163,7 +1163,7 @@ unsafe extern "C" fn tilde_expand_paths(mut paths: *mut *mut libc::c_char, mut n
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     i = 0 as libc::c_int as u_int;
     while i < num_paths {
-        cp = tilde_expand_filename(*paths.offset(i as isize), getuid());
+        cp = tilde_expand_filename(*paths.offset(i as isize), libc::getuid());
         libc::free(*paths.offset(i as isize) as *mut libc::c_void);
         let ref mut fresh0 = *paths.offset(i as isize);
         *fresh0 = cp;
@@ -2103,7 +2103,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     compat_init_setproctitle(ac, av);
     av = saved_av;
     seed_rng();
-    pw = getpwuid(getuid());
+    pw = getpwuid(libc::getuid());
     if pw.is_null() {
         crate::log::sshlog(
             b"ssh.c\0" as *const u8 as *const libc::c_char,
@@ -2113,7 +2113,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             SYSLOG_LEVEL_INFO,
             0 as *const libc::c_char,
             b"No user exists for uid %lu\0" as *const u8 as *const libc::c_char,
-            getuid() as u_long,
+            libc::getuid() as u_long,
         );
         libc::exit(255 as libc::c_int);
     }
@@ -2428,7 +2428,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     options.gss_deleg_creds = 1 as libc::c_int;
                 }
                 105 => {
-                    p = tilde_expand_filename(BSDoptarg, getuid());
+                    p = tilde_expand_filename(BSDoptarg, libc::getuid());
                     if libc::stat(p, &mut st) == -(1 as libc::c_int) {
                         libc::fprintf(
                             stderr,
@@ -3412,27 +3412,27 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         }
     }
     if !(options.control_path).is_null() {
-        cp = tilde_expand_filename(options.control_path, getuid());
+        cp = tilde_expand_filename(options.control_path, libc::getuid());
         libc::free(options.control_path as *mut libc::c_void);
         options.control_path = default_client_percent_dollar_expand(cp, cinfo);
         libc::free(cp as *mut libc::c_void);
     }
     if !(options.identity_agent).is_null() {
-        p = tilde_expand_filename(options.identity_agent, getuid());
+        p = tilde_expand_filename(options.identity_agent, libc::getuid());
         cp = default_client_percent_dollar_expand(p, cinfo);
         libc::free(p as *mut libc::c_void);
         libc::free(options.identity_agent as *mut libc::c_void);
         options.identity_agent = cp;
     }
     if !(options.revoked_host_keys).is_null() {
-        p = tilde_expand_filename(options.revoked_host_keys, getuid());
+        p = tilde_expand_filename(options.revoked_host_keys, libc::getuid());
         cp = default_client_percent_dollar_expand(p, cinfo);
         libc::free(p as *mut libc::c_void);
         libc::free(options.revoked_host_keys as *mut libc::c_void);
         options.revoked_host_keys = cp;
     }
     if !(options.forward_agent_sock_path).is_null() {
-        p = tilde_expand_filename(options.forward_agent_sock_path, getuid());
+        p = tilde_expand_filename(options.forward_agent_sock_path, libc::getuid());
         cp = default_client_percent_dollar_expand(p, cinfo);
         libc::free(p as *mut libc::c_void);
         libc::free(options.forward_agent_sock_path as *mut libc::c_void);
@@ -3502,7 +3502,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     j = 0 as libc::c_int as u_int;
     while j < options.num_user_hostfiles {
         if !(options.user_hostfiles[j as usize]).is_null() {
-            cp = tilde_expand_filename(options.user_hostfiles[j as usize], getuid());
+            cp = tilde_expand_filename(options.user_hostfiles[j as usize], libc::getuid());
             p = default_client_percent_dollar_expand(cp, cinfo);
             if strcmp(options.user_hostfiles[j as usize], p) != 0 as libc::c_int {
                 crate::log::sshlog(
@@ -5666,7 +5666,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
             libc::free(options.identity_files[i as usize] as *mut libc::c_void);
             options.identity_files[i as usize] = 0 as *mut libc::c_char;
         } else {
-            cp = tilde_expand_filename(options.identity_files[i as usize], getuid());
+            cp = tilde_expand_filename(options.identity_files[i as usize], libc::getuid());
             filename = default_client_percent_dollar_expand(cp, cinfo);
             libc::free(cp as *mut libc::c_void);
             check_load(
@@ -5780,7 +5780,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
     }
     i = 0 as libc::c_int;
     while i < options.num_certificate_files {
-        cp = tilde_expand_filename(options.certificate_files[i as usize], getuid());
+        cp = tilde_expand_filename(options.certificate_files[i as usize], libc::getuid());
         filename = default_client_percent_dollar_expand(cp, cinfo);
         libc::free(cp as *mut libc::c_void);
         check_load(

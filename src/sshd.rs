@@ -89,7 +89,7 @@ extern "C" {
     
     fn getpgid(__pid: __pid_t) -> __pid_t;
     fn setsid() -> __pid_t;
-    fn getuid() -> __uid_t;
+    
     fn geteuid() -> __uid_t;
     fn fork() -> __pid_t;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
@@ -4124,7 +4124,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         print_config(ssh, connection_info);
     }
     privsep_chroot = (use_privsep != 0
-        && (getuid() == 0 as libc::c_int as libc::c_uint
+        && (libc::getuid() == 0 as libc::c_int as libc::c_uint
             || geteuid() == 0 as libc::c_int as libc::c_uint)) as libc::c_int;
     privsep_pw = getpwnam(b"sshd\0" as *const u8 as *const libc::c_char);
     if privsep_pw.is_null() {

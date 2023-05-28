@@ -46,7 +46,7 @@ extern "C" {
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
     
-    fn getuid() -> __uid_t;
+    
     fn fork() -> __pid_t;
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
@@ -1041,7 +1041,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
     if iamremote != 0 {
         mode = MODE_SCP;
     }
-    userid = getuid();
+    userid = libc::getuid();
     pwd = getpwuid(userid);
     if pwd.is_null() {
         sshfatal(

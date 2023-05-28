@@ -12,7 +12,7 @@ extern "C" {
     pub type ec_key_st;
 
     fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
-    fn getuid() -> __uid_t;
+    
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
     fn BSDgetopt(
@@ -1576,7 +1576,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
     hostkeys = init_hostkeys();
     i = 0 as libc::c_int as size_t;
     while !(*hostkey_files.offset(i as isize)).is_null() {
-        path = tilde_expand_filename(*hostkey_files.offset(i as isize), getuid());
+        path = tilde_expand_filename(*hostkey_files.offset(i as isize), libc::getuid());
         crate::log::sshlog(
             b"ssh-add.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
@@ -2171,12 +2171,12 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
                     let mut st: libc::stat = unsafe { std::mem::zeroed() };
                     let mut count: libc::c_int = 0 as libc::c_int;
-                    pw = getpwuid(getuid());
+                    pw = getpwuid(libc::getuid());
                     if pw.is_null() {
                         libc::fprintf(
                             stderr,
                             b"No user found with uid %u\n\0" as *const u8 as *const libc::c_char,
-                            getuid(),
+                            libc::getuid(),
                         );
                         ret = 1 as libc::c_int;
                     } else {

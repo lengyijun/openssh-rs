@@ -6,7 +6,7 @@ extern "C" {
 
     fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
     fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
-    fn getuid() -> __uid_t;
+    
     fn geteuid() -> __uid_t;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn opendir(__name: *const libc::c_char) -> *mut DIR;
@@ -467,11 +467,11 @@ unsafe extern "C" fn globtilde(
     if *(patbuf as *mut libc::c_char).offset(0 as libc::c_int as isize) as libc::c_int
         == '\0' as i32
     {
-        if getuid() != geteuid() || {
+        if libc::getuid() != geteuid() || {
             h = getenv(b"HOME\0" as *const u8 as *const libc::c_char);
             h.is_null()
         } {
-            pwd = getpwuid(getuid());
+            pwd = getpwuid(libc::getuid());
             if pwd.is_null() {
                 return pattern;
             } else {

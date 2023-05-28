@@ -26,7 +26,7 @@ extern "C" {
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
     
-    fn getuid() -> __uid_t;
+    
     fn fork() -> __pid_t;
     fn gethostname(__name: *mut libc::c_char, __len: size_t) -> libc::c_int;
     fn getservbyname(__name: *const libc::c_char, __proto: *const libc::c_char) -> *mut servent;
@@ -6023,7 +6023,7 @@ unsafe extern "C" fn read_config_file_depth(
                 strerror(*libc::__errno_location()),
             );
         }
-        if sb.st_uid != 0 as libc::c_int as libc::c_uint && sb.st_uid != getuid()
+        if sb.st_uid != 0 as libc::c_int as libc::c_uint && sb.st_uid != libc::getuid()
             || sb.st_mode & 0o22 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint
         {
             sshfatal(

@@ -41,7 +41,7 @@ extern "C" {
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
     
-    fn getuid() -> __uid_t;
+    
     fn fork() -> __pid_t;
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
@@ -3493,7 +3493,7 @@ unsafe extern "C" fn parse_dispatch_command(
             if path1.is_null() || *path1 as libc::c_int == '\0' as i32 {
                 path1 = xstrdup(b"~\0" as *const u8 as *const libc::c_char);
             }
-            tmp = tilde_expand_filename(path1, getuid());
+            tmp = tilde_expand_filename(path1, libc::getuid());
             libc::free(path1 as *mut libc::c_void);
             path1 = tmp;
             if chdir(path1) == -(1 as libc::c_int) {

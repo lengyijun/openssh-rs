@@ -34,7 +34,7 @@ extern "C" {
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
-    fn getuid() -> __uid_t;
+    
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
     fn getaddrinfo(
@@ -5149,7 +5149,7 @@ unsafe extern "C" fn channel_post_mux_listener(mut ssh: *mut ssh, mut c: *mut Ch
         close(newsock);
         return;
     }
-    if euid != 0 as libc::c_int as libc::c_uint && getuid() != euid {
+    if euid != 0 as libc::c_int as libc::c_uint && libc::getuid() != euid {
         crate::log::sshlog(
             b"channels.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
@@ -5162,7 +5162,7 @@ unsafe extern "C" fn channel_post_mux_listener(mut ssh: *mut ssh, mut c: *mut Ch
             0 as *const libc::c_char,
             b"multiplex uid mismatch: peer euid %u != uid %u\0" as *const u8 as *const libc::c_char,
             euid,
-            getuid(),
+            libc::getuid(),
         );
         close(newsock);
         return;

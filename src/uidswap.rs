@@ -1,7 +1,7 @@
 use ::libc;
 extern "C" {
 
-    fn getuid() -> __uid_t;
+    
     fn geteuid() -> __uid_t;
     fn getgid() -> __gid_t;
     fn getegid() -> __gid_t;
@@ -296,7 +296,7 @@ pub unsafe extern "C" fn restore_uid() {
     temporarily_use_uid_effective = 0 as libc::c_int;
 }
 pub unsafe extern "C" fn permanently_set_uid(mut pw: *mut libc::passwd) {
-    let mut old_uid: uid_t = getuid();
+    let mut old_uid: uid_t = libc::getuid();
     let mut old_gid: gid_t = getgid();
     if pw.is_null() {
         sshfatal(
@@ -414,7 +414,7 @@ pub unsafe extern "C" fn permanently_set_uid(mut pw: *mut libc::passwd) {
                 .as_ptr(),
         );
     }
-    if getuid() != (*pw).pw_uid || geteuid() != (*pw).pw_uid {
+    if libc::getuid() != (*pw).pw_uid || geteuid() != (*pw).pw_uid {
         sshfatal(
             b"uidswap.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"permanently_set_uid\0"))
@@ -427,7 +427,7 @@ pub unsafe extern "C" fn permanently_set_uid(mut pw: *mut libc::passwd) {
                 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"permanently_set_uid\0"))
                 .as_ptr(),
-            getuid(),
+            libc::getuid(),
             geteuid(),
             (*pw).pw_uid,
         );

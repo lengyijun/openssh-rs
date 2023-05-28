@@ -3,7 +3,7 @@ extern "C" {
     fn oom_adjust_setup();
     fn oom_adjust_restore();
     fn geteuid() -> __uid_t;
-    fn getuid() -> __uid_t;
+    
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn auth_shadow_acctexpired(_: *mut spwd) -> libc::c_int;
@@ -39,7 +39,7 @@ pub unsafe extern "C" fn platform_post_fork_child() {
     oom_adjust_restore();
 }
 pub unsafe extern "C" fn platform_privileged_uidswap() -> libc::c_int {
-    return (getuid() == 0 as libc::c_int as libc::c_uint
+    return (libc::getuid() == 0 as libc::c_int as libc::c_uint
         || geteuid() == 0 as libc::c_int as libc::c_uint) as libc::c_int;
 }
 pub unsafe extern "C" fn platform_setusercontext(mut _pw: *mut libc::passwd) {}

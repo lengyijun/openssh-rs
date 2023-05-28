@@ -31,7 +31,7 @@ extern "C" {
     
     fn getppid() -> __pid_t;
     fn setsid() -> __pid_t;
-    fn getuid() -> __uid_t;
+    
     fn getgid() -> __gid_t;
     fn setgid(__gid: __gid_t) -> libc::c_int;
     fn accept(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __addr_len: *mut socklen_t)
@@ -4245,7 +4245,7 @@ unsafe extern "C" fn handle_socket_read(mut socknum: u_int) -> libc::c_int {
         close(fd);
         return -(1 as libc::c_int);
     }
-    if euid != 0 as libc::c_int as libc::c_uint && getuid() != euid {
+    if euid != 0 as libc::c_int as libc::c_uint && libc::getuid() != euid {
         crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"handle_socket_read\0"))
@@ -4256,7 +4256,7 @@ unsafe extern "C" fn handle_socket_read(mut socknum: u_int) -> libc::c_int {
             0 as *const libc::c_char,
             b"uid mismatch: peer euid %u != uid %u\0" as *const u8 as *const libc::c_char,
             euid,
-            getuid(),
+            libc::getuid(),
         );
         close(fd);
         return -(1 as libc::c_int);

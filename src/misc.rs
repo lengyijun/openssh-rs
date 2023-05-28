@@ -81,7 +81,7 @@ extern "C" {
     ) -> libc::c_int;
     fn setresuid(__ruid: __uid_t, __euid: __uid_t, __suid: __uid_t) -> libc::c_int;
     fn geteuid() -> __uid_t;
-    fn getuid() -> __uid_t;
+    
     fn getsid(__pid: __pid_t) -> __pid_t;
     fn getppid() -> __pid_t;
     
@@ -4602,7 +4602,7 @@ pub unsafe extern "C" fn subprocess(
         return 0 as libc::c_int;
     }
     if pw.is_null() && {
-        pw = getpwuid(getuid());
+        pw = getpwuid(libc::getuid());
         pw.is_null()
     } {
         crate::log::sshlog(

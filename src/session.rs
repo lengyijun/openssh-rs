@@ -74,7 +74,7 @@ extern "C" {
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     
     fn setsid() -> __pid_t;
-    fn getuid() -> __uid_t;
+    
     fn geteuid() -> __uid_t;
     fn setgid(__gid: __gid_t) -> libc::c_int;
     fn fork() -> __pid_t;
@@ -2650,7 +2650,7 @@ pub unsafe extern "C" fn do_setusercontext(mut pw: *mut libc::passwd) {
                 as *const libc::c_char,
         );
     }
-    if getuid() != (*pw).pw_uid || geteuid() != (*pw).pw_uid {
+    if libc::getuid() != (*pw).pw_uid || geteuid() != (*pw).pw_uid {
         sshfatal(
             b"session.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"do_setusercontext\0"))
@@ -4078,7 +4078,7 @@ pub unsafe extern "C" fn session_pty_cleanup2(mut s: *mut Session) {
     if (*s).pid != 0 as libc::c_int {
         record_logout((*s).pid, ((*s).tty).as_mut_ptr(), (*(*s).pw).pw_name);
     }
-    if getuid() == 0 as libc::c_int as libc::c_uint {
+    if libc::getuid() == 0 as libc::c_int as libc::c_uint {
         pty_release(((*s).tty).as_mut_ptr());
     }
     if (*s).ptymaster != -(1 as libc::c_int) && close((*s).ptymaster) == -(1 as libc::c_int) {
