@@ -70,9 +70,9 @@ extern "C" {
     fn getrlimit(__resource: __rlimit_resource_t, __rlimits: *mut rlimit) -> libc::c_int;
     fn statvfs(__file: *const libc::c_char, __buf: *mut statvfs) -> libc::c_int;
     fn fstatvfs(__fildes: libc::c_int, __buf: *mut statvfs) -> libc::c_int;
-    fn opendir(__name: *const libc::c_char) -> *mut DIR;
-    fn closedir(__dirp: *mut DIR) -> libc::c_int;
-    fn readdir(__dirp: *mut DIR) -> *mut dirent;
+    
+    fn closedir(__dirp: *mut libc::DIR) -> libc::c_int;
+    fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
 
     fn getgrgid(__gid: __gid_t) -> *mut group;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
@@ -281,7 +281,7 @@ pub struct dirent {
     pub d_type: libc::c_uchar,
     pub d_name: [libc::c_char; 256],
 }
-pub type DIR = __dirstream;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct group {
@@ -332,7 +332,7 @@ pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 #[repr(C)]
 pub struct Handle {
     pub use_0: libc::c_int,
-    pub dirp: *mut DIR,
+    pub dirp: *mut libc::DIR,
     pub fd: libc::c_int,
     pub flags: libc::c_int,
     pub name: *mut libc::c_char,
@@ -455,7 +455,7 @@ static mut handlers: [sftp_handler; 19] = unsafe {
         },
         {
             let mut init = sftp_handler {
-                name: b"opendir\0" as *const u8 as *const libc::c_char,
+                name: b"libc::opendir\0" as *const u8 as *const libc::c_char,
                 ext_name: 0 as *const libc::c_char,
                 type_0: 11 as libc::c_int as u_int,
                 handler: Some(process_opendir as unsafe extern "C" fn(u_int32_t) -> ()),
@@ -925,7 +925,7 @@ unsafe extern "C" fn handle_new(
     mut name: *const libc::c_char,
     mut fd: libc::c_int,
     mut flags: libc::c_int,
-    mut dirp: *mut DIR,
+    mut dirp: *mut libc::DIR,
 ) -> libc::c_int {
     let mut i: libc::c_int = 0;
     if first_unused_handle == -(1 as libc::c_int) {
@@ -994,11 +994,11 @@ unsafe extern "C" fn handle_to_name(mut handle: libc::c_int) -> *mut libc::c_cha
     }
     return 0 as *mut libc::c_char;
 }
-unsafe extern "C" fn handle_to_dir(mut handle: libc::c_int) -> *mut DIR {
+unsafe extern "C" fn handle_to_dir(mut handle: libc::c_int) -> *mut libc::DIR {
     if handle_is_ok(handle, HANDLE_DIR as libc::c_int) != 0 {
         return (*handles.offset(handle as isize)).dirp;
     }
-    return 0 as *mut DIR;
+    return 0 as *mut libc::DIR;
 }
 unsafe extern "C" fn handle_to_fd(mut handle: libc::c_int) -> libc::c_int {
     if handle_is_ok(handle, HANDLE_FILE as libc::c_int) != 0 {
@@ -1819,7 +1819,7 @@ unsafe extern "C" fn process_open(mut id: u_int32_t) {
         if fd == -(1 as libc::c_int) {
             status = errno_to_portable(*libc::__errno_location());
         } else {
-            handle = handle_new(HANDLE_FILE as libc::c_int, name, fd, flags, 0 as *mut DIR);
+            handle = handle_new(HANDLE_FILE as libc::c_int, name, fd, flags, 0 as *mut libc::DIR);
             if handle < 0 as libc::c_int {
                 close(fd);
             } else {
@@ -2534,7 +2534,7 @@ unsafe extern "C" fn process_fsetstat(mut id: u_int32_t) {
     send_status(id, status as u_int32_t);
 }
 unsafe extern "C" fn process_opendir(mut id: u_int32_t) {
-    let mut dirp: *mut DIR = 0 as *mut DIR;
+    let mut dirp: *mut libc::DIR = 0 as *mut libc::DIR;
     let mut path: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
     let mut handle: libc::c_int = 0;
@@ -2559,7 +2559,7 @@ unsafe extern "C" fn process_opendir(mut id: u_int32_t) {
         0 as libc::c_int,
         SYSLOG_LEVEL_DEBUG3,
         0 as *const libc::c_char,
-        b"request %u: opendir\0" as *const u8 as *const libc::c_char,
+        b"request %u: libc::opendir\0" as *const u8 as *const libc::c_char,
         id,
     );
     crate::log::sshlog(
@@ -2569,10 +2569,10 @@ unsafe extern "C" fn process_opendir(mut id: u_int32_t) {
         0 as libc::c_int,
         SYSLOG_LEVEL_INFO,
         0 as *const libc::c_char,
-        b"opendir \"%s\"\0" as *const u8 as *const libc::c_char,
+        b"libc::opendir \"%s\"\0" as *const u8 as *const libc::c_char,
         path,
     );
-    dirp = opendir(path);
+    dirp = libc::opendir(path);
     if dirp.is_null() {
         status = errno_to_portable(*libc::__errno_location());
     } else {
@@ -2596,7 +2596,7 @@ unsafe extern "C" fn process_opendir(mut id: u_int32_t) {
     libc::free(path as *mut libc::c_void);
 }
 unsafe extern "C" fn process_readdir(mut id: u_int32_t) {
-    let mut dirp: *mut DIR = 0 as *mut DIR;
+    let mut dirp: *mut libc::DIR = 0 as *mut libc::DIR;
     let mut dp: *mut dirent = 0 as *mut dirent;
     let mut path: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;

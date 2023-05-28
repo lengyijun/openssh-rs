@@ -9,9 +9,9 @@ extern "C" {
     
     fn geteuid() -> __uid_t;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn opendir(__name: *const libc::c_char) -> *mut DIR;
-    fn closedir(__dirp: *mut DIR) -> libc::c_int;
-    fn readdir(__dirp: *mut DIR) -> *mut dirent;
+    
+    fn closedir(__dirp: *mut libc::DIR) -> libc::c_int;
+    fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
     fn isalnum(_: libc::c_int) -> libc::c_int;
     fn isalpha(_: libc::c_int) -> libc::c_int;
     fn iscntrl(_: libc::c_int) -> libc::c_int;
@@ -94,7 +94,7 @@ pub struct glob_path_stat {
     pub gps_path: *mut libc::c_char,
     pub gps_stat: *mut libc::stat,
 }
-pub type DIR = __dirstream;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct cclass {
@@ -938,7 +938,7 @@ unsafe extern "C" fn glob3(
     mut limitp: *mut glob_lim,
 ) -> libc::c_int {
     let mut dp: *mut dirent = 0 as *mut dirent;
-    let mut dirp: *mut DIR = 0 as *mut DIR;
+    let mut dirp: *mut libc::DIR = 0 as *mut libc::DIR;
     let mut err: libc::c_int = 0;
     let mut buf: [libc::c_char; 4096] = [0; 4096];
     let mut readdirfunc: Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent> = None;
@@ -974,10 +974,10 @@ unsafe extern "C" fn glob3(
         readdirfunc = (*pglob).gl_readdir;
     } else {
         readdirfunc = ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut DIR) -> *mut dirent>,
+            Option<unsafe extern "C" fn(*mut libc::DIR) -> *mut dirent>,
             Option<unsafe extern "C" fn(*mut libc::c_void) -> *mut dirent>,
         >(Some(
-            readdir as unsafe extern "C" fn(*mut DIR) -> *mut dirent,
+            readdir as unsafe extern "C" fn(*mut libc::DIR) -> *mut dirent,
         ));
     }
     loop {
@@ -1395,7 +1395,7 @@ pub unsafe extern "C" fn _ssh__compat_globfree(mut pglob: *mut _ssh_compat_glob_
         (*pglob).gl_statv = 0 as *mut *mut libc::stat;
     }
 }
-unsafe extern "C" fn g_opendir(mut str: *mut Char, mut pglob: *mut _ssh_compat_glob_t) -> *mut DIR {
+unsafe extern "C" fn g_opendir(mut str: *mut Char, mut pglob: *mut _ssh_compat_glob_t) -> *mut libc::DIR {
     let mut buf: [libc::c_char; 4096] = [0; 4096];
     if *str == 0 {
         strlcpy(
@@ -1409,13 +1409,13 @@ unsafe extern "C" fn g_opendir(mut str: *mut Char, mut pglob: *mut _ssh_compat_g
         ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong,
     ) != 0
     {
-        return 0 as *mut DIR;
+        return 0 as *mut libc::DIR;
     }
     if (*pglob).gl_flags & 0x40 as libc::c_int != 0 {
         return (Some(((*pglob).gl_opendir).expect("non-null function pointer")))
-            .expect("non-null function pointer")(buf.as_mut_ptr()) as *mut DIR;
+            .expect("non-null function pointer")(buf.as_mut_ptr()) as *mut libc::DIR;
     }
-    return opendir(buf.as_mut_ptr());
+    return libc::opendir(buf.as_mut_ptr());
 }
 unsafe extern "C" fn g_lstat(
     mut fn_0: *mut Char,

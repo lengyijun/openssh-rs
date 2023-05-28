@@ -25,9 +25,9 @@ extern "C" {
 
     fn lstat(__file: *const libc::c_char, __buf: *mut libc::stat) -> libc::c_int;
     fn writev(__fd: libc::c_int, __iovec: *const iovec, __count: libc::c_int) -> ssize_t;
-    fn opendir(__name: *const libc::c_char) -> *mut DIR;
-    fn closedir(__dirp: *mut DIR) -> libc::c_int;
-    fn readdir(__dirp: *mut DIR) -> *mut dirent;
+    
+    fn closedir(__dirp: *mut libc::DIR) -> libc::c_int;
+    fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
@@ -187,7 +187,7 @@ pub struct dirent {
     pub d_type: libc::c_uchar,
     pub d_name: [libc::c_char; 256],
 }
-pub type DIR = __dirstream;
+
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;
 pub const SYSLOG_LEVEL_DEBUG3: LogLevel = 7;
@@ -5556,7 +5556,7 @@ unsafe extern "C" fn upload_dir_internal(
     mut inplace_flag: libc::c_int,
 ) -> libc::c_int {
     let mut ret: libc::c_int = 0 as libc::c_int;
-    let mut dirp: *mut DIR = 0 as *mut DIR;
+    let mut dirp: *mut libc::DIR = 0 as *mut libc::DIR;
     let mut dp: *mut dirent = 0 as *mut dirent;
     let mut filename: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut new_src: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -5667,7 +5667,7 @@ unsafe extern "C" fn upload_dir_internal(
         }
     }
     a.perm = saved_perm;
-    dirp = opendir(src);
+    dirp = libc::opendir(src);
     if dirp.is_null() {
         crate::log::sshlog(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -5677,7 +5677,7 @@ unsafe extern "C" fn upload_dir_internal(
             0 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"local opendir \"%s\": %s\0" as *const u8 as *const libc::c_char,
+            b"local libc::opendir \"%s\": %s\0" as *const u8 as *const libc::c_char,
             src,
             strerror(*libc::__errno_location()),
         );

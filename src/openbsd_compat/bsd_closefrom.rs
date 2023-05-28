@@ -9,17 +9,17 @@ extern "C" {
     fn close_range(__fd: libc::c_uint, __max_fd: libc::c_uint, __flags: libc::c_int)
         -> libc::c_int;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
-    fn opendir(__name: *const libc::c_char) -> *mut DIR;
-    fn closedir(__dirp: *mut DIR) -> libc::c_int;
-    fn readdir(__dirp: *mut DIR) -> *mut dirent;
-    fn dirfd(__dirp: *mut DIR) -> libc::c_int;
+    
+    fn closedir(__dirp: *mut libc::DIR) -> libc::c_int;
+    fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
+    fn dirfd(__dirp: *mut libc::DIR) -> libc::c_int;
 }
 pub type __ino_t = libc::c_ulong;
 pub type __off_t = libc::c_long;
 pub type __pid_t = libc::c_int;
 pub type size_t = libc::c_ulong;
 pub const _SC_OPEN_MAX: C2RustUnnamed = 4;
-pub type DIR = __dirstream;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct dirent {
@@ -266,7 +266,7 @@ pub unsafe extern "C" fn closefrom(mut lowfd: libc::c_int) {
     let mut fdpath: [libc::c_char; 4096] = [0; 4096];
     let mut endp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut dent: *mut dirent = 0 as *mut dirent;
-    let mut dirp: *mut DIR = 0 as *mut DIR;
+    let mut dirp: *mut libc::DIR = 0 as *mut libc::DIR;
     let mut len: libc::c_int = 0;
     if close_range(
         lowfd as libc::c_uint,
@@ -285,7 +285,7 @@ pub unsafe extern "C" fn closefrom(mut lowfd: libc::c_int) {
     if len > 0 as libc::c_int
         && (len as size_t) < ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong
         && {
-            dirp = opendir(fdpath.as_mut_ptr());
+            dirp = libc::opendir(fdpath.as_mut_ptr());
             !dirp.is_null()
         }
     {
