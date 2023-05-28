@@ -71,7 +71,7 @@ extern "C" {
     fn statvfs(__file: *const libc::c_char, __buf: *mut statvfs) -> libc::c_int;
     fn fstatvfs(__fildes: libc::c_int, __buf: *mut statvfs) -> libc::c_int;
     
-    fn closedir(__dirp: *mut libc::DIR) -> libc::c_int;
+    
     fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
 
     fn getgrgid(__gid: __gid_t) -> *mut group;
@@ -1049,7 +1049,7 @@ unsafe extern "C" fn handle_close(mut handle: libc::c_int) -> libc::c_int {
         libc::free((*handles.offset(handle as isize)).name as *mut libc::c_void);
         handle_unused(handle);
     } else if handle_is_ok(handle, HANDLE_DIR as libc::c_int) != 0 {
-        ret = closedir((*handles.offset(handle as isize)).dirp);
+        ret = libc::closedir((*handles.offset(handle as isize)).dirp);
         libc::free((*handles.offset(handle as isize)).name as *mut libc::c_void);
         handle_unused(handle);
     } else {
@@ -2584,7 +2584,7 @@ unsafe extern "C" fn process_opendir(mut id: u_int32_t) {
             dirp,
         );
         if handle < 0 as libc::c_int {
-            closedir(dirp);
+            libc::closedir(dirp);
         } else {
             send_handle(id, handle);
             status = 0 as libc::c_int;

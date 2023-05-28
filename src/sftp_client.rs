@@ -26,7 +26,7 @@ extern "C" {
     fn lstat(__file: *const libc::c_char, __buf: *mut libc::stat) -> libc::c_int;
     fn writev(__fd: libc::c_int, __iovec: *const iovec, __count: libc::c_int) -> ssize_t;
     
-    fn closedir(__dirp: *mut libc::DIR) -> libc::c_int;
+    
     fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -5786,7 +5786,7 @@ unsafe extern "C" fn upload_dir_internal(
     libc::free(new_dst as *mut libc::c_void);
     libc::free(new_src as *mut libc::c_void);
     do_setstat(conn, dst, &mut a);
-    closedir(dirp);
+    libc::closedir(dirp);
     return ret;
 }
 pub unsafe extern "C" fn upload_dir(

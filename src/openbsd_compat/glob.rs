@@ -10,7 +10,7 @@ extern "C" {
     fn geteuid() -> __uid_t;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     
-    fn closedir(__dirp: *mut libc::DIR) -> libc::c_int;
+    
     fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
     fn isalnum(_: libc::c_int) -> libc::c_int;
     fn isalpha(_: libc::c_int) -> libc::c_int;
@@ -1044,7 +1044,7 @@ unsafe extern "C" fn glob3(
         (Some(((*pglob).gl_closedir).expect("non-null function pointer")))
             .expect("non-null function pointer")(dirp as *mut libc::c_void);
     } else {
-        closedir(dirp);
+        libc::closedir(dirp);
     }
     return err;
 }

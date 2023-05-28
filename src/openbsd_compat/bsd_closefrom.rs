@@ -10,7 +10,7 @@ extern "C" {
         -> libc::c_int;
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
     
-    fn closedir(__dirp: *mut libc::DIR) -> libc::c_int;
+    
     fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
     fn dirfd(__dirp: *mut libc::DIR) -> libc::c_int;
 }
@@ -305,7 +305,7 @@ pub unsafe extern "C" fn closefrom(mut lowfd: libc::c_int) {
                 close(fd as libc::c_int);
             }
         }
-        closedir(dirp);
+        libc::closedir(dirp);
         return;
     }
     closefrom_fallback(lowfd);

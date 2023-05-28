@@ -58,7 +58,7 @@ extern "C" {
 
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     
-    fn closedir(__dirp: *mut libc::DIR) -> libc::c_int;
+    
     fn readdir(__dirp: *mut libc::DIR) -> *mut dirent;
     fn fnmatch(
         __pattern: *const libc::c_char,
@@ -2856,7 +2856,7 @@ pub unsafe extern "C" fn rsource(mut name: *mut libc::c_char, mut statp: *mut li
     }
     if pflag != 0 {
         if do_times(remout, verbose_mode, statp) < 0 as libc::c_int {
-            closedir(dirp);
+            libc::closedir(dirp);
             return;
         }
     }
@@ -2895,7 +2895,7 @@ pub unsafe extern "C" fn rsource(mut name: *mut libc::c_char, mut statp: *mut li
         strlen(path.as_mut_ptr()),
     );
     if response() < 0 as libc::c_int {
-        closedir(dirp);
+        libc::closedir(dirp);
         return;
     }
     loop {
@@ -2940,7 +2940,7 @@ pub unsafe extern "C" fn rsource(mut name: *mut libc::c_char, mut statp: *mut li
             source(1 as libc::c_int, vect.as_mut_ptr());
         }
     }
-    closedir(dirp);
+    libc::closedir(dirp);
     atomicio(
         ::core::mem::transmute::<
             Option<unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t>,
