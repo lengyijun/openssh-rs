@@ -76,7 +76,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-
     fn atomiciov6(
         f: Option<unsafe extern "C" fn(libc::c_int, *const iovec, libc::c_int) -> ssize_t>,
         fd: libc::c_int,

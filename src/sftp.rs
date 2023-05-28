@@ -37,7 +37,6 @@ extern "C" {
     fn getcwd(__buf: *mut libc::c_char, __size: size_t) -> *mut libc::c_char;
 
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
-    fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
@@ -4106,7 +4105,7 @@ unsafe extern "C" fn connect_to_server(
             ),
         );
         crate::misc::ssh_signal(15 as libc::c_int, None);
-        execvp(path, args as *const *mut libc::c_char);
+        libc::execvp(path, args as *const *const libc::c_char);
         libc::fprintf(
             stderr,
             b"exec: %s: %s\n\0" as *const u8 as *const libc::c_char,

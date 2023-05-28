@@ -26,7 +26,6 @@ extern "C" {
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn usleep(__useconds: __useconds_t) -> libc::c_int;
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
-    fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
     fn getppid() -> __pid_t;
     fn setsid() -> __pid_t;
@@ -5065,9 +5064,9 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 libc::perror(b"setenv\0" as *const u8 as *const libc::c_char);
                 libc::exit(1 as libc::c_int);
             }
-            execvp(
+            libc::execvp(
                 *av.offset(0 as libc::c_int as isize),
-                av as *const *mut libc::c_char,
+                av as *const *const libc::c_char,
             );
             libc::perror(*av.offset(0 as libc::c_int as isize));
             libc::exit(1 as libc::c_int);

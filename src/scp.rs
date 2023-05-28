@@ -41,8 +41,6 @@ extern "C" {
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
 
-    fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
-
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
@@ -76,7 +74,6 @@ extern "C" {
     fn xrecallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn xstrdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
-
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -332,9 +329,9 @@ unsafe extern "C" fn do_local_cmd(mut a: *mut arglist) -> libc::c_int {
         );
     }
     if pid == 0 as libc::c_int {
-        execvp(
+        libc::execvp(
             *((*a).list).offset(0 as libc::c_int as isize),
-            (*a).list as *const *mut libc::c_char,
+            (*a).list as *const *const libc::c_char,
         );
         libc::perror(*((*a).list).offset(0 as libc::c_int as isize));
         libc::exit(1 as libc::c_int);
@@ -516,7 +513,7 @@ pub unsafe extern "C" fn do_cmd(
                 b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 cmd_0,
             );
-            execvp(program, args.list as *const *mut libc::c_char);
+            libc::execvp(program, args.list as *const *const libc::c_char);
             libc::perror(program);
             libc::_exit(1 as libc::c_int);
         }
@@ -622,7 +619,7 @@ pub unsafe extern "C" fn do_cmd2(
             b"%s\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             cmd_0,
         );
-        execvp(ssh_program, args.list as *const *mut libc::c_char);
+        libc::execvp(ssh_program, args.list as *const *const libc::c_char);
         libc::perror(ssh_program);
         libc::exit(1 as libc::c_int);
     } else if pid == -(1 as libc::c_int) {
