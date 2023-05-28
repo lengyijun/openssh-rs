@@ -12,7 +12,7 @@ extern "C" {
         __termios_p: *const termios,
     ) -> libc::c_int;
 
-    fn getpid() -> __pid_t;
+    
 
     fn sigaction(
         __sig: libc::c_int,
@@ -485,7 +485,7 @@ pub unsafe extern "C" fn readpassphrase(
         i = 0 as libc::c_int;
         while i < 64 as libc::c_int + 1 as libc::c_int {
             if signo[i as usize] != 0 {
-                kill(getpid(), i);
+                kill(libc::getpid(), i);
                 match i {
                     20 | 21 | 22 => {
                         need_restart = 1 as libc::c_int;

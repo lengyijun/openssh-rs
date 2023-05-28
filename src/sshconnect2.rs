@@ -23,7 +23,7 @@ extern "C" {
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;
 
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
-    fn getpid() -> __pid_t;
+    
     fn fork() -> __pid_t;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
@@ -4180,7 +4180,7 @@ unsafe extern "C" fn ssh_keysign(
             SYSLOG_LEVEL_DEBUG3,
             0 as *const libc::c_char,
             b"[child] pid=%ld, exec %s\0" as *const u8 as *const libc::c_char,
-            getpid() as libc::c_long,
+            libc::getpid() as libc::c_long,
             b"/usr/local/libexec/ssh-keysign\0" as *const u8 as *const libc::c_char,
         );
         execl(

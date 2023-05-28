@@ -4,7 +4,7 @@ extern "C" {
     pub type __dirstream;
 
     fn sysconf(__name: libc::c_int) -> libc::c_long;
-    fn getpid() -> __pid_t;
+    
 
     fn close_range(__fd: libc::c_uint, __max_fd: libc::c_uint, __flags: libc::c_int)
         -> libc::c_int;
@@ -280,7 +280,7 @@ pub unsafe extern "C" fn closefrom(mut lowfd: libc::c_int) {
         fdpath.as_mut_ptr(),
         ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
         b"/proc/%ld/fd\0" as *const u8 as *const libc::c_char,
-        getpid() as libc::c_long,
+        libc::getpid() as libc::c_long,
     );
     if len > 0 as libc::c_int
         && (len as size_t) < ::core::mem::size_of::<[libc::c_char; 4096]>() as libc::c_ulong

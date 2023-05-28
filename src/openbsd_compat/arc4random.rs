@@ -10,7 +10,7 @@ extern "C" {
     ) -> *mut libc::c_void;
     fn munmap(__addr: *mut libc::c_void, __len: size_t) -> libc::c_int;
 
-    fn getpid() -> __pid_t;
+    
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
@@ -733,7 +733,7 @@ static mut _rs_forked: sig_atomic_t = 0;
 #[inline]
 unsafe extern "C" fn _rs_forkdetect() {
     static mut _rs_pid: pid_t = 0 as libc::c_int;
-    let mut pid: pid_t = getpid();
+    let mut pid: pid_t = libc::getpid();
     if _rs_pid == 0 as libc::c_int
         || _rs_pid == 1 as libc::c_int
         || _rs_pid != pid

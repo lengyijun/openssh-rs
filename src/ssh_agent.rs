@@ -28,7 +28,7 @@ extern "C" {
     fn chdir(__path: *const libc::c_char) -> libc::c_int;
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
-    fn getpid() -> __pid_t;
+    
     fn getppid() -> __pid_t;
     fn setsid() -> __pid_t;
     fn getuid() -> __uid_t;
@@ -4638,7 +4638,7 @@ unsafe extern "C" fn prepare_poll(
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn cleanup_socket() {
-    if cleanup_pid != 0 as libc::c_int && getpid() != cleanup_pid {
+    if cleanup_pid != 0 as libc::c_int && libc::getpid() != cleanup_pid {
         return;
     }
     crate::log::sshlog(
@@ -4956,7 +4956,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             + 1 as libc::c_int
             + 4 as libc::c_int) as libc::c_ulong,
     ) as u_int;
-    parent_pid = getpid();
+    parent_pid = libc::getpid();
     if agentsocket.is_null() {
         mktemp_proto(
             socket_dir.as_mut_ptr(),
@@ -5127,7 +5127,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             cleanup_exit(1 as libc::c_int);
         }
     }
-    cleanup_pid = getpid();
+    cleanup_pid = libc::getpid();
     pkcs11_init(0 as libc::c_int);
     new_socket(AUTH_SOCKET, sock);
     if ac > 0 as libc::c_int {

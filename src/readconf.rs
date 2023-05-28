@@ -25,7 +25,7 @@ extern "C" {
     fn closefrom(__lowfd: libc::c_int);
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
-    fn getpid() -> __pid_t;
+    
     fn getuid() -> __uid_t;
     fn fork() -> __pid_t;
     fn gethostname(__name: *mut libc::c_char, __len: size_t) -> libc::c_int;
@@ -1839,7 +1839,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             strerror(*libc::__errno_location()),
         );
         ssh_signal(15 as libc::c_int, None);
-        kill(getpid(), 15 as libc::c_int);
+        kill(libc::getpid(), 15 as libc::c_int);
         libc::_exit(1 as libc::c_int);
     }
     if pid == -(1 as libc::c_int) {

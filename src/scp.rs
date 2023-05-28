@@ -45,7 +45,7 @@ extern "C" {
 
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
-    fn getpid() -> __pid_t;
+    
     fn getuid() -> __uid_t;
     fn fork() -> __pid_t;
     fn isatty(__fd: libc::c_int) -> libc::c_int;
@@ -326,7 +326,7 @@ unsafe extern "C" fn suspone(mut pid: libc::c_int, mut signo: libc::c_int) {
 unsafe extern "C" fn suspchild(mut signo: libc::c_int) {
     suspone(do_cmd_pid, signo);
     suspone(do_cmd_pid2, signo);
-    kill(getpid(), 19 as libc::c_int);
+    kill(libc::getpid(), 19 as libc::c_int);
 }
 unsafe extern "C" fn do_local_cmd(mut a: *mut arglist) -> libc::c_int {
     let mut i: u_int = 0;

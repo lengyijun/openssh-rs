@@ -37,7 +37,7 @@ extern "C" {
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
-    fn getpid() -> __pid_t;
+    
     fn geteuid() -> __uid_t;
 
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
@@ -1169,7 +1169,7 @@ pub unsafe extern "C" fn record_failed_login(
         time(&mut t);
         ut.ut_tv.tv_sec = t as int32_t;
         ut.ut_type = 6 as libc::c_int as libc::c_short;
-        ut.ut_pid = getpid();
+        ut.ut_pid = libc::getpid();
         strncpy(
             (ut.ut_host).as_mut_ptr(),
             hostname,

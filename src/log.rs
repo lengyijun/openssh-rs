@@ -10,7 +10,7 @@ extern "C" {
 
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
 
-    fn getpid() -> __pid_t;
+    
     static mut stderr: *mut libc::FILE;
 
     fn vsnprintf(
@@ -728,7 +728,7 @@ pub unsafe extern "C" fn sshlogv(
         },
         func,
         line,
-        getpid() as libc::c_long,
+        libc::getpid() as libc::c_long,
     );
     i = 0 as libc::c_int as size_t;
     while i < nlog_verbose {

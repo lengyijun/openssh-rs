@@ -30,7 +30,7 @@ extern "C" {
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     static mut environ: *mut *mut libc::c_char;
-    fn getpid() -> __pid_t;
+    
     fn arc4random_uniform(_: uint32_t) -> uint32_t;
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
 
@@ -1776,7 +1776,7 @@ unsafe extern "C" fn mux_master_process_alive_check(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(reply, getpid() as u_int);
+            r = sshbuf_put_u32(reply, libc::getpid() as u_int);
             r != 0 as libc::c_int
         }
     {

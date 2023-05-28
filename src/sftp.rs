@@ -40,7 +40,7 @@ extern "C" {
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
     fn execvp(__file: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
-    fn getpid() -> __pid_t;
+    
     fn getuid() -> __uid_t;
     fn fork() -> __pid_t;
     fn isatty(__fd: libc::c_int) -> libc::c_int;
@@ -869,7 +869,7 @@ unsafe extern "C" fn suspchild(mut signo: libc::c_int) {
             && *libc::__errno_location() == 4 as libc::c_int
         {}
     }
-    kill(getpid(), 19 as libc::c_int);
+    kill(libc::getpid(), 19 as libc::c_int);
 }
 unsafe extern "C" fn cmd_interrupt(mut _signo: libc::c_int) {
     let msg: [libc::c_char; 14] =

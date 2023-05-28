@@ -72,7 +72,7 @@ extern "C" {
         __envp: *const *mut libc::c_char,
     ) -> libc::c_int;
     fn execl(__path: *const libc::c_char, __arg: *const libc::c_char, _: ...) -> libc::c_int;
-    fn getpid() -> __pid_t;
+    
     fn setsid() -> __pid_t;
     fn getuid() -> __uid_t;
     fn geteuid() -> __uid_t;
@@ -1041,7 +1041,7 @@ unsafe extern "C" fn auth_input_request_forwarding(
             &mut auth_sock_name as *mut *mut libc::c_char,
             b"%s/agent.%ld\0" as *const u8 as *const libc::c_char,
             auth_sock_dir,
-            getpid() as libc::c_long,
+            libc::getpid() as libc::c_long,
         );
         sock = unix_listener(auth_sock_name, 128 as libc::c_int, 0 as libc::c_int);
         restore_uid();
@@ -1771,7 +1771,7 @@ pub unsafe extern "C" fn do_login(
         __ss_align: 0,
     };
     let mut pw: *mut libc::passwd = (*s).pw;
-    let mut pid: pid_t = getpid();
+    let mut pid: pid_t = libc::getpid();
     memset(
         &mut from as *mut sockaddr_storage as *mut libc::c_void,
         0 as libc::c_int,

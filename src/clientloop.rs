@@ -54,7 +54,7 @@ extern "C" {
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn fork() -> __pid_t;
-    fn getpid() -> __pid_t;
+    
 
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
@@ -1749,7 +1749,7 @@ unsafe extern "C" fn client_suspend_self(
     sshbuf_reset(bin);
     sshbuf_reset(bout);
     sshbuf_reset(berr);
-    kill(getpid(), 20 as libc::c_int);
+    kill(libc::getpid(), 20 as libc::c_int);
     ::core::ptr::write_volatile(
         &mut received_window_change_signal as *mut sig_atomic_t,
         1 as libc::c_int,

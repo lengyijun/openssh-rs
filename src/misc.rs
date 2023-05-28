@@ -84,7 +84,7 @@ extern "C" {
     fn getuid() -> __uid_t;
     fn getsid(__pid: __pid_t) -> __pid_t;
     fn getppid() -> __pid_t;
-    fn getpid() -> __pid_t;
+    
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
@@ -3437,7 +3437,7 @@ pub unsafe extern "C" fn daemonized() -> libc::c_int {
     if getppid() != 1 as libc::c_int {
         return 0 as libc::c_int;
     }
-    if getsid(0 as libc::c_int) != getpid() {
+    if getsid(0 as libc::c_int) != libc::getpid() {
         return 0 as libc::c_int;
     }
     crate::log::sshlog(

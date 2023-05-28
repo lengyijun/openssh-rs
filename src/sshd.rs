@@ -86,7 +86,7 @@ extern "C" {
 
     fn execv(__path: *const libc::c_char, __argv: *const *mut libc::c_char) -> libc::c_int;
 
-    fn getpid() -> __pid_t;
+    
     fn getpgid(__pid: __pid_t) -> __pid_t;
     fn setsid() -> __pid_t;
     fn getuid() -> __uid_t;
@@ -1366,7 +1366,7 @@ unsafe extern "C" fn main_sigchld_handler(mut _sig: libc::c_int) {
     *libc::__errno_location() = save_errno;
 }
 unsafe extern "C" fn grace_alarm_handler(mut _sig: libc::c_int) {
-    if getpgid(0 as libc::c_int) == getpid() {
+    if getpgid(0 as libc::c_int) == libc::getpid() {
         ssh_signal(
             15 as libc::c_int,
             ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
@@ -3265,7 +3265,7 @@ unsafe extern "C" fn server_accept_loop(
                         close(startup_p[0 as libc::c_int as usize]);
                         close(startup_p[1 as libc::c_int as usize]);
                         startup_pipe = -(1 as libc::c_int);
-                        pid = getpid();
+                        pid = libc::getpid();
                         if rexec_flag != 0 {
                             send_rexec_state(*config_s.offset(0 as libc::c_int as isize), cfg);
                             close(*config_s.offset(0 as libc::c_int as isize));
@@ -4707,7 +4707,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 libc::fprintf(
                     f,
                     b"%ld\n\0" as *const u8 as *const libc::c_char,
-                    getpid() as libc::c_long,
+                    libc::getpid() as libc::c_long,
                 );
                 fclose(f);
             }
