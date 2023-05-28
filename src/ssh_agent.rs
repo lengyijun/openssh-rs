@@ -65,12 +65,7 @@ extern "C" {
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn getpeereid(_: libc::c_int, _: *mut uid_t, _: *mut gid_t) -> libc::c_int;
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
-    fn strtonum(
-        _: *const libc::c_char,
-        _: libc::c_longlong,
-        _: libc::c_longlong,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_longlong;
+
     fn timingsafe_bcmp(_: *const libc::c_void, _: *const libc::c_void, _: size_t) -> libc::c_int;
     fn bcrypt_pbkdf(
         _: *const libc::c_char,
@@ -4890,7 +4885,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             );
             libc::exit(1 as libc::c_int);
         }
-        pid = strtonum(
+        pid = crate::openbsd_compat::strtonum::strtonum(
             pidstr,
             2 as libc::c_int as libc::c_longlong,
             2147483647 as libc::c_int as libc::c_longlong,

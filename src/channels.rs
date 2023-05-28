@@ -57,12 +57,7 @@ extern "C" {
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn getpeereid(_: libc::c_int, _: *mut uid_t, _: *mut gid_t) -> libc::c_int;
-    fn strtonum(
-        _: *const libc::c_char,
-        _: libc::c_longlong,
-        _: libc::c_longlong,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_longlong;
+
     fn timingsafe_bcmp(_: *const libc::c_void, _: *const libc::c_void, _: size_t) -> libc::c_int;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
@@ -10735,7 +10730,7 @@ pub unsafe extern "C" fn x11_request_forwarding_with_spoofing(
         cp = strchr(cp, '.' as i32);
     }
     if !cp.is_null() {
-        screen_number = strtonum(
+        screen_number = crate::openbsd_compat::strtonum::strtonum(
             cp.offset(1 as libc::c_int as isize),
             0 as libc::c_int as libc::c_longlong,
             400 as libc::c_int as libc::c_longlong,

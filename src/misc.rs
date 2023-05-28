@@ -68,12 +68,7 @@ extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
-    fn strtonum(
-        _: *const libc::c_char,
-        _: libc::c_longlong,
-        _: libc::c_longlong,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_longlong;
+
     fn sys_tun_open(_: libc::c_int, _: libc::c_int, _: *mut *mut libc::c_char) -> libc::c_int;
     fn sys_get_rdomain(fd: libc::c_int) -> *mut libc::c_char;
     fn sys_set_rdomain(fd: libc::c_int, name: *const libc::c_char) -> libc::c_int;
@@ -1208,7 +1203,7 @@ pub unsafe extern "C" fn a2port(mut s: *const libc::c_char) -> libc::c_int {
     let mut se: *mut servent = 0 as *mut servent;
     let mut port: libc::c_longlong = 0;
     let mut errstr: *const libc::c_char = 0 as *const libc::c_char;
-    port = strtonum(
+    port = crate::openbsd_compat::strtonum::strtonum(
         s,
         0 as libc::c_int as libc::c_longlong,
         65535 as libc::c_int as libc::c_longlong,
@@ -1254,7 +1249,7 @@ pub unsafe extern "C" fn a2tun(
     if strcasecmp(s, b"any\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 0x7fffffff as libc::c_int;
     }
-    tun = strtonum(
+    tun = crate::openbsd_compat::strtonum::strtonum(
         s,
         0 as libc::c_int as libc::c_longlong,
         (0x7fffffff as libc::c_int - 2 as libc::c_int) as libc::c_longlong,
@@ -4181,7 +4176,7 @@ pub unsafe extern "C" fn atoi_err(
     if nptr.is_null() || *nptr as libc::c_int == '\0' as i32 {
         return b"missing\0" as *const u8 as *const libc::c_char;
     }
-    num = strtonum(
+    num = crate::openbsd_compat::strtonum::strtonum(
         nptr,
         0 as libc::c_int as libc::c_longlong,
         2147483647 as libc::c_int as libc::c_longlong,

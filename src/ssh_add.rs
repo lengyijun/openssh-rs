@@ -42,12 +42,7 @@ extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
-    fn strtonum(
-        _: *const libc::c_char,
-        _: libc::c_longlong,
-        _: libc::c_longlong,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_longlong;
+
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn seed_rng();
 
@@ -1961,7 +1956,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 confirm = 1 as libc::c_int;
             }
             109 => {
-                minleft = strtonum(
+                minleft = crate::openbsd_compat::strtonum::strtonum(
                     BSDoptarg,
                     1 as libc::c_int as libc::c_longlong,
                     (2147483647 as libc::c_int as libc::c_uint)
@@ -1978,7 +1973,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 break;
             }
             77 => {
-                maxsign = strtonum(
+                maxsign = crate::openbsd_compat::strtonum::strtonum(
                     BSDoptarg,
                     1 as libc::c_int as libc::c_longlong,
                     (2147483647 as libc::c_int as libc::c_uint)

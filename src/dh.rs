@@ -16,12 +16,7 @@ extern "C" {
     ) -> __ssize_t;
     fn rewind(__stream: *mut libc::FILE);
     fn arc4random_uniform(_: uint32_t) -> uint32_t;
-    fn strtonum(
-        _: *const libc::c_char,
-        _: libc::c_longlong,
-        _: libc::c_longlong,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_longlong;
+
 
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
@@ -132,7 +127,7 @@ unsafe extern "C" fn parse_prime(
         if cp.is_null() || *arg as libc::c_int == '\0' as i32 {
             current_block = 12731601281199319562;
         } else {
-            n = strtonum(
+            n = crate::openbsd_compat::strtonum::strtonum(
                 arg,
                 0 as libc::c_int as libc::c_longlong,
                 5 as libc::c_int as libc::c_longlong,
@@ -157,7 +152,7 @@ unsafe extern "C" fn parse_prime(
                 if cp.is_null() || *arg as libc::c_int == '\0' as i32 {
                     current_block = 12731601281199319562;
                 } else {
-                    n = strtonum(
+                    n = crate::openbsd_compat::strtonum::strtonum(
                         arg,
                         0 as libc::c_int as libc::c_longlong,
                         0x1f as libc::c_int as libc::c_longlong,
@@ -187,7 +182,7 @@ unsafe extern "C" fn parse_prime(
                         if cp.is_null() || *arg as libc::c_int == '\0' as i32 {
                             current_block = 12731601281199319562;
                         } else {
-                            n = strtonum(
+                            n = crate::openbsd_compat::strtonum::strtonum(
                                 arg,
                                 0 as libc::c_int as libc::c_longlong,
                                 ((1 as libc::c_int) << 30 as libc::c_int) as libc::c_longlong,
@@ -215,7 +210,7 @@ unsafe extern "C" fn parse_prime(
                                 if cp.is_null()
                                     || *strsize as libc::c_int == '\0' as i32
                                     || {
-                                        (*dhg).size = strtonum(
+                                        (*dhg).size = crate::openbsd_compat::strtonum::strtonum(
                                             strsize,
                                             0 as libc::c_int as libc::c_longlong,
                                             (64 as libc::c_int * 1024 as libc::c_int)

@@ -35,12 +35,7 @@ extern "C" {
         __shortopts: *const libc::c_char,
     ) -> libc::c_int;
     fn freezero(_: *mut libc::c_void, _: size_t);
-    fn strtonum(
-        _: *const libc::c_char,
-        _: libc::c_longlong,
-        _: libc::c_longlong,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_longlong;
+
     
     static mut stdin: *mut libc::FILE;
     static mut stdout: *mut libc::FILE;
@@ -7563,7 +7558,7 @@ unsafe extern "C" fn do_moduli_gen(
             7 as libc::c_int as libc::c_ulong,
         ) == 0 as libc::c_int
         {
-            memory = strtonum(
+            memory = crate::openbsd_compat::strtonum::strtonum(
                 (*opts.offset(i as isize)).offset(7 as libc::c_int as isize),
                 1 as libc::c_int as libc::c_longlong,
                 (2147483647 as libc::c_int as libc::c_uint)
@@ -7613,7 +7608,7 @@ unsafe extern "C" fn do_moduli_gen(
             5 as libc::c_int as libc::c_ulong,
         ) == 0 as libc::c_int
         {
-            moduli_bits = strtonum(
+            moduli_bits = crate::openbsd_compat::strtonum::strtonum(
                 (*opts.offset(i as isize)).offset(5 as libc::c_int as isize),
                 1 as libc::c_int as libc::c_longlong,
                 2147483647 as libc::c_int as libc::c_longlong,
@@ -7740,7 +7735,7 @@ unsafe extern "C" fn do_moduli_screen(
             10 as libc::c_int as libc::c_ulong,
         ) == 0 as libc::c_int
         {
-            generator_wanted = strtonum(
+            generator_wanted = crate::openbsd_compat::strtonum::strtonum(
                 (*opts.offset(i as isize)).offset(10 as libc::c_int as isize),
                 1 as libc::c_int as libc::c_longlong,
                 (2147483647 as libc::c_int as libc::c_uint)
@@ -7770,7 +7765,7 @@ unsafe extern "C" fn do_moduli_screen(
             12 as libc::c_int as libc::c_ulong,
         ) == 0 as libc::c_int
         {
-            prime_tests = strtonum(
+            prime_tests = crate::openbsd_compat::strtonum::strtonum(
                 (*opts.offset(i as isize)).offset(12 as libc::c_int as isize),
                 1 as libc::c_int as libc::c_longlong,
                 2147483647 as libc::c_int as libc::c_longlong,
@@ -8446,7 +8441,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 gen_all_hostkeys = 1 as libc::c_int;
             }
             98 => {
-                bits = strtonum(
+                bits = crate::openbsd_compat::strtonum::strtonum(
                     BSDoptarg,
                     1 as libc::c_int as libc::c_longlong,
                     4294967295 as libc::c_uint as libc::c_longlong,
@@ -8662,7 +8657,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 rr_hostname = BSDoptarg;
             }
             97 => {
-                rounds = strtonum(
+                rounds = crate::openbsd_compat::strtonum::strtonum(
                     BSDoptarg,
                     1 as libc::c_int as libc::c_longlong,
                     2147483647 as libc::c_int as libc::c_longlong,

@@ -78,12 +78,7 @@ extern "C" {
     fn scan_scaled(_: *mut libc::c_char, _: *mut libc::c_longlong) -> libc::c_int;
     static mut BSDoptreset: libc::c_int;
     
-    fn strtonum(
-        _: *const libc::c_char,
-        _: libc::c_longlong,
-        _: libc::c_longlong,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_longlong;
+
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
@@ -4370,7 +4365,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 sftp_direct = BSDoptarg;
             }
             108 => {
-                limit_kbps = strtonum(
+                limit_kbps = crate::openbsd_compat::strtonum::strtonum(
                     BSDoptarg,
                     1 as libc::c_int as libc::c_longlong,
                     (100 as libc::c_int * 1024 as libc::c_int * 1024 as libc::c_int)
@@ -4451,7 +4446,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     10 as libc::c_int as libc::c_ulong,
                 ) == 0 as libc::c_int
                 {
-                    llv = strtonum(
+                    llv = crate::openbsd_compat::strtonum::strtonum(
                         BSDoptarg.offset(10 as libc::c_int as isize),
                         1 as libc::c_int as libc::c_longlong,
                         (256 as libc::c_int * 1024 as libc::c_int) as libc::c_longlong,

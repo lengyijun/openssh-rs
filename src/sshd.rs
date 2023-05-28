@@ -123,12 +123,7 @@ extern "C" {
     ) -> libc::c_int;
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
     fn arc4random_uniform(_: uint32_t) -> uint32_t;
-    fn strtonum(
-        _: *const libc::c_char,
-        _: libc::c_longlong,
-        _: libc::c_longlong,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_longlong;
+
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn seed_rng();
     fn waitpid(__pid: __pid_t, __stat_loc: *mut libc::c_int, __options: libc::c_int) -> __pid_t;
@@ -3881,7 +3876,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 current_block_66 = 7178192492338286402;
             }
             117 => {
-                utmp_len = strtonum(
+                utmp_len = crate::openbsd_compat::strtonum::strtonum(
                     BSDoptarg,
                     0 as libc::c_int as libc::c_longlong,
                     (64 as libc::c_int + 1 as libc::c_int + 1 as libc::c_int) as libc::c_longlong,
