@@ -133,7 +133,7 @@ extern "C" {
     ) -> libc::c_int;
     fn unsetenv(__name: *const libc::c_char) -> libc::c_int;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
@@ -4152,7 +4152,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
     ) as *mut *mut sshkey;
     if !(options.host_key_agent).is_null() {
-        if strcmp(
+        if libc::strcmp(
             options.host_key_agent,
             b"SSH_AUTH_SOCK\0" as *const u8 as *const libc::c_char,
         ) != 0

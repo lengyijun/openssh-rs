@@ -41,7 +41,7 @@ extern "C" {
     fn link(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
@@ -1935,7 +1935,7 @@ unsafe extern "C" fn compare_host(
     if a.is_null() || b.is_null() {
         return 0 as libc::c_int;
     }
-    return (strcmp(a, b) == 0 as libc::c_int) as libc::c_int;
+    return (libc::strcmp(a, b) == 0 as libc::c_int) as libc::c_int;
 }
 unsafe extern "C" fn compare_forward(mut a: *mut Forward, mut b: *mut Forward) -> libc::c_int {
     if compare_host((*a).listen_host, (*b).listen_host) == 0 {

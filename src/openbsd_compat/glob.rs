@@ -29,7 +29,7 @@ extern "C" {
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn qsort(__base: *mut libc::c_void, __nmemb: size_t, __size: size_t, __compar: __compar_fn_t);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strnlen(__string: *const libc::c_char, __maxlen: size_t) -> size_t;
 }
 pub type __u_char = libc::c_uchar;
@@ -776,7 +776,7 @@ unsafe extern "C" fn compare(
     mut p: *const libc::c_void,
     mut q: *const libc::c_void,
 ) -> libc::c_int {
-    return strcmp(
+    return libc::strcmp(
         *(p as *mut *mut libc::c_char),
         *(q as *mut *mut libc::c_char),
     );
@@ -787,7 +787,7 @@ unsafe extern "C" fn compare_gps(
 ) -> libc::c_int {
     let mut p: *const glob_path_stat = _p as *const glob_path_stat;
     let mut q: *const glob_path_stat = _q as *const glob_path_stat;
-    return strcmp((*p).gps_path, (*q).gps_path);
+    return libc::strcmp((*p).gps_path, (*q).gps_path);
 }
 unsafe extern "C" fn glob1(
     mut pattern: *mut Char,

@@ -10,7 +10,6 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -259,40 +258,42 @@ unsafe extern "C" fn cert_option_list(
                 );
                 found = 0 as libc::c_int;
                 if which & 2 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint {
-                    if strcmp(
+                    if libc::strcmp(
                         name,
                         b"no-touch-required\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
                     {
                         (*opts).no_require_user_presence = 1 as libc::c_int;
                         found = 1 as libc::c_int;
-                    } else if strcmp(
+                    } else if libc::strcmp(
                         name,
                         b"permit-X11-forwarding\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
                     {
                         (*opts).permit_x11_forwarding_flag = 1 as libc::c_int;
                         found = 1 as libc::c_int;
-                    } else if strcmp(
+                    } else if libc::strcmp(
                         name,
                         b"permit-agent-forwarding\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
                     {
                         (*opts).permit_agent_forwarding_flag = 1 as libc::c_int;
                         found = 1 as libc::c_int;
-                    } else if strcmp(
+                    } else if libc::strcmp(
                         name,
                         b"permit-port-forwarding\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
                     {
                         (*opts).permit_port_forwarding_flag = 1 as libc::c_int;
                         found = 1 as libc::c_int;
-                    } else if strcmp(name, b"permit-pty\0" as *const u8 as *const libc::c_char)
-                        == 0 as libc::c_int
+                    } else if libc::strcmp(
+                        name,
+                        b"permit-pty\0" as *const u8 as *const libc::c_char,
+                    ) == 0 as libc::c_int
                     {
                         (*opts).permit_pty_flag = 1 as libc::c_int;
                         found = 1 as libc::c_int;
-                    } else if strcmp(
+                    } else if libc::strcmp(
                         name,
                         b"permit-user-rc\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
@@ -304,15 +305,17 @@ unsafe extern "C" fn cert_option_list(
                 if found == 0
                     && which & 1 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint
                 {
-                    if strcmp(
+                    if libc::strcmp(
                         name,
                         b"verify-required\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
                     {
                         (*opts).require_verify = 1 as libc::c_int;
                         found = 1 as libc::c_int;
-                    } else if strcmp(name, b"force-command\0" as *const u8 as *const libc::c_char)
-                        == 0 as libc::c_int
+                    } else if libc::strcmp(
+                        name,
+                        b"force-command\0" as *const u8 as *const libc::c_char,
+                    ) == 0 as libc::c_int
                     {
                         r = sshbuf_get_cstring(data, &mut command, 0 as *mut size_t);
                         if r != 0 as libc::c_int {
@@ -353,7 +356,7 @@ unsafe extern "C" fn cert_option_list(
                             (*opts).force_command = command;
                             found = 1 as libc::c_int;
                         }
-                    } else if strcmp(
+                    } else if libc::strcmp(
                         name,
                         b"source-address\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
@@ -596,7 +599,7 @@ unsafe extern "C" fn handle_permit(
         return -(1 as libc::c_int);
     }
     if cp.is_null()
-        || strcmp(cp, b"*\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
+        || libc::strcmp(cp, b"*\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
             && crate::misc::a2port(cp) <= 0 as libc::c_int
     {
         libc::free(tmp as *mut libc::c_void);
@@ -1265,7 +1268,7 @@ pub unsafe extern "C" fn sshauthopt_merge(
                                         if !((*primary).force_command).is_null()
                                             && !((*additional).force_command).is_null()
                                         {
-                                            if strcmp(
+                                            if libc::strcmp(
                                                 (*primary).force_command,
                                                 (*additional).force_command,
                                             ) == 0 as libc::c_int

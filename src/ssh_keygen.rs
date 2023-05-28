@@ -100,7 +100,7 @@ extern "C" {
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn PEM_read_PUBKEY(
@@ -960,7 +960,8 @@ unsafe extern "C" fn ask_filename(mut pw: *mut libc::passwd, mut prompt: *const 
         buf.as_mut_ptr(),
         b"\n\0" as *const u8 as *const libc::c_char,
     ) as usize] = '\0' as i32 as libc::c_char;
-    if strcmp(buf.as_mut_ptr(), b"\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int {
+    if libc::strcmp(buf.as_mut_ptr(), b"\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
+    {
         strlcpy(
             identity_file.as_mut_ptr(),
             buf.as_mut_ptr(),
@@ -1475,7 +1476,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut sshbuf) -> *mut sshkey 
         i3,
         i4,
     );
-    if strcmp(cipher, b"none\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int {
+    if libc::strcmp(cipher, b"none\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int {
         crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 24], &[libc::c_char; 24]>(
@@ -2673,7 +2674,7 @@ unsafe extern "C" fn do_fingerprint(mut pw: *mut libc::passwd) {
         );
     }
     path = identity_file.as_mut_ptr();
-    if strcmp(
+    if libc::strcmp(
         identity_file.as_mut_ptr(),
         b"-\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -2709,7 +2710,7 @@ unsafe extern "C" fn do_fingerprint(mut pw: *mut libc::passwd) {
             continue;
         }
         if lnum == 1 as libc::c_int as libc::c_ulong
-            && strcmp(
+            && libc::strcmp(
                 identity_file.as_mut_ptr(),
                 b"-\0" as *const u8 as *const libc::c_char,
             ) != 0 as libc::c_int
@@ -3759,7 +3760,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut libc::passwd) {
             b"Enter same passphrase again: \0" as *const u8 as *const libc::c_char,
             0x2 as libc::c_int,
         );
-        if strcmp(passphrase1, passphrase2) != 0 as libc::c_int {
+        if libc::strcmp(passphrase1, passphrase2) != 0 as libc::c_int {
             explicit_bzero(passphrase1 as *mut libc::c_void, strlen(passphrase1));
             explicit_bzero(passphrase2 as *mut libc::c_void, strlen(passphrase2));
             libc::free(passphrase1 as *mut libc::c_void);
@@ -4053,7 +4054,7 @@ unsafe extern "C" fn do_change_comment(
             b"\n\0" as *const u8 as *const libc::c_char,
         ) as usize] = '\0' as i32 as libc::c_char;
     }
-    if !comment.is_null() && strcmp(comment, new_comment.as_mut_ptr()) == 0 as libc::c_int {
+    if !comment.is_null() && libc::strcmp(comment, new_comment.as_mut_ptr()) == 0 as libc::c_int {
         printf(b"No change to comment\n\0" as *const u8 as *const libc::c_char);
         libc::free(passphrase as *mut libc::c_void);
         sshkey_free(private);
@@ -4168,7 +4169,7 @@ unsafe extern "C" fn cert_ext_cmp(
             1 as libc::c_int
         };
     }
-    r = strcmp((*a).key, (*b).key);
+    r = libc::strcmp((*a).key, (*b).key);
     if r != 0 as libc::c_int {
         return r;
     }
@@ -4182,7 +4183,7 @@ unsafe extern "C" fn cert_ext_cmp(
         };
     }
     if !((*a).val).is_null() && {
-        r = strcmp((*a).val, (*b).val);
+        r = libc::strcmp((*a).val, (*b).val);
         r != 0 as libc::c_int
     } {
         return r;
@@ -4798,7 +4799,7 @@ unsafe extern "C" fn do_ca_sign(
         }
         cp = strrchr(tmp, '.' as i32);
         if !cp.is_null()
-            && strcmp(cp, b".pub\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+            && libc::strcmp(cp, b".pub\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
         {
             *cp = '\0' as i32 as libc::c_char;
         }
@@ -4993,7 +4994,9 @@ unsafe extern "C" fn parse_cert_times(mut timespec: *mut libc::c_char) {
     *fresh5 = '\0' as i32 as libc::c_char;
     if *from as libc::c_int == '-' as i32 || *from as libc::c_int == '+' as i32 {
         cert_valid_from = parse_relative_time(from, now);
-    } else if strcmp(from, b"always\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    } else if libc::strcmp(from, b"always\0" as *const u8 as *const libc::c_char)
+        == 0 as libc::c_int
+    {
         cert_valid_from = 0 as libc::c_int as u_int64_t;
     } else if strncmp(
         from,
@@ -5017,7 +5020,8 @@ unsafe extern "C" fn parse_cert_times(mut timespec: *mut libc::c_char) {
     }
     if *to as libc::c_int == '-' as i32 || *to as libc::c_int == '+' as i32 {
         cert_valid_to = parse_relative_time(to, now);
-    } else if strcmp(to, b"forever\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    } else if libc::strcmp(to, b"forever\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+    {
         cert_valid_to = !(0 as libc::c_int as u_int64_t);
     } else if strncmp(
         to,
@@ -5287,34 +5291,34 @@ unsafe extern "C" fn show_options(mut optbuf: *mut sshbuf, mut in_critical: libc
             name,
         );
         if in_critical == 0
-            && (strcmp(
+            && (libc::strcmp(
                 name,
                 b"permit-X11-forwarding\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
-                || strcmp(
+                || libc::strcmp(
                     name,
                     b"permit-agent-forwarding\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int
-                || strcmp(
+                || libc::strcmp(
                     name,
                     b"permit-port-forwarding\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int
-                || strcmp(name, b"permit-pty\0" as *const u8 as *const libc::c_char)
+                || libc::strcmp(name, b"permit-pty\0" as *const u8 as *const libc::c_char)
                     == 0 as libc::c_int
-                || strcmp(
+                || libc::strcmp(
                     name,
                     b"permit-user-rc\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int
-                || strcmp(
+                || libc::strcmp(
                     name,
                     b"no-touch-required\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int)
         {
             printf(b"\n\0" as *const u8 as *const libc::c_char);
         } else if in_critical != 0
-            && (strcmp(name, b"force-command\0" as *const u8 as *const libc::c_char)
+            && (libc::strcmp(name, b"force-command\0" as *const u8 as *const libc::c_char)
                 == 0 as libc::c_int
-                || strcmp(
+                || libc::strcmp(
                     name,
                     b"source-address\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int)
@@ -5335,7 +5339,7 @@ unsafe extern "C" fn show_options(mut optbuf: *mut sshbuf, mut in_critical: libc
             printf(b" %s\n\0" as *const u8 as *const libc::c_char, arg);
             libc::free(arg as *mut libc::c_void);
         } else if in_critical != 0
-            && strcmp(
+            && libc::strcmp(
                 name,
                 b"verify-required\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
@@ -5473,7 +5477,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut libc::passwd) {
             b"Enter file in which the key is\0" as *const u8 as *const libc::c_char,
         );
     }
-    if strcmp(
+    if libc::strcmp(
         identity_file.as_mut_ptr(),
         b"-\0" as *const u8 as *const libc::c_char,
     ) != 0 as libc::c_int
@@ -5493,7 +5497,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut libc::passwd) {
         );
     }
     path = identity_file.as_mut_ptr();
-    if strcmp(path, b"-\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(path, b"-\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         f = stdin;
         path = b"(stdin)\0" as *const u8 as *const libc::c_char;
         is_stdin = 1 as libc::c_int;
@@ -5734,7 +5738,7 @@ unsafe extern "C" fn update_krl_from_file(
     let mut r: libc::c_int = 0;
     let mut krl_spec: *mut libc::FILE = 0 as *mut libc::FILE;
     path = tilde_expand_filename(file, (*pw).pw_uid);
-    if strcmp(path, b"-\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(path, b"-\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         krl_spec = stdin;
         libc::free(path as *mut libc::c_void);
         path = crate::xmalloc::xstrdup(b"(standard input)\0" as *const u8 as *const libc::c_char);
@@ -6134,7 +6138,7 @@ unsafe extern "C" fn update_krl_from_file(
             sshkey_free(key);
         }
     }
-    if strcmp(path, b"-\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int {
+    if libc::strcmp(path, b"-\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int {
         fclose(krl_spec);
     }
     libc::free(line as *mut libc::c_void);
@@ -6391,7 +6395,7 @@ unsafe extern "C" fn load_sign_key(
     while !(suffixes[i as usize]).is_null() {
         slen = strlen(suffixes[i as usize]);
         if !(plen <= slen
-            || strcmp(
+            || libc::strcmp(
                 privpath.offset(plen as isize).offset(-(slen as isize)),
                 suffixes[i as usize],
             ) != 0 as libc::c_int)
@@ -6897,7 +6901,7 @@ unsafe extern "C" fn sig_sign(
     let mut hashalg: *mut libc::c_char = 0 as *mut libc::c_char;
     i = 0 as libc::c_int;
     while i < argc {
-        if !(strcmp(
+        if !(libc::strcmp(
             *argv.offset(i as isize),
             b"-\0" as *const u8 as *const libc::c_char,
         ) != 0 as libc::c_int)
@@ -7046,7 +7050,7 @@ unsafe extern "C" fn sig_sign(
                                 current_block = 6450636197030046351;
                                 break;
                             }
-                            if strcmp(
+                            if libc::strcmp(
                                 *argv.offset(i as isize),
                                 b"-\0" as *const u8 as *const libc::c_char,
                             ) == 0 as libc::c_int
@@ -7782,7 +7786,7 @@ unsafe extern "C" fn do_moduli_screen(
         i;
     }
     if have_identity != 0
-        && strcmp(
+        && libc::strcmp(
             identity_file.as_mut_ptr(),
             b"-\0" as *const u8 as *const libc::c_char,
         ) != 0 as libc::c_int
@@ -7868,7 +7872,7 @@ unsafe extern "C" fn read_check_passphrase(
     loop {
         passphrase1 = read_passphrase(prompt1, 0x2 as libc::c_int);
         passphrase2 = read_passphrase(prompt2, 0x2 as libc::c_int);
-        if strcmp(passphrase1, passphrase2) == 0 as libc::c_int {
+        if libc::strcmp(passphrase1, passphrase2) == 0 as libc::c_int {
             freezero(passphrase2 as *mut libc::c_void, strlen(passphrase2));
             return passphrase1;
         }
@@ -8696,11 +8700,11 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 }
             }
             77 => {
-                if strcmp(BSDoptarg, b"generate\0" as *const u8 as *const libc::c_char)
+                if libc::strcmp(BSDoptarg, b"generate\0" as *const u8 as *const libc::c_char)
                     == 0 as libc::c_int
                 {
                     do_gen_candidates = 1 as libc::c_int;
-                } else if strcmp(BSDoptarg, b"screen\0" as *const u8 as *const libc::c_char)
+                } else if libc::strcmp(BSDoptarg, b"screen\0" as *const u8 as *const libc::c_char)
                     == 0 as libc::c_int
                 {
                     do_screen_candidates = 1 as libc::c_int;

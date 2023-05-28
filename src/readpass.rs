@@ -39,7 +39,7 @@ extern "C" {
         __value: *const libc::c_char,
         __replace: libc::c_int,
     ) -> libc::c_int;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
@@ -496,7 +496,8 @@ pub unsafe extern "C" fn notify_start(
         } else if (getenv(b"DISPLAY\0" as *const u8 as *const libc::c_char)).is_null() && {
             s = getenv(b"SSH_ASKPASS_REQUIRE\0" as *const u8 as *const libc::c_char);
             s.is_null()
-                || strcmp(s, b"force\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
+                || libc::strcmp(s, b"force\0" as *const u8 as *const libc::c_char)
+                    != 0 as libc::c_int
         } {
             crate::log::sshlog(
                 b"readpass.c\0" as *const u8 as *const libc::c_char,

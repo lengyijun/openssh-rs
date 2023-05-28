@@ -4,7 +4,6 @@ extern "C" {
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __ctype_tolower_loc() -> *mut *const __int32_t;
 
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -295,7 +294,7 @@ pub unsafe extern "C" fn match_list(
     while !p.is_null() && *p as libc::c_int != '\0' as i32 {
         j = 0 as libc::c_int;
         while j < nproposals {
-            if strcmp(p, sproposals[j as usize]) == 0 as libc::c_int {
+            if libc::strcmp(p, sproposals[j as usize]) == 0 as libc::c_int {
                 ret = crate::xmalloc::xstrdup(p);
                 if !next.is_null() {
                     *next = (if cp.is_null() {

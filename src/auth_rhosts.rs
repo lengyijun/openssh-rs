@@ -23,7 +23,6 @@ extern "C" {
     ) -> *mut libc::c_char;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
     fn temporarily_use_uid(_: *mut libc::passwd);
@@ -397,7 +396,9 @@ unsafe extern "C" fn check_rhosts_file(
                 {
                     continue;
                 }
-            } else if strcasecmp(host, hostname) != 0 && strcmp(host, ipaddr) != 0 as libc::c_int {
+            } else if strcasecmp(host, hostname) != 0
+                && libc::strcmp(host, ipaddr) != 0 as libc::c_int
+            {
                 continue;
             }
             if *user.offset(0 as libc::c_int as isize) as libc::c_int == '@' as i32 {
@@ -410,7 +411,7 @@ unsafe extern "C" fn check_rhosts_file(
                 {
                     continue;
                 }
-            } else if strcmp(user, client_user) != 0 as libc::c_int {
+            } else if libc::strcmp(user, client_user) != 0 as libc::c_int {
                 continue;
             }
             fclose(f);
@@ -632,7 +633,7 @@ pub unsafe extern "C" fn auth_rhosts2(
             libc::free(path as *mut libc::c_void);
         } else if options.ignore_rhosts == 1 as libc::c_int
             || options.ignore_rhosts == 2 as libc::c_int
-                && strcmp(
+                && libc::strcmp(
                     rhosts_files[rhosts_file_index as usize],
                     b".shosts\0" as *const u8 as *const libc::c_char,
                 ) != 0 as libc::c_int

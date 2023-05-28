@@ -15,7 +15,7 @@ extern "C" {
         _: libc::c_ulonglong,
         _: *const libc::c_uchar,
     ) -> libc::c_int;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn sshbuf_get_string_direct(
@@ -356,7 +356,7 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
         || sshbuf_get_u32(b, &mut sig_counter) != 0 as libc::c_int
     {
         r = -(4 as libc::c_int);
-    } else if strcmp(sshkey_ssh_name_plain(key), ktype) != 0 as libc::c_int {
+    } else if libc::strcmp(sshkey_ssh_name_plain(key), ktype) != 0 as libc::c_int {
         r = -(13 as libc::c_int);
     } else if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
         r = -(23 as libc::c_int);

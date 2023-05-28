@@ -91,7 +91,7 @@ extern "C" {
     static mut BSDoptreset: libc::c_int;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -3088,7 +3088,7 @@ pub unsafe extern "C" fn session_by_tty(mut tty: *mut libc::c_char) -> *mut Sess
         let mut s: *mut Session = &mut *sessions.offset(i as isize) as *mut Session;
         if (*s).used != 0
             && (*s).ttyfd != -(1 as libc::c_int)
-            && strcmp(((*s).tty).as_mut_ptr(), tty) == 0 as libc::c_int
+            && libc::strcmp(((*s).tty).as_mut_ptr(), tty) == 0 as libc::c_int
         {
             crate::log::sshlog(
                 b"session.c\0" as *const u8 as *const libc::c_char,
@@ -3327,7 +3327,7 @@ unsafe extern "C" fn session_pty_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
                 .as_ptr(),
         );
     }
-    if strcmp((*s).term, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp((*s).term, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         libc::free((*s).term as *mut libc::c_void);
         (*s).term = 0 as *mut libc::c_char;
     }
@@ -3437,10 +3437,10 @@ unsafe extern "C" fn session_subsystem_req(mut ssh: *mut ssh, mut s: *mut Sessio
     );
     i = 0 as libc::c_int as u_int;
     while i < options.num_subsystems {
-        if strcmp((*s).subsys, options.subsystem_name[i as usize]) == 0 as libc::c_int {
+        if libc::strcmp((*s).subsys, options.subsystem_name[i as usize]) == 0 as libc::c_int {
             prog = options.subsystem_command[i as usize];
             cmd = options.subsystem_args[i as usize];
-            if strcmp(b"internal-sftp\0" as *const u8 as *const libc::c_char, prog)
+            if libc::strcmp(b"internal-sftp\0" as *const u8 as *const libc::c_char, prog)
                 == 0 as libc::c_int
             {
                 (*s).is_subsystem = 2 as libc::c_int;
@@ -3747,25 +3747,25 @@ unsafe extern "C" fn session_env_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn name2sig(mut name: *mut libc::c_char) -> libc::c_int {
-    if strcmp(name, b"HUP\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(name, b"HUP\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 1 as libc::c_int;
     }
-    if strcmp(name, b"INT\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(name, b"INT\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 2 as libc::c_int;
     }
-    if strcmp(name, b"KILL\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(name, b"KILL\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 9 as libc::c_int;
     }
-    if strcmp(name, b"QUIT\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(name, b"QUIT\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 3 as libc::c_int;
     }
-    if strcmp(name, b"TERM\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(name, b"TERM\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 15 as libc::c_int;
     }
-    if strcmp(name, b"USR1\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(name, b"USR1\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 10 as libc::c_int;
     }
-    if strcmp(name, b"USR2\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(name, b"USR2\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 12 as libc::c_int;
     }
     return -(1 as libc::c_int);
@@ -3971,41 +3971,49 @@ pub unsafe extern "C" fn session_input_channel_req(
         rtype,
     );
     if (*c).type_0 == 10 as libc::c_int {
-        if strcmp(rtype, b"shell\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+        if libc::strcmp(rtype, b"shell\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
             success = session_shell_req(ssh, s);
-        } else if strcmp(rtype, b"exec\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+        } else if libc::strcmp(rtype, b"exec\0" as *const u8 as *const libc::c_char)
+            == 0 as libc::c_int
+        {
             success = session_exec_req(ssh, s);
-        } else if strcmp(rtype, b"pty-req\0" as *const u8 as *const libc::c_char)
+        } else if libc::strcmp(rtype, b"pty-req\0" as *const u8 as *const libc::c_char)
             == 0 as libc::c_int
         {
             success = session_pty_req(ssh, s);
-        } else if strcmp(rtype, b"x11-req\0" as *const u8 as *const libc::c_char)
+        } else if libc::strcmp(rtype, b"x11-req\0" as *const u8 as *const libc::c_char)
             == 0 as libc::c_int
         {
             success = session_x11_req(ssh, s);
-        } else if strcmp(
+        } else if libc::strcmp(
             rtype,
             b"auth-agent-req@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             success = session_auth_agent_req(ssh, s);
-        } else if strcmp(rtype, b"subsystem\0" as *const u8 as *const libc::c_char)
+        } else if libc::strcmp(rtype, b"subsystem\0" as *const u8 as *const libc::c_char)
             == 0 as libc::c_int
         {
             success = session_subsystem_req(ssh, s);
-        } else if strcmp(rtype, b"env\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+        } else if libc::strcmp(rtype, b"env\0" as *const u8 as *const libc::c_char)
+            == 0 as libc::c_int
+        {
             success = session_env_req(ssh, s);
         }
     }
-    if strcmp(
+    if libc::strcmp(
         rtype,
         b"window-change\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
     {
         success = session_window_change_req(ssh, s);
-    } else if strcmp(rtype, b"break\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    } else if libc::strcmp(rtype, b"break\0" as *const u8 as *const libc::c_char)
+        == 0 as libc::c_int
+    {
         success = session_break_req(ssh, s);
-    } else if strcmp(rtype, b"signal\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    } else if libc::strcmp(rtype, b"signal\0" as *const u8 as *const libc::c_char)
+        == 0 as libc::c_int
+    {
         success = session_signal_req(ssh, s);
     }
     return success;

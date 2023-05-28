@@ -19,7 +19,6 @@ extern "C" {
     fn seed_rng();
 
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
@@ -250,7 +249,7 @@ unsafe extern "C" fn del_keys_by_name(mut name: *mut libc::c_char) {
     ki = pkcs11_keylist.tqh_first;
     while !ki.is_null() {
         nxt = (*ki).next.tqe_next;
-        if strcmp((*ki).providername, name) == 0 {
+        if libc::strcmp((*ki).providername, name) == 0 {
             if !((*ki).next.tqe_next).is_null() {
                 (*(*ki).next.tqe_next).next.tqe_prev = (*ki).next.tqe_prev;
             } else {

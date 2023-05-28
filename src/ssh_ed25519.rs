@@ -23,7 +23,6 @@ extern "C" {
     fn crypto_sign_ed25519_keypair(_: *mut libc::c_uchar, _: *mut libc::c_uchar) -> libc::c_int;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_get_string_direct(
         buf: *mut sshbuf,
@@ -482,7 +481,9 @@ unsafe extern "C" fn ssh_ed25519_verify(
         r = sshbuf_get_string_direct(b, &mut sigblob, &mut len);
         r != 0 as libc::c_int
     }) {
-        if strcmp(b"ssh-ed25519\0" as *const u8 as *const libc::c_char, ktype) != 0 as libc::c_int {
+        if libc::strcmp(b"ssh-ed25519\0" as *const u8 as *const libc::c_char, ktype)
+            != 0 as libc::c_int
+        {
             r = -(13 as libc::c_int);
         } else if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
             r = -(23 as libc::c_int);

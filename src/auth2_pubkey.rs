@@ -19,8 +19,6 @@ extern "C" {
     fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
@@ -742,7 +740,7 @@ unsafe extern "C" fn userauth_pubkey(
     let mut authenticated: libc::c_int = 0 as libc::c_int;
     let mut authopts: *mut sshauthopt = 0 as *mut sshauthopt;
     let mut sig_details: *mut sshkey_sig_details = 0 as *mut sshkey_sig_details;
-    hostbound = (strcmp(
+    hostbound = (libc::strcmp(
         method,
         b"publickey-hostbound-v00@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int) as libc::c_int;

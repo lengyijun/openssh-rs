@@ -9,7 +9,7 @@ extern "C" {
     pub type session_state;
     fn xcrypt(password: *const libc::c_char, salt: *const libc::c_char) -> *mut libc::c_char;
     fn shadow_pw(pw: *mut libc::passwd) -> *mut libc::c_char;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn auth_restrict_session(_: *mut ssh);
     fn auth_shadow_pwexpired(_: *mut Authctxt) -> libc::c_int;
@@ -391,8 +391,8 @@ pub unsafe extern "C" fn sys_auth_passwd(
     if pw_password.is_null() {
         return 0 as libc::c_int;
     }
-    if strcmp(pw_password, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
-        && strcmp(password, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+    if libc::strcmp(pw_password, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+        && libc::strcmp(password, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
     {
         return 1 as libc::c_int;
     }
@@ -404,5 +404,6 @@ pub unsafe extern "C" fn sys_auth_passwd(
     }
     encrypted_password = xcrypt(password, salt);
     return (!encrypted_password.is_null()
-        && strcmp(encrypted_password, pw_password) == 0 as libc::c_int) as libc::c_int;
+        && libc::strcmp(encrypted_password, pw_password) == 0 as libc::c_int)
+        as libc::c_int;
 }

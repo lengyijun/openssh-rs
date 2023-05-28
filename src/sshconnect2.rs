@@ -33,7 +33,7 @@ extern "C" {
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
@@ -2141,7 +2141,7 @@ unsafe extern "C" fn input_userauth_passwd_changereq(
                             host,
                         );
                         retype = read_passphrase(prompt.as_mut_ptr(), 0 as libc::c_int);
-                        if strcmp(password, retype) != 0 as libc::c_int {
+                        if libc::strcmp(password, retype) != 0 as libc::c_int {
                             freezero(password as *mut libc::c_void, strlen(password));
                             crate::log::sshlog(
                                 b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
@@ -2443,7 +2443,7 @@ unsafe extern "C" fn id_filename_matches(
     let mut plen: size_t = strlen((*private_id).filename);
     let mut i: size_t = 0;
     let mut slen: size_t = 0;
-    if strcmp((*id).filename, (*private_id).filename) == 0 as libc::c_int {
+    if libc::strcmp((*id).filename, (*private_id).filename) == 0 as libc::c_int {
         return 1 as libc::c_int;
     }
     i = 0 as libc::c_int as size_t;
@@ -2451,7 +2451,7 @@ unsafe extern "C" fn id_filename_matches(
         slen = strlen(suffixes[i as usize]);
         if len > slen
             && plen == len.wrapping_sub(slen)
-            && strcmp(
+            && libc::strcmp(
                 ((*id).filename).offset(len.wrapping_sub(slen) as isize),
                 suffixes[i as usize],
             ) == 0 as libc::c_int
@@ -4725,7 +4725,7 @@ unsafe extern "C" fn authmethod_lookup(mut name: *const libc::c_char) -> *mut Au
     if !name.is_null() {
         method = authmethods.as_mut_ptr();
         while !((*method).name).is_null() {
-            if strcmp(name, (*method).name) == 0 as libc::c_int {
+            if libc::strcmp(name, (*method).name) == 0 as libc::c_int {
                 return method;
             }
             method = method.offset(1);
@@ -4758,7 +4758,7 @@ unsafe extern "C" fn authmethod_get(mut authlist: *mut libc::c_char) -> *mut Aut
     if authlist.is_null() || strlen(authlist) == 0 as libc::c_int as libc::c_ulong {
         authlist = options.preferred_authentications;
     }
-    if supported.is_null() || strcmp(authlist, supported) != 0 as libc::c_int {
+    if supported.is_null() || libc::strcmp(authlist, supported) != 0 as libc::c_int {
         crate::log::sshlog(
             b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"authmethod_get\0"))

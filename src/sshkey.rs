@@ -135,7 +135,7 @@ extern "C" {
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strndup(_: *const libc::c_char, _: libc::c_ulong) -> *mut libc::c_char;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -606,7 +606,7 @@ pub unsafe extern "C" fn sshkey_type_from_name(mut name: *const libc::c_char) ->
     i = 0 as libc::c_int;
     while !(keyimpls[i as usize]).is_null() {
         impl_0 = keyimpls[i as usize];
-        if !((*impl_0).name).is_null() && strcmp(name, (*impl_0).name) == 0 as libc::c_int
+        if !((*impl_0).name).is_null() && libc::strcmp(name, (*impl_0).name) == 0 as libc::c_int
             || (*impl_0).cert == 0 && strcasecmp((*impl_0).shortname, name) == 0 as libc::c_int
         {
             return (*impl_0).type_0;
@@ -629,7 +629,7 @@ pub unsafe extern "C" fn sshkey_ecdsa_nid_from_name(mut name: *const libc::c_cha
     while !(keyimpls[i as usize]).is_null() {
         if !(key_type_is_ecdsa_variant((*keyimpls[i as usize]).type_0) == 0) {
             if !((*keyimpls[i as usize]).name).is_null()
-                && strcmp(name, (*keyimpls[i as usize]).name) == 0 as libc::c_int
+                && libc::strcmp(name, (*keyimpls[i as usize]).name) == 0 as libc::c_int
             {
                 return (*keyimpls[i as usize]).nid;
             }
@@ -747,7 +747,7 @@ pub unsafe extern "C" fn sshkey_names_valid2(
     let mut i: libc::c_int = 0;
     let mut type_0: libc::c_int = 0;
     if names.is_null()
-        || strcmp(names, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+        || libc::strcmp(names, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
     {
         return 0 as libc::c_int;
     }
@@ -855,11 +855,15 @@ unsafe extern "C" fn sshkey_type_certified(mut type_0: libc::c_int) -> libc::c_i
     };
 }
 pub unsafe extern "C" fn sshkey_curve_name_to_nid(mut name: *const libc::c_char) -> libc::c_int {
-    if strcmp(name, b"nistp256\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(name, b"nistp256\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 415 as libc::c_int;
-    } else if strcmp(name, b"nistp384\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    } else if libc::strcmp(name, b"nistp384\0" as *const u8 as *const libc::c_char)
+        == 0 as libc::c_int
+    {
         return 715 as libc::c_int;
-    } else if strcmp(name, b"nistp521\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    } else if libc::strcmp(name, b"nistp521\0" as *const u8 as *const libc::c_char)
+        == 0 as libc::c_int
+    {
         return 716 as libc::c_int;
     } else {
         return -(1 as libc::c_int);
@@ -1050,7 +1054,7 @@ pub unsafe extern "C" fn sshkey_sk_fields_equal(
     if ((*a).sk_application).is_null() || ((*b).sk_application).is_null() {
         return 0 as libc::c_int;
     }
-    if strcmp((*a).sk_application, (*b).sk_application) != 0 as libc::c_int {
+    if libc::strcmp((*a).sk_application, (*b).sk_application) != 0 as libc::c_int {
         return 0 as libc::c_int;
     }
     return 1 as libc::c_int;
@@ -2970,7 +2974,7 @@ pub unsafe extern "C" fn sshkey_sigalg_by_name(
     i = 0 as libc::c_int;
     while !(keyimpls[i as usize]).is_null() {
         impl_0 = keyimpls[i as usize];
-        if strcmp((*impl_0).name, name) != 0 as libc::c_int {
+        if libc::strcmp((*impl_0).name, name) != 0 as libc::c_int {
             i += 1;
             i;
         } else {
@@ -3007,7 +3011,7 @@ pub unsafe extern "C" fn sshkey_check_sigtype(
     if r != 0 as libc::c_int {
         return r;
     }
-    r = (strcmp(expected_alg, sigtype) == 0 as libc::c_int) as libc::c_int;
+    r = (libc::strcmp(expected_alg, sigtype) == 0 as libc::c_int) as libc::c_int;
     libc::free(sigtype as *mut libc::c_void);
     return if r != 0 {
         0 as libc::c_int
@@ -3158,7 +3162,7 @@ pub unsafe extern "C" fn sshkey_certify_custom(
     if alg.is_null() {
         alg = (*(*k).cert).signature_type;
     } else if !((*(*k).cert).signature_type).is_null()
-        && strcmp(alg, (*(*k).cert).signature_type) != 0 as libc::c_int
+        && libc::strcmp(alg, (*(*k).cert).signature_type) != 0 as libc::c_int
     {
         return -(10 as libc::c_int);
     }
@@ -3275,7 +3279,7 @@ pub unsafe extern "C" fn sshkey_certify_custom(
                                         ret = sshkey_get_sigtype(sig_blob, sig_len, &mut sigtype);
                                         if !(ret != 0 as libc::c_int) {
                                             if !alg.is_null()
-                                                && strcmp(alg, sigtype) != 0 as libc::c_int
+                                                && libc::strcmp(alg, sigtype) != 0 as libc::c_int
                                             {
                                                 ret = -(58 as libc::c_int);
                                             } else {
@@ -3420,7 +3424,7 @@ pub unsafe extern "C" fn sshkey_cert_check_authority(
                     principal_matches = 1 as libc::c_int as u_int;
                     break;
                 }
-            } else if strcmp(name, *((*(*k).cert).principals).offset(i as isize))
+            } else if libc::strcmp(name, *((*(*k).cert).principals).offset(i as isize))
                 == 0 as libc::c_int
             {
                 principal_matches = 1 as libc::c_int as u_int;
@@ -3731,7 +3735,7 @@ pub unsafe extern "C" fn sshkey_private_deserialize(
                     if !(r != 0 as libc::c_int) {
                         if !expect_sk_application.is_null()
                             && (((*k).sk_application).is_null()
-                                || strcmp(expect_sk_application, (*k).sk_application)
+                                || libc::strcmp(expect_sk_application, (*k).sk_application)
                                     != 0 as libc::c_int)
                             || !expect_ed25519_pk.is_null()
                                 && (((*k).ed25519_pk).is_null()
@@ -3980,7 +3984,7 @@ unsafe extern "C" fn sshkey_private_to_blob2(
             if key.is_null() {
                 r = -(2 as libc::c_int);
             } else {
-                if strcmp(kdfname, b"bcrypt\0" as *const u8 as *const libc::c_char)
+                if libc::strcmp(kdfname, b"bcrypt\0" as *const u8 as *const libc::c_char)
                     == 0 as libc::c_int
                 {
                     arc4random_buf(
@@ -4014,7 +4018,7 @@ unsafe extern "C" fn sshkey_private_to_blob2(
                             current_block = 16203760046146113240;
                         }
                     }
-                } else if strcmp(kdfname, b"none\0" as *const u8 as *const libc::c_char)
+                } else if libc::strcmp(kdfname, b"none\0" as *const u8 as *const libc::c_char)
                     != 0 as libc::c_int
                 {
                     r = -(42 as libc::c_int);
@@ -4386,21 +4390,21 @@ unsafe extern "C" fn private2_decrypt(
                     cipher = cipher_by_name(ciphername);
                     if cipher.is_null() {
                         r = -(42 as libc::c_int);
-                    } else if strcmp(kdfname, b"none\0" as *const u8 as *const libc::c_char)
+                    } else if libc::strcmp(kdfname, b"none\0" as *const u8 as *const libc::c_char)
                         != 0 as libc::c_int
-                        && strcmp(kdfname, b"bcrypt\0" as *const u8 as *const libc::c_char)
+                        && libc::strcmp(kdfname, b"bcrypt\0" as *const u8 as *const libc::c_char)
                             != 0 as libc::c_int
                     {
                         r = -(42 as libc::c_int);
-                    } else if strcmp(kdfname, b"none\0" as *const u8 as *const libc::c_char)
+                    } else if libc::strcmp(kdfname, b"none\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
-                        && strcmp(ciphername, b"none\0" as *const u8 as *const libc::c_char)
+                        && libc::strcmp(ciphername, b"none\0" as *const u8 as *const libc::c_char)
                             != 0 as libc::c_int
                     {
                         r = -(4 as libc::c_int);
                     } else if (passphrase.is_null()
                         || strlen(passphrase) == 0 as libc::c_int as libc::c_ulong)
-                        && strcmp(kdfname, b"none\0" as *const u8 as *const libc::c_char)
+                        && libc::strcmp(kdfname, b"none\0" as *const u8 as *const libc::c_char)
                             != 0 as libc::c_int
                     {
                         r = -(43 as libc::c_int);
@@ -4422,8 +4426,10 @@ unsafe extern "C" fn private2_decrypt(
                             if key.is_null() {
                                 r = -(2 as libc::c_int);
                             } else {
-                                if strcmp(kdfname, b"bcrypt\0" as *const u8 as *const libc::c_char)
-                                    == 0 as libc::c_int
+                                if libc::strcmp(
+                                    kdfname,
+                                    b"bcrypt\0" as *const u8 as *const libc::c_char,
+                                ) == 0 as libc::c_int
                                 {
                                     r = sshbuf_get_string(kdf, &mut salt, &mut slen);
                                     if r != 0 as libc::c_int || {

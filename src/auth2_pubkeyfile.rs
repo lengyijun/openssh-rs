@@ -19,7 +19,6 @@ extern "C" {
     ) -> __ssize_t;
     fn fileno(__stream: *mut libc::FILE) -> libc::c_int;
 
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -516,7 +515,7 @@ pub unsafe extern "C" fn auth_check_principals_line(
     }
     i = 0 as libc::c_int as u_int;
     while i < (*cert).nprincipals {
-        if !(strcmp(cp, *((*cert).principals).offset(i as isize)) != 0 as libc::c_int) {
+        if !(libc::strcmp(cp, *((*cert).principals).offset(i as isize)) != 0 as libc::c_int) {
             crate::log::sshlog(
                 b"auth2-pubkeyfile.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(

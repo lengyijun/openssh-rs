@@ -24,7 +24,7 @@ extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
@@ -679,16 +679,18 @@ unsafe extern "C" fn agent_encode_alg(
     mut alg: *const libc::c_char,
 ) -> u_int {
     if !alg.is_null() && sshkey_type_plain((*key).type_0) == KEY_RSA as libc::c_int {
-        if strcmp(alg, b"rsa-sha2-256\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
-            || strcmp(
+        if libc::strcmp(alg, b"rsa-sha2-256\0" as *const u8 as *const libc::c_char)
+            == 0 as libc::c_int
+            || libc::strcmp(
                 alg,
                 b"rsa-sha2-256-cert-v01@openssh.com\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             return 0x2 as libc::c_int as u_int;
         }
-        if strcmp(alg, b"rsa-sha2-512\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
-            || strcmp(
+        if libc::strcmp(alg, b"rsa-sha2-512\0" as *const u8 as *const libc::c_char)
+            == 0 as libc::c_int
+            || libc::strcmp(
                 alg,
                 b"rsa-sha2-512-cert-v01@openssh.com\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int

@@ -22,7 +22,6 @@ extern "C" {
         __arg: ::core::ffi::VaList,
     ) -> libc::c_int;
 
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -632,7 +631,7 @@ unsafe extern "C" fn input_service_request(
                 b"input_service_request: no authctxt\0" as *const u8 as *const libc::c_char,
             );
         }
-        if strcmp(
+        if libc::strcmp(
             service,
             b"ssh-userauth\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -877,7 +876,7 @@ unsafe extern "C" fn input_userauth_request(
             };
             (*authctxt).user = crate::xmalloc::xstrdup(user);
             if !((*authctxt).pw).is_null()
-                && strcmp(
+                && libc::strcmp(
                     service,
                     b"ssh-connection\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int
@@ -939,8 +938,8 @@ unsafe extern "C" fn input_userauth_request(
                     b"no authentication methods enabled\0" as *const u8 as *const libc::c_char,
                 );
             }
-        } else if strcmp(user, (*authctxt).user) != 0 as libc::c_int
-            || strcmp(service, (*authctxt).service) != 0 as libc::c_int
+        } else if libc::strcmp(user, (*authctxt).user) != 0 as libc::c_int
+            || libc::strcmp(service, (*authctxt).service) != 0 as libc::c_int
         {
             ssh_packet_disconnect(
                 ssh,
@@ -1100,7 +1099,7 @@ pub unsafe extern "C" fn userauth_finish(
         if partial == 0
             && (*authctxt).server_caused_failure == 0
             && ((*authctxt).attempt > 1 as libc::c_int
-                || strcmp(method, b"none\0" as *const u8 as *const libc::c_char)
+                || libc::strcmp(method, b"none\0" as *const u8 as *const libc::c_char)
                     != 0 as libc::c_int)
         {
             (*authctxt).failures += 1;
@@ -1199,7 +1198,7 @@ unsafe extern "C" fn authmethods_get(mut authctxt: *mut Authctxt) -> *mut libc::
     }
     i = 0 as libc::c_int;
     while !(authmethods[i as usize]).is_null() {
-        if !(strcmp(
+        if !(libc::strcmp(
             (*authmethods[i as usize]).name,
             b"none\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int)
@@ -1275,9 +1274,9 @@ unsafe extern "C" fn authmethod_byname(mut name: *const libc::c_char) -> *mut Au
     }
     i = 0 as libc::c_int;
     while !(authmethods[i as usize]).is_null() {
-        if strcmp(name, (*authmethods[i as usize]).name) == 0 as libc::c_int
+        if libc::strcmp(name, (*authmethods[i as usize]).name) == 0 as libc::c_int
             || !((*authmethods[i as usize]).synonym).is_null()
-                && strcmp(name, (*authmethods[i as usize]).synonym) == 0 as libc::c_int
+                && libc::strcmp(name, (*authmethods[i as usize]).synonym) == 0 as libc::c_int
         {
             return authmethods[i as usize];
         }
@@ -1376,7 +1375,7 @@ pub unsafe extern "C" fn auth2_methods_valid(
             if !p.is_null() {
                 *p = '\0' as i32 as libc::c_char;
             }
-            if strcmp(method, (*authmethods[i as usize]).name) != 0 as libc::c_int {
+            if libc::strcmp(method, (*authmethods[i as usize]).name) != 0 as libc::c_int {
                 i = i.wrapping_add(1);
                 i;
             } else {
@@ -1436,7 +1435,7 @@ pub unsafe extern "C" fn auth2_methods_valid(
 pub unsafe extern "C" fn auth2_setup_methods_lists(mut authctxt: *mut Authctxt) -> libc::c_int {
     let mut i: u_int = 0;
     if options.num_auth_methods == 1 as libc::c_int as libc::c_uint
-        && strcmp(
+        && libc::strcmp(
             *(options.auth_methods).offset(0 as libc::c_int as isize),
             b"any\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int

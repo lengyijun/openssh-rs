@@ -24,7 +24,7 @@ extern "C" {
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -1004,7 +1004,7 @@ unsafe extern "C" fn sshsig_wrap_verify(
                         b"Signature contains trailing data\0" as *const u8 as *const libc::c_char,
                     );
                     r = -(4 as libc::c_int);
-                } else if strcmp(expect_namespace, got_namespace) != 0 as libc::c_int {
+                } else if libc::strcmp(expect_namespace, got_namespace) != 0 as libc::c_int {
                     crate::log::sshlog(
                         b"sshsig.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
@@ -1034,7 +1034,7 @@ unsafe extern "C" fn sshsig_wrap_verify(
                         got_namespace,
                     );
                     r = -(21 as libc::c_int);
-                } else if strcmp(hashalg, sig_hashalg) != 0 as libc::c_int {
+                } else if libc::strcmp(hashalg, sig_hashalg) != 0 as libc::c_int {
                     crate::log::sshlog(
                         b"sshsig.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(

@@ -39,7 +39,6 @@ extern "C" {
     ) -> libc::c_int;
 
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
     fn sshpkt_fmt_connection_id(ssh: *mut ssh, s: *mut libc::c_char, l: size_t);
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
@@ -1889,19 +1888,19 @@ unsafe extern "C" fn server_input_channel_open(
         rwindow,
         rmaxpack,
     );
-    if strcmp(ctype, b"session\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(ctype, b"session\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         c = server_request_session(ssh);
-    } else if strcmp(ctype, b"direct-tcpip\0" as *const u8 as *const libc::c_char)
+    } else if libc::strcmp(ctype, b"direct-tcpip\0" as *const u8 as *const libc::c_char)
         == 0 as libc::c_int
     {
         c = server_request_direct_tcpip(ssh, &mut reason, &mut errmsg);
-    } else if strcmp(
+    } else if libc::strcmp(
         ctype,
         b"direct-streamlocal@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
     {
         c = server_request_direct_streamlocal(ssh);
-    } else if strcmp(
+    } else if libc::strcmp(
         ctype,
         b"tun@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -2302,7 +2301,7 @@ unsafe extern "C" fn server_input_global_request(
         rtype,
         want_reply as libc::c_int,
     );
-    if strcmp(
+    if libc::strcmp(
         rtype,
         b"tcpip-forward\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -2392,7 +2391,7 @@ unsafe extern "C" fn server_input_global_request(
                 b"sshbuf_put_u32\0" as *const u8 as *const libc::c_char,
             );
         }
-    } else if strcmp(
+    } else if libc::strcmp(
         rtype,
         b"cancel-tcpip-forward\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -2430,7 +2429,7 @@ unsafe extern "C" fn server_input_global_request(
             fwd.listen_port = port as libc::c_int;
             success = channel_cancel_rport_listener(ssh, &mut fwd);
         }
-    } else if strcmp(
+    } else if libc::strcmp(
         rtype,
         b"streamlocal-forward@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -2479,7 +2478,7 @@ unsafe extern "C" fn server_input_global_request(
                 &mut options.fwd_opts,
             );
         }
-    } else if strcmp(
+    } else if libc::strcmp(
         rtype,
         b"cancel-streamlocal-forward@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -2511,14 +2510,14 @@ unsafe extern "C" fn server_input_global_request(
             fwd.listen_path,
         );
         success = channel_cancel_rport_listener(ssh, &mut fwd);
-    } else if strcmp(
+    } else if libc::strcmp(
         rtype,
         b"no-more-sessions@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
     {
         no_more_sessions = 1 as libc::c_int;
         success = 1 as libc::c_int;
-    } else if strcmp(
+    } else if libc::strcmp(
         rtype,
         b"hostkeys-prove-00@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -2625,7 +2624,7 @@ unsafe extern "C" fn server_input_channel_req(
             id,
         );
     }
-    if strcmp(
+    if libc::strcmp(
         rtype,
         b"eow@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0
@@ -2644,7 +2643,8 @@ unsafe extern "C" fn server_input_channel_req(
         }
         chan_rcvd_eow(ssh, c);
     } else if ((*c).type_0 == 10 as libc::c_int || (*c).type_0 == 4 as libc::c_int)
-        && strcmp((*c).ctype, b"session\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+        && libc::strcmp((*c).ctype, b"session\0" as *const u8 as *const libc::c_char)
+            == 0 as libc::c_int
     {
         success = session_input_channel_req(ssh, c, rtype);
     }

@@ -10,7 +10,7 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -157,14 +157,14 @@ pub unsafe extern "C" fn sftp_realpath(
                 if next_token[0 as libc::c_int as usize] as libc::c_int == '\0' as i32 {
                     continue;
                 }
-                if strcmp(
+                if libc::strcmp(
                     next_token.as_mut_ptr(),
                     b".\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int
                 {
                     continue;
                 }
-                if strcmp(
+                if libc::strcmp(
                     next_token.as_mut_ptr(),
                     b"..\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int

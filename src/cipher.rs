@@ -5,7 +5,7 @@ extern "C" {
     pub type chachapoly_ctx;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
@@ -325,7 +325,9 @@ pub unsafe extern "C" fn cipher_keylen(mut c: *const sshcipher) -> u_int {
     return (*c).key_len;
 }
 pub unsafe extern "C" fn cipher_seclen(mut c: *const sshcipher) -> u_int {
-    if strcmp(b"3des-cbc\0" as *const u8 as *const libc::c_char, (*c).name) == 0 as libc::c_int {
+    if libc::strcmp(b"3des-cbc\0" as *const u8 as *const libc::c_char, (*c).name)
+        == 0 as libc::c_int
+    {
         return 14 as libc::c_int as u_int;
     }
     return cipher_keylen(c);
@@ -354,7 +356,7 @@ pub unsafe extern "C" fn cipher_by_name(mut name: *const libc::c_char) -> *const
     let mut c: *const sshcipher = 0 as *const sshcipher;
     c = ciphers.as_ptr();
     while !((*c).name).is_null() {
-        if strcmp((*c).name, name) == 0 as libc::c_int {
+        if libc::strcmp((*c).name, name) == 0 as libc::c_int {
             return c;
         }
         c = c.offset(1);
@@ -368,7 +370,7 @@ pub unsafe extern "C" fn ciphers_valid(mut names: *const libc::c_char) -> libc::
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut p: *mut libc::c_char = 0 as *mut libc::c_char;
     if names.is_null()
-        || strcmp(names, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+        || libc::strcmp(names, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
     {
         return 0 as libc::c_int;
     }

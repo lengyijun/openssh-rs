@@ -76,7 +76,7 @@ extern "C" {
 
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
 
@@ -682,7 +682,7 @@ unsafe extern "C" fn extended_handler_byname(mut name: *const libc::c_char) -> *
     let mut i: libc::c_int = 0;
     i = 0 as libc::c_int;
     while (extended_handlers[i as usize].handler).is_some() {
-        if strcmp(name, extended_handlers[i as usize].ext_name) == 0 as libc::c_int {
+        if libc::strcmp(name, extended_handlers[i as usize].ext_name) == 0 as libc::c_int {
             return &*extended_handlers.as_ptr().offset(i as isize) as *const sftp_handler;
         }
         i += 1;
@@ -2648,7 +2648,7 @@ unsafe extern "C" fn process_readdir(mut id: u_int32_t) {
                 ::core::mem::size_of::<[libc::c_char; 4096]>() as usize,
                 b"%s%s%s\0" as *const u8 as *const libc::c_char,
                 path,
-                if strcmp(path, b"/\0" as *const u8 as *const libc::c_char) != 0 {
+                if libc::strcmp(path, b"/\0" as *const u8 as *const libc::c_char) != 0 {
                     b"/\0" as *const u8 as *const libc::c_char
                 } else {
                     b"\0" as *const u8 as *const libc::c_char
@@ -3701,7 +3701,7 @@ unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
             path = crate::xmalloc::xstrdup(b".\0" as *const u8 as *const libc::c_char);
             current_block = 17478428563724192186;
         } else if *path as libc::c_int == '~' as i32 {
-            if strcmp(path, b"~\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+            if libc::strcmp(path, b"~\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
                 libc::free(path as *mut libc::c_void);
                 path = crate::xmalloc::xstrdup(cwd.as_mut_ptr());
                 current_block = 17478428563724192186;
@@ -3862,7 +3862,7 @@ unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
     if read_handle == write_handle
         || read_fd < 0 as libc::c_int
         || write_fd < 0 as libc::c_int
-        || strcmp(handle_to_name(read_handle), handle_to_name(write_handle)) == 0
+        || libc::strcmp(handle_to_name(read_handle), handle_to_name(write_handle)) == 0
     {
         status = 4 as libc::c_int;
     } else if lseek(read_fd, read_off as __off_t, 0 as libc::c_int)

@@ -27,7 +27,7 @@ extern "C" {
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn mbtowc(__pwc: *mut wchar_t, __s: *const libc::c_char, __n: size_t) -> libc::c_int;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strcasestr(
         __haystack: *const libc::c_char,
         __needle: *const libc::c_char,
@@ -440,12 +440,14 @@ pub const ABDAY_1: C2RustUnnamed = 131072;
 unsafe extern "C" fn dangerous_locale() -> libc::c_int {
     let mut loc: *mut libc::c_char = 0 as *mut libc::c_char;
     loc = nl_langinfo(CODESET as libc::c_int);
-    return (strcmp(loc, b"UTF-8\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
-        && strcmp(loc, b"US-ASCII\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
-        && strcmp(loc, b"ANSI_X3.4-1968\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
-        && strcmp(loc, b"ISO8859-1\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
-        && strcmp(loc, b"646\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
-        && strcmp(loc, b"\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int)
+    return (libc::strcmp(loc, b"UTF-8\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
+        && libc::strcmp(loc, b"US-ASCII\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
+        && libc::strcmp(loc, b"ANSI_X3.4-1968\0" as *const u8 as *const libc::c_char)
+            != 0 as libc::c_int
+        && libc::strcmp(loc, b"ISO8859-1\0" as *const u8 as *const libc::c_char)
+            != 0 as libc::c_int
+        && libc::strcmp(loc, b"646\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
+        && libc::strcmp(loc, b"\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int)
         as libc::c_int;
 }
 unsafe extern "C" fn grow_dst(

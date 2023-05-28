@@ -7,8 +7,6 @@ extern "C" {
     pub type sshbuf;
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
 
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-
     fn sshbuf_len(buf: *const sshbuf) -> size_t;
     fn sshbuf_reset(buf: *mut sshbuf);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
@@ -765,7 +763,7 @@ pub unsafe extern "C" fn chan_write_failed(mut ssh: *mut ssh, mut c: *mut Channe
     match (*c).ostate {
         0 | 1 => {
             chan_shutdown_write(ssh, c);
-            if strcmp((*c).ctype, b"session\0" as *const u8 as *const libc::c_char)
+            if libc::strcmp((*c).ctype, b"session\0" as *const u8 as *const libc::c_char)
                 == 0 as libc::c_int
             {
                 chan_send_eow2(ssh, c);

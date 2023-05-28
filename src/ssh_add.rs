@@ -42,7 +42,7 @@ extern "C" {
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -477,7 +477,7 @@ unsafe extern "C" fn delete_file(
     let mut comment: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
     let mut ret: libc::c_int = -(1 as libc::c_int);
-    if strcmp(filename, b"-\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(filename, b"-\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return delete_stdin(agent_fd, qflag);
     }
     r = sshkey_load_public(filename, &mut public, &mut comment);
@@ -583,7 +583,7 @@ unsafe extern "C" fn add_file(
     let mut left: u_int32_t = 0;
     let mut keyblob: *mut sshbuf = 0 as *mut sshbuf;
     let mut idlist: *mut ssh_identitylist = 0 as *mut ssh_identitylist;
-    if strcmp(filename, b"-\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(filename, b"-\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         fd = 0 as libc::c_int;
         filename = b"(stdin)\0" as *const u8 as *const libc::c_char;
     } else {
@@ -660,7 +660,7 @@ unsafe extern "C" fn add_file(
                     );
                     loop {
                         pass = read_passphrase(msg.as_mut_ptr(), 0x2 as libc::c_int);
-                        if strcmp(pass, b"\0" as *const u8 as *const libc::c_char)
+                        if libc::strcmp(pass, b"\0" as *const u8 as *const libc::c_char)
                             == 0 as libc::c_int
                         {
                             current_block = 10441068446736761227;
@@ -1277,7 +1277,7 @@ unsafe extern "C" fn lock_agent(mut agent_fd: libc::c_int, mut lock: libc::c_int
             ::core::mem::size_of::<[libc::c_char; 100]>() as libc::c_ulong,
         );
         p2 = read_passphrase(prompt.as_mut_ptr(), 0x2 as libc::c_int);
-        if strcmp(p1, p2) != 0 as libc::c_int {
+        if libc::strcmp(p1, p2) != 0 as libc::c_int {
             libc::fprintf(
                 stderr,
                 b"Passwords do not match.\n\0" as *const u8 as *const libc::c_char,

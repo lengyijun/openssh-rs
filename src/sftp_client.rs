@@ -28,7 +28,7 @@ extern "C" {
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strpbrk(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -1319,108 +1319,108 @@ pub unsafe extern "C" fn do_init(
                 b"parse extension\0" as *const u8 as *const libc::c_char,
             );
         }
-        if strcmp(
+        if libc::strcmp(
             name,
             b"posix-rename@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            && strcmp(
+            && libc::strcmp(
                 value as *mut libc::c_char,
                 b"1\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             (*ret).exts |= 0x1 as libc::c_int as libc::c_uint;
             known = 1 as libc::c_int;
-        } else if strcmp(
+        } else if libc::strcmp(
             name,
             b"statvfs@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            && strcmp(
+            && libc::strcmp(
                 value as *mut libc::c_char,
                 b"2\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             (*ret).exts |= 0x2 as libc::c_int as libc::c_uint;
             known = 1 as libc::c_int;
-        } else if strcmp(
+        } else if libc::strcmp(
             name,
             b"fstatvfs@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            && strcmp(
+            && libc::strcmp(
                 value as *mut libc::c_char,
                 b"2\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             (*ret).exts |= 0x4 as libc::c_int as libc::c_uint;
             known = 1 as libc::c_int;
-        } else if strcmp(
+        } else if libc::strcmp(
             name,
             b"hardlink@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            && strcmp(
+            && libc::strcmp(
                 value as *mut libc::c_char,
                 b"1\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             (*ret).exts |= 0x8 as libc::c_int as libc::c_uint;
             known = 1 as libc::c_int;
-        } else if strcmp(
+        } else if libc::strcmp(
             name,
             b"fsync@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            && strcmp(
+            && libc::strcmp(
                 value as *mut libc::c_char,
                 b"1\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             (*ret).exts |= 0x10 as libc::c_int as libc::c_uint;
             known = 1 as libc::c_int;
-        } else if strcmp(
+        } else if libc::strcmp(
             name,
             b"lsetstat@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            && strcmp(
+            && libc::strcmp(
                 value as *mut libc::c_char,
                 b"1\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             (*ret).exts |= 0x20 as libc::c_int as libc::c_uint;
             known = 1 as libc::c_int;
-        } else if strcmp(
+        } else if libc::strcmp(
             name,
             b"limits@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            && strcmp(
+            && libc::strcmp(
                 value as *mut libc::c_char,
                 b"1\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             (*ret).exts |= 0x40 as libc::c_int as libc::c_uint;
             known = 1 as libc::c_int;
-        } else if strcmp(
+        } else if libc::strcmp(
             name,
             b"expand-path@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            && strcmp(
+            && libc::strcmp(
                 value as *mut libc::c_char,
                 b"1\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             (*ret).exts |= 0x80 as libc::c_int as libc::c_uint;
             known = 1 as libc::c_int;
-        } else if strcmp(name, b"copy-data\0" as *const u8 as *const libc::c_char)
+        } else if libc::strcmp(name, b"copy-data\0" as *const u8 as *const libc::c_char)
             == 0 as libc::c_int
-            && strcmp(
+            && libc::strcmp(
                 value as *mut libc::c_char,
                 b"1\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             (*ret).exts |= 0x100 as libc::c_int as libc::c_uint;
             known = 1 as libc::c_int;
-        } else if strcmp(
+        } else if libc::strcmp(
             name,
             b"users-groups-by-id@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            && strcmp(
+            && libc::strcmp(
                 value as *mut libc::c_char,
                 b"1\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
@@ -4834,8 +4834,9 @@ unsafe extern "C" fn download_dir_internal(
         if (**dir_entries.offset(i as isize)).a.perm & 0o170000 as libc::c_int as libc::c_uint
             == 0o40000 as libc::c_int as libc::c_uint
         {
-            if !(strcmp(filename, b".\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
-                || strcmp(filename, b"..\0" as *const u8 as *const libc::c_char)
+            if !(libc::strcmp(filename, b".\0" as *const u8 as *const libc::c_char)
+                == 0 as libc::c_int
+                || libc::strcmp(filename, b"..\0" as *const u8 as *const libc::c_char)
                     == 0 as libc::c_int)
             {
                 if download_dir_internal(
@@ -5691,8 +5692,10 @@ unsafe extern "C" fn upload_dir_internal(
         } else if sb.st_mode & 0o170000 as libc::c_int as libc::c_uint
             == 0o40000 as libc::c_int as libc::c_uint
         {
-            if strcmp(filename, b".\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
-                || strcmp(filename, b"..\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+            if libc::strcmp(filename, b".\0" as *const u8 as *const libc::c_char)
+                == 0 as libc::c_int
+                || libc::strcmp(filename, b"..\0" as *const u8 as *const libc::c_char)
+                    == 0 as libc::c_int
             {
                 continue;
             }
@@ -6719,8 +6722,9 @@ unsafe extern "C" fn crossload_dir_internal(
         if (**dir_entries.offset(i as isize)).a.perm & 0o170000 as libc::c_int as libc::c_uint
             == 0o40000 as libc::c_int as libc::c_uint
         {
-            if !(strcmp(filename, b".\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
-                || strcmp(filename, b"..\0" as *const u8 as *const libc::c_char)
+            if !(libc::strcmp(filename, b".\0" as *const u8 as *const libc::c_char)
+                == 0 as libc::c_int
+                || libc::strcmp(filename, b"..\0" as *const u8 as *const libc::c_char)
                     == 0 as libc::c_int)
             {
                 if crossload_dir_internal(

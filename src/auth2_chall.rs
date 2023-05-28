@@ -10,7 +10,6 @@ extern "C" {
     pub type session_state;
     fn freezero(_: *mut libc::c_void, _: size_t);
 
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -235,7 +234,7 @@ unsafe extern "C" fn kbdint_alloc(mut devs: *const libc::c_char) -> *mut KbdintA
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<KbdintAuthctxt>() as libc::c_ulong,
     ) as *mut KbdintAuthctxt;
-    if strcmp(devs, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(devs, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         b = sshbuf_new();
         if b.is_null() {
             sshfatal(

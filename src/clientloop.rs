@@ -61,7 +61,7 @@ extern "C" {
     fn mkdtemp(__template: *mut libc::c_char) -> *mut libc::c_char;
     fn system(__command: *const libc::c_char) -> libc::c_int;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -4369,21 +4369,23 @@ unsafe extern "C" fn client_input_channel_open(
             rwindow,
             rmaxpack,
         );
-        if strcmp(
+        if libc::strcmp(
             ctype,
             b"forwarded-tcpip\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             c = client_request_forwarded_tcpip(ssh, ctype, rchan as libc::c_int, rwindow, rmaxpack);
-        } else if strcmp(
+        } else if libc::strcmp(
             ctype,
             b"forwarded-streamlocal@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             c = client_request_forwarded_streamlocal(ssh, ctype, rchan as libc::c_int);
-        } else if strcmp(ctype, b"x11\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+        } else if libc::strcmp(ctype, b"x11\0" as *const u8 as *const libc::c_char)
+            == 0 as libc::c_int
+        {
             c = client_request_x11(ssh, ctype, rchan as libc::c_int);
-        } else if strcmp(
+        } else if libc::strcmp(
             ctype,
             b"auth-agent@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -4576,7 +4578,7 @@ unsafe extern "C" fn client_input_channel_req(
                 id,
             );
             current_block = 17478428563724192186;
-        } else if strcmp(
+        } else if libc::strcmp(
             rtype,
             b"eow@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -4588,7 +4590,7 @@ unsafe extern "C" fn client_input_channel_req(
                 chan_rcvd_eow(ssh, c);
                 current_block = 17478428563724192186;
             }
-        } else if strcmp(
+        } else if libc::strcmp(
             rtype,
             b"libc::exit-status\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -6213,7 +6215,7 @@ unsafe extern "C" fn client_input_global_request(
             rtype,
             want_reply as libc::c_int,
         );
-        if strcmp(
+        if libc::strcmp(
             rtype,
             b"hostkeys-00@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int

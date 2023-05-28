@@ -43,7 +43,7 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -519,13 +519,13 @@ unsafe extern "C" fn check_markers(mut cpp: *mut *mut libc::c_char) -> HostkeyMa
             sp.offset_from(cp) as libc::c_long as libc::c_ulong,
         );
         marker[sp.offset_from(cp) as libc::c_long as usize] = '\0' as i32 as libc::c_char;
-        if strcmp(
+        if libc::strcmp(
             marker.as_mut_ptr(),
             b"@cert-authority\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             ret = MRK_CA as libc::c_int;
-        } else if strcmp(
+        } else if libc::strcmp(
             marker.as_mut_ptr(),
             b"@revoked\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int

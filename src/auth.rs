@@ -49,7 +49,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
 
     fn match_user(
@@ -988,7 +988,8 @@ pub unsafe extern "C" fn auth_log(
     if authenticated == 1 as libc::c_int
         || (*authctxt).valid == 0
         || (*authctxt).failures >= options.max_authtries / 2 as libc::c_int
-        || strcmp(method, b"password\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+        || libc::strcmp(method, b"password\0" as *const u8 as *const libc::c_char)
+            == 0 as libc::c_int
     {
         level = SYSLOG_LEVEL_INFO as libc::c_int;
     }
@@ -1051,13 +1052,14 @@ pub unsafe extern "C" fn auth_log(
     );
     libc::free(extra as *mut libc::c_void);
     if authenticated == 0 as libc::c_int && !((*authctxt).postponed != 0 || partial != 0) {
-        if strcmp(method, b"password\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+        if libc::strcmp(method, b"password\0" as *const u8 as *const libc::c_char)
+            == 0 as libc::c_int
             || strncmp(
                 method,
                 b"keyboard-interactive\0" as *const u8 as *const libc::c_char,
                 20 as libc::c_int as libc::c_ulong,
             ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 method,
                 b"challenge-response\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
@@ -1104,11 +1106,11 @@ pub unsafe extern "C" fn auth_root_allowed(
     match options.permit_root_login {
         3 => return 1 as libc::c_int,
         2 => {
-            if strcmp(method, b"publickey\0" as *const u8 as *const libc::c_char)
+            if libc::strcmp(method, b"publickey\0" as *const u8 as *const libc::c_char)
                 == 0 as libc::c_int
-                || strcmp(method, b"hostbased\0" as *const u8 as *const libc::c_char)
+                || libc::strcmp(method, b"hostbased\0" as *const u8 as *const libc::c_char)
                     == 0 as libc::c_int
-                || strcmp(
+                || libc::strcmp(
                     method,
                     b"gssapi-with-mic\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int
@@ -1708,7 +1710,7 @@ unsafe extern "C" fn remote_hostname(mut ssh: *mut ssh) -> *mut libc::c_char {
             0 as libc::c_int as socklen_t,
             1 as libc::c_int,
         ) == 0 as libc::c_int
-            && strcmp(ntop, ntop2.as_mut_ptr()) == 0 as libc::c_int
+            && libc::strcmp(ntop, ntop2.as_mut_ptr()) == 0 as libc::c_int
         {
             break;
         }

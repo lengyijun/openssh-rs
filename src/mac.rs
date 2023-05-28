@@ -6,7 +6,7 @@ extern "C" {
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
@@ -349,7 +349,7 @@ pub unsafe extern "C" fn mac_setup(
     let mut m: *const macalg = 0 as *const macalg;
     m = macs.as_ptr();
     while !((*m).name).is_null() {
-        if strcmp(name, (*m).name) != 0 as libc::c_int {
+        if libc::strcmp(name, (*m).name) != 0 as libc::c_int {
             m = m.offset(1);
             m;
         } else {
@@ -538,7 +538,7 @@ pub unsafe extern "C" fn mac_valid(mut names: *const libc::c_char) -> libc::c_in
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut p: *mut libc::c_char = 0 as *mut libc::c_char;
     if names.is_null()
-        || strcmp(names, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+        || libc::strcmp(names, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
     {
         return 0 as libc::c_int;
     }

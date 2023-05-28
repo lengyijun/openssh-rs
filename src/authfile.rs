@@ -22,7 +22,6 @@ extern "C" {
     ) -> __ssize_t;
     fn ferror(__stream: *mut libc::FILE) -> libc::c_int;
 
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -438,7 +437,7 @@ unsafe extern "C" fn sshkey_try_load_public(
             b"-----BEGIN\0" as *const u8 as *const libc::c_char,
             10 as libc::c_int as libc::c_ulong,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 cp,
                 b"SSH PRIVATE KEY libc::FILE\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int

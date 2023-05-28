@@ -13,7 +13,7 @@ extern "C" {
     fn BN_clear_free(a: *mut BIGNUM);
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn ECDSA_do_verify(
         dgst: *const libc::c_uchar,
         dgst_len: libc::c_int,
@@ -564,7 +564,7 @@ unsafe extern "C" fn ssh_ecdsa_verify(
         || sshbuf_froms(b, &mut sigbuf) != 0 as libc::c_int
     {
         ret = -(4 as libc::c_int);
-    } else if strcmp(sshkey_ssh_name_plain(key), ktype) != 0 as libc::c_int {
+    } else if libc::strcmp(sshkey_ssh_name_plain(key), ktype) != 0 as libc::c_int {
         ret = -(13 as libc::c_int);
     } else if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
         ret = -(23 as libc::c_int);

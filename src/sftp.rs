@@ -83,7 +83,7 @@ extern "C" {
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn qsort(__base: *mut libc::c_void, __nmemb: size_t, __size: size_t, __compar: __compar_fn_t);
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -1939,7 +1939,7 @@ unsafe extern "C" fn sdirent_comp(
         1 as libc::c_int
     };
     if sort_flag & 0x8 as libc::c_int != 0 {
-        return rmul * strcmp((*a).filename, (*b).filename);
+        return rmul * libc::strcmp((*a).filename, (*b).filename);
     } else if sort_flag & 0x10 as libc::c_int != 0 {
         return rmul
             * (if (*a).a.mtime == (*b).a.mtime {
@@ -2138,7 +2138,7 @@ unsafe extern "C" fn sglob_comp(
         1 as libc::c_int
     };
     if sort_flag & 0x8 as libc::c_int != 0 {
-        return rmul * strcmp(ap, bp);
+        return rmul * libc::strcmp(ap, bp);
     } else if sort_flag & 0x10 as libc::c_int != 0 {
         if if (*as_0).st_mtime == (*bs).st_mtime {
             ((*as_0).st_mtime_nsec == (*bs).st_mtime_nsec) as libc::c_int
@@ -4327,7 +4327,8 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                         b"Batch file already specified.\0" as *const u8 as *const libc::c_char,
                     );
                 }
-                if strcmp(BSDoptarg, b"-\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int
+                if libc::strcmp(BSDoptarg, b"-\0" as *const u8 as *const libc::c_char)
+                    != 0 as libc::c_int
                     && {
                         infile = fopen(BSDoptarg, b"r\0" as *const u8 as *const libc::c_char);
                         infile.is_null()

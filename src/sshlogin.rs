@@ -2,7 +2,7 @@ use ::libc;
 extern "C" {
     pub type sshbuf;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn ctime(__timer: *const time_t) -> *mut libc::c_char;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
@@ -342,7 +342,7 @@ unsafe extern "C" fn store_lastlog_message(mut user: *const libc::c_char, mut ui
         *time_string
             .offset(strcspn(time_string, b"\n\0" as *const u8 as *const libc::c_char) as isize) =
             '\0' as i32 as libc::c_char;
-        if strcmp(
+        if libc::strcmp(
             hostname.as_mut_ptr(),
             b"\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int

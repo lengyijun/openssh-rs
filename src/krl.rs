@@ -18,7 +18,7 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn time(__timer: *mut time_t) -> time_t;
     fn strftime(
@@ -1869,7 +1869,7 @@ unsafe extern "C" fn key_id_cmp(
     mut a: *mut revoked_key_id,
     mut b: *mut revoked_key_id,
 ) -> libc::c_int {
-    return strcmp((*a).key_id, (*b).key_id);
+    return libc::strcmp((*a).key_id, (*b).key_id);
 }
 unsafe extern "C" fn blob_cmp(mut a: *mut revoked_blob, mut b: *mut revoked_blob) -> libc::c_int {
     let mut r: libc::c_int = 0;

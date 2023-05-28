@@ -70,7 +70,7 @@ extern "C" {
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -1241,7 +1241,7 @@ unsafe extern "C" fn check_ifaddrs(
                 || (*ifa).ifa_flags & IFF_UP as libc::c_int as libc::c_uint
                     == 0 as libc::c_int as libc::c_uint
                 || (*(*ifa).ifa_addr).sa_family as libc::c_int != af
-                || strcmp((*ifa).ifa_name, options.bind_interface) != 0 as libc::c_int)
+                || libc::strcmp((*ifa).ifa_name, options.bind_interface) != 0 as libc::c_int)
             {
                 match (*(*ifa).ifa_addr).sa_family as libc::c_int {
                     2 => {
@@ -1907,7 +1907,7 @@ pub unsafe extern "C" fn ssh_connect(
             timeout_ms,
             want_keepalive,
         );
-    } else if strcmp(
+    } else if libc::strcmp(
         options.proxy_command,
         b"-\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -1971,7 +1971,7 @@ unsafe extern "C" fn confirm(
         {
             ret = 0 as libc::c_int;
         } else if strcasecmp(p, b"yes\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
-            || !fingerprint.is_null() && strcmp(p, fingerprint) == 0 as libc::c_int
+            || !fingerprint.is_null() && libc::strcmp(p, fingerprint) == 0 as libc::c_int
         {
             ret = 1 as libc::c_int;
         }
@@ -2100,7 +2100,7 @@ unsafe extern "C" fn path_in_hostfiles(
     let mut i: u_int = 0;
     i = 0 as libc::c_int as u_int;
     while i < num_hostfiles {
-        if strcmp(path, *hostfiles.offset(i as isize)) == 0 as libc::c_int {
+        if libc::strcmp(path, *hostfiles.offset(i as isize)) == 0 as libc::c_int {
             return 1 as libc::c_int;
         }
         i = i.wrapping_add(1);
@@ -2722,7 +2722,7 @@ unsafe extern "C" fn check_host_key(
     );
     if options.check_host_ip != 0
         && (local != 0
-            || strcmp(hostname, ip) == 0 as libc::c_int
+            || libc::strcmp(hostname, ip) == 0 as libc::c_int
             || !(options.proxy_command).is_null())
     {
         options.check_host_ip = 0 as libc::c_int;

@@ -49,7 +49,7 @@ extern "C" {
     fn DSA_SIG_free(a: *mut DSA_SIG);
     fn DSA_SIG_new() -> *mut DSA_SIG;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut sshbuf;
@@ -650,7 +650,9 @@ unsafe extern "C" fn ssh_dss_verify(
         || sshbuf_get_string(b, &mut sigblob, &mut len) != 0 as libc::c_int
     {
         ret = -(4 as libc::c_int);
-    } else if strcmp(b"ssh-dss\0" as *const u8 as *const libc::c_char, ktype) != 0 as libc::c_int {
+    } else if libc::strcmp(b"ssh-dss\0" as *const u8 as *const libc::c_char, ktype)
+        != 0 as libc::c_int
+    {
         ret = -(13 as libc::c_int);
     } else if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
         ret = -(23 as libc::c_int);

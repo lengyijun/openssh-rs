@@ -28,7 +28,7 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -587,7 +587,7 @@ unsafe extern "C" fn kex_alg_by_name(mut name: *const libc::c_char) -> *const ke
     let mut k: *const kexalg = 0 as *const kexalg;
     k = kexalgs.as_ptr();
     while !((*k).name).is_null() {
-        if strcmp((*k).name, name) == 0 as libc::c_int {
+        if libc::strcmp((*k).name, name) == 0 as libc::c_int {
             return k;
         }
         k = k.offset(1);
@@ -600,7 +600,7 @@ pub unsafe extern "C" fn kex_names_valid(mut names: *const libc::c_char) -> libc
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut p: *mut libc::c_char = 0 as *mut libc::c_char;
     if names.is_null()
-        || strcmp(names, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+        || libc::strcmp(names, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
     {
         return 0 as libc::c_int;
     }
@@ -1351,7 +1351,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
             libc::free(name as *mut libc::c_void);
             return r;
         }
-        if strcmp(
+        if libc::strcmp(
             name,
             b"server-sig-algs\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -1388,7 +1388,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
             );
             (*kex).server_sig_algs = val as *mut libc::c_char;
             val = 0 as *mut u_char;
-        } else if strcmp(
+        } else if libc::strcmp(
             name,
             b"publickey-hostbound@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -1423,7 +1423,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
                 name,
                 val,
             );
-            if strcmp(
+            if libc::strcmp(
                 val as *const libc::c_char,
                 b"0\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
@@ -1967,15 +1967,17 @@ unsafe extern "C" fn choose_comp(
     if name.is_null() {
         return -(33 as libc::c_int);
     }
-    if strcmp(
+    if libc::strcmp(
         name,
         b"zlib@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
     {
         (*comp).type_0 = 2 as libc::c_int as u_int;
-    } else if strcmp(name, b"zlib\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    } else if libc::strcmp(name, b"zlib\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+    {
         (*comp).type_0 = 1 as libc::c_int as u_int;
-    } else if strcmp(name, b"none\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    } else if libc::strcmp(name, b"none\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+    {
         (*comp).type_0 = 0 as libc::c_int as u_int;
     } else {
         crate::log::sshlog(
@@ -2101,7 +2103,8 @@ unsafe extern "C" fn proposals_match(
         if !p.is_null() {
             *p = '\0' as i32 as libc::c_char;
         }
-        if strcmp(*my.offset(*idx as isize), *peer.offset(*idx as isize)) != 0 as libc::c_int {
+        if libc::strcmp(*my.offset(*idx as isize), *peer.offset(*idx as isize)) != 0 as libc::c_int
+        {
             crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"proposals_match\0"))

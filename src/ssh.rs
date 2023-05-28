@@ -71,7 +71,7 @@ extern "C" {
     fn unsetenv(__name: *const libc::c_char) -> libc::c_int;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -1542,7 +1542,7 @@ unsafe extern "C" fn check_follow_cname(
     let mut rule: *mut allowed_cname = 0 as *mut allowed_cname;
     if *cname as libc::c_int == '\0' as i32
         || config_has_permitted_cnames(&mut options) == 0
-        || strcmp(*namep, cname) == 0 as libc::c_int
+        || libc::strcmp(*namep, cname) == 0 as libc::c_int
     {
         return 0 as libc::c_int;
     }
@@ -2215,30 +2215,36 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                                 as *const libc::c_char,
                         );
                     }
-                    if strcmp(BSDoptarg, b"check\0" as *const u8 as *const libc::c_char)
+                    if libc::strcmp(BSDoptarg, b"check\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
                     {
                         muxclient_command = 2 as libc::c_int as u_int;
-                    } else if strcmp(BSDoptarg, b"forward\0" as *const u8 as *const libc::c_char)
-                        == 0 as libc::c_int
+                    } else if libc::strcmp(
+                        BSDoptarg,
+                        b"forward\0" as *const u8 as *const libc::c_char,
+                    ) == 0 as libc::c_int
                     {
                         muxclient_command = 5 as libc::c_int as u_int;
-                    } else if strcmp(
+                    } else if libc::strcmp(
                         BSDoptarg,
                         b"libc::exit\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
                     {
                         muxclient_command = 3 as libc::c_int as u_int;
-                    } else if strcmp(BSDoptarg, b"stop\0" as *const u8 as *const libc::c_char)
+                    } else if libc::strcmp(BSDoptarg, b"stop\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
                     {
                         muxclient_command = 6 as libc::c_int as u_int;
-                    } else if strcmp(BSDoptarg, b"cancel\0" as *const u8 as *const libc::c_char)
-                        == 0 as libc::c_int
+                    } else if libc::strcmp(
+                        BSDoptarg,
+                        b"cancel\0" as *const u8 as *const libc::c_char,
+                    ) == 0 as libc::c_int
                     {
                         muxclient_command = 7 as libc::c_int as u_int;
-                    } else if strcmp(BSDoptarg, b"proxy\0" as *const u8 as *const libc::c_char)
-                        == 0 as libc::c_int
+                    } else if libc::strcmp(
+                        BSDoptarg,
+                        b"proxy\0" as *const u8 as *const libc::c_char,
+                    ) == 0 as libc::c_int
                     {
                         muxclient_command = 8 as libc::c_int as u_int;
                     } else {
@@ -2257,25 +2263,25 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 80 => {}
                 81 => {
                     cp = 0 as *mut libc::c_char;
-                    if strcmp(BSDoptarg, b"cipher\0" as *const u8 as *const libc::c_char)
+                    if libc::strcmp(BSDoptarg, b"cipher\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
                         || strcasecmp(BSDoptarg, b"Ciphers\0" as *const u8 as *const libc::c_char)
                             == 0 as libc::c_int
                     {
                         cp = cipher_alg_list('\n' as i32 as libc::c_char, 0 as libc::c_int);
-                    } else if strcmp(
+                    } else if libc::strcmp(
                         BSDoptarg,
                         b"cipher-auth\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
                     {
                         cp = cipher_alg_list('\n' as i32 as libc::c_char, 1 as libc::c_int);
-                    } else if strcmp(BSDoptarg, b"mac\0" as *const u8 as *const libc::c_char)
+                    } else if libc::strcmp(BSDoptarg, b"mac\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
                         || strcasecmp(BSDoptarg, b"MACs\0" as *const u8 as *const libc::c_char)
                             == 0 as libc::c_int
                     {
                         cp = mac_alg_list('\n' as i32 as libc::c_char);
-                    } else if strcmp(BSDoptarg, b"kex\0" as *const u8 as *const libc::c_char)
+                    } else if libc::strcmp(BSDoptarg, b"kex\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
                         || strcasecmp(
                             BSDoptarg,
@@ -2283,7 +2289,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         ) == 0 as libc::c_int
                     {
                         cp = kex_alg_list('\n' as i32 as libc::c_char);
-                    } else if strcmp(BSDoptarg, b"key\0" as *const u8 as *const libc::c_char)
+                    } else if libc::strcmp(BSDoptarg, b"key\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
                     {
                         cp = sshkey_alg_list(
@@ -2292,8 +2298,10 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             0 as libc::c_int,
                             '\n' as i32 as libc::c_char,
                         );
-                    } else if strcmp(BSDoptarg, b"key-cert\0" as *const u8 as *const libc::c_char)
-                        == 0 as libc::c_int
+                    } else if libc::strcmp(
+                        BSDoptarg,
+                        b"key-cert\0" as *const u8 as *const libc::c_char,
+                    ) == 0 as libc::c_int
                     {
                         cp = sshkey_alg_list(
                             1 as libc::c_int,
@@ -2301,7 +2309,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             0 as libc::c_int,
                             '\n' as i32 as libc::c_char,
                         );
-                    } else if strcmp(
+                    } else if libc::strcmp(
                         BSDoptarg,
                         b"key-plain\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
@@ -2312,8 +2320,10 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             0 as libc::c_int,
                             '\n' as i32 as libc::c_char,
                         );
-                    } else if strcmp(BSDoptarg, b"key-sig\0" as *const u8 as *const libc::c_char)
-                        == 0 as libc::c_int
+                    } else if libc::strcmp(
+                        BSDoptarg,
+                        b"key-sig\0" as *const u8 as *const libc::c_char,
+                    ) == 0 as libc::c_int
                         || strcasecmp(
                             BSDoptarg,
                             b"CASignatureAlgorithms\0" as *const u8 as *const libc::c_char,
@@ -2349,7 +2359,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             1 as libc::c_int,
                             '\n' as i32 as libc::c_char,
                         );
-                    } else if strcmp(BSDoptarg, b"sig\0" as *const u8 as *const libc::c_char)
+                    } else if libc::strcmp(BSDoptarg, b"sig\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
                     {
                         cp = sshkey_alg_list(
@@ -2358,13 +2368,13 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             1 as libc::c_int,
                             '\n' as i32 as libc::c_char,
                         );
-                    } else if strcmp(
+                    } else if libc::strcmp(
                         BSDoptarg,
                         b"protocol-version\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
                     {
                         cp = crate::xmalloc::xstrdup(b"2\0" as *const u8 as *const libc::c_char);
-                    } else if strcmp(
+                    } else if libc::strcmp(
                         BSDoptarg,
                         b"compression\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
@@ -2379,7 +2389,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             n = n.wrapping_add(1);
                             n;
                         }
-                    } else if strcmp(BSDoptarg, b"help\0" as *const u8 as *const libc::c_char)
+                    } else if libc::strcmp(BSDoptarg, b"help\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
                     {
                         cp = crate::xmalloc::xstrdup(
@@ -2591,7 +2601,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     } else if strlen(BSDoptarg) == 1 as libc::c_int as libc::c_ulong {
                         options.escape_char =
                             *BSDoptarg.offset(0 as libc::c_int as isize) as u_char as libc::c_int;
-                    } else if strcmp(BSDoptarg, b"none\0" as *const u8 as *const libc::c_char)
+                    } else if libc::strcmp(BSDoptarg, b"none\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
                     {
                         options.escape_char = -(2 as libc::c_int);
@@ -2793,7 +2803,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             }
         }
         if BSDoptind > 1 as libc::c_int
-            && strcmp(
+            && libc::strcmp(
                 *av.offset((BSDoptind - 1 as libc::c_int) as isize),
                 b"--\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
@@ -3061,9 +3071,9 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         if jumpuser.is_null() {
             jumpuser = options.user;
         }
-        if strcmp(options.jump_host, host) == 0 as libc::c_int
+        if libc::strcmp(options.jump_host, host) == 0 as libc::c_int
             && port == jumpport
-            && strcmp(options.user, jumpuser) == 0 as libc::c_int
+            && libc::strcmp(options.user, jumpuser) == 0 as libc::c_int
         {
             sshfatal(
                 b"ssh.c\0" as *const u8 as *const libc::c_char,
@@ -3173,7 +3183,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         lowercase(options.host_key_alias);
     }
     if !(options.proxy_command).is_null()
-        && strcmp(
+        && libc::strcmp(
             options.proxy_command,
             b"-\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -3495,7 +3505,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         if !(options.user_hostfiles[j as usize]).is_null() {
             cp = tilde_expand_filename(options.user_hostfiles[j as usize], libc::getuid());
             p = default_client_percent_dollar_expand(cp, cinfo);
-            if strcmp(options.user_hostfiles[j as usize], p) != 0 as libc::c_int {
+            if libc::strcmp(options.user_hostfiles[j as usize], p) != 0 as libc::c_int {
                 crate::log::sshlog(
                     b"ssh.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
@@ -3523,7 +3533,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             let ref mut fresh4 = (*(options.local_forwards).offset(i as isize)).listen_path;
             *fresh4 = default_client_percent_expand(cp, cinfo);
             p = *fresh4;
-            if strcmp(cp, p) != 0 as libc::c_int {
+            if libc::strcmp(cp, p) != 0 as libc::c_int {
                 crate::log::sshlog(
                     b"ssh.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
@@ -3544,7 +3554,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             let ref mut fresh5 = (*(options.local_forwards).offset(i as isize)).connect_path;
             *fresh5 = default_client_percent_expand(cp, cinfo);
             p = *fresh5;
-            if strcmp(cp, p) != 0 as libc::c_int {
+            if libc::strcmp(cp, p) != 0 as libc::c_int {
                 crate::log::sshlog(
                     b"ssh.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
@@ -3570,7 +3580,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             let ref mut fresh6 = (*(options.remote_forwards).offset(i as isize)).listen_path;
             *fresh6 = default_client_percent_expand(cp, cinfo);
             p = *fresh6;
-            if strcmp(cp, p) != 0 as libc::c_int {
+            if libc::strcmp(cp, p) != 0 as libc::c_int {
                 crate::log::sshlog(
                     b"ssh.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
@@ -3591,7 +3601,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             let ref mut fresh7 = (*(options.remote_forwards).offset(i as isize)).connect_path;
             *fresh7 = default_client_percent_expand(cp, cinfo);
             p = *fresh7;
-            if strcmp(cp, p) != 0 as libc::c_int {
+            if libc::strcmp(cp, p) != 0 as libc::c_int {
                 crate::log::sshlog(
                     b"ssh.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
@@ -4204,12 +4214,12 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             }
             load_public_identity_files(cinfo);
             if !(options.identity_agent).is_null()
-                && strcmp(
+                && libc::strcmp(
                     options.identity_agent,
                     b"SSH_AUTH_SOCK\0" as *const u8 as *const libc::c_char,
                 ) != 0 as libc::c_int
             {
-                if strcmp(
+                if libc::strcmp(
                     options.identity_agent,
                     b"none\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int
@@ -4881,7 +4891,7 @@ unsafe extern "C" fn ssh_init_forward_permissions(
         return;
     }
     if num_opens == 1 as libc::c_int as libc::c_uint
-        && strcmp(
+        && libc::strcmp(
             *opens.offset(0 as libc::c_int as isize),
             b"any\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -4889,7 +4899,7 @@ unsafe extern "C" fn ssh_init_forward_permissions(
         return;
     }
     if num_opens == 1 as libc::c_int as libc::c_uint
-        && strcmp(
+        && libc::strcmp(
             *opens.offset(0 as libc::c_int as isize),
             b"none\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int

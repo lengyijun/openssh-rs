@@ -61,7 +61,7 @@ extern "C" {
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -2198,7 +2198,7 @@ unsafe extern "C" fn prepare_remote_path(
 ) -> *mut libc::c_char {
     let mut nslash: size_t = 0;
     if *path as libc::c_int == '\0' as i32
-        || strcmp(path, b"~\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+        || libc::strcmp(path, b"~\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
     {
         return crate::xmalloc::xstrdup(b".\0" as *const u8 as *const libc::c_char);
     }
@@ -2842,11 +2842,11 @@ pub unsafe extern "C" fn rsource(mut name: *mut libc::c_char, mut statp: *mut li
         if (*dp).d_ino == 0 as libc::c_int as libc::c_ulong {
             continue;
         }
-        if strcmp(
+        if libc::strcmp(
             ((*dp).d_name).as_mut_ptr(),
             b".\0" as *const u8 as *const libc::c_char,
         ) == 0
-            || strcmp(
+            || libc::strcmp(
                 ((*dp).d_name).as_mut_ptr(),
                 b"..\0" as *const u8 as *const libc::c_char,
             ) == 0
@@ -3685,9 +3685,9 @@ pub unsafe extern "C" fn sink(
                                 size = ull as off_t;
                                 if *cp as libc::c_int == '\0' as i32
                                     || !(strchr(cp, '/' as i32)).is_null()
-                                    || strcmp(cp, b".\0" as *const u8 as *const libc::c_char)
+                                    || libc::strcmp(cp, b".\0" as *const u8 as *const libc::c_char)
                                         == 0 as libc::c_int
-                                    || strcmp(cp, b"..\0" as *const u8 as *const libc::c_char)
+                                    || libc::strcmp(cp, b"..\0" as *const u8 as *const libc::c_char)
                                         == 0 as libc::c_int
                                 {
                                     run_err(
@@ -3700,7 +3700,7 @@ pub unsafe extern "C" fn sink(
                                 if npatterns > 0 as libc::c_int as libc::c_ulong {
                                     n = 0 as libc::c_int as size_t;
                                     while n < npatterns {
-                                        if strcmp(*patterns.offset(n as isize), cp)
+                                        if libc::strcmp(*patterns.offset(n as isize), cp)
                                             == 0 as libc::c_int
                                             || fnmatch(
                                                 *patterns.offset(n as isize),
@@ -3740,8 +3740,10 @@ pub unsafe extern "C" fn sink(
                                         need as usize,
                                         b"%s%s%s\0" as *const u8 as *const libc::c_char,
                                         targ,
-                                        if strcmp(targ, b"/\0" as *const u8 as *const libc::c_char)
-                                            != 0
+                                        if libc::strcmp(
+                                            targ,
+                                            b"/\0" as *const u8 as *const libc::c_char,
+                                        ) != 0
                                         {
                                             b"/\0" as *const u8 as *const libc::c_char
                                         } else {

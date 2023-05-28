@@ -19,7 +19,7 @@ extern "C" {
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn dlopen(__file: *const libc::c_char, __mode: libc::c_int) -> *mut libc::c_void;
     fn dlclose(__handle: *mut libc::c_void) -> libc::c_int;
@@ -1065,7 +1065,7 @@ unsafe extern "C" fn pkcs11_provider_lookup(
             b"check provider \"%s\"\0" as *const u8 as *const libc::c_char,
             (*p).name,
         );
-        if strcmp(provider_id, (*p).name) == 0 {
+        if libc::strcmp(provider_id, (*p).name) == 0 {
             return p;
         }
         p = (*p).next.tqe_next;

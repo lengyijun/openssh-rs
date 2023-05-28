@@ -34,7 +34,7 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn sshbuf_new() -> *mut sshbuf;
@@ -560,13 +560,17 @@ unsafe extern "C" fn rsa_hash_alg_ident(mut hash_alg: libc::c_int) -> *const lib
     return 0 as *const libc::c_char;
 }
 unsafe extern "C" fn rsa_hash_id_from_ident(mut ident: *const libc::c_char) -> libc::c_int {
-    if strcmp(ident, b"ssh-rsa\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(ident, b"ssh-rsa\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 1 as libc::c_int;
     }
-    if strcmp(ident, b"rsa-sha2-256\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(ident, b"rsa-sha2-256\0" as *const u8 as *const libc::c_char)
+        == 0 as libc::c_int
+    {
         return 2 as libc::c_int;
     }
-    if strcmp(ident, b"rsa-sha2-512\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(ident, b"rsa-sha2-512\0" as *const u8 as *const libc::c_char)
+        == 0 as libc::c_int
+    {
         return 4 as libc::c_int;
     }
     return -(1 as libc::c_int);
@@ -577,21 +581,21 @@ unsafe extern "C" fn rsa_hash_id_from_keyname(mut alg: *const libc::c_char) -> l
     if r != -(1 as libc::c_int) {
         return r;
     }
-    if strcmp(
+    if libc::strcmp(
         alg,
         b"ssh-rsa-cert-v01@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
     {
         return 1 as libc::c_int;
     }
-    if strcmp(
+    if libc::strcmp(
         alg,
         b"rsa-sha2-256-cert-v01@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
     {
         return 2 as libc::c_int;
     }
-    if strcmp(
+    if libc::strcmp(
         alg,
         b"rsa-sha2-512-cert-v01@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -880,7 +884,7 @@ unsafe extern "C" fn ssh_rsa_verify(
             ret = -(13 as libc::c_int);
         } else {
             if !alg.is_null()
-                && strcmp(
+                && libc::strcmp(
                     alg,
                     b"ssh-rsa-cert-v01@openssh.com\0" as *const u8 as *const libc::c_char,
                 ) != 0 as libc::c_int

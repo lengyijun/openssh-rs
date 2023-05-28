@@ -9,7 +9,6 @@ extern "C" {
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;
 
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
@@ -449,7 +448,8 @@ unsafe extern "C" fn valid_request(
             b"parse service\0" as *const u8 as *const libc::c_char,
         );
     }
-    if strcmp(b"ssh-connection\0" as *const u8 as *const libc::c_char, p) != 0 as libc::c_int {
+    if libc::strcmp(b"ssh-connection\0" as *const u8 as *const libc::c_char, p) != 0 as libc::c_int
+    {
         fail += 1;
         fail;
     }
@@ -467,7 +467,7 @@ unsafe extern "C" fn valid_request(
             b"parse method\0" as *const u8 as *const libc::c_char,
         );
     }
-    if strcmp(b"hostbased\0" as *const u8 as *const libc::c_char, p) != 0 as libc::c_int {
+    if libc::strcmp(b"hostbased\0" as *const u8 as *const libc::c_char, p) != 0 as libc::c_int {
         fail += 1;
         fail;
     }
@@ -564,7 +564,7 @@ unsafe extern "C" fn valid_request(
             b"parse luser\0" as *const u8 as *const libc::c_char,
         );
     }
-    if strcmp((*pw).pw_name, luser) != 0 as libc::c_int {
+    if libc::strcmp((*pw).pw_name, luser) != 0 as libc::c_int {
         fail += 1;
         fail;
     }

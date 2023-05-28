@@ -73,7 +73,7 @@ extern "C" {
     fn getrlimit(__resource: __rlimit_resource_t, __rlimits: *mut rlimit) -> libc::c_int;
     fn setrlimit(__resource: __rlimit_resource_t, __rlimits: *const rlimit) -> libc::c_int;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
@@ -1360,7 +1360,7 @@ unsafe extern "C" fn parse_userauth_request(
             {
                 if t as libc::c_int != 50 as libc::c_int
                     || sig_follows as libc::c_int != 1 as libc::c_int
-                    || strcmp(
+                    || libc::strcmp(
                         service,
                         b"ssh-connection\0" as *const u8 as *const libc::c_char,
                     ) != 0 as libc::c_int
@@ -1369,7 +1369,7 @@ unsafe extern "C" fn parse_userauth_request(
                 {
                     r = -(4 as libc::c_int);
                 } else {
-                    if strcmp(
+                    if libc::strcmp(
                         method,
                         b"publickey-hostbound-v00@openssh.com\0" as *const u8
                             as *const libc::c_char,
@@ -1381,8 +1381,10 @@ unsafe extern "C" fn parse_userauth_request(
                         } else {
                             current_block = 15904375183555213903;
                         }
-                    } else if strcmp(method, b"publickey\0" as *const u8 as *const libc::c_char)
-                        != 0 as libc::c_int
+                    } else if libc::strcmp(
+                        method,
+                        b"publickey\0" as *const u8 as *const libc::c_char,
+                    ) != 0 as libc::c_int
                     {
                         r = -(4 as libc::c_int);
                         current_block = 1189788983119488299;
@@ -2509,7 +2511,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
             b"constraint ext %s\0" as *const u8 as *const libc::c_char,
             ext_name,
         );
-        if strcmp(
+        if libc::strcmp(
             ext_name,
             b"sk-provider@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -2567,7 +2569,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
                     current_block = 15768484401365413375;
                 }
             }
-        } else if strcmp(
+        } else if libc::strcmp(
             ext_name,
             b"restrict-destination-v00@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -3586,7 +3588,7 @@ unsafe extern "C" fn process_remove_smartcard_key(mut e: *mut SocketEntry) {
             while !id.is_null() {
                 nxt = (*id).next.tqe_next;
                 if !((*id).provider).is_null() {
-                    if strcmp(canonical_provider.as_mut_ptr(), (*id).provider) == 0 {
+                    if libc::strcmp(canonical_provider.as_mut_ptr(), (*id).provider) == 0 {
                         if !((*id).next.tqe_next).is_null() {
                             (*(*id).next.tqe_next).next.tqe_prev = (*id).next.tqe_prev;
                         } else {
@@ -3905,7 +3907,7 @@ unsafe extern "C" fn process_extension(mut e: *mut SocketEntry) {
             b"parse\0" as *const u8 as *const libc::c_char,
         );
     } else {
-        if strcmp(
+        if libc::strcmp(
             name,
             b"session-bind@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -4762,7 +4764,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 k_flag;
             }
             79 => {
-                if strcmp(
+                if libc::strcmp(
                     BSDoptarg,
                     b"no-restrict-websafe\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int

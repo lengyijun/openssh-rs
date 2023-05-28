@@ -12,7 +12,7 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn ECDSA_do_verify(
         dgst: *const libc::c_uchar,
         dgst_len: libc::c_int,
@@ -451,14 +451,14 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
     } else if sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t) != 0 as libc::c_int {
         ret = -(4 as libc::c_int);
     } else {
-        if strcmp(
+        if libc::strcmp(
             ktype,
             b"webauthn-sk-ecdsa-sha2-nistp256@openssh.com\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             is_webauthn = 1 as libc::c_int;
             current_block = 4956146061682418353;
-        } else if strcmp(
+        } else if libc::strcmp(
             ktype,
             b"sk-ecdsa-sha2-nistp256@openssh.com\0" as *const u8 as *const libc::c_char,
         ) != 0 as libc::c_int

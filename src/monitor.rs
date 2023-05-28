@@ -43,7 +43,7 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
@@ -1181,7 +1181,7 @@ pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor: 
             b"authenticated invalid user\0" as *const u8 as *const libc::c_char,
         );
     }
-    if strcmp(
+    if libc::strcmp(
         auth_method,
         b"unknown\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -3203,7 +3203,7 @@ unsafe extern "C" fn monitor_valid_userblob(
             b"\0" as *const u8 as *const libc::c_char
         },
     );
-    if strcmp(userstyle, cp) != 0 as libc::c_int {
+    if libc::strcmp(userstyle, cp) != 0 as libc::c_int {
         crate::log::sshlog(
             b"monitor.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
@@ -3242,8 +3242,8 @@ unsafe extern "C" fn monitor_valid_userblob(
             b"parse method\0" as *const u8 as *const libc::c_char,
         );
     }
-    if strcmp(b"publickey\0" as *const u8 as *const libc::c_char, cp) != 0 as libc::c_int {
-        if strcmp(
+    if libc::strcmp(b"publickey\0" as *const u8 as *const libc::c_char, cp) != 0 as libc::c_int {
+        if libc::strcmp(
             b"publickey-hostbound-v00@openssh.com\0" as *const u8 as *const libc::c_char,
             cp,
         ) == 0 as libc::c_int
@@ -3426,7 +3426,7 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
             b"\0" as *const u8 as *const libc::c_char
         },
     );
-    if strcmp(userstyle, cp) != 0 as libc::c_int {
+    if libc::strcmp(userstyle, cp) != 0 as libc::c_int {
         crate::log::sshlog(
             b"monitor.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 28], &[libc::c_char; 28]>(
@@ -3465,7 +3465,7 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
             b"parse method\0" as *const u8 as *const libc::c_char,
         );
     }
-    if strcmp(cp, b"hostbased\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int {
+    if libc::strcmp(cp, b"hostbased\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int {
         fail += 1;
         fail;
     }
@@ -3511,7 +3511,7 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
         *cp.offset(len.wrapping_sub(1 as libc::c_int as libc::c_ulong) as isize) =
             '\0' as i32 as libc::c_char;
     }
-    if strcmp(cp, chost) != 0 as libc::c_int {
+    if libc::strcmp(cp, chost) != 0 as libc::c_int {
         fail += 1;
         fail;
     }
@@ -3531,7 +3531,7 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
             b"parse ruser\0" as *const u8 as *const libc::c_char,
         );
     }
-    if strcmp(cp, cuser) != 0 as libc::c_int {
+    if libc::strcmp(cp, cuser) != 0 as libc::c_int {
         fail += 1;
         fail;
     }

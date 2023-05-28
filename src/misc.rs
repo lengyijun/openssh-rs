@@ -92,7 +92,7 @@ extern "C" {
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -3393,7 +3393,7 @@ unsafe extern "C" fn strcmp_maybe_null(
     if a.is_null() && !b.is_null() || !a.is_null() && b.is_null() {
         return 0 as libc::c_int;
     }
-    if !a.is_null() && strcmp(a, b) != 0 as libc::c_int {
+    if !a.is_null() && libc::strcmp(a, b) != 0 as libc::c_int {
         return 0 as libc::c_int;
     }
     return 1 as libc::c_int;
@@ -3871,11 +3871,14 @@ pub unsafe extern "C" fn safe_path(
             );
             return -(1 as libc::c_int);
         }
-        if comparehome != 0 && strcmp(homedir.as_mut_ptr(), buf.as_mut_ptr()) == 0 as libc::c_int {
+        if comparehome != 0
+            && libc::strcmp(homedir.as_mut_ptr(), buf.as_mut_ptr()) == 0 as libc::c_int
+        {
             break;
         }
-        if strcmp(b"/\0" as *const u8 as *const libc::c_char, buf.as_mut_ptr()) == 0 as libc::c_int
-            || strcmp(b".\0" as *const u8 as *const libc::c_char, buf.as_mut_ptr())
+        if libc::strcmp(b"/\0" as *const u8 as *const libc::c_char, buf.as_mut_ptr())
+            == 0 as libc::c_int
+            || libc::strcmp(b".\0" as *const u8 as *const libc::c_char, buf.as_mut_ptr())
                 == 0 as libc::c_int
         {
             break;

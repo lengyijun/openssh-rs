@@ -43,7 +43,7 @@ extern "C" {
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -1633,7 +1633,7 @@ pub unsafe extern "C" fn add_certificate_file(
     i = 0 as libc::c_int;
     while i < (*options).num_certificate_files {
         if (*options).certificate_file_userprovided[i as usize] == userprovided
-            && strcmp((*options).certificate_files[i as usize], path) == 0 as libc::c_int
+            && libc::strcmp((*options).certificate_files[i as usize], path) == 0 as libc::c_int
         {
             crate::log::sshlog(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
@@ -1704,7 +1704,7 @@ pub unsafe extern "C" fn add_identity_file(
     i = 0 as libc::c_int;
     while i < (*options).num_identity_files {
         if (*options).identity_file_userprovided[i as usize] == userprovided
-            && strcmp((*options).identity_files[i as usize], path) == 0 as libc::c_int
+            && libc::strcmp((*options).identity_files[i as usize], path) == 0 as libc::c_int
         {
             crate::log::sshlog(
                 b"readconf.c\0" as *const u8 as *const libc::c_char,
@@ -2416,7 +2416,7 @@ unsafe extern "C" fn parse_token(
     let mut i: libc::c_int = 0;
     i = 0 as libc::c_int;
     while !(keywords[i as usize].name).is_null() {
-        if strcmp(cp, keywords[i as usize].name) == 0 as libc::c_int {
+        if libc::strcmp(cp, keywords[i as usize].name) == 0 as libc::c_int {
             return keywords[i as usize].opcode;
         }
         i += 1;
@@ -3364,7 +3364,8 @@ unsafe extern "C" fn process_config_line_depth(
                 );
                 current_block = 7482270440933722938;
             } else {
-                if strcmp(arg, b"default\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+                if libc::strcmp(arg, b"default\0" as *const u8 as *const libc::c_char)
+                    == 0 as libc::c_int
                 {
                     val64 = 0 as libc::c_int as libc::c_longlong;
                     current_block = 9521147444787763968;
@@ -3420,7 +3421,7 @@ unsafe extern "C" fn process_config_line_depth(
                             (*options).rekey_limit = val64 as int64_t;
                         }
                         if ac != 0 as libc::c_int {
-                            if strcmp(
+                            if libc::strcmp(
                                 *av.offset(0 as libc::c_int as isize),
                                 b"none\0" as *const u8 as *const libc::c_char,
                             ) == 0 as libc::c_int
@@ -4162,7 +4163,7 @@ unsafe extern "C" fn process_config_line_depth(
                     }
                     p = cleanhostname(p);
                     if arg.is_null()
-                        || strcmp(arg, b"*\0" as *const u8 as *const libc::c_char)
+                        || libc::strcmp(arg, b"*\0" as *const u8 as *const libc::c_char)
                             != 0 as libc::c_int
                             && crate::misc::a2port(arg) <= 0 as libc::c_int
                     {
@@ -4418,7 +4419,9 @@ unsafe extern "C" fn process_config_line_depth(
                 );
                 current_block = 7482270440933722938;
             } else {
-                if strcmp(arg, b"none\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+                if libc::strcmp(arg, b"none\0" as *const u8 as *const libc::c_char)
+                    == 0 as libc::c_int
+                {
                     value = -(2 as libc::c_int);
                     current_block = 15439134456549723682;
                 } else if *arg.offset(1 as libc::c_int as isize) as libc::c_int == '\0' as i32 {
@@ -4622,15 +4625,16 @@ unsafe extern "C" fn process_config_line_depth(
             } else {
                 value = 0 as libc::c_int;
                 value2 = 0 as libc::c_int;
-                if strcmp(arg, b"no\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
-                    || strcmp(arg, b"false\0" as *const u8 as *const libc::c_char)
+                if libc::strcmp(arg, b"no\0" as *const u8 as *const libc::c_char)
+                    == 0 as libc::c_int
+                    || libc::strcmp(arg, b"false\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
                 {
                     value = 0 as libc::c_int;
                     current_block = 763911284580919563;
-                } else if strcmp(arg, b"yes\0" as *const u8 as *const libc::c_char)
+                } else if libc::strcmp(arg, b"yes\0" as *const u8 as *const libc::c_char)
                     == 0 as libc::c_int
-                    || strcmp(arg, b"true\0" as *const u8 as *const libc::c_char)
+                    || libc::strcmp(arg, b"true\0" as *const u8 as *const libc::c_char)
                         == 0 as libc::c_int
                 {
                     value = 1 as libc::c_int;
@@ -5181,7 +5185,7 @@ unsafe extern "C" fn process_config_line_depth(
                     } else {
                         arg2 = b"\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
                     }
-                } else if strcmp(arg, b"*\0" as *const u8 as *const libc::c_char)
+                } else if libc::strcmp(arg, b"*\0" as *const u8 as *const libc::c_char)
                     == 0 as libc::c_int
                 {
                     arg2 = arg;
@@ -5780,7 +5784,9 @@ unsafe extern "C" fn process_config_line_depth(
                 );
                 current_block = 7482270440933722938;
             } else {
-                if strcmp(arg, b"none\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+                if libc::strcmp(arg, b"none\0" as *const u8 as *const libc::c_char)
+                    == 0 as libc::c_int
+                {
                     value = -(1 as libc::c_int);
                     current_block = 12199444798915819164;
                 } else {
@@ -6088,7 +6094,7 @@ pub unsafe extern "C" fn config_has_permitted_cnames(mut options: *mut Options) 
             (*options).permitted_cnames[0 as libc::c_int as usize].source_list,
             b"none\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-        && strcmp(
+        && libc::strcmp(
             (*options).permitted_cnames[0 as libc::c_int as usize].target_list,
             b"\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -6404,7 +6410,7 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
         if (*options).verify_host_key_dns <= 0 as libc::c_int
             && ((*options).num_user_hostfiles == 0 as libc::c_int as libc::c_uint
                 || (*options).num_user_hostfiles == 1 as libc::c_int as libc::c_uint
-                    && strcmp(
+                    && libc::strcmp(
                         (*options).user_hostfiles[0 as libc::c_int as usize],
                         b"~/.ssh/known_hosts\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int)
@@ -6693,7 +6699,7 @@ pub unsafe extern "C" fn fill_default_options(mut options: *mut Options) -> libc
                                 (*options).known_hosts_command = 0 as *mut libc::c_char;
                             }
                             if !((*options).jump_host).is_null()
-                                && strcmp(
+                                && libc::strcmp(
                                     (*options).jump_host,
                                     b"none\0" as *const u8 as *const libc::c_char,
                                 ) == 0 as libc::c_int
@@ -7397,14 +7403,14 @@ unsafe extern "C" fn dump_cfg_forwards(
         fwd = &*fwds.offset(i as isize) as *const Forward;
         if !(code as libc::c_uint == oDynamicForward as libc::c_int as libc::c_uint
             && !((*fwd).connect_host).is_null()
-            && strcmp(
+            && libc::strcmp(
                 (*fwd).connect_host,
                 b"socks\0" as *const u8 as *const libc::c_char,
             ) != 0 as libc::c_int)
         {
             if !(code as libc::c_uint == oLocalForward as libc::c_int as libc::c_uint
                 && !((*fwd).connect_host).is_null()
-                && strcmp(
+                && libc::strcmp(
                     (*fwd).connect_host,
                     b"socks\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int)

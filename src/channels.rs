@@ -65,7 +65,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn memchr(_: *const libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
+
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -3742,7 +3742,9 @@ unsafe extern "C" fn port_open_helper(
         c,
         rtype,
     );
-    if strcmp(rtype, b"direct-tcpip\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(rtype, b"direct-tcpip\0" as *const u8 as *const libc::c_char)
+        == 0 as libc::c_int
+    {
         r = sshpkt_put_cstring(ssh, (*c).path as *const libc::c_void);
         if r != 0 as libc::c_int || {
             r = sshpkt_put_u32(ssh, (*c).host_port as u_int32_t);
@@ -3760,7 +3762,7 @@ unsafe extern "C" fn port_open_helper(
                 (*c).self_0,
             );
         }
-    } else if strcmp(
+    } else if libc::strcmp(
         rtype,
         b"direct-streamlocal@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -3779,7 +3781,7 @@ unsafe extern "C" fn port_open_helper(
                 (*c).self_0,
             );
         }
-    } else if strcmp(
+    } else if libc::strcmp(
         rtype,
         b"forwarded-streamlocal@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -3817,7 +3819,7 @@ unsafe extern "C" fn port_open_helper(
             );
         }
     }
-    if strcmp(
+    if libc::strcmp(
         rtype,
         b"forwarded-streamlocal@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -6596,7 +6598,7 @@ pub unsafe extern "C" fn channel_proxy_downstream(
                         b"parse\0" as *const u8 as *const libc::c_char,
                     );
                     current_block = 11241368042544214213;
-                } else if strcmp(
+                } else if libc::strcmp(
                     ctype,
                     b"tcpip-forward\0" as *const u8 as *const libc::c_char,
                 ) != 0 as libc::c_int
@@ -7820,22 +7822,23 @@ unsafe extern "C" fn channel_fwd_bind_addr(
         }
     } else if (*fwd_opts).gateway_ports != 0 || is_client != 0 {
         if (*ssh).compat & 0x1000000 as libc::c_int != 0
-            && strcmp(
+            && libc::strcmp(
                 listen_addr,
                 b"0.0.0.0\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
             && is_client == 0 as libc::c_int
             || *listen_addr as libc::c_int == '\0' as i32
-            || strcmp(listen_addr, b"*\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+            || libc::strcmp(listen_addr, b"*\0" as *const u8 as *const libc::c_char)
+                == 0 as libc::c_int
             || is_client == 0 && (*fwd_opts).gateway_ports == 1 as libc::c_int
         {
             wildcard = 1 as libc::c_int;
             if *listen_addr as libc::c_int != '\0' as i32
-                && strcmp(
+                && libc::strcmp(
                     listen_addr,
                     b"0.0.0.0\0" as *const u8 as *const libc::c_char,
                 ) != 0 as libc::c_int
-                && strcmp(listen_addr, b"*\0" as *const u8 as *const libc::c_char)
+                && libc::strcmp(listen_addr, b"*\0" as *const u8 as *const libc::c_char)
                     != 0 as libc::c_int
             {
                 ssh_packet_send_debug(
@@ -7845,23 +7848,25 @@ unsafe extern "C" fn channel_fwd_bind_addr(
                     listen_addr,
                 );
             }
-        } else if strcmp(
+        } else if libc::strcmp(
             listen_addr,
             b"localhost\0" as *const u8 as *const libc::c_char,
         ) != 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 listen_addr,
                 b"127.0.0.1\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
-            || strcmp(listen_addr, b"::1\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+            || libc::strcmp(listen_addr, b"::1\0" as *const u8 as *const libc::c_char)
+                == 0 as libc::c_int
         {
             addr = listen_addr;
         }
-    } else if strcmp(
+    } else if libc::strcmp(
         listen_addr,
         b"127.0.0.1\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
-        || strcmp(listen_addr, b"::1\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+        || libc::strcmp(listen_addr, b"::1\0" as *const u8 as *const libc::c_char)
+            == 0 as libc::c_int
     {
         addr = listen_addr;
     }
@@ -8422,7 +8427,7 @@ unsafe extern "C" fn channel_cancel_rport_listener_tcpip(
     while i < (*(*ssh).chanctxt).channels_alloc {
         let mut c: *mut Channel = *((*(*ssh).chanctxt).channels).offset(i as isize);
         if !(c.is_null() || (*c).type_0 != 11 as libc::c_int) {
-            if strcmp((*c).path, host) == 0 as libc::c_int
+            if libc::strcmp((*c).path, host) == 0 as libc::c_int
                 && (*c).listening_port == port as libc::c_int
             {
                 crate::log::sshlog(
@@ -8458,7 +8463,7 @@ unsafe extern "C" fn channel_cancel_rport_listener_streamlocal(
         let mut c: *mut Channel = *((*(*ssh).chanctxt).channels).offset(i as isize);
         if !(c.is_null() || (*c).type_0 != 19 as libc::c_int) {
             if !((*c).path).is_null() {
-                if strcmp((*c).path, path) == 0 as libc::c_int {
+                if libc::strcmp((*c).path, path) == 0 as libc::c_int {
                     crate::log::sshlog(
                         b"channels.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 42], &[libc::c_char; 42]>(
@@ -8536,7 +8541,7 @@ unsafe extern "C" fn channel_cancel_lport_listener_tcpip(
                             || !((*c).listening_addr).is_null() && addr.is_null())
                         {
                             if addr.is_null()
-                                || strcmp((*c).listening_addr, addr) == 0 as libc::c_int
+                                || libc::strcmp((*c).listening_addr, addr) == 0 as libc::c_int
                             {
                                 crate::log::sshlog(
                                     b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -8590,7 +8595,7 @@ unsafe extern "C" fn channel_cancel_lport_listener_streamlocal(
         let mut c: *mut Channel = *((*(*ssh).chanctxt).channels).offset(i as isize);
         if !(c.is_null() || (*c).type_0 != 18 as libc::c_int) {
             if !((*c).listening_addr).is_null() {
-                if strcmp((*c).listening_addr, path) == 0 as libc::c_int {
+                if libc::strcmp((*c).listening_addr, path) == 0 as libc::c_int {
                     crate::log::sshlog(
                         b"channels.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 42], &[libc::c_char; 42]>(
@@ -8798,7 +8803,7 @@ unsafe extern "C" fn channel_rfwd_bind_host(
     if listen_host.is_null() {
         return b"localhost\0" as *const u8 as *const libc::c_char;
     } else if *listen_host as libc::c_int == '\0' as i32
-        || strcmp(listen_host, b"*\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
+        || libc::strcmp(listen_host, b"*\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int
     {
         return b"\0" as *const u8 as *const libc::c_char;
     } else {
@@ -8954,11 +8959,11 @@ unsafe extern "C" fn open_match(
     {
         return 0 as libc::c_int;
     }
-    if strcmp(
+    if libc::strcmp(
         (*allowed_open).host_to_connect,
         b"*\0" as *const u8 as *const libc::c_char,
     ) != 0 as libc::c_int
-        && strcmp((*allowed_open).host_to_connect, requestedhost) != 0 as libc::c_int
+        && libc::strcmp((*allowed_open).host_to_connect, requestedhost) != 0 as libc::c_int
     {
         return 0 as libc::c_int;
     }
@@ -8987,7 +8992,7 @@ unsafe extern "C" fn open_listen_match_tcpip(
     };
     if allowed_host.is_null()
         || requestedhost.is_null()
-        || strcmp(allowed_host, requestedhost) != 0 as libc::c_int
+        || libc::strcmp(allowed_host, requestedhost) != 0 as libc::c_int
     {
         return 0 as libc::c_int;
     }
@@ -9004,7 +9009,7 @@ unsafe extern "C" fn open_listen_match_streamlocal(
         return 0 as libc::c_int;
     }
     if ((*allowed_open).listen_path).is_null()
-        || strcmp((*allowed_open).listen_path, requestedpath) != 0 as libc::c_int
+        || libc::strcmp((*allowed_open).listen_path, requestedpath) != 0 as libc::c_int
     {
         return 0 as libc::c_int;
     }
@@ -9313,7 +9318,7 @@ pub unsafe extern "C" fn channel_update_permission(
 }
 pub unsafe extern "C" fn permitopen_port(mut p: *const libc::c_char) -> libc::c_int {
     let mut port: libc::c_int = 0;
-    if strcmp(p, b"*\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
+    if libc::strcmp(p, b"*\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         return 0 as libc::c_int;
     }
     port = crate::misc::a2port(p);
@@ -10705,7 +10710,7 @@ pub unsafe extern "C" fn x11_request_forwarding_with_spoofing(
     let mut screen_number: libc::c_int = 0;
     if ((*sc).x11_saved_display).is_null() {
         (*sc).x11_saved_display = crate::xmalloc::xstrdup(disp);
-    } else if strcmp(disp, (*sc).x11_saved_display) != 0 as libc::c_int {
+    } else if libc::strcmp(disp, (*sc).x11_saved_display) != 0 as libc::c_int {
         crate::log::sshlog(
             b"channels.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 37], &[libc::c_char; 37]>(
