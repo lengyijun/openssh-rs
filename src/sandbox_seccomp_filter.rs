@@ -17,7 +17,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
+
 }
 pub type __uint32_t = libc::c_uint;
 pub type __uint64_t = libc::c_ulong;
@@ -109,7 +109,7 @@ pub unsafe extern "C" fn ssh_sandbox_init(mut _monitor: *mut monitor) -> *mut ss
         b"%s: preparing seccomp filter sandbox\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"ssh_sandbox_init\0")).as_ptr(),
     );
-    box_0 = xcalloc(
+    box_0 = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<ssh_sandbox>() as libc::c_ulong,
     ) as *mut ssh_sandbox;

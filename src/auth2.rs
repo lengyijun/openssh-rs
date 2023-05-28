@@ -34,7 +34,6 @@ extern "C" {
     ) -> libc::c_int;
 
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_get_cstring(
@@ -1461,7 +1460,7 @@ pub unsafe extern "C" fn auth2_setup_methods_lists(mut authctxt: *mut Authctxt) 
         0 as *const libc::c_char,
         b"checking methods\0" as *const u8 as *const libc::c_char,
     );
-    (*authctxt).auth_methods = xcalloc(
+    (*authctxt).auth_methods = crate::xmalloc::xcalloc(
         options.num_auth_methods as size_t,
         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
     ) as *mut *mut libc::c_char;

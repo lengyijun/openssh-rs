@@ -142,7 +142,6 @@ extern "C" {
     fn RAND_seed(buf: *const libc::c_void, num: libc::c_int);
     fn RAND_poll() -> libc::c_int;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn disconnect_controlling_tty();
     fn ssh_packet_set_connection(_: *mut ssh, _: libc::c_int, _: libc::c_int) -> *mut ssh;
@@ -2463,7 +2462,7 @@ unsafe extern "C" fn recv_rexec_state(mut fd: libc::c_int, mut conf: *mut sshbuf
         );
     }
     while sshbuf_len(inc) != 0 as libc::c_int as libc::c_ulong {
-        item = xcalloc(
+        item = crate::xmalloc::xcalloc(
             1 as libc::c_int as size_t,
             ::core::mem::size_of::<include_item>() as libc::c_ulong,
         ) as *mut include_item;
@@ -2812,15 +2811,15 @@ unsafe extern "C" fn server_accept_loop(
     let mut rnd: [u_char; 256] = [0; 256];
     let mut nsigset: sigset_t = sigset_t { __val: [0; 16] };
     let mut osigset: sigset_t = sigset_t { __val: [0; 16] };
-    startup_pipes = xcalloc(
+    startup_pipes = crate::xmalloc::xcalloc(
         options.max_startups as size_t,
         ::core::mem::size_of::<libc::c_int>() as libc::c_ulong,
     ) as *mut libc::c_int;
-    startup_flags = xcalloc(
+    startup_flags = crate::xmalloc::xcalloc(
         options.max_startups as size_t,
         ::core::mem::size_of::<libc::c_int>() as libc::c_ulong,
     ) as *mut libc::c_int;
-    startup_pollfd = xcalloc(
+    startup_pollfd = crate::xmalloc::xcalloc(
         options.max_startups as size_t,
         ::core::mem::size_of::<libc::c_int>() as libc::c_ulong,
     ) as *mut libc::c_int;
@@ -2835,7 +2834,7 @@ unsafe extern "C" fn server_accept_loop(
     sigaddset(&mut nsigset, 17 as libc::c_int);
     sigaddset(&mut nsigset, 15 as libc::c_int);
     sigaddset(&mut nsigset, 3 as libc::c_int);
-    pfd = xcalloc(
+    pfd = crate::xmalloc::xcalloc(
         (num_listen_socks + options.max_startups) as size_t,
         ::core::mem::size_of::<pollfd>() as libc::c_ulong,
     ) as *mut pollfd;
@@ -3686,7 +3685,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     sigprocmask(2 as libc::c_int, &mut sigmask, 0 as *mut sigset_t);
     saved_argc = ac;
     rexec_argc = ac;
-    saved_argv = xcalloc(
+    saved_argv = crate::xmalloc::xcalloc(
         (ac + 1 as libc::c_int) as size_t,
         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
     ) as *mut *mut libc::c_char;
@@ -4145,11 +4144,11 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             crate::xmalloc::xstrdup(b"*\0" as *const u8 as *const libc::c_char);
     }
     endpwent();
-    sensitive_data.host_keys = xcalloc(
+    sensitive_data.host_keys = crate::xmalloc::xcalloc(
         options.num_host_key_files as size_t,
         ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
     ) as *mut *mut sshkey;
-    sensitive_data.host_pubkeys = xcalloc(
+    sensitive_data.host_pubkeys = crate::xmalloc::xcalloc(
         options.num_host_key_files as size_t,
         ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
     ) as *mut *mut sshkey;
@@ -4413,7 +4412,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         );
         libc::exit(1 as libc::c_int);
     }
-    sensitive_data.host_certificates = xcalloc(
+    sensitive_data.host_certificates = crate::xmalloc::xcalloc(
         options.num_host_key_files as size_t,
         ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
     ) as *mut *mut sshkey;
@@ -4577,7 +4576,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 rexec_argc,
             );
         }
-        rexec_argv = xcalloc(
+        rexec_argv = crate::xmalloc::xcalloc(
             (rexec_argc + 2 as libc::c_int) as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         ) as *mut *mut libc::c_char;
@@ -4979,7 +4978,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         );
     }
     ssh_packet_set_nonblocking(ssh);
-    authctxt = xcalloc(
+    authctxt = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<Authctxt>() as libc::c_ulong,
     ) as *mut Authctxt;

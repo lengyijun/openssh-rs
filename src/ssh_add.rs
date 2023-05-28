@@ -48,8 +48,6 @@ extern "C" {
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -1477,7 +1475,7 @@ unsafe extern "C" fn stringlist_append(
 ) {
     let mut i: size_t = 0 as libc::c_int as size_t;
     if (*listp).is_null() {
-        *listp = xcalloc(
+        *listp = crate::xmalloc::xcalloc(
             2 as libc::c_int as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         ) as *mut *mut libc::c_char;
@@ -1696,7 +1694,7 @@ unsafe extern "C" fn parse_dest_constraint(
     let mut dc: *mut dest_constraint = 0 as *mut dest_constraint;
     let mut os: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
-    dc = xcalloc(
+    dc = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<dest_constraint>() as libc::c_ulong,
     ) as *mut dest_constraint;

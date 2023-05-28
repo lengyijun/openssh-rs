@@ -22,7 +22,6 @@ extern "C" {
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
@@ -235,7 +234,7 @@ unsafe extern "C" fn add_key(
     mut label: *mut libc::c_char,
 ) {
     let mut ki: *mut pkcs11_keyinfo = 0 as *mut pkcs11_keyinfo;
-    ki = xcalloc(
+    ki = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<pkcs11_keyinfo>() as libc::c_ulong,
     ) as *mut pkcs11_keyinfo;

@@ -132,7 +132,7 @@ extern "C" {
 
     fn initgroups(__user: *const libc::c_char, __group: __gid_t) -> libc::c_int;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
+
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn xvasprintf(
@@ -1162,7 +1162,7 @@ pub unsafe extern "C" fn strdelimw(mut s: *mut *mut libc::c_char) -> *mut libc::
     return strdelim_internal(s, 0 as libc::c_int);
 }
 pub unsafe extern "C" fn pwcopy(mut pw: *mut libc::passwd) -> *mut libc::passwd {
-    let mut copy: *mut libc::passwd = xcalloc(
+    let mut copy: *mut libc::passwd = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<libc::passwd>() as libc::c_ulong,
     ) as *mut libc::passwd;
@@ -2627,7 +2627,7 @@ pub unsafe extern "C" fn tohex(mut vp: *const libc::c_void, mut l: size_t) -> *m
     hl = l
         .wrapping_mul(2 as libc::c_int as libc::c_ulong)
         .wrapping_add(1 as libc::c_int as libc::c_ulong);
-    r = xcalloc(1 as libc::c_int as size_t, hl) as *mut libc::c_char;
+    r = crate::xmalloc::xcalloc(1 as libc::c_int as size_t, hl) as *mut libc::c_char;
     i = 0 as libc::c_int as size_t;
     while i < l {
         libc::snprintf(
@@ -3462,7 +3462,7 @@ pub unsafe extern "C" fn argv_split(
     let mut i: libc::c_int = 0;
     let mut j: libc::c_int = 0;
     let mut arg: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut argv: *mut *mut libc::c_char = xcalloc(
+    let mut argv: *mut *mut libc::c_char = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
     ) as *mut *mut libc::c_char;
@@ -3490,7 +3490,7 @@ pub unsafe extern "C" fn argv_split(
             let fresh11 = argc;
             argc = argc + 1;
             let ref mut fresh12 = *argv.offset(fresh11 as isize);
-            *fresh12 = xcalloc(
+            *fresh12 = crate::xmalloc::xcalloc(
                 1 as libc::c_int as size_t,
                 (strlen(s.offset(i as isize))).wrapping_add(1 as libc::c_int as libc::c_ulong),
             ) as *mut libc::c_char;
@@ -4753,7 +4753,7 @@ pub unsafe extern "C" fn subprocess(
                     == 0 as libc::c_int as libc::c_uint
                 {
                     nenv = 5 as libc::c_int as u_int;
-                    env = xcalloc(
+                    env = crate::xmalloc::xcalloc(
                         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
                         nenv as size_t,
                     ) as *mut *mut libc::c_char;

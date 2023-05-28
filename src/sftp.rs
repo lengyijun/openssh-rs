@@ -92,7 +92,6 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strsignal(__sig: libc::c_int) -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -1510,7 +1509,7 @@ unsafe extern "C" fn escape_glob(mut s: *const libc::c_char) -> *mut libc::c_cha
     let mut len: size_t = 0;
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
     len = strlen(s);
-    ret = xcalloc(
+    ret = crate::xmalloc::xcalloc(
         2 as libc::c_int as size_t,
         len.wrapping_add(1 as libc::c_int as libc::c_ulong),
     ) as *mut libc::c_char;
@@ -2316,7 +2315,7 @@ unsafe extern "C" fn do_globbed_ls(
             nentries = nentries.wrapping_add(1);
             nentries;
         }
-        indices = xcalloc(
+        indices = crate::xmalloc::xcalloc(
             nentries as size_t,
             ::core::mem::size_of::<u_int>() as libc::c_ulong,
         ) as *mut u_int;

@@ -15,7 +15,6 @@ extern "C" {
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn userauth_finish(_: *mut ssh, _: libc::c_int, _: *const libc::c_char, _: *const libc::c_char);
     fn auth2_method_allowed(
@@ -232,7 +231,7 @@ unsafe extern "C" fn kbdint_alloc(mut devs: *const libc::c_char) -> *mut KbdintA
     let mut b: *mut sshbuf = 0 as *mut sshbuf;
     let mut i: libc::c_int = 0;
     let mut r: libc::c_int = 0;
-    kbdintctxt = xcalloc(
+    kbdintctxt = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<KbdintAuthctxt>() as libc::c_ulong,
     ) as *mut KbdintAuthctxt;
@@ -706,7 +705,7 @@ unsafe extern "C" fn input_userauth_info_response(
         );
     }
     if nresp > 0 as libc::c_int as libc::c_uint {
-        response = xcalloc(
+        response = crate::xmalloc::xcalloc(
             nresp as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         ) as *mut *mut libc::c_char;

@@ -53,7 +53,6 @@ extern "C" {
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn match_hostname(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn sshkey_ssh_name(_: *const sshkey) -> *const libc::c_char;
@@ -545,7 +544,7 @@ unsafe extern "C" fn check_markers(mut cpp: *mut *mut libc::c_char) -> HostkeyMa
     return ret as HostkeyMarker;
 }
 pub unsafe extern "C" fn init_hostkeys() -> *mut hostkeys {
-    let mut ret: *mut hostkeys = xcalloc(
+    let mut ret: *mut hostkeys = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<hostkeys>() as libc::c_ulong,
     ) as *mut hostkeys;

@@ -29,7 +29,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
+
 }
 pub type __u_int = libc::c_uint;
 pub type __uint8_t = libc::c_uchar;
@@ -192,7 +192,7 @@ pub unsafe extern "C" fn srclimit_init(
             max,
         );
     }
-    child = xcalloc(
+    child = crate::xmalloc::xcalloc(
         max_children as size_t,
         ::core::mem::size_of::<child_info>() as libc::c_ulong,
     ) as *mut child_info;

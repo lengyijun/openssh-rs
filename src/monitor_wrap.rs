@@ -25,8 +25,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-
     fn dh_new_group(_: *mut BIGNUM, _: *mut BIGNUM) -> *mut DH;
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_free(buf: *mut sshbuf);
@@ -1275,7 +1273,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
     if ok as libc::c_int == 0 as libc::c_int {
         pw = 0 as *mut libc::passwd;
     } else {
-        pw = xcalloc(
+        pw = crate::xmalloc::xcalloc(
             ::core::mem::size_of::<libc::passwd>() as libc::c_ulong,
             1 as libc::c_int as size_t,
         ) as *mut libc::passwd;
@@ -1399,7 +1397,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
             b"option block size mismatch\0" as *const u8 as *const libc::c_char,
         );
     }
-    newopts = xcalloc(
+    newopts = crate::xmalloc::xcalloc(
         ::core::mem::size_of::<ServerOptions>() as libc::c_ulong,
         1 as libc::c_int as size_t,
     ) as *mut ServerOptions;
@@ -1644,7 +1642,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
         (if (*newopts).num_authkeys_files == 0 as libc::c_int as libc::c_uint {
             0 as *mut libc::c_void
         } else {
-            xcalloc(
+            crate::xmalloc::xcalloc(
                 (*newopts).num_authkeys_files as size_t,
                 ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
             )
@@ -1675,7 +1673,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
     (*newopts).allow_users = (if (*newopts).num_allow_users == 0 as libc::c_int as libc::c_uint {
         0 as *mut libc::c_void
     } else {
-        xcalloc(
+        crate::xmalloc::xcalloc(
             (*newopts).num_allow_users as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         )
@@ -1706,7 +1704,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
     (*newopts).deny_users = (if (*newopts).num_deny_users == 0 as libc::c_int as libc::c_uint {
         0 as *mut libc::c_void
     } else {
-        xcalloc(
+        crate::xmalloc::xcalloc(
             (*newopts).num_deny_users as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         )
@@ -1737,7 +1735,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
     (*newopts).allow_groups = (if (*newopts).num_allow_groups == 0 as libc::c_int as libc::c_uint {
         0 as *mut libc::c_void
     } else {
-        xcalloc(
+        crate::xmalloc::xcalloc(
             (*newopts).num_allow_groups as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         )
@@ -1768,7 +1766,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
     (*newopts).deny_groups = (if (*newopts).num_deny_groups == 0 as libc::c_int as libc::c_uint {
         0 as *mut libc::c_void
     } else {
-        xcalloc(
+        crate::xmalloc::xcalloc(
             (*newopts).num_deny_groups as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         )
@@ -1799,7 +1797,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
     (*newopts).accept_env = (if (*newopts).num_accept_env == 0 as libc::c_int as libc::c_uint {
         0 as *mut libc::c_void
     } else {
-        xcalloc(
+        crate::xmalloc::xcalloc(
             (*newopts).num_accept_env as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         )
@@ -1830,7 +1828,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
     (*newopts).setenv = (if (*newopts).num_setenv == 0 as libc::c_int as libc::c_uint {
         0 as *mut libc::c_void
     } else {
-        xcalloc(
+        crate::xmalloc::xcalloc(
             (*newopts).num_setenv as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         )
@@ -1861,7 +1859,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
     (*newopts).auth_methods = (if (*newopts).num_auth_methods == 0 as libc::c_int as libc::c_uint {
         0 as *mut libc::c_void
     } else {
-        xcalloc(
+        crate::xmalloc::xcalloc(
             (*newopts).num_auth_methods as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         )
@@ -1893,7 +1891,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
         (if (*newopts).num_permitted_opens == 0 as libc::c_int as libc::c_uint {
             0 as *mut libc::c_void
         } else {
-            xcalloc(
+            crate::xmalloc::xcalloc(
                 (*newopts).num_permitted_opens as size_t,
                 ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
             )
@@ -1925,7 +1923,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
         (if (*newopts).num_permitted_listens == 0 as libc::c_int as libc::c_uint {
             0 as *mut libc::c_void
         } else {
-            xcalloc(
+            crate::xmalloc::xcalloc(
                 (*newopts).num_permitted_listens as size_t,
                 ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
             )
@@ -1957,7 +1955,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
         (if (*newopts).num_channel_timeouts == 0 as libc::c_int as libc::c_uint {
             0 as *mut libc::c_void
         } else {
-            xcalloc(
+            crate::xmalloc::xcalloc(
                 (*newopts).num_channel_timeouts as size_t,
                 ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
             )
@@ -1988,7 +1986,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
     (*newopts).log_verbose = (if (*newopts).num_log_verbose == 0 as libc::c_int as libc::c_uint {
         0 as *mut libc::c_void
     } else {
-        xcalloc(
+        crate::xmalloc::xcalloc(
             (*newopts).num_log_verbose as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         )
@@ -2498,7 +2496,7 @@ pub unsafe extern "C" fn mm_sshkey_verify(
             );
         }
         if !sig_detailsp.is_null() {
-            *sig_detailsp = xcalloc(
+            *sig_detailsp = crate::xmalloc::xcalloc(
                 1 as libc::c_int as size_t,
                 ::core::mem::size_of::<sshkey_sig_details>() as libc::c_ulong,
             ) as *mut sshkey_sig_details;
@@ -2773,11 +2771,11 @@ unsafe extern "C" fn mm_chall_setup(
     *name = crate::xmalloc::xstrdup(b"\0" as *const u8 as *const libc::c_char);
     *infotxt = crate::xmalloc::xstrdup(b"\0" as *const u8 as *const libc::c_char);
     *numprompts = 1 as libc::c_int as u_int;
-    *prompts = xcalloc(
+    *prompts = crate::xmalloc::xcalloc(
         *numprompts as size_t,
         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
     ) as *mut *mut libc::c_char;
-    *echo_on = xcalloc(
+    *echo_on = crate::xmalloc::xcalloc(
         *numprompts as size_t,
         ::core::mem::size_of::<u_int>() as libc::c_ulong,
     ) as *mut u_int;

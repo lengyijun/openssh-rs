@@ -118,7 +118,7 @@ extern "C" {
             ) -> libc::c_int,
         >,
     ) -> libc::c_int;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
+
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_free(buf: *mut sshbuf);
     fn sshbuf_reset(buf: *mut sshbuf);
@@ -994,12 +994,12 @@ pub unsafe extern "C" fn pkcs11_add_provider(
                 b"parse nkeys\0" as *const u8 as *const libc::c_char,
             );
         }
-        *keysp = xcalloc(
+        *keysp = crate::xmalloc::xcalloc(
             nkeys as size_t,
             ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
         ) as *mut *mut sshkey;
         if !labelsp.is_null() {
-            *labelsp = xcalloc(
+            *labelsp = crate::xmalloc::xcalloc(
                 nkeys as size_t,
                 ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
             ) as *mut *mut libc::c_char;

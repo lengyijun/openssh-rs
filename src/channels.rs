@@ -83,7 +83,6 @@ extern "C" {
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshbuf_read(_: libc::c_int, _: *mut sshbuf, _: size_t, _: *mut size_t) -> libc::c_int;
@@ -688,7 +687,7 @@ pub unsafe extern "C" fn channel_init_channels(mut ssh: *mut ssh) {
         );
     }
     (*sc).channels_alloc = 10 as libc::c_int as u_int;
-    (*sc).channels = xcalloc(
+    (*sc).channels = crate::xmalloc::xcalloc(
         (*sc).channels_alloc as size_t,
         ::core::mem::size_of::<*mut Channel>() as libc::c_ulong,
     ) as *mut *mut Channel;
@@ -1028,7 +1027,7 @@ pub unsafe extern "C" fn channel_new(
         );
     }
     let ref mut fresh1 = *((*sc).channels).offset(found as isize);
-    *fresh1 = xcalloc(
+    *fresh1 = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<Channel>() as libc::c_ulong,
     ) as *mut Channel;
@@ -2120,7 +2119,7 @@ pub unsafe extern "C" fn channel_register_status_confirm(
             id,
         );
     }
-    cc = xcalloc(
+    cc = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<channel_confirm>() as libc::c_ulong,
     ) as *mut channel_confirm;
@@ -10373,7 +10372,7 @@ pub unsafe extern "C" fn x11_create_display_inet(
         n += 1;
         n;
     }
-    *chanids = xcalloc(
+    *chanids = crate::xmalloc::xcalloc(
         (num_socks + 1 as libc::c_int) as size_t,
         ::core::mem::size_of::<libc::c_int>() as libc::c_ulong,
     ) as *mut libc::c_int;

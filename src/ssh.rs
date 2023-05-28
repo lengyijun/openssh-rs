@@ -79,7 +79,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn OpenSSL_version(type_0: libc::c_int) -> *const libc::c_char;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn ciphers_valid(_: *const libc::c_char) -> libc::c_int;
     fn cipher_alg_list(_: libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -2078,7 +2077,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     closefrom(2 as libc::c_int + 1 as libc::c_int);
     __progname =
         crate::openbsd_compat::bsd_misc::ssh_get_progname(*av.offset(0 as libc::c_int as isize));
-    saved_av = xcalloc(
+    saved_av = crate::xmalloc::xcalloc(
         (ac + 1 as libc::c_int) as size_t,
         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
     ) as *mut *mut libc::c_char;
@@ -3314,7 +3313,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         }
         tty_flag = 0 as libc::c_int;
     }
-    cinfo = xcalloc(
+    cinfo = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<ssh_conn_info>() as libc::c_ulong,
     ) as *mut ssh_conn_info;
@@ -3743,7 +3742,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             if options.hostbased_authentication != 0 {
                 let mut loaded: libc::c_int = 0 as libc::c_int;
                 sensitive_data.nkeys = 10 as libc::c_int;
-                sensitive_data.keys = xcalloc(
+                sensitive_data.keys = crate::xmalloc::xcalloc(
                     sensitive_data.nkeys as size_t,
                     ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
                 ) as *mut *mut sshkey;

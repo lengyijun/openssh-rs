@@ -34,7 +34,7 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
+
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
@@ -248,7 +248,7 @@ unsafe extern "C" fn request_enqueue(
     mut offset: uint64_t,
 ) -> *mut request {
     let mut req: *mut request = 0 as *mut request;
-    req = xcalloc(
+    req = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<request>() as libc::c_ulong,
     ) as *mut request;
@@ -1202,7 +1202,7 @@ pub unsafe extern "C" fn do_init(
     let mut msg: *mut sshbuf = 0 as *mut sshbuf;
     let mut ret: *mut sftp_conn = 0 as *mut sftp_conn;
     let mut r: libc::c_int = 0;
-    ret = xcalloc(
+    ret = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<sftp_conn>() as libc::c_ulong,
     ) as *mut sftp_conn;
@@ -1878,7 +1878,7 @@ unsafe extern "C" fn do_lsreaddir(
     }
     if !dir.is_null() {
         ents = 0 as libc::c_int as u_int;
-        *dir = xcalloc(
+        *dir = crate::xmalloc::xcalloc(
             1 as libc::c_int as size_t,
             ::core::mem::size_of::<*mut SFTP_DIRENT>() as libc::c_ulong,
         ) as *mut *mut SFTP_DIRENT;
@@ -2146,7 +2146,7 @@ unsafe extern "C" fn do_lsreaddir(
                             ::core::mem::size_of::<*mut SFTP_DIRENT>() as libc::c_ulong,
                         ) as *mut *mut SFTP_DIRENT;
                         let ref mut fresh5 = *(*dir).offset(ents as isize);
-                        *fresh5 = xcalloc(
+                        *fresh5 = crate::xmalloc::xcalloc(
                             1 as libc::c_int as size_t,
                             ::core::mem::size_of::<SFTP_DIRENT>() as libc::c_ulong,
                         ) as *mut SFTP_DIRENT;
@@ -2186,7 +2186,7 @@ unsafe extern "C" fn do_lsreaddir(
         *dir = 0 as *mut *mut SFTP_DIRENT;
     } else if interrupted != 0 && !dir.is_null() && !(*dir).is_null() {
         free_sftp_dirents(*dir);
-        *dir = xcalloc(
+        *dir = crate::xmalloc::xcalloc(
             1 as libc::c_int as size_t,
             ::core::mem::size_of::<*mut SFTP_DIRENT>() as libc::c_ulong,
         ) as *mut *mut SFTP_DIRENT;
@@ -7107,7 +7107,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
         );
     }
     if nuids > 0 as libc::c_int as libc::c_uint {
-        usernames = xcalloc(
+        usernames = crate::xmalloc::xcalloc(
             nuids as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         ) as *mut *mut libc::c_char;
@@ -7139,7 +7139,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
         }
     }
     if ngids > 0 as libc::c_int as libc::c_uint {
-        groupnames = xcalloc(
+        groupnames = crate::xmalloc::xcalloc(
             ngids as size_t,
             ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
         ) as *mut *mut libc::c_char;

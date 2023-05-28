@@ -82,7 +82,6 @@ extern "C" {
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshkey_write(_: *const sshkey, _: *mut libc::FILE) -> libc::c_int;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
@@ -2156,11 +2155,11 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     if maxfd > fdlim_get(0 as libc::c_int) {
         fdlim_set(maxfd);
     }
-    fdcon = xcalloc(
+    fdcon = crate::xmalloc::xcalloc(
         maxfd as size_t,
         ::core::mem::size_of::<con>() as libc::c_ulong,
     ) as *mut con;
-    read_wait = xcalloc(
+    read_wait = crate::xmalloc::xcalloc(
         maxfd as size_t,
         ::core::mem::size_of::<pollfd>() as libc::c_ulong,
     ) as *mut pollfd;

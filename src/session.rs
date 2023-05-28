@@ -105,7 +105,6 @@ extern "C" {
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn mkdtemp(__template: *mut libc::c_char) -> *mut libc::c_char;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn pty_allocate(
         _: *mut libc::c_int,
@@ -1946,7 +1945,7 @@ unsafe extern "C" fn do_setup_env(
     let mut pw: *mut libc::passwd = (*s).pw;
     let mut path: *mut libc::c_char = 0 as *mut libc::c_char;
     envsize = 100 as libc::c_int as u_int;
-    env = xcalloc(
+    env = crate::xmalloc::xcalloc(
         envsize as size_t,
         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
     ) as *mut *mut libc::c_char;

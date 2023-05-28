@@ -89,7 +89,7 @@ extern "C" {
     fn localtime(__timer: *const time_t) -> *mut tm;
 
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
+
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
@@ -2627,7 +2627,7 @@ unsafe extern "C" fn process_readdir(mut id: u_int32_t) {
         let mut nstats: libc::c_int = 10 as libc::c_int;
         let mut count: libc::c_int = 0 as libc::c_int;
         let mut i: libc::c_int = 0;
-        stats = xcalloc(
+        stats = crate::xmalloc::xcalloc(
             nstats as size_t,
             ::core::mem::size_of::<Stat>() as libc::c_ulong,
         ) as *mut Stat;

@@ -40,7 +40,6 @@ extern "C" {
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshbuf_dup_string(buf: *mut sshbuf) -> *mut libc::c_char;
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
@@ -3377,7 +3376,7 @@ unsafe extern "C" fn pubkey_prepare(mut ssh: *mut ssh, mut authctxt: *mut Authct
             );
         } else {
             options.identity_keys[i as usize] = 0 as *mut sshkey;
-            id = xcalloc(
+            id = crate::xmalloc::xcalloc(
                 1 as libc::c_int as size_t,
                 ::core::mem::size_of::<identity>() as libc::c_ulong,
             ) as *mut identity;
@@ -3429,7 +3428,7 @@ unsafe extern "C" fn pubkey_prepare(mut ssh: *mut ssh, mut authctxt: *mut Authct
                 options.identity_files[i as usize],
             );
         } else {
-            id = xcalloc(
+            id = crate::xmalloc::xcalloc(
                 1 as libc::c_int as size_t,
                 ::core::mem::size_of::<identity>() as libc::c_ulong,
             ) as *mut identity;
@@ -3490,7 +3489,7 @@ unsafe extern "C" fn pubkey_prepare(mut ssh: *mut ssh, mut authctxt: *mut Authct
                     }
                 }
                 if found == 0 && options.identities_only == 0 {
-                    id = xcalloc(
+                    id = crate::xmalloc::xcalloc(
                         1 as libc::c_int as size_t,
                         ::core::mem::size_of::<identity>() as libc::c_ulong,
                     ) as *mut identity;

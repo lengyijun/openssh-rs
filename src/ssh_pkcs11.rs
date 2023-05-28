@@ -208,7 +208,6 @@ extern "C" {
     fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
     fn sshkey_ecdsa_key_to_nid(_: *mut EC_KEY) -> libc::c_int;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
 }
 pub type __u_char = libc::c_uchar;
@@ -1763,7 +1762,7 @@ unsafe extern "C" fn pkcs11_rsa_wrap(
     if pkcs11_rsa_start_wrapper() == -(1 as libc::c_int) {
         return -(1 as libc::c_int);
     }
-    k11 = xcalloc(
+    k11 = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<pkcs11_key>() as libc::c_ulong,
     ) as *mut pkcs11_key;
@@ -1998,7 +1997,7 @@ unsafe extern "C" fn pkcs11_ecdsa_wrap(
     if pkcs11_ecdsa_start_wrapper() == -(1 as libc::c_int) {
         return -(1 as libc::c_int);
     }
-    k11 = xcalloc(
+    k11 = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<pkcs11_key>() as libc::c_ulong,
     ) as *mut pkcs11_key;
@@ -2227,8 +2226,10 @@ unsafe extern "C" fn pkcs11_fetch_ecdsa_pubkey(
     i = 0 as libc::c_int;
     while i < 3 as libc::c_int {
         if key_attr[i as usize].ulValueLen > 0 as libc::c_int as libc::c_ulong {
-            key_attr[i as usize].pValue =
-                xcalloc(1 as libc::c_int as size_t, key_attr[i as usize].ulValueLen);
+            key_attr[i as usize].pValue = crate::xmalloc::xcalloc(
+                1 as libc::c_int as size_t,
+                key_attr[i as usize].ulValueLen,
+            );
         }
         i += 1;
         i;
@@ -2447,8 +2448,10 @@ unsafe extern "C" fn pkcs11_fetch_rsa_pubkey(
     i = 0 as libc::c_int;
     while i < 3 as libc::c_int {
         if key_attr[i as usize].ulValueLen > 0 as libc::c_int as libc::c_ulong {
-            key_attr[i as usize].pValue =
-                xcalloc(1 as libc::c_int as size_t, key_attr[i as usize].ulValueLen);
+            key_attr[i as usize].pValue = crate::xmalloc::xcalloc(
+                1 as libc::c_int as size_t,
+                key_attr[i as usize].ulValueLen,
+            );
         }
         i += 1;
         i;
@@ -2648,8 +2651,10 @@ unsafe extern "C" fn pkcs11_fetch_x509_pubkey(
     i = 0 as libc::c_int;
     while i < 3 as libc::c_int {
         if cert_attr[i as usize].ulValueLen > 0 as libc::c_int as libc::c_ulong {
-            cert_attr[i as usize].pValue =
-                xcalloc(1 as libc::c_int as size_t, cert_attr[i as usize].ulValueLen);
+            cert_attr[i as usize].pValue = crate::xmalloc::xcalloc(
+                1 as libc::c_int as size_t,
+                cert_attr[i as usize].ulValueLen,
+            );
         }
         i += 1;
         i;
@@ -3520,7 +3525,7 @@ unsafe extern "C" fn pkcs11_register_provider(
                         dlerror(),
                     );
                 } else {
-                    p = xcalloc(
+                    p = crate::xmalloc::xcalloc(
                         1 as libc::c_int as size_t,
                         ::core::mem::size_of::<pkcs11_provider>() as libc::c_ulong,
                     ) as *mut pkcs11_provider;
@@ -3653,7 +3658,7 @@ unsafe extern "C" fn pkcs11_register_provider(
                                     );
                                     ret = -(3 as libc::c_int);
                                 } else {
-                                    (*p).slotlist = xcalloc(
+                                    (*p).slotlist = crate::xmalloc::xcalloc(
                                         (*p).nslots,
                                         ::core::mem::size_of::<CK_SLOT_ID>() as libc::c_ulong,
                                     )
@@ -3684,7 +3689,7 @@ unsafe extern "C" fn pkcs11_register_provider(
                                             rv,
                                         );
                                     } else {
-                                        (*p).slotinfo = xcalloc(
+                                        (*p).slotinfo = crate::xmalloc::xcalloc(
                                             (*p).nslots,
                                             ::core::mem::size_of::<pkcs11_slotinfo>()
                                                 as libc::c_ulong,

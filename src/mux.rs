@@ -48,7 +48,7 @@ extern "C" {
     fn strsignal(__sig: libc::c_int) -> *mut libc::c_char;
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
+
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn cleanup_exit(_: libc::c_int) -> !;
@@ -1325,7 +1325,7 @@ unsafe extern "C" fn mux_master_process_new_session(
     let mut packetmax: u_int = 0;
     let mut r: libc::c_int = 0;
     let mut new_fd: [libc::c_int; 3] = [0; 3];
-    cctx = xcalloc(
+    cctx = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<mux_session_confirm_ctx>() as libc::c_ulong,
     ) as *mut mux_session_confirm_ctx;
@@ -2587,7 +2587,7 @@ unsafe extern "C" fn mux_master_process_open_fwd(
                                             current_block = 1889179602920924282;
                                         } else {
                                             add_remote_forward(&mut options, &mut fwd);
-                                            fctx = xcalloc(
+                                            fctx = crate::xmalloc::xcalloc(
                                                 1 as libc::c_int as size_t,
                                                 ::core::mem::size_of::<mux_channel_confirm_ctx>()
                                                     as libc::c_ulong,
@@ -3051,7 +3051,7 @@ unsafe extern "C" fn mux_master_process_stdio_fwd(
                     ),
                     1 as libc::c_int,
                 );
-                cctx = xcalloc(
+                cctx = crate::xmalloc::xcalloc(
                     1 as libc::c_int as size_t,
                     ::core::mem::size_of::<mux_stdio_confirm_ctx>() as libc::c_ulong,
                 ) as *mut mux_stdio_confirm_ctx;
@@ -3352,7 +3352,7 @@ unsafe extern "C" fn mux_master_read_cb(mut ssh: *mut ssh, mut c: *mut Channel) 
         );
     }
     if ((*c).mux_ctx).is_null() {
-        state = xcalloc(
+        state = crate::xmalloc::xcalloc(
             1 as libc::c_int as size_t,
             ::core::mem::size_of::<mux_master_state>() as libc::c_ulong,
         ) as *mut mux_master_state;

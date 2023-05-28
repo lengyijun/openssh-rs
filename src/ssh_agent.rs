@@ -87,7 +87,6 @@ extern "C" {
     ) -> libc::c_int;
     fn mkdtemp(__template: *mut libc::c_char) -> *mut libc::c_char;
     fn realpath(__name: *const libc::c_char, __resolved: *mut libc::c_char) -> *mut libc::c_char;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_fromb(buf: *mut sshbuf) -> *mut sshbuf;
@@ -558,7 +557,7 @@ unsafe extern "C" fn close_socket(mut e: *mut SocketEntry) {
     (*e).type_0 = AUTH_UNUSED;
 }
 unsafe extern "C" fn idtab_init() {
-    idtab = xcalloc(
+    idtab = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<idtable>() as libc::c_ulong,
     ) as *mut idtable;
@@ -3046,7 +3045,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                     }
                     id = lookup_identity(k);
                     if id.is_null() {
-                        id = xcalloc(
+                        id = crate::xmalloc::xcalloc(
                             1 as libc::c_int as size_t,
                             ::core::mem::size_of::<Identity>() as libc::c_ulong,
                         ) as *mut Identity;
@@ -3472,7 +3471,7 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
         while i < count {
             k = *keys.offset(i as isize);
             if (lookup_identity(k)).is_null() {
-                id = xcalloc(
+                id = crate::xmalloc::xcalloc(
                     1 as libc::c_int as size_t,
                     ::core::mem::size_of::<Identity>() as libc::c_ulong,
                 ) as *mut Identity;

@@ -70,7 +70,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -661,7 +660,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
     crate::misc::sanitise_stdfd();
     msetlocale();
     argv0 = *argv.offset(0 as libc::c_int as isize);
-    newargv = xcalloc(
+    newargv = crate::xmalloc::xcalloc(
         (if argc + 1 as libc::c_int > 1 as libc::c_int {
             argc + 1 as libc::c_int
         } else {

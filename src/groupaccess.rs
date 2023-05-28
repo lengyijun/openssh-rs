@@ -9,7 +9,6 @@ extern "C" {
         __ngroups: *mut libc::c_int,
     ) -> libc::c_int;
 
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -282,7 +281,7 @@ pub unsafe extern "C" fn ga_init(mut user: *const libc::c_char, mut base: gid_t)
     } else {
         sysconf(_SC_NGROUPS_MAX as libc::c_int)
     }) as libc::c_int;
-    groups_bygid = xcalloc(
+    groups_bygid = crate::xmalloc::xcalloc(
         ngroups as size_t,
         ::core::mem::size_of::<gid_t>() as libc::c_ulong,
     ) as *mut gid_t;
@@ -306,7 +305,7 @@ pub unsafe extern "C" fn ga_init(mut user: *const libc::c_char, mut base: gid_t)
             ::core::mem::size_of::<gid_t>() as libc::c_ulong,
         ) as *mut gid_t;
     }
-    groups_byname = xcalloc(
+    groups_byname = crate::xmalloc::xcalloc(
         ngroups as size_t,
         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,
     ) as *mut *mut libc::c_char;

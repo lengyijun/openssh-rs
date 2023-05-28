@@ -4,7 +4,7 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
+
     fn get_u32(_: *const libc::c_void) -> u_int32_t;
     fn AES_encrypt(in_0: *const libc::c_uchar, out: *mut libc::c_uchar, key: *const AES_KEY);
     fn AES_set_encrypt_key(
@@ -88,7 +88,7 @@ pub unsafe extern "C" fn umac128_new(mut key: *const u_char) -> *mut umac128_ctx
         rd_key: [0; 60],
         rounds: 0,
     }; 1];
-    ctx = xcalloc(
+    ctx = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         (::core::mem::size_of::<umac128_ctx>() as libc::c_ulong)
             .wrapping_add(16 as libc::c_int as libc::c_ulong),

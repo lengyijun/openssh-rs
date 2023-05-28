@@ -66,7 +66,6 @@ extern "C" {
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn xvasprintf(
         _: *mut *mut libc::c_char,
@@ -1921,7 +1920,7 @@ pub unsafe extern "C" fn client_expect_confirm(
     mut request: *const libc::c_char,
     mut action: confirm_action,
 ) {
-    let mut cr: *mut channel_reply_ctx = xcalloc(
+    let mut cr: *mut channel_reply_ctx = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<channel_reply_ctx>() as libc::c_ulong,
     ) as *mut channel_reply_ctx;
@@ -1972,7 +1971,7 @@ pub unsafe extern "C" fn client_register_global_confirm(
         }
         return;
     }
-    gc = xcalloc(
+    gc = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<global_confirm>() as libc::c_ulong,
     ) as *mut global_confirm;
@@ -3162,7 +3161,7 @@ pub unsafe extern "C" fn client_new_escape_filter_ctx(
     mut escape_char: libc::c_int,
 ) -> *mut libc::c_void {
     let mut ret: *mut escape_filter_ctx = 0 as *mut escape_filter_ctx;
-    ret = xcalloc(
+    ret = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<escape_filter_ctx>() as libc::c_ulong,
     ) as *mut escape_filter_ctx;
@@ -5605,7 +5604,7 @@ unsafe extern "C" fn client_input_hostkeys(mut ssh: *mut ssh) -> libc::c_int {
         return 1 as libc::c_int;
     }
     hostkeys_seen = 1 as libc::c_int;
-    ctx = xcalloc(
+    ctx = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<hostkeys_update_ctx>() as libc::c_ulong,
     ) as *mut hostkeys_update_ctx;

@@ -17,8 +17,6 @@ extern "C" {
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
-
     fn can_get_users_groups_by_id(conn: *mut sftp_conn) -> libc::c_int;
     fn do_get_users_groups_by_id(
         conn: *mut sftp_conn,
@@ -295,7 +293,7 @@ unsafe extern "C" fn idname_enter(
     mut name: *const libc::c_char,
 ) {
     let mut idname: *mut idname = 0 as *mut idname;
-    idname = xcalloc(
+    idname = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<idname>() as libc::c_ulong,
     ) as *mut idname;

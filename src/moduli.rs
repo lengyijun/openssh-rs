@@ -60,7 +60,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -356,12 +355,12 @@ pub unsafe extern "C" fn gen_candidates(
         );
         largewords = largememory << 20 as libc::c_int - 2 as libc::c_int;
     }
-    TinySieve = xcalloc(
+    TinySieve = crate::xmalloc::xcalloc(
         tinywords as size_t,
         ::core::mem::size_of::<u_int32_t>() as libc::c_ulong,
     ) as *mut u_int32_t;
     tinybits = tinywords << 3 as libc::c_int + 2 as libc::c_int;
-    SmallSieve = xcalloc(
+    SmallSieve = crate::xmalloc::xcalloc(
         smallwords as size_t,
         ::core::mem::size_of::<u_int32_t>() as libc::c_ulong,
     ) as *mut u_int32_t;

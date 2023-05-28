@@ -57,7 +57,6 @@ extern "C" {
     fn DH_free(dh: *mut DH);
 
     fn xmalloc(_: size_t) -> *mut libc::c_void;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_fingerprint(_: *const sshkey, _: libc::c_int, _: sshkey_fp_rep) -> *mut libc::c_char;
@@ -4401,7 +4400,7 @@ unsafe extern "C" fn monitor_openfds(mut mon: *mut monitor, mut do_logfds: libc:
 }
 pub unsafe extern "C" fn monitor_init() -> *mut monitor {
     let mut mon: *mut monitor = 0 as *mut monitor;
-    mon = xcalloc(
+    mon = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<monitor>() as libc::c_ulong,
     ) as *mut monitor;

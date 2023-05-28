@@ -10,7 +10,7 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
+
     fn attrib_to_stat(_: *const Attrib, _: *mut libc::stat);
     fn do_readdir(
         _: *mut sftp_conn,
@@ -67,7 +67,7 @@ static mut cur: C2RustUnnamed = C2RustUnnamed {
 };
 unsafe extern "C" fn fudge_opendir(mut path: *const libc::c_char) -> *mut libc::c_void {
     let mut r: *mut SFTP_OPENDIR = 0 as *mut SFTP_OPENDIR;
-    r = xcalloc(
+    r = crate::xmalloc::xcalloc(
         1 as libc::c_int as size_t,
         ::core::mem::size_of::<SFTP_OPENDIR>() as libc::c_ulong,
     ) as *mut SFTP_OPENDIR;
