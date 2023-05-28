@@ -60,7 +60,7 @@ extern "C" {
     fn perror(__s: *const libc::c_char);
     fn recallocarray(_: *mut libc::c_void, _: size_t, _: size_t, _: size_t) -> *mut libc::c_void;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn ssh_get_progname(_: *mut libc::c_char) -> *mut libc::c_char;
+    
     fn pledge(promises: *const libc::c_char, paths: *mut *const libc::c_char) -> libc::c_int;
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn getpeereid(_: libc::c_int, _: *mut uid_t, _: *mut gid_t) -> libc::c_int;
@@ -4737,7 +4737,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             strerror(*libc::__errno_location()),
         );
     }
-    __progname = ssh_get_progname(*av.offset(0 as libc::c_int as isize));
+    __progname = crate::openbsd_compat::bsd_misc::ssh_get_progname(*av.offset(0 as libc::c_int as isize));
     seed_rng();
     loop {
         ch = BSDgetopt(

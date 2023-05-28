@@ -61,7 +61,7 @@ extern "C" {
     fn ftruncate(__fd: libc::c_int, __length: __off_t) -> libc::c_int;
     fn perror(__s: *const libc::c_char);
     fn scan_scaled(_: *mut libc::c_char, _: *mut libc::c_longlong) -> libc::c_int;
-    fn ssh_get_progname(_: *mut libc::c_char) -> *mut libc::c_char;
+    
     fn pledge(promises: *const libc::c_char, paths: *mut *const libc::c_char) -> libc::c_int;
     fn strtonum(
         _: *const libc::c_char,
@@ -787,7 +787,7 @@ pub unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) ->
         n;
     }
     argv = newargv;
-    __progname = ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
+    __progname = crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
     log_init(argv0, log_level, SYSLOG_FACILITY_USER, 2 as libc::c_int);
     memset(
         &mut args as *mut arglist as *mut libc::c_void,

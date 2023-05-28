@@ -65,7 +65,7 @@ extern "C" {
     fn fputs(__s: *const libc::c_char, __stream: *mut libc::FILE) -> libc::c_int;
     fn ferror(__stream: *mut libc::FILE) -> libc::c_int;
     fn seed_rng();
-    fn ssh_get_progname(_: *mut libc::c_char) -> *mut libc::c_char;
+    
     fn ppoll(
         __fds: *mut pollfd,
         __nfds: nfds_t,
@@ -1948,7 +1948,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         #[link_name = "BSDoptarg"]
         static mut BSDoptarg_0: *mut libc::c_char;
     }
-    __progname = ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
+    __progname = crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
     seed_rng();
     tq.tqh_first = 0 as *mut Connection;
     tq.tqh_last = &mut tq.tqh_first;

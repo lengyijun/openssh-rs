@@ -61,7 +61,7 @@ extern "C" {
     fn setproctitle(fmt: *const libc::c_char, _: ...);
     fn compat_init_setproctitle(argc: libc::c_int, argv: *mut *mut libc::c_char);
     static mut BSDoptreset: libc::c_int;
-    fn ssh_get_progname(_: *mut libc::c_char) -> *mut libc::c_char;
+    
     fn fork() -> __pid_t;
     fn isatty(__fd: libc::c_int) -> libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
@@ -2096,7 +2096,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     let mut cinfo: *mut ssh_conn_info = 0 as *mut ssh_conn_info;
     crate::misc::sanitise_stdfd();
     closefrom(2 as libc::c_int + 1 as libc::c_int);
-    __progname = ssh_get_progname(*av.offset(0 as libc::c_int as isize));
+    __progname = crate::openbsd_compat::bsd_misc::ssh_get_progname(*av.offset(0 as libc::c_int as isize));
     saved_av = xcalloc(
         (ac + 1 as libc::c_int) as size_t,
         ::core::mem::size_of::<*mut libc::c_char>() as libc::c_ulong,

@@ -40,7 +40,7 @@ extern "C" {
     ) -> __ssize_t;
     fn perror(__s: *const libc::c_char);
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn ssh_get_progname(_: *mut libc::c_char) -> *mut libc::c_char;
+    
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
     fn strtonum(
         _: *const libc::c_char,
@@ -1848,7 +1848,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     let mut dest_constraints: *mut *mut dest_constraint = 0 as *mut *mut dest_constraint;
     let mut ndest_constraints: size_t = 0 as libc::c_int as size_t;
     crate::misc::sanitise_stdfd();
-    __progname = ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
+    __progname = crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
     seed_rng();
     log_init(__progname, log_level, log_facility, 1 as libc::c_int);
     setvbuf(

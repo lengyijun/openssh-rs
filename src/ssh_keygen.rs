@@ -41,7 +41,7 @@ extern "C" {
         _: libc::c_longlong,
         _: *mut *const libc::c_char,
     ) -> libc::c_longlong;
-    fn ssh_get_progname(_: *mut libc::c_char) -> *mut libc::c_char;
+    
     static mut stdin: *mut libc::FILE;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
@@ -8391,7 +8391,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         static mut BSDoptarg_0: *mut libc::c_char;
     }
     crate::misc::sanitise_stdfd();
-    __progname = ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
+    __progname = crate::openbsd_compat::bsd_misc::ssh_get_progname(*argv.offset(0 as libc::c_int as isize));
     seed_rng();
     log_init(
         *argv.offset(0 as libc::c_int as isize),

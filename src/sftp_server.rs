@@ -69,7 +69,7 @@ extern "C" {
 
     static mut stderr: *mut libc::FILE;
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
-    fn ssh_get_progname(_: *mut libc::c_char) -> *mut libc::c_char;
+    
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
     fn getrlimit(__resource: __rlimit_resource_t, __rlimits: *mut rlimit) -> libc::c_int;
     fn statvfs(__file: *const libc::c_char, __buf: *mut statvfs) -> libc::c_int;
