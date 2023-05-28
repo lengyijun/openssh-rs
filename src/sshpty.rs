@@ -63,17 +63,7 @@ pub struct termios {
     pub c_ospeed: speed_t,
 }
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct winsize {
@@ -291,7 +281,7 @@ pub unsafe extern "C" fn pty_change_window_size(
         &mut w as *mut winsize,
     );
 }
-pub unsafe extern "C" fn pty_setowner(mut pw: *mut passwd, mut tty: *const libc::c_char) {
+pub unsafe extern "C" fn pty_setowner(mut pw: *mut libc::passwd, mut tty: *const libc::c_char) {
     let mut grp: *mut group = 0 as *mut group;
     let mut gid: gid_t = 0;
     let mut mode: mode_t = 0;

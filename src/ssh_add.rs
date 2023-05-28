@@ -11,7 +11,7 @@ extern "C" {
     pub type rsa_st;
     pub type ec_key_st;
 
-    fn getpwuid(__uid: __uid_t) -> *mut passwd;
+    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
     fn getuid() -> __uid_t;
     static mut BSDoptarg: *mut libc::c_char;
     static mut BSDoptind: libc::c_int;
@@ -201,17 +201,7 @@ pub type u_int64_t = __uint64_t;
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -2178,7 +2168,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     }
                 } else if argc == 0 as libc::c_int {
                     let mut buf: [libc::c_char; 4096] = [0; 4096];
-                    let mut pw: *mut passwd = 0 as *mut passwd;
+                    let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
                     let mut st: libc::stat = unsafe { std::mem::zeroed() };
                     let mut count: libc::c_int = 0 as libc::c_int;
                     pw = getpwuid(getuid());

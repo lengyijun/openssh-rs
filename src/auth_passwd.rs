@@ -8,7 +8,7 @@ extern "C" {
     pub type kex;
     pub type session_state;
     fn xcrypt(password: *const libc::c_char, salt: *const libc::c_char) -> *mut libc::c_char;
-    fn shadow_pw(pw: *mut passwd) -> *mut libc::c_char;
+    fn shadow_pw(pw: *mut libc::passwd) -> *mut libc::c_char;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn auth_restrict_session(_: *mut ssh);
@@ -42,17 +42,7 @@ pub struct sockaddr {
     pub sa_data: [libc::c_char; 14],
 }
 pub type uint8_t = __uint8_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 pub type sig_atomic_t = __sig_atomic_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -340,7 +330,7 @@ pub struct Authctxt {
     pub force_pwchange: libc::c_int,
     pub user: *mut libc::c_char,
     pub service: *mut libc::c_char,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub style: *mut libc::c_char,
     pub auth_methods: *mut *mut libc::c_char,
     pub num_auth_methods: u_int,
@@ -358,7 +348,7 @@ pub unsafe extern "C" fn auth_password(
     mut password: *const libc::c_char,
 ) -> libc::c_int {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
-    let mut pw: *mut passwd = (*authctxt).pw;
+    let mut pw: *mut libc::passwd = (*authctxt).pw;
     let mut result: libc::c_int = 0;
     let mut ok: libc::c_int = (*authctxt).valid;
     static mut expire_checked: libc::c_int = 0 as libc::c_int;
@@ -390,7 +380,7 @@ pub unsafe extern "C" fn sys_auth_passwd(
     mut password: *const libc::c_char,
 ) -> libc::c_int {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
-    let mut pw: *mut passwd = (*authctxt).pw;
+    let mut pw: *mut libc::passwd = (*authctxt).pw;
     let mut encrypted_password: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut salt: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut pw_password: *mut libc::c_char = if (*authctxt).valid != 0 {

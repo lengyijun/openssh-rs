@@ -36,17 +36,7 @@ pub type u_int = __u_int;
 pub type gid_t = __gid_t;
 pub type uid_t = __uid_t;
 pub type size_t = libc::c_ulong;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;
 pub const SYSLOG_LEVEL_DEBUG3: LogLevel = 7;
@@ -66,7 +56,7 @@ static mut saved_egroups: *mut gid_t = 0 as *const gid_t as *mut gid_t;
 static mut user_groups: *mut gid_t = 0 as *const gid_t as *mut gid_t;
 static mut saved_egroupslen: libc::c_int = -(1 as libc::c_int);
 static mut user_groupslen: libc::c_int = -(1 as libc::c_int);
-pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut passwd) {
+pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut libc::passwd) {
     saved_euid = geteuid();
     saved_egid = getegid();
     crate::log::sshlog(
@@ -305,7 +295,7 @@ pub unsafe extern "C" fn restore_uid() {
     }
     temporarily_use_uid_effective = 0 as libc::c_int;
 }
-pub unsafe extern "C" fn permanently_set_uid(mut pw: *mut passwd) {
+pub unsafe extern "C" fn permanently_set_uid(mut pw: *mut libc::passwd) {
     let mut old_uid: uid_t = getuid();
     let mut old_gid: gid_t = getgid();
     if pw.is_null() {

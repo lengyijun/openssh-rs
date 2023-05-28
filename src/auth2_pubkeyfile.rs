@@ -42,7 +42,7 @@ extern "C" {
     fn safe_path_fd(
         _: libc::c_int,
         _: *const libc::c_char,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         err: *mut libc::c_char,
         errlen: size_t,
     ) -> libc::c_int;
@@ -115,17 +115,7 @@ pub type u_int64_t = __uint64_t;
 pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -240,7 +230,7 @@ unsafe extern "C" fn getline(
     return __getdelim(__lineptr, __n, '\n' as i32, __stream);
 }
 pub unsafe extern "C" fn auth_authorise_keyopts(
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut opts: *mut sshauthopt,
     mut allow_cert_authority: libc::c_int,
     mut remote_ip: *const libc::c_char,
@@ -624,7 +614,7 @@ pub unsafe extern "C" fn auth_process_principals(
     return found_principal as libc::c_int;
 }
 pub unsafe extern "C" fn auth_check_authkey_line(
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut key: *mut sshkey,
     mut cp: *mut libc::c_char,
     mut remote_ip: *const libc::c_char,
@@ -977,7 +967,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
     return ret;
 }
 pub unsafe extern "C" fn auth_check_authkeys_file(
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut f: *mut libc::FILE,
     mut file: *mut libc::c_char,
     mut key: *mut sshkey,
@@ -1046,7 +1036,7 @@ pub unsafe extern "C" fn auth_check_authkeys_file(
 }
 unsafe extern "C" fn auth_openfile(
     mut file: *const libc::c_char,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut strict_modes: libc::c_int,
     mut log_missing: libc::c_int,
     mut file_type: *mut libc::c_char,
@@ -1151,7 +1141,7 @@ unsafe extern "C" fn auth_openfile(
 }
 pub unsafe extern "C" fn auth_openkeyfile(
     mut file: *const libc::c_char,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut strict_modes: libc::c_int,
 ) -> *mut libc::FILE {
     return auth_openfile(
@@ -1164,7 +1154,7 @@ pub unsafe extern "C" fn auth_openkeyfile(
 }
 pub unsafe extern "C" fn auth_openprincipals(
     mut file: *const libc::c_char,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut strict_modes: libc::c_int,
 ) -> *mut libc::FILE {
     return auth_openfile(

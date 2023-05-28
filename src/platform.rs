@@ -13,17 +13,7 @@ pub type __uid_t = libc::c_uint;
 pub type __gid_t = libc::c_uint;
 pub type __pid_t = libc::c_int;
 pub type pid_t = __pid_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct spwd {
@@ -52,14 +42,14 @@ pub unsafe extern "C" fn platform_privileged_uidswap() -> libc::c_int {
     return (getuid() == 0 as libc::c_int as libc::c_uint
         || geteuid() == 0 as libc::c_int as libc::c_uint) as libc::c_int;
 }
-pub unsafe extern "C" fn platform_setusercontext(mut _pw: *mut passwd) {}
-pub unsafe extern "C" fn platform_setusercontext_post_groups(mut _pw: *mut passwd) {}
+pub unsafe extern "C" fn platform_setusercontext(mut _pw: *mut libc::passwd) {}
+pub unsafe extern "C" fn platform_setusercontext_post_groups(mut _pw: *mut libc::passwd) {}
 pub unsafe extern "C" fn platform_krb5_get_principal_name(
     mut _pw_name: *const libc::c_char,
 ) -> *mut libc::c_char {
     return 0 as *mut libc::c_char;
 }
-pub unsafe extern "C" fn platform_locked_account(mut pw: *mut passwd) -> libc::c_int {
+pub unsafe extern "C" fn platform_locked_account(mut pw: *mut libc::passwd) -> libc::c_int {
     let mut locked: libc::c_int = 0 as libc::c_int;
     let mut passwd: *mut libc::c_char = (*pw).pw_passwd;
     let mut spw: *mut spwd = 0 as *mut spwd;

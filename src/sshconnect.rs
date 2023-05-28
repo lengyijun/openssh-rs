@@ -196,7 +196,7 @@ extern "C" {
         _: *mut *mut libc::c_char,
         _: *mut *mut libc::FILE,
         _: u_int,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: Option<privdrop_fn>,
         _: Option<privrestore_fn>,
     ) -> pid_t;
@@ -355,17 +355,7 @@ pub union __CONST_SOCKADDR_ARG {
     pub __sockaddr_un__: *const sockaddr_un,
     pub __sockaddr_x25__: *const sockaddr_x25,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -876,7 +866,7 @@ pub struct find_by_key_ctx {
     pub nnames: u_int,
 }
 pub type privrestore_fn = unsafe extern "C" fn() -> ();
-pub type privdrop_fn = unsafe extern "C" fn(*mut passwd) -> ();
+pub type privdrop_fn = unsafe extern "C" fn(*mut libc::passwd) -> ();
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct dest_constraint {
@@ -2602,7 +2592,7 @@ pub unsafe extern "C" fn load_hostkeys_command(
             ((1 as libc::c_int) << 1 as libc::c_int
                 | (1 as libc::c_int) << 3 as libc::c_int
                 | (1 as libc::c_int) << 4 as libc::c_int) as u_int,
-            0 as *mut passwd,
+            0 as *mut libc::passwd,
             None,
             None,
         );
@@ -4347,7 +4337,7 @@ pub unsafe extern "C" fn ssh_login(
     mut orighost: *const libc::c_char,
     mut hostaddr: *mut sockaddr,
     mut port: u_short,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut timeout_ms: libc::c_int,
     mut cinfo: *const ssh_conn_info,
 ) {

@@ -20,7 +20,7 @@ extern "C" {
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut passwd;
+    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
     fn access(__name: *const libc::c_char, __type: libc::c_int) -> libc::c_int;
 
     fn closefrom(__lowfd: libc::c_int);
@@ -258,7 +258,7 @@ extern "C" {
     ) -> libc::c_int;
     fn valid_env_name(_: *const libc::c_char) -> libc::c_int;
     fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
-    fn pwcopy(_: *mut passwd) -> *mut passwd;
+    fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
     fn ssh_gai_strerror(_: libc::c_int) -> *const libc::c_char;
     fn lookup_env_in_list(
         env: *const libc::c_char,
@@ -277,7 +277,7 @@ extern "C" {
     fn fill_default_options_for_canonicalization(_: *mut Options);
     fn process_config_line(
         _: *mut Options,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: *const libc::c_char,
         _: *const libc::c_char,
         _: *mut libc::c_char,
@@ -288,7 +288,7 @@ extern "C" {
     ) -> libc::c_int;
     fn read_config_file(
         _: *const libc::c_char,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: *const libc::c_char,
         _: *const libc::c_char,
         _: *mut Options,
@@ -338,7 +338,7 @@ extern "C" {
         _: *const libc::c_char,
         _: *mut sockaddr,
         _: u_short,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: libc::c_int,
         _: *const ssh_conn_info,
     );
@@ -481,17 +481,7 @@ pub struct termios {
     pub c_ospeed: speed_t,
 }
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -1929,7 +1919,7 @@ unsafe extern "C" fn check_load(
 }
 unsafe extern "C" fn process_config_files(
     mut host_name: *const libc::c_char,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut final_pass: libc::c_int,
     mut want_final_pass: *mut libc::c_int,
 ) {
@@ -2065,7 +2055,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     let mut cname: [libc::c_char; 1025] = [0; 1025];
     let mut thishost: [libc::c_char; 1025] = [0; 1025];
     let mut st: libc::stat = unsafe { std::mem::zeroed() };
-    let mut pw: *mut passwd = 0 as *mut passwd;
+    let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
     extern "C" {
         #[link_name = "BSDoptind"]
         static mut BSDoptind_0: libc::c_int;

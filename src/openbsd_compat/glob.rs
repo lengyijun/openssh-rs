@@ -4,8 +4,8 @@ extern "C" {
 
     fn lstat(__file: *const libc::c_char, __buf: *mut libc::stat) -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut passwd;
-    fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
+    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn getuid() -> __uid_t;
     fn geteuid() -> __uid_t;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
@@ -52,17 +52,7 @@ pub type u_char = __u_char;
 pub type u_short = __u_short;
 pub type size_t = libc::c_ulong;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct _ssh_compat_glob_t {
@@ -454,7 +444,7 @@ unsafe extern "C" fn globtilde(
     mut patbuf_len: size_t,
     mut pglob: *mut _ssh_compat_glob_t,
 ) -> *const Char {
-    let mut pwd: *mut passwd = 0 as *mut passwd;
+    let mut pwd: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut h: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut p: *const Char = 0 as *const Char;
     let mut b: *mut Char = 0 as *mut Char;

@@ -87,13 +87,13 @@ extern "C" {
         _: *const libc::c_char,
     );
     fn auth_maxtries_exceeded(_: *mut ssh) -> !;
-    fn getpwnamallow(_: *mut ssh, user: *const libc::c_char) -> *mut passwd;
+    fn getpwnamallow(_: *mut ssh, user: *const libc::c_char) -> *mut libc::passwd;
     fn auth_root_allowed(_: *mut ssh, _: *const libc::c_char) -> libc::c_int;
     fn auth2_challenge_stop(_: *mut ssh);
-    fn fakepw() -> *mut passwd;
+    fn fakepw() -> *mut libc::passwd;
     static mut use_privsep: libc::c_int;
     fn mm_inform_authserv(_: *mut libc::c_char, _: *mut libc::c_char);
-    fn mm_getpwnamallow(_: *mut ssh, _: *const libc::c_char) -> *mut passwd;
+    fn mm_getpwnamallow(_: *mut ssh, _: *const libc::c_char) -> *mut libc::passwd;
     fn mm_auth2_read_banner() -> *mut libc::c_char;
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
     fn ssh_digest_memory(
@@ -158,17 +158,7 @@ pub struct sockaddr {
 }
 pub type uint8_t = __uint8_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 pub type sig_atomic_t = __sig_atomic_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -466,7 +456,7 @@ pub struct Authctxt {
     pub force_pwchange: libc::c_int,
     pub user: *mut libc::c_char,
     pub service: *mut libc::c_char,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub style: *mut libc::c_char,
     pub auth_methods: *mut *mut libc::c_char,
     pub num_auth_methods: u_int,

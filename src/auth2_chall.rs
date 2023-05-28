@@ -69,17 +69,7 @@ pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
 pub type uint8_t = __uint8_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 pub type sig_atomic_t = __sig_atomic_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -184,7 +174,7 @@ pub struct Authctxt {
     pub force_pwchange: libc::c_int,
     pub user: *mut libc::c_char,
     pub service: *mut libc::c_char,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub style: *mut libc::c_char,
     pub auth_methods: *mut *mut libc::c_char,
     pub num_auth_methods: u_int,

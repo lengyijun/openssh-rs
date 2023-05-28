@@ -255,17 +255,7 @@ pub struct sockaddr {
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 pub type sig_atomic_t = __sig_atomic_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -820,7 +810,7 @@ pub struct Authctxt {
     pub force_pwchange: libc::c_int,
     pub user: *mut libc::c_char,
     pub service: *mut libc::c_char,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub style: *mut libc::c_char,
     pub auth_methods: *mut *mut libc::c_char,
     pub num_auth_methods: u_int,
@@ -839,7 +829,7 @@ pub struct Session {
     pub used: libc::c_int,
     pub self_0: libc::c_int,
     pub next_unused: libc::c_int,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub authctxt: *mut Authctxt,
     pub pid: pid_t,
     pub forced: libc::c_int,
@@ -1503,7 +1493,7 @@ unsafe extern "C" fn server_request_direct_streamlocal(mut ssh: *mut ssh) -> *mu
     let mut target: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut originator: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut originator_port: u_int = 0 as libc::c_int as u_int;
-    let mut pw: *mut passwd = (*the_authctxt).pw;
+    let mut pw: *mut libc::passwd = (*the_authctxt).pw;
     let mut r: libc::c_int = 0;
     if pw.is_null() || (*the_authctxt).valid == 0 {
         sshfatal(
@@ -2254,7 +2244,7 @@ unsafe extern "C" fn server_input_global_request(
     let mut allocated_listen_port: libc::c_int = 0 as libc::c_int;
     let mut port: u_int = 0 as libc::c_int as u_int;
     let mut resp: *mut sshbuf = 0 as *mut sshbuf;
-    let mut pw: *mut passwd = (*the_authctxt).pw;
+    let mut pw: *mut libc::passwd = (*the_authctxt).pw;
     let mut fwd: Forward = Forward {
         listen_host: 0 as *mut libc::c_char,
         listen_port: 0,

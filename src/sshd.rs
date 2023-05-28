@@ -60,7 +60,7 @@ extern "C" {
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
     fn endpwent();
-    fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
+    fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn platform_pre_listen();
     fn platform_pre_fork();
     fn platform_pre_restart();
@@ -238,7 +238,7 @@ extern "C" {
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
     fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
     fn sock_set_v6only(_: libc::c_int);
-    fn pwcopy(_: *mut passwd) -> *mut passwd;
+    fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
     fn ssh_gai_strerror(_: libc::c_int) -> *const libc::c_char;
     fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
     fn match_pattern_list(
@@ -289,7 +289,7 @@ extern "C" {
         _: *mut ServerOptions,
         path: *const libc::c_char,
     );
-    fn permanently_set_uid(_: *mut passwd);
+    fn permanently_set_uid(_: *mut libc::passwd);
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
     fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
     fn ssh_digest_update(
@@ -378,7 +378,7 @@ extern "C" {
     fn channel_set_af(_: *mut ssh, af: libc::c_int);
     fn do_authenticated(_: *mut ssh, _: *mut Authctxt);
     fn do_cleanup(_: *mut ssh, _: *mut Authctxt);
-    fn do_setusercontext(_: *mut passwd);
+    fn do_setusercontext(_: *mut libc::passwd);
     fn monitor_init() -> *mut monitor;
     fn monitor_reinit(_: *mut monitor);
     fn monitor_child_preauth(_: *mut ssh, _: *mut monitor);
@@ -582,17 +582,7 @@ pub const IPPROTO_IPIP: C2RustUnnamed_0 = 4;
 pub const IPPROTO_IGMP: C2RustUnnamed_0 = 2;
 pub const IPPROTO_ICMP: C2RustUnnamed_0 = 1;
 pub const IPPROTO_IP: C2RustUnnamed_0 = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -857,7 +847,7 @@ pub struct Authctxt {
     pub force_pwchange: libc::c_int,
     pub user: *mut libc::c_char,
     pub service: *mut libc::c_char,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub style: *mut libc::c_char,
     pub auth_methods: *mut *mut libc::c_char,
     pub num_auth_methods: u_int,
@@ -1291,7 +1281,7 @@ pub static mut includes: include_list = include_list {
     tqh_last: 0 as *const *mut include_item as *mut *mut include_item,
 };
 pub static mut loginmsg: *mut sshbuf = 0 as *const sshbuf as *mut sshbuf;
-pub static mut privsep_pw: *mut passwd = 0 as *const passwd as *mut passwd;
+pub static mut privsep_pw: *mut libc::passwd = 0 as *const libc::passwd as *mut libc::passwd;
 static mut listener_proctitle: *mut libc::c_char = 0 as *const libc::c_char as *mut libc::c_char;
 unsafe extern "C" fn close_listen_socks() {
     let mut i: libc::c_int = 0;

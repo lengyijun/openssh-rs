@@ -27,7 +27,7 @@ extern "C" {
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
-    fn temporarily_use_uid(_: *mut passwd);
+    fn temporarily_use_uid(_: *mut libc::passwd);
     fn restore_uid();
 
     fn xasprintf(_: *mut *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
@@ -65,17 +65,7 @@ pub struct sockaddr {
     pub sa_data: [libc::c_char; 14],
 }
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -442,7 +432,7 @@ unsafe extern "C" fn check_rhosts_file(
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn auth_rhosts2(
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut client_user: *const libc::c_char,
     mut hostname: *const libc::c_char,
     mut ipaddr: *const libc::c_char,

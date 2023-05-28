@@ -9,7 +9,7 @@ extern "C" {
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut passwd;
+    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
 
     fn getuid() -> __uid_t;
 
@@ -45,7 +45,7 @@ extern "C" {
         _: *const libc::c_char,
         _: u_int,
     ) -> libc::c_int;
-    fn pwcopy(_: *mut passwd) -> *mut passwd;
+    fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
     fn sshbuf_new() -> *mut sshbuf;
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut sshbuf;
     fn sshbuf_free(buf: *mut sshbuf);
@@ -83,14 +83,14 @@ extern "C" {
     fn fill_default_options(_: *mut Options) -> libc::c_int;
     fn read_config_file(
         _: *const libc::c_char,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: *const libc::c_char,
         _: *const libc::c_char,
         _: *mut Options,
         _: libc::c_int,
         _: *mut libc::c_int,
     ) -> libc::c_int;
-    fn permanently_set_uid(_: *mut passwd);
+    fn permanently_set_uid(_: *mut libc::passwd);
     static mut __progname: *mut libc::c_char;
 }
 pub type __u_char = libc::c_uchar;
@@ -110,17 +110,7 @@ pub type int64_t = __int64_t;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
 pub type uint8_t = __uint8_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 pub type DSA = dsa_st;
 pub type RSA = rsa_st;
 pub type EC_KEY = ec_key_st;
@@ -361,7 +351,7 @@ pub struct Options {
     pub ignored_unknown: *mut libc::c_char,
 }
 unsafe extern "C" fn valid_request(
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut host: *mut libc::c_char,
     mut ret: *mut *mut sshkey,
     mut pkalgp: *mut *mut libc::c_char,
@@ -751,7 +741,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
     };
     let mut keys: [*mut sshkey; 5] = [0 as *mut sshkey; 5];
     let mut key: *mut sshkey = 0 as *mut sshkey;
-    let mut pw: *mut passwd = 0 as *mut passwd;
+    let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut r: libc::c_int = 0;
     let mut key_fd: [libc::c_int; 5] = [0; 5];
     let mut i: libc::c_int = 0;

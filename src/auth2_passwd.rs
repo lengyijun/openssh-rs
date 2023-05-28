@@ -363,7 +363,7 @@ unsafe extern "C" fn userauth_passwd(
     {
         freezero(password as *mut libc::c_void, len);
         sshfatal(
-            b"auth2-passwd.c\0" as *const u8 as *const libc::c_char,
+            b"auth2-libc::passwd.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"userauth_passwd\0"))
                 .as_ptr(),
             64 as libc::c_int,
@@ -375,7 +375,7 @@ unsafe extern "C" fn userauth_passwd(
     }
     if change != 0 {
         crate::log::sshlog(
-            b"auth2-passwd.c\0" as *const u8 as *const libc::c_char,
+            b"auth2-libc::passwd.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"userauth_passwd\0"))
                 .as_ptr(),
             68 as libc::c_int,

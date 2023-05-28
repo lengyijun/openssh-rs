@@ -31,8 +31,8 @@ extern "C" {
         __ut_host: *const libc::c_char,
     );
 
-    fn getpwuid(__uid: __uid_t) -> *mut passwd;
-    fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
+    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn lseek(__fd: libc::c_int, __offset: __off_t, __whence: libc::c_int) -> __off_t;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
@@ -209,17 +209,7 @@ pub struct C2RustUnnamed_0 {
     pub tv_usec: int32_t,
 }
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct ssh {
@@ -387,7 +377,7 @@ pub unsafe extern "C" fn login_get_lastlog_time(uid: uid_t) -> libc::c_uint {
     };
 }
 pub unsafe extern "C" fn login_get_lastlog(mut li: *mut logininfo, uid: uid_t) -> *mut logininfo {
-    let mut pw: *mut passwd = 0 as *mut passwd;
+    let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
     memset(
         li as *mut libc::c_void,
         '\0' as i32,
@@ -460,7 +450,7 @@ pub unsafe extern "C" fn login_init_entry(
     mut hostname: *const libc::c_char,
     mut line: *const libc::c_char,
 ) -> libc::c_int {
-    let mut pw: *mut passwd = 0 as *mut passwd;
+    let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
     memset(
         li as *mut libc::c_void,
         0 as libc::c_int,

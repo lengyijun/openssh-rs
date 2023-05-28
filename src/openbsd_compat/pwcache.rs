@@ -1,6 +1,6 @@
 use ::libc;
 extern "C" {
-    fn getpwuid(__uid: __uid_t) -> *mut passwd;
+    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
 
     fn getgrgid(__gid: __gid_t) -> *mut group;
 
@@ -12,17 +12,7 @@ pub type __gid_t = libc::c_uint;
 pub type u_long = __u_long;
 pub type gid_t = __gid_t;
 pub type uid_t = __uid_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct ncache {
@@ -54,7 +44,7 @@ pub unsafe extern "C" fn user_from_uid(
     }; 64];
     static mut pwopen: libc::c_int = 0;
     static mut nbuf: [libc::c_char; 15] = [0; 15];
-    let mut pw: *mut passwd = 0 as *mut passwd;
+    let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut cp: *mut ncache = 0 as *mut ncache;
     cp = c_uid
         .as_mut_ptr()

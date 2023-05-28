@@ -126,14 +126,14 @@ extern "C" {
     fn auth_password(_: *mut ssh, _: *const libc::c_char) -> libc::c_int;
     fn hostbased_key_allowed(
         _: *mut ssh,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: *const libc::c_char,
         _: *mut libc::c_char,
         _: *mut sshkey,
     ) -> libc::c_int;
     fn user_key_allowed(
         ssh: *mut ssh,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: *mut sshkey,
         _: libc::c_int,
         _: *mut *mut sshauthopt,
@@ -158,7 +158,7 @@ extern "C" {
         _: *const libc::c_char,
     ) -> libc::c_int;
     fn auth2_setup_methods_lists(_: *mut Authctxt) -> libc::c_int;
-    fn getpwnamallow(_: *mut ssh, user: *const libc::c_char) -> *mut passwd;
+    fn getpwnamallow(_: *mut ssh, user: *const libc::c_char) -> *mut libc::passwd;
     fn get_hostkey_by_index(_: libc::c_int) -> *mut sshkey;
     fn get_hostkey_public_by_index(_: libc::c_int, _: *mut ssh) -> *mut sshkey;
     fn get_hostkey_public_by_type(_: libc::c_int, _: libc::c_int, _: *mut ssh) -> *mut sshkey;
@@ -174,7 +174,7 @@ extern "C" {
         _: *const libc::c_char,
     ) -> libc::c_int;
     fn auth_activate_options(_: *mut ssh, _: *mut sshauthopt) -> libc::c_int;
-    fn fakepw() -> *mut passwd;
+    fn fakepw() -> *mut libc::passwd;
     fn kexgex_server(_: *mut ssh) -> libc::c_int;
     fn kex_gen_server(_: *mut ssh) -> libc::c_int;
     fn choose_dh(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> *mut DH;
@@ -194,7 +194,7 @@ extern "C" {
         _: *mut libc::c_char,
         _: size_t,
     ) -> libc::c_int;
-    fn pty_setowner(_: *mut passwd, _: *const libc::c_char);
+    fn pty_setowner(_: *mut libc::passwd, _: *const libc::c_char);
     fn session_unused(_: libc::c_int);
     fn session_destroy_all(_: *mut ssh, _: Option<unsafe extern "C" fn(*mut Session) -> ()>);
     fn session_pty_cleanup2(_: *mut Session);
@@ -351,17 +351,7 @@ pub struct in_addr {
 }
 pub type in_addr_t = uint32_t;
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 pub type sig_atomic_t = __sig_atomic_t;
 pub type __sighandler_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 #[derive(Copy, Clone)]
@@ -623,7 +613,7 @@ pub struct Authctxt {
     pub force_pwchange: libc::c_int,
     pub user: *mut libc::c_char,
     pub service: *mut libc::c_char,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub style: *mut libc::c_char,
     pub auth_methods: *mut *mut libc::c_char,
     pub num_auth_methods: u_int,
@@ -665,7 +655,7 @@ pub struct Session {
     pub used: libc::c_int,
     pub self_0: libc::c_int,
     pub next_unused: libc::c_int,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub authctxt: *mut Authctxt,
     pub pid: pid_t,
     pub forced: libc::c_int,
@@ -1988,7 +1978,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     mut sock: libc::c_int,
     mut m: *mut sshbuf,
 ) -> libc::c_int {
-    let mut pwent: *mut passwd = 0 as *mut passwd;
+    let mut pwent: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut r: libc::c_int = 0;
     let mut allowed: libc::c_int = 0 as libc::c_int;
     let mut i: u_int = 0;
@@ -3849,7 +3839,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
     sshkey_free(key);
     return (ret == 0 as libc::c_int) as libc::c_int;
 }
-unsafe extern "C" fn mm_record_login(mut ssh: *mut ssh, mut s: *mut Session, mut pw: *mut passwd) {
+unsafe extern "C" fn mm_record_login(mut ssh: *mut ssh, mut s: *mut Session, mut pw: *mut libc::passwd) {
     let mut fromlen: socklen_t = 0;
     let mut from: sockaddr_storage = sockaddr_storage {
         ss_family: 0,

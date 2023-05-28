@@ -29,8 +29,8 @@ extern "C" {
         __flags: libc::c_int,
     ) -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut passwd;
-    fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
+    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn platform_disable_tracing(_: libc::c_int);
     fn platform_pledge_sftp_server();
     fn lseek(__fd: libc::c_int, __offset: __off_t, __whence: libc::c_int) -> __off_t;
@@ -147,7 +147,7 @@ extern "C" {
     fn tilde_expand(_: *const libc::c_char, _: uid_t, _: *mut *mut libc::c_char) -> libc::c_int;
     fn tilde_expand_filename(_: *const libc::c_char, _: uid_t) -> *mut libc::c_char;
     fn percent_expand(_: *const libc::c_char, _: ...) -> *mut libc::c_char;
-    fn pwcopy(_: *mut passwd) -> *mut passwd;
+    fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
     fn get_u32(_: *const libc::c_void) -> u_int32_t;
     fn put_u32(_: *mut libc::c_void, _: u_int32_t);
     fn match_list(
@@ -207,17 +207,7 @@ pub type u_int64_t = __uint64_t;
 
 pub type uint64_t = __uint64_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -376,7 +366,7 @@ pub struct Stat {
 
 pub type C2RustUnnamed_0 = libc::c_uint;
 static mut log_level: LogLevel = SYSLOG_LEVEL_ERROR;
-static mut pw: *mut passwd = 0 as *const passwd as *mut passwd;
+static mut pw: *mut libc::passwd = 0 as *const libc::passwd as *mut libc::passwd;
 static mut client_addr: *mut libc::c_char = 0 as *const libc::c_char as *mut libc::c_char;
 pub static mut iqueue: *mut sshbuf = 0 as *const sshbuf as *mut sshbuf;
 pub static mut oqueue: *mut sshbuf = 0 as *const sshbuf as *mut sshbuf;
@@ -4038,7 +4028,7 @@ unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
 }
 unsafe extern "C" fn process_extended_home_directory(mut id: u_int32_t) {
     let mut username: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut user_pw: *mut passwd = 0 as *mut passwd;
+    let mut user_pw: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut r: libc::c_int = 0;
     let mut s: Stat = Stat {
         name: 0 as *mut libc::c_char,
@@ -4107,7 +4097,7 @@ unsafe extern "C" fn process_extended_home_directory(mut id: u_int32_t) {
     libc::free(username as *mut libc::c_void);
 }
 unsafe extern "C" fn process_extended_get_users_groups_by_id(mut id: u_int32_t) {
-    let mut user_pw: *mut passwd = 0 as *mut passwd;
+    let mut user_pw: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut gr: *mut group = 0 as *mut group;
     let mut uids: *mut sshbuf = 0 as *mut sshbuf;
     let mut gids: *mut sshbuf = 0 as *mut sshbuf;

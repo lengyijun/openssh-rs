@@ -55,8 +55,8 @@ extern "C" {
 
     fn endpwent();
     fn platform_privileged_uidswap() -> libc::c_int;
-    fn platform_setusercontext(_: *mut passwd);
-    fn platform_setusercontext_post_groups(_: *mut passwd);
+    fn platform_setusercontext(_: *mut libc::passwd);
+    fn platform_setusercontext_post_groups(_: *mut libc::passwd);
     fn killpg(__pgrp: __pid_t, __sig: libc::c_int) -> libc::c_int;
 
     fn closefrom(__lowfd: libc::c_int);
@@ -118,7 +118,7 @@ extern "C" {
     fn pty_release(_: *const libc::c_char);
     fn pty_make_controlling_tty(_: *mut libc::c_int, _: *const libc::c_char);
     fn pty_change_window_size(_: libc::c_int, _: u_int, _: u_int, _: u_int, _: u_int);
-    fn pty_setowner(_: *mut passwd, _: *const libc::c_char);
+    fn pty_setowner(_: *mut libc::passwd, _: *const libc::c_char);
     fn sshpkt_fmt_connection_id(ssh: *mut ssh, s: *mut libc::c_char, l: size_t);
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_get_cstring(
@@ -156,9 +156,9 @@ extern "C" {
         _: *const libc::c_char,
         _: libc::c_int,
     ) -> libc::c_int;
-    fn temporarily_use_uid(_: *mut passwd);
+    fn temporarily_use_uid(_: *mut libc::passwd);
     fn restore_uid();
-    fn permanently_set_uid(_: *mut passwd);
+    fn permanently_set_uid(_: *mut libc::passwd);
     fn channel_by_id(_: *mut ssh, _: libc::c_int) -> *mut Channel;
     fn channel_lookup(_: *mut ssh, _: libc::c_int) -> *mut Channel;
     fn channel_new(
@@ -267,7 +267,7 @@ extern "C" {
         _: size_t,
     ) -> libc::c_int;
     fn mm_session_pty_cleanup2(_: *mut Session);
-    fn sftp_server_main(_: libc::c_int, _: *mut *mut libc::c_char, _: *mut passwd) -> libc::c_int;
+    fn sftp_server_main(_: libc::c_int, _: *mut *mut libc::c_char, _: *mut libc::passwd) -> libc::c_int;
 
     static mut options: ServerOptions;
     static mut __progname: *mut libc::c_char;
@@ -392,17 +392,7 @@ pub struct in_addr {
 pub type in_addr_t = uint32_t;
 pub type uint64_t = __uint64_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -770,7 +760,7 @@ pub struct Authctxt {
     pub force_pwchange: libc::c_int,
     pub user: *mut libc::c_char,
     pub service: *mut libc::c_char,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub style: *mut libc::c_char,
     pub auth_methods: *mut *mut libc::c_char,
     pub num_auth_methods: u_int,
@@ -954,7 +944,7 @@ pub struct Session {
     pub used: libc::c_int,
     pub self_0: libc::c_int,
     pub next_unused: libc::c_int,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub authctxt: *mut Authctxt,
     pub pid: pid_t,
     pub forced: libc::c_int,
@@ -1004,7 +994,7 @@ static mut in_chroot: libc::c_int = 0 as libc::c_int;
 static mut auth_info_file: *mut libc::c_char = 0 as *const libc::c_char as *mut libc::c_char;
 static mut auth_sock_name: *mut libc::c_char = 0 as *const libc::c_char as *mut libc::c_char;
 static mut auth_sock_dir: *mut libc::c_char = 0 as *const libc::c_char as *mut libc::c_char;
-unsafe extern "C" fn auth_sock_cleanup_proc(mut pw: *mut passwd) {
+unsafe extern "C" fn auth_sock_cleanup_proc(mut pw: *mut libc::passwd) {
     if !auth_sock_name.is_null() {
         temporarily_use_uid(pw);
         unlink(auth_sock_name);
@@ -1015,7 +1005,7 @@ unsafe extern "C" fn auth_sock_cleanup_proc(mut pw: *mut passwd) {
 }
 unsafe extern "C" fn auth_input_request_forwarding(
     mut ssh: *mut ssh,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
 ) -> libc::c_int {
     let mut nc: *mut Channel = 0 as *mut Channel;
     let mut sock: libc::c_int = -(1 as libc::c_int);
@@ -1111,7 +1101,7 @@ unsafe extern "C" fn display_loginmsg() {
     );
     sshbuf_reset(loginmsg);
 }
-unsafe extern "C" fn prepare_auth_info_file(mut pw: *mut passwd, mut info: *mut sshbuf) {
+unsafe extern "C" fn prepare_auth_info_file(mut pw: *mut libc::passwd, mut info: *mut sshbuf) {
     let mut fd: libc::c_int = -(1 as libc::c_int);
     let mut success: libc::c_int = 0 as libc::c_int;
     if options.expose_userauth_info == 0 || info.is_null() {
@@ -1780,7 +1770,7 @@ pub unsafe extern "C" fn do_login(
         __ss_padding: [0; 118],
         __ss_align: 0,
     };
-    let mut pw: *mut passwd = (*s).pw;
+    let mut pw: *mut libc::passwd = (*s).pw;
     let mut pid: pid_t = getpid();
     memset(
         &mut from as *mut sockaddr_storage as *mut libc::c_void,
@@ -1854,7 +1844,7 @@ pub unsafe extern "C" fn check_quietlogin(
     mut command: *const libc::c_char,
 ) -> libc::c_int {
     let mut buf: [libc::c_char; 256] = [0; 256];
-    let mut pw: *mut passwd = (*s).pw;
+    let mut pw: *mut libc::passwd = (*s).pw;
     let mut st: libc::stat = unsafe { std::mem::zeroed() };
     if !command.is_null() {
         return 1 as libc::c_int;
@@ -1950,7 +1940,7 @@ unsafe extern "C" fn do_setup_env(
     let mut value: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut env: *mut *mut libc::c_char = 0 as *mut *mut libc::c_char;
     let mut laddr: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut pw: *mut passwd = (*s).pw;
+    let mut pw: *mut libc::passwd = (*s).pw;
     let mut path: *mut libc::c_char = 0 as *mut libc::c_char;
     envsize = 100 as libc::c_int as u_int;
     env = xcalloc(
@@ -2375,7 +2365,7 @@ unsafe extern "C" fn do_rc_files(
     libc::free(cmd as *mut libc::c_void);
     libc::free(user_rc as *mut libc::c_void);
 }
-unsafe extern "C" fn do_nologin(mut pw: *mut passwd) {
+unsafe extern "C" fn do_nologin(mut pw: *mut libc::passwd) {
     let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut buf: [libc::c_char; 1024] = [0; 1024];
     let mut nl: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -2581,7 +2571,7 @@ unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut _uid: uid_
         path,
     );
 }
-pub unsafe extern "C" fn do_setusercontext(mut pw: *mut passwd) {
+pub unsafe extern "C" fn do_setusercontext(mut pw: *mut libc::passwd) {
     let mut uidstr: [libc::c_char; 32] = [0; 32];
     let mut chroot_path: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut tmp: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -2687,11 +2677,11 @@ unsafe extern "C" fn do_pwchange(mut s: *mut Session) {
                 as *const libc::c_char,
         );
         execl(
-            b"/usr/bin/passwd\0" as *const u8 as *const libc::c_char,
-            b"passwd\0" as *const u8 as *const libc::c_char,
+            b"/usr/bin/libc::passwd\0" as *const u8 as *const libc::c_char,
+            b"libc::passwd\0" as *const u8 as *const libc::c_char,
             0 as *mut libc::c_void as *mut libc::c_char,
         );
-        perror(b"passwd\0" as *const u8 as *const libc::c_char);
+        perror(b"libc::passwd\0" as *const u8 as *const libc::c_char);
     } else {
         libc::fprintf(
             stderr,
@@ -2734,7 +2724,7 @@ pub unsafe extern "C" fn do_child(
     let mut remote_id: [libc::c_char; 512] = [0; 512];
     let mut shell: *const libc::c_char = 0 as *const libc::c_char;
     let mut shell0: *const libc::c_char = 0 as *const libc::c_char;
-    let mut pw: *mut passwd = (*s).pw;
+    let mut pw: *mut libc::passwd = (*s).pw;
     let mut r: libc::c_int = 0 as libc::c_int;
     sshpkt_fmt_connection_id(
         ssh,

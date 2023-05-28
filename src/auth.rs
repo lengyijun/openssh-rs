@@ -21,8 +21,8 @@ extern "C" {
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
-    fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
-    fn platform_locked_account(_: *mut passwd) -> libc::c_int;
+    fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
+    fn platform_locked_account(_: *mut libc::passwd) -> libc::c_int;
     fn getaddrinfo(
         __name: *const libc::c_char,
         __service: *const libc::c_char,
@@ -92,7 +92,7 @@ extern "C" {
     fn lowercase(s: *mut libc::c_char);
     fn format_absolute_time(_: uint64_t, _: *mut libc::c_char, _: size_t);
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
-    fn pwcopy(_: *mut passwd) -> *mut passwd;
+    fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
     fn get_connection_info(_: *mut ssh, _: libc::c_int, _: libc::c_int) -> *mut connection_info;
     fn process_permitopen(ssh: *mut ssh, options_0: *mut ServerOptions);
     fn parse_server_match_config(
@@ -125,7 +125,7 @@ extern "C" {
         errstrp: *mut *const libc::c_char,
     ) -> *mut sshauthopt;
     fn ipv64_normalise_mapped(_: *mut sockaddr_storage, _: *mut socklen_t);
-    fn temporarily_use_uid(_: *mut passwd);
+    fn temporarily_use_uid(_: *mut libc::passwd);
     fn restore_uid();
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
@@ -140,7 +140,7 @@ extern "C" {
     fn mm_is_monitor() -> libc::c_int;
     static mut options: ServerOptions;
     static mut includes: include_list;
-    static mut privsep_pw: *mut passwd;
+    static mut privsep_pw: *mut libc::passwd;
     static mut auth_opts: *mut sshauthopt;
 }
 pub type __builtin_va_list = [__va_list_tag; 1];
@@ -267,17 +267,7 @@ pub struct in_addr {
 pub type in_addr_t = uint32_t;
 pub type uint64_t = __uint64_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 pub type sig_atomic_t = __sig_atomic_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -655,7 +645,7 @@ pub struct Authctxt {
     pub force_pwchange: libc::c_int,
     pub user: *mut libc::c_char,
     pub service: *mut libc::c_char,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub style: *mut libc::c_char,
     pub auth_methods: *mut *mut libc::c_char,
     pub num_auth_methods: u_int,
@@ -669,7 +659,7 @@ pub struct Authctxt {
     pub session_info: *mut sshbuf,
 }
 static mut auth_debug: *mut sshbuf = 0 as *const sshbuf as *mut sshbuf;
-pub unsafe extern "C" fn allowed_user(mut ssh: *mut ssh, mut pw: *mut passwd) -> libc::c_int {
+pub unsafe extern "C" fn allowed_user(mut ssh: *mut ssh, mut pw: *mut libc::passwd) -> libc::c_int {
     let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut hostname: *const libc::c_char = 0 as *const libc::c_char;
     let mut ipaddr: *const libc::c_char = 0 as *const libc::c_char;
@@ -1165,7 +1155,7 @@ pub unsafe extern "C" fn auth_root_allowed(
 }
 pub unsafe extern "C" fn expand_authorized_keys(
     mut filename: *const libc::c_char,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
 ) -> *mut libc::c_char {
     let mut file: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut uidstr: [libc::c_char; 32] = [0; 32];
@@ -1216,14 +1206,14 @@ pub unsafe extern "C" fn expand_authorized_keys(
     libc::free(file as *mut libc::c_void);
     return xstrdup(ret.as_mut_ptr());
 }
-pub unsafe extern "C" fn authorized_principals_file(mut pw: *mut passwd) -> *mut libc::c_char {
+pub unsafe extern "C" fn authorized_principals_file(mut pw: *mut libc::passwd) -> *mut libc::c_char {
     if (options.authorized_principals_file).is_null() {
         return 0 as *mut libc::c_char;
     }
     return expand_authorized_keys(options.authorized_principals_file, pw);
 }
 pub unsafe extern "C" fn check_key_in_hostfiles(
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut key: *mut sshkey,
     mut host: *const libc::c_char,
     mut sysfile: *const libc::c_char,
@@ -1323,8 +1313,8 @@ pub unsafe extern "C" fn check_key_in_hostfiles(
 pub unsafe extern "C" fn getpwnamallow(
     mut ssh: *mut ssh,
     mut user: *const libc::c_char,
-) -> *mut passwd {
-    let mut pw: *mut passwd = 0 as *mut passwd;
+) -> *mut libc::passwd {
+    let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut ci: *mut connection_info = 0 as *mut connection_info;
     let mut i: u_int = 0;
     ci = get_connection_info(ssh, 1 as libc::c_int, options.use_dns);
@@ -1360,15 +1350,15 @@ pub unsafe extern "C" fn getpwnamallow(
             auth_get_canonical_hostname(ssh, options.use_dns),
             b"ssh\0" as *const u8 as *const libc::c_char,
         );
-        return 0 as *mut passwd;
+        return 0 as *mut libc::passwd;
     }
     if allowed_user(ssh, pw) == 0 {
-        return 0 as *mut passwd;
+        return 0 as *mut libc::passwd;
     }
     if !pw.is_null() {
         return pwcopy(pw);
     }
-    return 0 as *mut passwd;
+    return 0 as *mut libc::passwd;
 }
 pub unsafe extern "C" fn auth_key_is_revoked(mut key: *mut sshkey) -> libc::c_int {
     let mut fp: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -1520,9 +1510,9 @@ pub unsafe extern "C" fn auth_debug_reset() {
         }
     };
 }
-pub unsafe extern "C" fn fakepw() -> *mut passwd {
+pub unsafe extern "C" fn fakepw() -> *mut libc::passwd {
     static mut done: libc::c_int = 0 as libc::c_int;
-    static mut fake: passwd = passwd {
+    static mut fake: libc::passwd = libc::passwd {
         pw_name: 0 as *const libc::c_char as *mut libc::c_char,
         pw_passwd: 0 as *const libc::c_char as *mut libc::c_char,
         pw_uid: 0,
@@ -1539,9 +1529,9 @@ pub unsafe extern "C" fn fakepw() -> *mut passwd {
         return &mut fake;
     }
     memset(
-        &mut fake as *mut passwd as *mut libc::c_void,
+        &mut fake as *mut libc::passwd as *mut libc::c_void,
         0 as libc::c_int,
-        ::core::mem::size_of::<passwd>() as libc::c_ulong,
+        ::core::mem::size_of::<libc::passwd>() as libc::c_ulong,
     );
     fake.pw_name = b"NOUSER\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
     fake.pw_passwd = xstrdup(

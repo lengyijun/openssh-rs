@@ -2,7 +2,7 @@ use ::libc;
 extern "C" {
     fn setpwent();
     fn endpwent();
-    fn getpwent() -> *mut passwd;
+    fn getpwent() -> *mut libc::passwd;
     fn crypt(__key: *const libc::c_char, __salt: *const libc::c_char) -> *mut libc::c_char;
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
@@ -13,17 +13,7 @@ extern "C" {
 pub type __uid_t = libc::c_uint;
 pub type __gid_t = libc::c_uint;
 pub type size_t = libc::c_ulong;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct spwd {
@@ -38,7 +28,7 @@ pub struct spwd {
     pub sp_flag: libc::c_ulong,
 }
 unsafe extern "C" fn pick_salt() -> *const libc::c_char {
-    let mut pw: *mut passwd = 0 as *mut passwd;
+    let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut passwd: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut p: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut typelen: size_t = 0;
@@ -97,7 +87,7 @@ pub unsafe extern "C" fn xcrypt(
     return crypted;
 }
 #[no_mangle]
-pub unsafe extern "C" fn shadow_pw(mut pw: *mut passwd) -> *mut libc::c_char {
+pub unsafe extern "C" fn shadow_pw(mut pw: *mut libc::passwd) -> *mut libc::c_char {
     let mut pw_password: *mut libc::c_char = (*pw).pw_passwd;
     let mut spw: *mut spwd = getspnam((*pw).pw_name);
     if !spw.is_null() {

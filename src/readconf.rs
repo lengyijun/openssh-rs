@@ -216,17 +216,7 @@ pub struct sockaddr_un {
 }
 pub type uint8_t = __uint8_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -1911,7 +1901,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
 unsafe extern "C" fn match_cfg_line(
     mut options: *mut Options,
     mut condition: *mut *mut libc::c_char,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut host_arg: *const libc::c_char,
     mut original_host: *const libc::c_char,
     mut final_pass: libc::c_int,
@@ -3038,7 +3028,7 @@ unsafe extern "C" fn parse_multistate_value(
 }
 pub unsafe extern "C" fn process_config_line(
     mut options: *mut Options,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut host: *const libc::c_char,
     mut original_host: *const libc::c_char,
     mut line: *mut libc::c_char,
@@ -3063,7 +3053,7 @@ pub unsafe extern "C" fn process_config_line(
 }
 unsafe extern "C" fn process_config_line_depth(
     mut options: *mut Options,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut host: *const libc::c_char,
     mut original_host: *const libc::c_char,
     mut line: *mut libc::c_char,
@@ -5961,7 +5951,7 @@ unsafe extern "C" fn process_config_line_depth(
 }
 pub unsafe extern "C" fn read_config_file(
     mut filename: *const libc::c_char,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut host: *const libc::c_char,
     mut original_host: *const libc::c_char,
     mut options: *mut Options,
@@ -5983,7 +5973,7 @@ pub unsafe extern "C" fn read_config_file(
 }
 unsafe extern "C" fn read_config_file_depth(
     mut filename: *const libc::c_char,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut host: *const libc::c_char,
     mut original_host: *const libc::c_char,
     mut options: *mut Options,

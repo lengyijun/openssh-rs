@@ -16,7 +16,7 @@ extern "C" {
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
-    fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
+    fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -72,7 +72,7 @@ extern "C" {
         _: *mut *mut libc::c_char,
         _: *mut *mut libc::FILE,
         _: u_int,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: Option<privdrop_fn>,
         _: Option<privrestore_fn>,
     ) -> pid_t;
@@ -133,15 +133,15 @@ extern "C" {
     ) -> libc::c_int;
     fn auth_openprincipals(
         _: *const libc::c_char,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: libc::c_int,
     ) -> *mut libc::FILE;
-    fn authorized_principals_file(_: *mut passwd) -> *mut libc::c_char;
-    fn auth_openkeyfile(_: *const libc::c_char, _: *mut passwd, _: libc::c_int) -> *mut libc::FILE;
-    fn expand_authorized_keys(_: *const libc::c_char, pw: *mut passwd) -> *mut libc::c_char;
+    fn authorized_principals_file(_: *mut libc::passwd) -> *mut libc::c_char;
+    fn auth_openkeyfile(_: *const libc::c_char, _: *mut libc::passwd, _: libc::c_int) -> *mut libc::FILE;
+    fn expand_authorized_keys(_: *const libc::c_char, pw: *mut libc::passwd) -> *mut libc::c_char;
     fn auth_key_is_revoked(_: *mut sshkey) -> libc::c_int;
     fn auth_authorise_keyopts(
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: *mut sshauthopt,
         _: libc::c_int,
         _: *const libc::c_char,
@@ -151,7 +151,7 @@ extern "C" {
     fn auth_debug_add(fmt: *const libc::c_char, _: ...);
     fn auth_activate_options(_: *mut ssh, _: *mut sshauthopt) -> libc::c_int;
     fn auth_check_authkeys_file(
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: *mut libc::FILE,
         _: *mut libc::c_char,
         _: *mut sshkey,
@@ -160,7 +160,7 @@ extern "C" {
         _: *mut *mut sshauthopt,
     ) -> libc::c_int;
     fn auth_get_canonical_hostname(_: *mut ssh, _: libc::c_int) -> *const libc::c_char;
-    fn temporarily_use_uid(_: *mut passwd);
+    fn temporarily_use_uid(_: *mut libc::passwd);
     fn restore_uid();
     fn sshauthopt_free(opts: *mut sshauthopt);
     fn sshauthopt_from_cert(k: *mut sshkey) -> *mut sshauthopt;
@@ -172,7 +172,7 @@ extern "C" {
     static mut use_privsep: libc::c_int;
     fn mm_user_key_allowed(
         ssh: *mut ssh,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: *mut sshkey,
         _: libc::c_int,
         _: *mut *mut sshauthopt,
@@ -233,17 +233,7 @@ pub struct sockaddr {
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -479,7 +469,7 @@ pub struct ForwardOptions {
     pub streamlocal_bind_mask: mode_t,
     pub streamlocal_bind_unlink: libc::c_int,
 }
-pub type privdrop_fn = unsafe extern "C" fn(*mut passwd) -> ();
+pub type privdrop_fn = unsafe extern "C" fn(*mut libc::passwd) -> ();
 pub type privrestore_fn = unsafe extern "C" fn() -> ();
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 #[derive(Copy, Clone)]
@@ -689,7 +679,7 @@ pub struct Authctxt {
     pub force_pwchange: libc::c_int,
     pub user: *mut libc::c_char,
     pub service: *mut libc::c_char,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub style: *mut libc::c_char,
     pub auth_methods: *mut *mut libc::c_char,
     pub num_auth_methods: u_int,
@@ -729,7 +719,7 @@ unsafe extern "C" fn userauth_pubkey(
 ) -> libc::c_int {
     let mut current_block: u64;
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
-    let mut pw: *mut passwd = (*authctxt).pw;
+    let mut pw: *mut libc::passwd = (*authctxt).pw;
     let mut b: *mut sshbuf = 0 as *mut sshbuf;
     let mut key: *mut sshkey = 0 as *mut sshkey;
     let mut hostkey: *mut sshkey = 0 as *mut sshkey;
@@ -1475,7 +1465,7 @@ unsafe extern "C" fn userauth_pubkey(
     return authenticated;
 }
 unsafe extern "C" fn match_principals_file(
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut file: *mut libc::c_char,
     mut cert: *mut sshkey_cert,
     mut authoptsp: *mut *mut sshauthopt,
@@ -1508,11 +1498,11 @@ unsafe extern "C" fn match_principals_file(
     return success;
 }
 unsafe extern "C" fn match_principals_command(
-    mut user_pw: *mut passwd,
+    mut user_pw: *mut libc::passwd,
     mut key: *const sshkey,
     mut authoptsp: *mut *mut sshauthopt,
 ) -> libc::c_int {
-    let mut runas_pw: *mut passwd = 0 as *mut passwd;
+    let mut runas_pw: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut cert: *const sshkey_cert = (*key).cert;
     let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut r: libc::c_int = 0;
@@ -1751,7 +1741,7 @@ unsafe extern "C" fn match_principals_command(
                                 | (1 as libc::c_int) << 2 as libc::c_int)
                                 as u_int,
                             runas_pw,
-                            Some(temporarily_use_uid as unsafe extern "C" fn(*mut passwd) -> ()),
+                            Some(temporarily_use_uid as unsafe extern "C" fn(*mut libc::passwd) -> ()),
                             Some(restore_uid as unsafe extern "C" fn() -> ()),
                         );
                         if !(pid == 0 as libc::c_int) {
@@ -1804,7 +1794,7 @@ unsafe extern "C" fn match_principals_command(
     return found_principal;
 }
 unsafe extern "C" fn user_cert_trusted_ca(
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut key: *mut sshkey,
     mut remote_ip: *const libc::c_char,
     mut remote_host: *const libc::c_char,
@@ -2005,7 +1995,7 @@ unsafe extern "C" fn user_cert_trusted_ca(
     return ret;
 }
 unsafe extern "C" fn user_key_allowed2(
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut key: *mut sshkey,
     mut file: *mut libc::c_char,
     mut remote_ip: *const libc::c_char,
@@ -2038,13 +2028,13 @@ unsafe extern "C" fn user_key_allowed2(
     return found_key;
 }
 unsafe extern "C" fn user_key_command_allowed2(
-    mut user_pw: *mut passwd,
+    mut user_pw: *mut libc::passwd,
     mut key: *mut sshkey,
     mut remote_ip: *const libc::c_char,
     mut remote_host: *const libc::c_char,
     mut authoptsp: *mut *mut sshauthopt,
 ) -> libc::c_int {
-    let mut runas_pw: *mut passwd = 0 as *mut passwd;
+    let mut runas_pw: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut f: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut r: libc::c_int = 0;
     let mut ok: libc::c_int = 0;
@@ -2245,7 +2235,7 @@ unsafe extern "C" fn user_key_command_allowed2(
                     ((1 as libc::c_int) << 1 as libc::c_int
                         | (1 as libc::c_int) << 2 as libc::c_int) as u_int,
                     runas_pw,
-                    Some(temporarily_use_uid as unsafe extern "C" fn(*mut passwd) -> ()),
+                    Some(temporarily_use_uid as unsafe extern "C" fn(*mut libc::passwd) -> ()),
                     Some(restore_uid as unsafe extern "C" fn() -> ()),
                 );
                 if !(pid == 0 as libc::c_int) {
@@ -2297,7 +2287,7 @@ unsafe extern "C" fn user_key_command_allowed2(
 }
 pub unsafe extern "C" fn user_key_allowed(
     mut ssh: *mut ssh,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut key: *mut sshkey,
     mut _auth_attempt: libc::c_int,
     mut authoptsp: *mut *mut sshauthopt,

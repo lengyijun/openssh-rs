@@ -42,8 +42,8 @@ extern "C" {
         -> libc::c_int;
     fn gettimeofday(__tv: *mut libc::timeval, __tz: *mut libc::c_void) -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut passwd;
-    fn getpwnam(__name: *const libc::c_char) -> *mut passwd;
+    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
+    fn getpwnam(__name: *const libc::c_char) -> *mut libc::passwd;
     fn platform_sys_dir_uid(_: uid_t) -> libc::c_int;
 
     fn sigfillset(__set: *mut sigset_t) -> libc::c_int;
@@ -353,17 +353,7 @@ pub const IPPROTO_IPIP: C2RustUnnamed_0 = 4;
 pub const IPPROTO_IGMP: C2RustUnnamed_0 = 2;
 pub const IPPROTO_ICMP: C2RustUnnamed_0 = 1;
 pub const IPPROTO_IP: C2RustUnnamed_0 = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -544,7 +534,7 @@ pub struct C2RustUnnamed_13 {
     pub key: *const libc::c_char,
     pub repl: *const libc::c_char,
 }
-pub type privdrop_fn = unsafe extern "C" fn(*mut passwd) -> ();
+pub type privdrop_fn = unsafe extern "C" fn(*mut libc::passwd) -> ();
 pub type privrestore_fn = unsafe extern "C" fn() -> ();
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 #[derive(Copy, Clone)]
@@ -1175,11 +1165,11 @@ pub unsafe extern "C" fn strdelim(mut s: *mut *mut libc::c_char) -> *mut libc::c
 pub unsafe extern "C" fn strdelimw(mut s: *mut *mut libc::c_char) -> *mut libc::c_char {
     return strdelim_internal(s, 0 as libc::c_int);
 }
-pub unsafe extern "C" fn pwcopy(mut pw: *mut passwd) -> *mut passwd {
-    let mut copy: *mut passwd = xcalloc(
+pub unsafe extern "C" fn pwcopy(mut pw: *mut libc::passwd) -> *mut libc::passwd {
+    let mut copy: *mut libc::passwd = xcalloc(
         1 as libc::c_int as size_t,
-        ::core::mem::size_of::<passwd>() as libc::c_ulong,
-    ) as *mut passwd;
+        ::core::mem::size_of::<libc::passwd>() as libc::c_ulong,
+    ) as *mut libc::passwd;
     (*copy).pw_name = xstrdup((*pw).pw_name);
     (*copy).pw_passwd = xstrdup(if ((*pw).pw_passwd).is_null() {
         b"*\0" as *const u8 as *const libc::c_char
@@ -2023,7 +2013,7 @@ pub unsafe extern "C" fn tilde_expand(
     let mut s: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut path: *const libc::c_char = 0 as *const libc::c_char;
     let mut user: *const libc::c_char = 0 as *const libc::c_char;
-    let mut pw: *mut passwd = 0 as *mut passwd;
+    let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut len: size_t = 0;
     let mut ret: libc::c_int = -(1 as libc::c_int);
     let mut r: libc::c_int = 0;
@@ -3898,7 +3888,7 @@ pub unsafe extern "C" fn safe_path(
 pub unsafe extern "C" fn safe_path_fd(
     mut fd: libc::c_int,
     mut file: *const libc::c_char,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut err: *mut libc::c_char,
     mut errlen: size_t,
 ) -> libc::c_int {
@@ -4583,7 +4573,7 @@ pub unsafe extern "C" fn subprocess(
     mut av: *mut *mut libc::c_char,
     mut child: *mut *mut libc::FILE,
     mut flags: u_int,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut drop_privs: Option<privdrop_fn>,
     mut restore_privs: Option<privrestore_fn>,
 ) -> pid_t {

@@ -118,17 +118,7 @@ pub struct sockaddr {
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 pub type sig_atomic_t = __sig_atomic_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -375,7 +365,7 @@ pub struct Authctxt {
     pub force_pwchange: libc::c_int,
     pub user: *mut libc::c_char,
     pub service: *mut libc::c_char,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub style: *mut libc::c_char,
     pub auth_methods: *mut *mut libc::c_char,
     pub num_auth_methods: u_int,
@@ -635,7 +625,7 @@ pub struct Session {
     pub used: libc::c_int,
     pub self_0: libc::c_int,
     pub next_unused: libc::c_int,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub authctxt: *mut Authctxt,
     pub pid: pid_t,
     pub forced: libc::c_int,
@@ -1214,9 +1204,9 @@ pub unsafe extern "C" fn mm_sshkey_sign(
 pub unsafe extern "C" fn mm_getpwnamallow(
     mut ssh: *mut ssh,
     mut username: *const libc::c_char,
-) -> *mut passwd {
+) -> *mut libc::passwd {
     let mut m: *mut sshbuf = 0 as *mut sshbuf;
-    let mut pw: *mut passwd = 0 as *mut passwd;
+    let mut pw: *mut libc::passwd = 0 as *mut libc::passwd;
     let mut len: size_t = 0;
     let mut i: u_int = 0;
     let mut newopts: *mut ServerOptions = 0 as *mut ServerOptions;
@@ -1283,12 +1273,12 @@ pub unsafe extern "C" fn mm_getpwnamallow(
         );
     }
     if ok as libc::c_int == 0 as libc::c_int {
-        pw = 0 as *mut passwd;
+        pw = 0 as *mut libc::passwd;
     } else {
         pw = xcalloc(
-            ::core::mem::size_of::<passwd>() as libc::c_ulong,
+            ::core::mem::size_of::<libc::passwd>() as libc::c_ulong,
             1 as libc::c_int as size_t,
-        ) as *mut passwd;
+        ) as *mut libc::passwd;
         r = sshbuf_get_string_direct(m, &mut p, &mut len);
         if r != 0 as libc::c_int {
             sshfatal(
@@ -2231,7 +2221,7 @@ pub unsafe extern "C" fn mm_auth_password(
 }
 pub unsafe extern "C" fn mm_user_key_allowed(
     mut _ssh: *mut ssh,
-    mut _pw: *mut passwd,
+    mut _pw: *mut libc::passwd,
     mut key: *mut sshkey,
     mut pubkey_auth_attempt: libc::c_int,
     mut authoptp: *mut *mut sshauthopt,
@@ -2247,7 +2237,7 @@ pub unsafe extern "C" fn mm_user_key_allowed(
 }
 pub unsafe extern "C" fn mm_hostbased_key_allowed(
     mut _ssh: *mut ssh,
-    mut _pw: *mut passwd,
+    mut _pw: *mut libc::passwd,
     mut user: *const libc::c_char,
     mut host: *const libc::c_char,
     mut key: *mut sshkey,

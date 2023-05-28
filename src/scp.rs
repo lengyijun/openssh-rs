@@ -38,7 +38,7 @@ extern "C" {
 
     fn vfprintf(_: *mut libc::FILE, _: *const libc::c_char, _: ::core::ffi::VaList) -> libc::c_int;
 
-    fn getpwuid(__uid: __uid_t) -> *mut passwd;
+    fn getpwuid(__uid: __uid_t) -> *mut libc::passwd;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
@@ -176,17 +176,7 @@ pub const SOCK_RAW: __socket_type = 3;
 pub const SOCK_DGRAM: __socket_type = 2;
 pub const SOCK_STREAM: __socket_type = 1;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 
 pub type _IO_lock_t = ();
 
@@ -702,7 +692,7 @@ pub unsafe extern "C" fn do_cmd2(
     }
     return 0 as libc::c_int;
 }
-pub static mut pwd: *mut passwd = 0 as *const passwd as *mut passwd;
+pub static mut pwd: *mut libc::passwd = 0 as *const libc::passwd as *mut libc::passwd;
 pub static mut userid: uid_t = 0;
 pub static mut errs: libc::c_int = 0;
 pub static mut remin: libc::c_int = 0;

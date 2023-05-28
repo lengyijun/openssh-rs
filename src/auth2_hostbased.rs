@@ -68,7 +68,7 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_check_rsa_length(_: *const sshkey, _: libc::c_int) -> libc::c_int;
     fn auth_rhosts2(
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: *const libc::c_char,
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -77,7 +77,7 @@ extern "C" {
     fn auth2_record_info(authctxt: *mut Authctxt, _: *const libc::c_char, _: ...);
     fn auth_get_canonical_hostname(_: *mut ssh, _: libc::c_int) -> *const libc::c_char;
     fn check_key_in_hostfiles(
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: *mut sshkey,
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -88,7 +88,7 @@ extern "C" {
     static mut use_privsep: libc::c_int;
     fn mm_hostbased_key_allowed(
         _: *mut ssh,
-        _: *mut passwd,
+        _: *mut libc::passwd,
         _: *const libc::c_char,
         _: *const libc::c_char,
         _: *mut sshkey,
@@ -138,17 +138,7 @@ pub struct sockaddr {
 }
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct passwd {
-    pub pw_name: *mut libc::c_char,
-    pub pw_passwd: *mut libc::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
-    pub pw_gecos: *mut libc::c_char,
-    pub pw_dir: *mut libc::c_char,
-    pub pw_shell: *mut libc::c_char,
-}
+
 pub type sig_atomic_t = __sig_atomic_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -568,7 +558,7 @@ pub struct Authctxt {
     pub force_pwchange: libc::c_int,
     pub user: *mut libc::c_char,
     pub service: *mut libc::c_char,
-    pub pw: *mut passwd,
+    pub pw: *mut libc::passwd,
     pub style: *mut libc::c_char,
     pub auth_methods: *mut *mut libc::c_char,
     pub num_auth_methods: u_int,
@@ -905,7 +895,7 @@ unsafe extern "C" fn userauth_hostbased(
 }
 pub unsafe extern "C" fn hostbased_key_allowed(
     mut ssh: *mut ssh,
-    mut pw: *mut passwd,
+    mut pw: *mut libc::passwd,
     mut cuser: *const libc::c_char,
     mut chost: *mut libc::c_char,
     mut key: *mut sshkey,
