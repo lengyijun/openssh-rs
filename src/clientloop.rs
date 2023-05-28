@@ -197,7 +197,7 @@ extern "C" {
         _: *mut u_int,
         _: *mut u_int,
         _: u_int,
-        _: *mut timespec,
+        _: *mut libc::timespec,
     );
     fn channel_after_poll(_: *mut ssh, _: *mut pollfd, _: u_int);
     fn channel_output_poll(_: *mut ssh);
@@ -277,10 +277,10 @@ extern "C" {
     fn monotime_double() -> libc::c_double;
     fn tun_open(_: libc::c_int, _: libc::c_int, _: *mut *mut libc::c_char) -> libc::c_int;
     fn mktemp_proto(_: *mut libc::c_char, _: size_t);
-    fn ptimeout_init(pt: *mut timespec);
-    fn ptimeout_deadline_sec(pt: *mut timespec, sec: libc::c_long);
-    fn ptimeout_deadline_monotime(pt: *mut timespec, when: time_t);
-    fn ptimeout_get_ms(pt: *mut timespec) -> libc::c_int;
+    fn ptimeout_init(pt: *mut libc::timespec);
+    fn ptimeout_deadline_sec(pt: *mut libc::timespec, sec: libc::c_long);
+    fn ptimeout_deadline_monotime(pt: *mut libc::timespec, when: time_t);
+    fn ptimeout_get_ms(pt: *mut libc::timespec) -> libc::c_int;
     fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
     fn parse_forward(
@@ -393,12 +393,7 @@ pub type int64_t = __int64_t;
 pub type u_int8_t = __uint8_t;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
+
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
 #[derive(Copy, Clone)]
@@ -1624,7 +1619,7 @@ unsafe extern "C" fn client_wait_until_can_do_something(
     mut conn_in_readyp: *mut libc::c_int,
     mut conn_out_readyp: *mut libc::c_int,
 ) {
-    let mut timeout: timespec = timespec {
+    let mut timeout: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };

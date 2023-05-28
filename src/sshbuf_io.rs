@@ -34,12 +34,6 @@ pub type u_char = __u_char;
 pub type off_t = __off_t;
 pub type ssize_t = __ssize_t;
 pub type size_t = libc::c_ulong;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
 
 pub unsafe extern "C" fn sshbuf_load_fd(
     mut fd: libc::c_int,

@@ -25,7 +25,7 @@ extern "C" {
     fn utimensat(
         __fd: libc::c_int,
         __path: *const libc::c_char,
-        __times: *const timespec,
+        __times: *const libc::timespec,
         __flags: libc::c_int,
     ) -> libc::c_int;
 
@@ -210,12 +210,7 @@ pub struct timeval {
     pub tv_sec: __time_t,
     pub tv_usec: __suseconds_t,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
+
 pub type uint64_t = __uint64_t;
 
 #[derive(Copy, Clone)]
@@ -2293,8 +2288,8 @@ unsafe extern "C" fn attrib_to_tv(mut a: *const Attrib) -> *mut timeval {
     tv[1 as libc::c_int as usize].tv_usec = 0 as libc::c_int as __suseconds_t;
     return tv.as_mut_ptr();
 }
-unsafe extern "C" fn attrib_to_ts(mut a: *const Attrib) -> *mut timespec {
-    static mut ts: [timespec; 2] = [timespec {
+unsafe extern "C" fn attrib_to_ts(mut a: *const Attrib) -> *mut libc::timespec {
+    static mut ts: [libc::timespec; 2] = [libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     }; 2];
@@ -3550,7 +3545,7 @@ unsafe extern "C" fn process_extended_lsetstat(mut id: u_int32_t) {
             r = utimensat(
                 -(100 as libc::c_int),
                 name,
-                attrib_to_ts(&mut a) as *const timespec,
+                attrib_to_ts(&mut a) as *const libc::timespec,
                 0x100 as libc::c_int,
             );
             if r == -(1 as libc::c_int) {

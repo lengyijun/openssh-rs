@@ -45,7 +45,7 @@ extern "C" {
     fn ppoll(
         __fds: *mut pollfd,
         __nfds: nfds_t,
-        __timeout: *const timespec,
+        __timeout: *const libc::timespec,
         __ss: *const __sigset_t,
     ) -> libc::c_int;
     fn arc4random() -> uint32_t;
@@ -158,7 +158,7 @@ extern "C" {
     fn get_sock_af(_: libc::c_int) -> libc::c_int;
     fn set_sock_tos(_: libc::c_int, _: libc::c_int);
     fn ms_subtract_diff(_: *mut timeval, _: *mut libc::c_int);
-    fn ms_to_timespec(_: *mut timespec, _: libc::c_int);
+    fn ms_to_timespec(_: *mut libc::timespec, _: libc::c_int);
     fn monotime_tv(_: *mut timeval);
     fn monotime() -> time_t;
     fn sshbuf_new() -> *mut sshbuf;
@@ -251,12 +251,7 @@ pub struct timeval {
     pub tv_sec: __time_t,
     pub tv_usec: __suseconds_t,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
+
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
 #[derive(Copy, Clone)]
@@ -2057,11 +2052,11 @@ pub unsafe extern "C" fn ssh_packet_read_seqnr(
         tv_sec: 0,
         tv_usec: 0,
     };
-    let mut timespec: timespec = timespec {
+    let mut timespec: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
-    let mut timespecp: *mut timespec = 0 as *mut timespec;
+    let mut timespecp: *mut libc::timespec = 0 as *mut libc::timespec;
     r = ssh_packet_write_wait(ssh);
     if !(r != 0 as libc::c_int) {
         's_26: loop {
@@ -3329,11 +3324,11 @@ pub unsafe extern "C" fn ssh_packet_write_wait(mut ssh: *mut ssh) -> libc::c_int
         tv_sec: 0,
         tv_usec: 0,
     };
-    let mut timespec: timespec = timespec {
+    let mut timespec: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
-    let mut timespecp: *mut timespec = 0 as *mut timespec;
+    let mut timespecp: *mut libc::timespec = 0 as *mut libc::timespec;
     let mut state: *mut session_state = (*ssh).state;
     let mut pfd: pollfd = pollfd {
         fd: 0,

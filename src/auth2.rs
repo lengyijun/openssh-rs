@@ -28,7 +28,10 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
-    fn nanosleep(__requested_time: *const timespec, __remaining: *mut timespec) -> libc::c_int;
+    fn nanosleep(
+        __requested_time: *const libc::timespec,
+        __remaining: *mut libc::timespec,
+    ) -> libc::c_int;
 
     fn xmalloc(_: size_t) -> *mut libc::c_void;
     fn xcalloc(_: size_t, _: size_t) -> *mut libc::c_void;
@@ -144,12 +147,7 @@ pub type size_t = libc::c_ulong;
 pub type int64_t = __int64_t;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
+
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
 #[derive(Copy, Clone)]
@@ -771,7 +769,7 @@ unsafe extern "C" fn ensure_minimum_time_since(
     mut start: libc::c_double,
     mut seconds: libc::c_double,
 ) {
-    let mut ts: timespec = timespec {
+    let mut ts: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
@@ -802,7 +800,7 @@ unsafe extern "C" fn ensure_minimum_time_since(
         remain * 1000 as libc::c_int as libc::c_double,
         req * 1000 as libc::c_int as libc::c_double,
     );
-    nanosleep(&mut ts, 0 as *mut timespec);
+    nanosleep(&mut ts, 0 as *mut libc::timespec);
 }
 unsafe extern "C" fn input_userauth_request(
     mut _type_0: libc::c_int,

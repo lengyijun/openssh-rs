@@ -118,7 +118,7 @@ extern "C" {
     fn ppoll(
         __fds: *mut pollfd,
         __nfds: nfds_t,
-        __timeout: *const timespec,
+        __timeout: *const libc::timespec,
         __ss: *const __sigset_t,
     ) -> libc::c_int;
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
@@ -458,12 +458,7 @@ pub struct __sigset_t {
     pub __val: [libc::c_ulong; 16],
 }
 pub type sigset_t = __sigset_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
+
 pub type socklen_t = __socklen_t;
 pub type __socket_type = libc::c_uint;
 pub const SOCK_NONBLOCK: __socket_type = 2048;
@@ -2945,7 +2940,12 @@ unsafe extern "C" fn server_accept_loop(
             i += 1;
             i;
         }
-        ret = ppoll(pfd, npfd as nfds_t, 0 as *const timespec, &mut osigset);
+        ret = ppoll(
+            pfd,
+            npfd as nfds_t,
+            0 as *const libc::timespec,
+            &mut osigset,
+        );
         if ret == -(1 as libc::c_int) && *libc::__errno_location() != 4 as libc::c_int {
             crate::log::sshlog(
                 b"sshd.c\0" as *const u8 as *const libc::c_char,

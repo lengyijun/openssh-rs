@@ -186,7 +186,7 @@ extern "C" {
     fn unix_listener(_: *const libc::c_char, _: libc::c_int, _: libc::c_int) -> libc::c_int;
     fn sock_set_v6only(_: libc::c_int);
     fn ssh_gai_strerror(_: libc::c_int) -> *const libc::c_char;
-    fn ptimeout_deadline_monotime(pt: *mut timespec, when: time_t);
+    fn ptimeout_deadline_monotime(pt: *mut libc::timespec, when: time_t);
     fn chan_is_dead(_: *mut ssh, _: *mut Channel, _: libc::c_int) -> libc::c_int;
     fn chan_mark_dead(_: *mut ssh, _: *mut Channel);
     fn chan_rcvd_oclose(_: *mut ssh, _: *mut Channel);
@@ -228,12 +228,7 @@ pub type u_int8_t = __uint8_t;
 pub type u_int16_t = __uint16_t;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
+
 pub type socklen_t = __socklen_t;
 pub type __socket_type = libc::c_uint;
 pub const SOCK_NONBLOCK: __socket_type = 2048;
@@ -5354,7 +5349,7 @@ unsafe extern "C" fn channel_garbage_collect(mut ssh: *mut ssh, mut c: *mut Chan
 unsafe extern "C" fn channel_handler(
     mut ssh: *mut ssh,
     mut table: libc::c_int,
-    mut timeout: *mut timespec,
+    mut timeout: *mut libc::timespec,
 ) {
     let mut sc: *mut ssh_channels = (*ssh).chanctxt;
     let mut ftab: *mut Option<chan_fn> = if table == CHAN_PRE as libc::c_int {
@@ -5634,7 +5629,7 @@ pub unsafe extern "C" fn channel_prepare_poll(
     mut npfd_allocp: *mut u_int,
     mut npfd_activep: *mut u_int,
     mut npfd_reserved: u_int,
-    mut timeout: *mut timespec,
+    mut timeout: *mut libc::timespec,
 ) {
     let mut sc: *mut ssh_channels = (*ssh).chanctxt;
     let mut i: u_int = 0;
@@ -6007,7 +6002,7 @@ pub unsafe extern "C" fn channel_after_poll(
         i = i.wrapping_add(1);
         i;
     }
-    channel_handler(ssh, CHAN_POST as libc::c_int, 0 as *mut timespec);
+    channel_handler(ssh, CHAN_POST as libc::c_int, 0 as *mut libc::timespec);
 }
 unsafe extern "C" fn channel_output_poll_input_open(mut ssh: *mut ssh, mut c: *mut Channel) {
     let mut len: size_t = 0;

@@ -43,12 +43,6 @@ pub type __syscall_slong_t = libc::c_long;
 pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
 
 #[derive(Copy, Clone)]
 #[repr(C)]

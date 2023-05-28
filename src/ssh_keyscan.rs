@@ -69,7 +69,7 @@ extern "C" {
     fn ppoll(
         __fds: *mut pollfd,
         __nfds: nfds_t,
-        __timeout: *const timespec,
+        __timeout: *const libc::timespec,
         __ss: *const __sigset_t,
     ) -> libc::c_int;
     fn getrlimit(__resource: __rlimit_resource_t, __rlimits: *mut rlimit) -> libc::c_int;
@@ -110,7 +110,7 @@ extern "C" {
     fn put_host_port(_: *const libc::c_char, _: u_short) -> *mut libc::c_char;
     fn convtime(_: *const libc::c_char) -> libc::c_int;
 
-    fn monotime_ts(_: *mut timespec);
+    fn monotime_ts(_: *mut libc::timespec);
     fn lowercase(s: *mut libc::c_char);
     fn ssh_gai_strerror(_: libc::c_int) -> *const libc::c_char;
     fn host_hash(_: *const libc::c_char, _: *const libc::c_char, _: u_int) -> *mut libc::c_char;
@@ -172,12 +172,7 @@ pub type u_int64_t = __uint64_t;
 pub struct __sigset_t {
     pub __val: [libc::c_ulong; 16],
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
+
 pub type socklen_t = __socklen_t;
 pub type __socket_type = libc::c_uint;
 pub const SOCK_NONBLOCK: __socket_type = 2048;
@@ -809,7 +804,7 @@ pub struct Connection {
     pub c_output_name: *mut libc::c_char,
     pub c_data: *mut libc::c_char,
     pub c_ssh: *mut ssh,
-    pub c_ts: timespec,
+    pub c_ts: libc::timespec,
     pub c_link: C2RustUnnamed_6,
 }
 #[derive(Copy, Clone)]
@@ -1705,11 +1700,11 @@ unsafe extern "C" fn conread(mut s: libc::c_int) {
     contouch(s);
 }
 unsafe extern "C" fn conloop() {
-    let mut seltime: timespec = timespec {
+    let mut seltime: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
-    let mut now: timespec = timespec {
+    let mut now: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };

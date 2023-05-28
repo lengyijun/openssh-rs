@@ -29,12 +29,6 @@ pub type __ssize_t = libc::c_long;
 pub type __syscall_slong_t = libc::c_long;
 pub type ssize_t = __ssize_t;
 pub type size_t = libc::c_ulong;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
 
 pub type ptrdiff_t = libc::c_long;
 pub unsafe extern "C" fn sftp_realpath(

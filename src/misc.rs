@@ -127,8 +127,11 @@ extern "C" {
     ) -> *mut libc::c_char;
     fn localtime_r(__timer: *const time_t, __tp: *mut tm) -> *mut tm;
     fn timegm(__tp: *mut tm) -> time_t;
-    fn nanosleep(__requested_time: *const timespec, __remaining: *mut timespec) -> libc::c_int;
-    fn clock_gettime(__clock_id: clockid_t, __tp: *mut timespec) -> libc::c_int;
+    fn nanosleep(
+        __requested_time: *const libc::timespec,
+        __remaining: *mut libc::timespec,
+    ) -> libc::c_int;
+    fn clock_gettime(__clock_id: clockid_t, __tp: *mut libc::timespec) -> libc::c_int;
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn __ctype_tolower_loc() -> *mut *const __int32_t;
     fn fcntl(__fd: libc::c_int, __cmd: libc::c_int, _: ...) -> libc::c_int;
@@ -225,12 +228,7 @@ pub struct timeval {
     pub tv_sec: __time_t,
     pub tv_usec: __suseconds_t,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
+
 pub type socklen_t = __socklen_t;
 pub type __socket_type = libc::c_uint;
 pub const SOCK_NONBLOCK: __socket_type = 2048;
@@ -2808,7 +2806,7 @@ pub unsafe extern "C" fn ms_subtract_diff(mut start: *mut timeval, mut ms: *mut 
         - (diff.tv_sec * 1000 as libc::c_int as libc::c_long
             + diff.tv_usec / 1000 as libc::c_int as libc::c_long)) as libc::c_int;
 }
-pub unsafe extern "C" fn ms_to_timespec(mut ts: *mut timespec, mut ms: libc::c_int) {
+pub unsafe extern "C" fn ms_to_timespec(mut ts: *mut libc::timespec, mut ms: libc::c_int) {
     if ms < 0 as libc::c_int {
         ms = 0 as libc::c_int;
     }
@@ -2816,7 +2814,7 @@ pub unsafe extern "C" fn ms_to_timespec(mut ts: *mut timespec, mut ms: libc::c_i
     (*ts).tv_nsec =
         (ms % 1000 as libc::c_int * 1000 as libc::c_int * 1000 as libc::c_int) as __syscall_slong_t;
 }
-pub unsafe extern "C" fn monotime_ts(mut ts: *mut timespec) {
+pub unsafe extern "C" fn monotime_ts(mut ts: *mut libc::timespec) {
     let mut tv: timeval = timeval {
         tv_sec: 0,
         tv_usec: 0,
@@ -2849,7 +2847,7 @@ pub unsafe extern "C" fn monotime_ts(mut ts: *mut timespec) {
     (*ts).tv_nsec = tv.tv_usec * 1000 as libc::c_int as libc::c_long;
 }
 pub unsafe extern "C" fn monotime_tv(mut tv: *mut timeval) {
-    let mut ts: timespec = timespec {
+    let mut ts: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
@@ -2858,7 +2856,7 @@ pub unsafe extern "C" fn monotime_tv(mut tv: *mut timeval) {
     (*tv).tv_usec = ts.tv_nsec / 1000 as libc::c_int as libc::c_long;
 }
 pub unsafe extern "C" fn monotime() -> time_t {
-    let mut ts: timespec = timespec {
+    let mut ts: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
@@ -2866,7 +2864,7 @@ pub unsafe extern "C" fn monotime() -> time_t {
     return ts.tv_sec;
 }
 pub unsafe extern "C" fn monotime_double() -> libc::c_double {
-    let mut ts: timespec = timespec {
+    let mut ts: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
@@ -2890,11 +2888,11 @@ pub unsafe extern "C" fn bandwidth_limit_init(
 }
 pub unsafe extern "C" fn bandwidth_limit(mut bw: *mut bwlimit, mut read_len: size_t) {
     let mut waitlen: u_int64_t = 0;
-    let mut ts: timespec = timespec {
+    let mut ts: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
-    let mut rm: timespec = timespec {
+    let mut rm: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
@@ -5095,17 +5093,20 @@ pub unsafe extern "C" fn lookup_setenv_in_list(
     libc::free(name as *mut libc::c_void);
     return ret;
 }
-pub unsafe extern "C" fn ptimeout_init(mut pt: *mut timespec) {
+pub unsafe extern "C" fn ptimeout_init(mut pt: *mut libc::timespec) {
     (*pt).tv_sec = -(1 as libc::c_int) as __time_t;
     (*pt).tv_nsec = 0 as libc::c_int as __syscall_slong_t;
 }
-pub unsafe extern "C" fn ptimeout_deadline_sec(mut pt: *mut timespec, mut sec: libc::c_long) {
+pub unsafe extern "C" fn ptimeout_deadline_sec(mut pt: *mut libc::timespec, mut sec: libc::c_long) {
     if (*pt).tv_sec == -(1 as libc::c_int) as libc::c_long || (*pt).tv_sec >= sec {
         (*pt).tv_sec = sec;
         (*pt).tv_nsec = 0 as libc::c_int as __syscall_slong_t;
     }
 }
-unsafe extern "C" fn ptimeout_deadline_tsp(mut pt: *mut timespec, mut p: *mut timespec) {
+unsafe extern "C" fn ptimeout_deadline_tsp(
+    mut pt: *mut libc::timespec,
+    mut p: *mut libc::timespec,
+) {
     if (*pt).tv_sec == -(1 as libc::c_int) as libc::c_long
         || (if (*pt).tv_sec == (*p).tv_sec {
             ((*pt).tv_nsec >= (*p).tv_nsec) as libc::c_int
@@ -5116,8 +5117,8 @@ unsafe extern "C" fn ptimeout_deadline_tsp(mut pt: *mut timespec, mut p: *mut ti
         *pt = *p;
     }
 }
-pub unsafe extern "C" fn ptimeout_deadline_ms(mut pt: *mut timespec, mut ms: libc::c_long) {
-    let mut p: timespec = timespec {
+pub unsafe extern "C" fn ptimeout_deadline_ms(mut pt: *mut libc::timespec, mut ms: libc::c_long) {
+    let mut p: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
@@ -5125,12 +5126,12 @@ pub unsafe extern "C" fn ptimeout_deadline_ms(mut pt: *mut timespec, mut ms: lib
     p.tv_nsec = ms % 1000 as libc::c_int as libc::c_long * 1000000 as libc::c_int as libc::c_long;
     ptimeout_deadline_tsp(pt, &mut p);
 }
-pub unsafe extern "C" fn ptimeout_deadline_monotime(mut pt: *mut timespec, mut when: time_t) {
-    let mut now: timespec = timespec {
+pub unsafe extern "C" fn ptimeout_deadline_monotime(mut pt: *mut libc::timespec, mut when: time_t) {
+    let mut now: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
-    let mut t: timespec = timespec {
+    let mut t: libc::timespec = libc::timespec {
         tv_sec: 0,
         tv_nsec: 0,
     };
@@ -5155,7 +5156,7 @@ pub unsafe extern "C" fn ptimeout_deadline_monotime(mut pt: *mut timespec, mut w
         ptimeout_deadline_tsp(pt, &mut t);
     };
 }
-pub unsafe extern "C" fn ptimeout_get_ms(mut pt: *mut timespec) -> libc::c_int {
+pub unsafe extern "C" fn ptimeout_get_ms(mut pt: *mut libc::timespec) -> libc::c_int {
     if (*pt).tv_sec == -(1 as libc::c_int) as libc::c_long {
         return -(1 as libc::c_int);
     }
@@ -5169,13 +5170,13 @@ pub unsafe extern "C" fn ptimeout_get_ms(mut pt: *mut timespec) -> libc::c_int {
     return ((*pt).tv_sec * 1000 as libc::c_int as libc::c_long
         + (*pt).tv_nsec / 1000000 as libc::c_int as libc::c_long) as libc::c_int;
 }
-pub unsafe extern "C" fn ptimeout_get_tsp(mut pt: *mut timespec) -> *mut timespec {
+pub unsafe extern "C" fn ptimeout_get_tsp(mut pt: *mut libc::timespec) -> *mut libc::timespec {
     return if (*pt).tv_sec == -(1 as libc::c_int) as libc::c_long {
-        0 as *mut timespec
+        0 as *mut libc::timespec
     } else {
         pt
     };
 }
-pub unsafe extern "C" fn ptimeout_isset(mut pt: *mut timespec) -> libc::c_int {
+pub unsafe extern "C" fn ptimeout_isset(mut pt: *mut libc::timespec) -> libc::c_int {
     return ((*pt).tv_sec != -(1 as libc::c_int) as libc::c_long) as libc::c_int;
 }

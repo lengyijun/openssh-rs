@@ -120,12 +120,7 @@ pub type mode_t = __mode_t;
 pub type uid_t = __uid_t;
 pub type size_t = libc::c_ulong;
 pub type u_int64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
+
 pub type uint8_t = __uint8_t;
 
 pub type _IO_lock_t = ();

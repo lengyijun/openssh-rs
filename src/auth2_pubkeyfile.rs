@@ -111,12 +111,7 @@ pub type u_long = __u_long;
 pub type time_t = __time_t;
 pub type size_t = libc::c_ulong;
 pub type u_int64_t = __uint64_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
+
 pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
 
