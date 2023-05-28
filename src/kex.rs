@@ -32,7 +32,7 @@ extern "C" {
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
@@ -2741,7 +2741,7 @@ unsafe extern "C" fn send_error(mut ssh: *mut ssh, mut msg: *mut libc::c_char) {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"write: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
 }
@@ -2833,7 +2833,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"write: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         r = -(24 as libc::c_int);
     } else {
@@ -2954,7 +2954,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                         SYSLOG_LEVEL_ERROR,
                                         0 as *const libc::c_char,
                                         b"%s\0" as *const u8 as *const libc::c_char,
-                                        strerror(*libc::__errno_location()),
+                                        libc::strerror(*libc::__errno_location()),
                                     );
                                     r = -(24 as libc::c_int);
                                     current_block = 4276536258050058664;
@@ -3006,7 +3006,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                     SYSLOG_LEVEL_ERROR,
                                     0 as *const libc::c_char,
                                     b"read: %.100s\0" as *const u8 as *const libc::c_char,
-                                    strerror(*libc::__errno_location()),
+                                    libc::strerror(*libc::__errno_location()),
                                 );
                                 r = -(24 as libc::c_int);
                                 current_block = 4276536258050058664;

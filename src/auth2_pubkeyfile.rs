@@ -23,7 +23,7 @@ extern "C" {
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn time(__timer: *mut time_t) -> time_t;
 
     fn sshfatal(
@@ -1058,7 +1058,7 @@ unsafe extern "C" fn auth_openfile(
                 (*pw).pw_name,
                 file_type,
                 file,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         } else if log_missing != 0 {
             crate::log::sshlog(
@@ -1073,7 +1073,7 @@ unsafe extern "C" fn auth_openfile(
                 (*pw).pw_name,
                 file_type,
                 file,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         return 0 as *mut libc::FILE;

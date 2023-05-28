@@ -20,7 +20,7 @@ extern "C" {
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn log_level_get() -> LogLevel;
     fn log_is_on_stderr() -> libc::c_int;
 
@@ -173,7 +173,7 @@ unsafe extern "C" fn start_helper(
             0 as *const libc::c_char,
             b"helper \"%s\" unusable: %s\0" as *const u8 as *const libc::c_char,
             helper,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
@@ -193,7 +193,7 @@ unsafe extern "C" fn start_helper(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(24 as libc::c_int);
     }
@@ -209,7 +209,7 @@ unsafe extern "C" fn start_helper(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         close(pair[0 as libc::c_int as usize]);
         close(pair[1 as libc::c_int as usize]);
@@ -230,7 +230,7 @@ unsafe extern "C" fn start_helper(
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             libc::_exit(1 as libc::c_int);
         }
@@ -266,7 +266,7 @@ unsafe extern "C" fn start_helper(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"execlp: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         libc::_exit(1 as libc::c_int);
     }
@@ -314,7 +314,7 @@ unsafe extern "C" fn reap_helper(mut pid: pid_t) -> libc::c_int {
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"libc::waitpid: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             *libc::__errno_location() = oerrno;
             return -(24 as libc::c_int);

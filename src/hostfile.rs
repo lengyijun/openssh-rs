@@ -50,7 +50,7 @@ extern "C" {
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
     fn match_hostname(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -702,7 +702,7 @@ pub unsafe extern "C" fn load_hostkeys(
             0 as *const libc::c_char,
             b"fopen %s: %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return;
     }
@@ -978,7 +978,7 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
                     0 as *const libc::c_char,
                     b"Could not libc::stat %s: %s\0" as *const u8 as *const libc::c_char,
                     dotsshdir,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             } else if libc::mkdir(dotsshdir, 0o700 as libc::c_int as __mode_t)
                 == -(1 as libc::c_int)
@@ -996,7 +996,7 @@ pub unsafe extern "C" fn hostfile_create_user_ssh_dir(
                     b"Could not create directory '%.200s' (%s).\0" as *const u8
                         as *const libc::c_char,
                     dotsshdir,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             } else if notify != 0 {
                 crate::log::sshlog(
@@ -1052,7 +1052,7 @@ pub unsafe extern "C" fn add_host_to_hostfile(
             0 as *const libc::c_char,
             b"Failed to add terminating newline to %s: %s\0" as *const u8 as *const libc::c_char,
             filename,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         fclose(f);
         return 0 as libc::c_int;
@@ -1241,7 +1241,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"mkstemp: %s\0" as *const u8 as *const libc::c_char,
-                strerror(oerrno),
+                libc::strerror(oerrno),
             );
             r = -(24 as libc::c_int);
         } else {
@@ -1260,7 +1260,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
                     b"libc::fdopen: %s\0" as *const u8 as *const libc::c_char,
-                    strerror(oerrno),
+                    libc::strerror(oerrno),
                 );
                 r = -(24 as libc::c_int);
             } else {
@@ -1441,7 +1441,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                                         0 as *const libc::c_char,
                                         b"unlink %.100s: %s\0" as *const u8 as *const libc::c_char,
                                         back,
-                                        strerror(*libc::__errno_location()),
+                                        libc::strerror(*libc::__errno_location()),
                                     );
                                     r = -(24 as libc::c_int);
                                     current_block = 3224374282125147660;
@@ -1461,7 +1461,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                                             as *const libc::c_char,
                                         filename,
                                         back,
-                                        strerror(*libc::__errno_location()),
+                                        libc::strerror(*libc::__errno_location()),
                                     );
                                     r = -(24 as libc::c_int);
                                     current_block = 3224374282125147660;
@@ -1481,7 +1481,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                                             as *const libc::c_char,
                                         temp,
                                         filename,
-                                        strerror(*libc::__errno_location()),
+                                        libc::strerror(*libc::__errno_location()),
                                     );
                                     r = -(24 as libc::c_int);
                                     current_block = 3224374282125147660;
@@ -1502,7 +1502,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                                         0 as *const libc::c_char,
                                         b"unlink \"%s\": %s\0" as *const u8 as *const libc::c_char,
                                         temp,
-                                        strerror(*libc::__errno_location()),
+                                        libc::strerror(*libc::__errno_location()),
                                     );
                                 }
                                 current_block = 8545136480011357681;

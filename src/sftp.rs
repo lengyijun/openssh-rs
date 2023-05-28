@@ -89,7 +89,7 @@ extern "C" {
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn strsignal(__sig: libc::c_int) -> *mut libc::c_char;
 
     fn sshfatal(
@@ -909,7 +909,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"Couldn't libc::fork: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if pid == 0 as libc::c_int {
@@ -951,7 +951,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
             stderr,
             b"Couldn't execute \"%s\": %s\n\0" as *const u8 as *const libc::c_char,
             shell,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         libc::_exit(1 as libc::c_int);
     }
@@ -966,7 +966,7 @@ unsafe extern "C" fn local_do_shell(mut args: *const libc::c_char) {
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"Couldn't wait for child: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     }
@@ -1659,7 +1659,7 @@ unsafe extern "C" fn process_get(
                     0 as *const libc::c_char,
                     b"basename %s: %s\0" as *const u8 as *const libc::c_char,
                     tmp,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
                 libc::free(tmp as *mut libc::c_void);
                 err = -(1 as libc::c_int);
@@ -1833,7 +1833,7 @@ unsafe extern "C" fn process_put(
                         0 as *const libc::c_char,
                         b"libc::stat %s: %s\0" as *const u8 as *const libc::c_char,
                         *(g.gl_pathv).offset(i as isize),
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                 } else {
                     tmp = crate::xmalloc::xstrdup(*(g.gl_pathv).offset(i as isize));
@@ -1851,7 +1851,7 @@ unsafe extern "C" fn process_put(
                             0 as *const libc::c_char,
                             b"basename %s: %s\0" as *const u8 as *const libc::c_char,
                             tmp,
-                            strerror(*libc::__errno_location()),
+                            libc::strerror(*libc::__errno_location()),
                         );
                         libc::free(tmp as *mut libc::c_void);
                         err = -(1 as libc::c_int);
@@ -3512,7 +3512,7 @@ unsafe extern "C" fn parse_dispatch_command(
                     b"Couldn't change local directory to \"%s\": %s\0" as *const u8
                         as *const libc::c_char,
                     path1,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
                 err = 1 as libc::c_int;
             }
@@ -3533,7 +3533,7 @@ unsafe extern "C" fn parse_dispatch_command(
                     b"Couldn't create local directory \"%s\": %s\0" as *const u8
                         as *const libc::c_char,
                     path1,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
                 err = 1 as libc::c_int;
             }
@@ -3733,7 +3733,7 @@ unsafe extern "C" fn parse_dispatch_command(
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
                     b"Couldn't get local cwd: %s\0" as *const u8 as *const libc::c_char,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
                 err = -(1 as libc::c_int);
             } else {
@@ -3968,7 +3968,7 @@ unsafe extern "C" fn interactive_loop(
                 0 as *const libc::c_char,
                 b"sigaction(%s): %s\0" as *const u8 as *const libc::c_char,
                 strsignal(2 as libc::c_int),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             break;
         } else {
@@ -4050,7 +4050,7 @@ unsafe extern "C" fn connect_to_server(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     *out = inout[0 as libc::c_int as usize];
@@ -4068,7 +4068,7 @@ unsafe extern "C" fn connect_to_server(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     } else if sshpid == 0 as libc::c_int {
         if libc::dup2(c_in, 0 as libc::c_int) == -(1 as libc::c_int)
@@ -4077,7 +4077,7 @@ unsafe extern "C" fn connect_to_server(
             libc::fprintf(
                 stderr,
                 b"libc::dup2: %s\n\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             libc::_exit(1 as libc::c_int);
         }
@@ -4097,7 +4097,7 @@ unsafe extern "C" fn connect_to_server(
             stderr,
             b"exec: %s: %s\n\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         libc::_exit(1 as libc::c_int);
     }
@@ -4342,7 +4342,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                         SYSLOG_LEVEL_FATAL,
                         0 as *const libc::c_char,
                         b"%s (%s).\0" as *const u8 as *const libc::c_char,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                         BSDoptarg,
                     );
                 }
@@ -4441,7 +4441,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                             0 as *const libc::c_char,
                             b"Invalid buffer size \"%s\": %s\0" as *const u8 as *const libc::c_char,
                             BSDoptarg.offset(7 as libc::c_int as isize),
-                            strerror(*libc::__errno_location()),
+                            libc::strerror(*libc::__errno_location()),
                         );
                     }
                     copy_buffer_len = llv as size_t;
@@ -4678,7 +4678,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"Couldn't wait for ssh process: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     }

@@ -8,7 +8,7 @@ extern "C" {
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
 
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn sshbuf_len(buf: *const sshbuf) -> size_t;
     fn sshbuf_reset(buf: *mut sshbuf);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
@@ -920,7 +920,7 @@ unsafe extern "C" fn chan_shutdown_write(mut ssh: *mut ssh, mut c: *mut Channel)
                 (*c).sock,
                 (*c).istate,
                 (*c).ostate,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     } else if channel_close_fd(ssh, c, &mut (*c).wfd) < 0 as libc::c_int {
@@ -938,7 +938,7 @@ unsafe extern "C" fn chan_shutdown_write(mut ssh: *mut ssh, mut c: *mut Channel)
             (*c).wfd,
             (*c).istate,
             (*c).ostate,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
 }
@@ -983,7 +983,7 @@ unsafe extern "C" fn chan_shutdown_read(mut ssh: *mut ssh, mut c: *mut Channel) 
                 (*c).sock,
                 (*c).istate,
                 (*c).ostate,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     } else if channel_close_fd(ssh, c, &mut (*c).rfd) < 0 as libc::c_int {
@@ -1001,7 +1001,7 @@ unsafe extern "C" fn chan_shutdown_read(mut ssh: *mut ssh, mut c: *mut Channel) 
             (*c).rfd,
             (*c).istate,
             (*c).ostate,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
 }
@@ -1048,7 +1048,7 @@ unsafe extern "C" fn chan_shutdown_extended_read(mut ssh: *mut ssh, mut c: *mut 
             (*c).efd,
             (*c).istate,
             (*c).ostate,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
 }

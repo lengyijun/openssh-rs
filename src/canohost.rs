@@ -26,7 +26,7 @@ extern "C" {
     ) -> libc::c_int;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn strtol(_: *const libc::c_char, _: *mut *mut libc::c_char, _: libc::c_int) -> libc::c_long;
 
     fn sshfatal(
@@ -323,7 +323,7 @@ pub unsafe extern "C" fn get_local_name(mut fd: libc::c_int) -> *mut libc::c_cha
             SYSLOG_LEVEL_VERBOSE,
             0 as *const libc::c_char,
             b"gethostname: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         host = crate::xmalloc::xstrdup(b"UNKNOWN\0" as *const u8 as *const libc::c_char);
     } else {
@@ -367,7 +367,7 @@ unsafe extern "C" fn get_sock_port(mut sock: libc::c_int, mut local: libc::c_int
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"getsockname failed: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             return 0 as libc::c_int;
         }
@@ -388,7 +388,7 @@ unsafe extern "C" fn get_sock_port(mut sock: libc::c_int, mut local: libc::c_int
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"getpeername failed: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }

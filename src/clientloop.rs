@@ -65,7 +65,6 @@ extern "C" {
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn xvasprintf(
         _: *mut *mut libc::c_char,
@@ -1295,7 +1294,7 @@ pub unsafe extern "C" fn client_x11_get_proto(
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
                     b"mkdtemp: %s\0" as *const u8 as *const libc::c_char,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
                 return -(1 as libc::c_int);
             }
@@ -1695,7 +1694,7 @@ unsafe extern "C" fn client_wait_until_can_do_something(
         }
         quit_message(
             b"poll: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return;
     }
@@ -2047,7 +2046,7 @@ unsafe extern "C" fn client_repledge() {
                 0 as *const libc::c_char,
                 b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8
                     as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     } else if options.forward_agent != 0 as libc::c_int {
@@ -2076,7 +2075,7 @@ unsafe extern "C" fn client_repledge() {
                 0 as *const libc::c_char,
                 b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8
                     as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     } else {
@@ -2106,7 +2105,7 @@ unsafe extern "C" fn client_repledge() {
                 0 as *const libc::c_char,
                 b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8
                     as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     };
@@ -2951,7 +2950,7 @@ unsafe extern "C" fn process_escapes(
                                 SYSLOG_LEVEL_ERROR,
                                 0 as *const libc::c_char,
                                 b"libc::fork: %.100s\0" as *const u8 as *const libc::c_char,
-                                strerror(*libc::__errno_location()),
+                                libc::strerror(*libc::__errno_location()),
                             );
                         } else {
                             if pid != 0 as libc::c_int {
@@ -3250,7 +3249,7 @@ pub unsafe extern "C" fn client_loop(
                 0 as *const libc::c_char,
                 b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8
                     as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     } else if options.forward_x11 != 0 || options.permit_local_command != 0 {
@@ -3279,7 +3278,7 @@ pub unsafe extern "C" fn client_loop(
                 0 as *const libc::c_char,
                 b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8
                     as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     } else if options.update_hostkeys != 0 {
@@ -3308,7 +3307,7 @@ pub unsafe extern "C" fn client_loop(
                 0 as *const libc::c_char,
                 b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8
                     as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     } else if option_clear_or_none(options.proxy_command) == 0
@@ -3338,7 +3337,7 @@ pub unsafe extern "C" fn client_loop(
                 0 as *const libc::c_char,
                 b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8
                     as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     } else {
@@ -3367,7 +3366,7 @@ pub unsafe extern "C" fn client_loop(
                 0 as *const libc::c_char,
                 b"crate::openbsd_compat::bsd_misc::pledge(): %s\0" as *const u8
                     as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     }
@@ -5234,7 +5233,7 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
                     0 as *const libc::c_char,
                     b"known hosts file %s inaccessible: %s\0" as *const u8 as *const libc::c_char,
                     options.user_hostfiles[i as usize],
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
         } else {

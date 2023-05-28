@@ -98,7 +98,7 @@ extern "C" {
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strtok(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn endgrent();
     fn initgroups(__user: *const libc::c_char, __group: __gid_t) -> libc::c_int;
@@ -1031,7 +1031,7 @@ unsafe extern "C" fn auth_input_request_forwarding(
             ssh,
             b"Agent forwarding disabled: mkdtemp() failed: %.100s\0" as *const u8
                 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         restore_uid();
         libc::free(auth_sock_dir as *mut libc::c_void);
@@ -1124,7 +1124,7 @@ unsafe extern "C" fn prepare_auth_info_file(mut pw: *mut libc::passwd, mut info:
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"mkstemp: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     } else if atomicio(
         ::core::mem::transmute::<
@@ -1149,7 +1149,7 @@ unsafe extern "C" fn prepare_auth_info_file(mut pw: *mut libc::passwd, mut info:
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"write: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     } else if close(fd) != 0 as libc::c_int {
         crate::log::sshlog(
@@ -1163,7 +1163,7 @@ unsafe extern "C" fn prepare_auth_info_file(mut pw: *mut libc::passwd, mut info:
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"close: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     } else {
         success = 1 as libc::c_int;
@@ -1368,7 +1368,7 @@ pub unsafe extern "C" fn do_exec_no_pty(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"pipe in: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -1382,7 +1382,7 @@ pub unsafe extern "C" fn do_exec_no_pty(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"pipe out: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         close(pin[0 as libc::c_int as usize]);
         close(pin[1 as libc::c_int as usize]);
@@ -1398,7 +1398,7 @@ pub unsafe extern "C" fn do_exec_no_pty(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"pipe err: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         close(pin[0 as libc::c_int as usize]);
         close(pin[1 as libc::c_int as usize]);
@@ -1419,7 +1419,7 @@ pub unsafe extern "C" fn do_exec_no_pty(
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"libc::fork: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             close(pin[0 as libc::c_int as usize]);
             close(pin[1 as libc::c_int as usize]);
@@ -1443,7 +1443,7 @@ pub unsafe extern "C" fn do_exec_no_pty(
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
                     b"setsid failed: %.100s\0" as *const u8 as *const libc::c_char,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
             close(pin[1 as libc::c_int as usize]);
@@ -1522,7 +1522,7 @@ pub unsafe extern "C" fn do_exec_pty(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"dup #1: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         close(ttyfd);
         close(ptyfd);
@@ -1538,7 +1538,7 @@ pub unsafe extern "C" fn do_exec_pty(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"dup #2: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         close(ttyfd);
         close(ptyfd);
@@ -1557,7 +1557,7 @@ pub unsafe extern "C" fn do_exec_pty(
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"libc::fork: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             close(fdout);
             close(ptymaster);
@@ -1581,7 +1581,7 @@ pub unsafe extern "C" fn do_exec_pty(
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
                     b"libc::dup2 stdin: %s\0" as *const u8 as *const libc::c_char,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
             if libc::dup2(ttyfd, 1 as libc::c_int) == -(1 as libc::c_int) {
@@ -1594,7 +1594,7 @@ pub unsafe extern "C" fn do_exec_pty(
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
                     b"libc::dup2 stdout: %s\0" as *const u8 as *const libc::c_char,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
             if libc::dup2(ttyfd, 2 as libc::c_int) == -(1 as libc::c_int) {
@@ -1607,7 +1607,7 @@ pub unsafe extern "C" fn do_exec_pty(
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
                     b"libc::dup2 stderr: %s\0" as *const u8 as *const libc::c_char,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
             close(ttyfd);
@@ -1797,7 +1797,7 @@ pub unsafe extern "C" fn do_login(
                 SYSLOG_LEVEL_DEBUG1,
                 0 as *const libc::c_char,
                 b"getpeername: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             cleanup_exit(255 as libc::c_int);
         }
@@ -2244,7 +2244,7 @@ unsafe extern "C" fn do_rc_files(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"crate::xmalloc::xasprintf: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if debug_flag != 0 {
@@ -2338,7 +2338,7 @@ unsafe extern "C" fn do_rc_files(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"crate::xmalloc::xasprintf: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         f = popen(cmd, b"w\0" as *const u8 as *const libc::c_char);
@@ -2476,7 +2476,7 @@ unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut _uid: uid_
                 0 as *const libc::c_char,
                 b"libc::stat(\"%s\"): %s\0" as *const u8 as *const libc::c_char,
                 component.as_mut_ptr(),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if st.st_uid != 0 as libc::c_int as libc::c_uint
@@ -2532,7 +2532,7 @@ unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut _uid: uid_
             0 as *const libc::c_char,
             b"Unable to chdir to chroot path \"%s\": %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if chroot(path) == -(1 as libc::c_int) {
@@ -2546,7 +2546,7 @@ unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut _uid: uid_
             0 as *const libc::c_char,
             b"chroot(\"%s\"): %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if chdir(b"/\0" as *const u8 as *const libc::c_char) == -(1 as libc::c_int) {
@@ -2559,7 +2559,7 @@ unsafe extern "C" fn safely_chroot(mut path: *const libc::c_char, mut _uid: uid_
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"chdir(/) after chroot: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     crate::log::sshlog(
@@ -2589,7 +2589,7 @@ pub unsafe extern "C" fn do_setusercontext(mut pw: *mut libc::passwd) {
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"setlogin failed: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if setgid((*pw).pw_gid) < 0 as libc::c_int {
@@ -2762,7 +2762,7 @@ pub unsafe extern "C" fn do_child(
                 stderr,
                 b"Could not chdir to home directory %s: %s\n\0" as *const u8 as *const libc::c_char,
                 (*pw).pw_dir,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if r != 0 {
@@ -3472,7 +3472,7 @@ unsafe extern "C" fn session_subsystem_req(mut ssh: *mut ssh, mut s: *mut Sessio
                         b"subsystem: cannot libc::stat %s: %s\0" as *const u8
                             as *const libc::c_char,
                         prog,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                 }
                 (*s).is_subsystem = 1 as libc::c_int;
@@ -3886,7 +3886,7 @@ unsafe extern "C" fn session_signal_req(mut ssh: *mut ssh, mut s: *mut Session) 
                     b"killpg(%ld, %d): %s\0" as *const u8 as *const libc::c_char,
                     (*s).pid as libc::c_long,
                     sig,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             } else {
                 success = 1 as libc::c_int;
@@ -4094,7 +4094,7 @@ pub unsafe extern "C" fn session_pty_cleanup2(mut s: *mut Session) {
             0 as *const libc::c_char,
             b"close(s->ptymaster/%d): %s\0" as *const u8 as *const libc::c_char,
             (*s).ptymaster,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     (*s).ttyfd = -(1 as libc::c_int);
@@ -4733,7 +4733,7 @@ pub unsafe extern "C" fn session_setup_x11fwd(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"gethostname: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if options.x11_use_localhost != 0 {

@@ -51,7 +51,6 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn match_user(
         _: *const libc::c_char,
@@ -1608,7 +1607,7 @@ unsafe extern "C" fn remote_hostname(mut ssh: *mut ssh) -> *mut libc::c_char {
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"getpeername failed: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return crate::xmalloc::xstrdup(ntop);
     }

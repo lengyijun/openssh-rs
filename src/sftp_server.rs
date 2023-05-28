@@ -79,7 +79,7 @@ extern "C" {
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn strftime(
         __s: *mut libc::c_char,
         __maxsize: size_t,
@@ -1964,7 +1964,7 @@ unsafe extern "C" fn process_read(mut id: u_int32_t) {
                 0 as *const libc::c_char,
                 b"seek \"%.100s\": %s\0" as *const u8 as *const libc::c_char,
                 handle_to_name(handle),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         } else {
             if len == 0 as libc::c_int as libc::c_uint {
@@ -1986,7 +1986,7 @@ unsafe extern "C" fn process_read(mut id: u_int32_t) {
                         0 as *const libc::c_char,
                         b"read \"%.100s\": %s\0" as *const u8 as *const libc::c_char,
                         handle_to_name(handle),
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                     current_block = 7767887306780309995;
                 } else if ret == 0 as libc::c_int {
@@ -2073,7 +2073,7 @@ unsafe extern "C" fn process_write(mut id: u_int32_t) {
             0 as *const libc::c_char,
             b"seek \"%.100s\": %s\0" as *const u8 as *const libc::c_char,
             handle_to_name(handle),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     } else {
         ret = write(fd, data as *const libc::c_void, len) as libc::c_int;
@@ -2089,7 +2089,7 @@ unsafe extern "C" fn process_write(mut id: u_int32_t) {
                 0 as *const libc::c_char,
                 b"write \"%.100s\": %s\0" as *const u8 as *const libc::c_char,
                 handle_to_name(handle),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         } else if ret as size_t == len {
             status = 0 as libc::c_int;
@@ -3948,7 +3948,7 @@ unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
                         b"process_extended_copy_data\0",
                     ))
                     .as_ptr(),
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
                 break;
             } else {
@@ -3997,7 +3997,7 @@ unsafe extern "C" fn process_extended_copy_data(mut id: u_int32_t) {
                         .as_ptr(),
                         ret as libc::c_ulonglong,
                         len as libc::c_ulonglong,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                     break;
                 } else {

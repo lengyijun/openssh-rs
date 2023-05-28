@@ -77,7 +77,7 @@ extern "C" {
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn OpenSSL_version(type_0: libc::c_int) -> *const libc::c_char;
 
     fn ciphers_valid(_: *const libc::c_char) -> libc::c_int;
@@ -1944,7 +1944,7 @@ unsafe extern "C" fn process_config_files(
                 0 as *const libc::c_char,
                 b"Can't open user config file %.100s: %.100s\0" as *const u8 as *const libc::c_char,
                 config,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     } else {
@@ -2425,7 +2425,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             b"Warning: Identity file %s not accessible: %s.\n\0" as *const u8
                                 as *const libc::c_char,
                             p,
-                            strerror(*libc::__errno_location()),
+                            libc::strerror(*libc::__errno_location()),
                         );
                     } else {
                         add_identity_file(
@@ -3330,7 +3330,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"gethostname: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     (*cinfo).thishost = crate::xmalloc::xstrdup(thishost.as_mut_ptr());
@@ -3439,7 +3439,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 b"Cannot forward agent socket path \"%s\": %s\0" as *const u8
                     as *const libc::c_char,
                 options.forward_agent_sock_path,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             if options.exit_on_forward_failure != 0 {
                 cleanup_exit(255 as libc::c_int);
@@ -4386,7 +4386,7 @@ unsafe extern "C" fn control_persist_detach() {
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         0 => {}
@@ -4475,7 +4475,7 @@ unsafe extern "C" fn fork_postauth() {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"daemon() failed: %.200s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if stdfd_devnull(

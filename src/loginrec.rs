@@ -48,7 +48,7 @@ extern "C" {
         -> *mut libc::c_char;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn time(__timer: *mut time_t) -> time_t;
 
     fn sshfatal(
@@ -792,7 +792,7 @@ unsafe extern "C" fn lastlog_openseek(
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"lastlog_openseek\0"))
                 .as_ptr(),
             b"/var/log/lastlog\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return 0 as libc::c_int;
     }
@@ -844,7 +844,7 @@ unsafe extern "C" fn lastlog_openseek(
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"lastlog_openseek\0"))
                 .as_ptr(),
             lastlog_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return 0 as libc::c_int;
     }
@@ -867,7 +867,7 @@ unsafe extern "C" fn lastlog_openseek(
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"lastlog_openseek\0"))
                     .as_ptr(),
                 lastlog_file.as_mut_ptr(),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             close(*fd);
             return 0 as libc::c_int;
@@ -945,7 +945,7 @@ pub unsafe extern "C" fn lastlog_write_entry(mut li: *mut logininfo) -> libc::c_
                     ))
                     .as_ptr(),
                     b"/var/log/lastlog\0" as *const u8 as *const libc::c_char,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
                 return 0 as libc::c_int;
             }
@@ -1013,7 +1013,7 @@ pub unsafe extern "C" fn lastlog_get_entry(mut li: *mut logininfo) -> libc::c_in
                 (*::core::mem::transmute::<&[u8; 18], &[libc::c_char; 18]>(b"lastlog_get_entry\0"))
                     .as_ptr(),
                 b"/var/log/lastlog\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             return 0 as libc::c_int;
         }
@@ -1110,7 +1110,7 @@ pub unsafe extern "C" fn record_failed_login(
             0 as *const libc::c_char,
             b"Unable to open the btmp file %s: %s\0" as *const u8 as *const libc::c_char,
             b"/var/log/btmp\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return;
     }
@@ -1127,7 +1127,7 @@ pub unsafe extern "C" fn record_failed_login(
             (*::core::mem::transmute::<&[u8; 20], &[libc::c_char; 20]>(b"record_failed_login\0"))
                 .as_ptr(),
             b"/var/log/btmp\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     } else if fst.st_mode
         & (0o100 as libc::c_int >> 3 as libc::c_int
@@ -1239,7 +1239,7 @@ pub unsafe extern "C" fn record_failed_login(
                 0 as *const libc::c_char,
                 b"Failed to write to %s: %s\0" as *const u8 as *const libc::c_char,
                 b"/var/log/btmp\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     }

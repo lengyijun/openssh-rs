@@ -25,7 +25,6 @@ extern "C" {
 
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn temporarily_use_uid(_: *mut libc::passwd);
     fn restore_uid();
@@ -605,7 +604,7 @@ pub unsafe extern "C" fn auth_rhosts2(
                 0 as *const libc::c_char,
                 b"libc::stat %s: %s\0" as *const u8 as *const libc::c_char,
                 path,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             libc::free(path as *mut libc::c_void);
         } else if options.strict_modes != 0

@@ -49,7 +49,7 @@ extern "C" {
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
     fn _ssh__compat_glob(
@@ -1763,7 +1763,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             0 as *const libc::c_char,
             b"Shell \"%s\" is not executable: %s\0" as *const u8 as *const libc::c_char,
             shell,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     crate::log::sshlog(
@@ -1813,7 +1813,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             0 as *const libc::c_char,
             b"Unable to execute '%.100s': %s\0" as *const u8 as *const libc::c_char,
             cmd,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         crate::misc::ssh_signal(15 as libc::c_int, None);
         kill(libc::getpid(), 15 as libc::c_int);
@@ -1829,7 +1829,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"libc::fork: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     while libc::waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
@@ -1845,7 +1845,7 @@ unsafe extern "C" fn execute_in_shell(mut cmd: *const libc::c_char) -> libc::c_i
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"libc::waitpid: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     }
@@ -2147,7 +2147,7 @@ unsafe extern "C" fn match_cfg_line(
                                     SYSLOG_LEVEL_FATAL,
                                     0 as *const libc::c_char,
                                     b"gethostname: %s\0" as *const u8 as *const libc::c_char,
-                                    strerror(*libc::__errno_location()),
+                                    libc::strerror(*libc::__errno_location()),
                                 );
                             }
                             strlcpy(
@@ -3386,7 +3386,7 @@ unsafe extern "C" fn process_config_line_depth(
                         filename,
                         linenum,
                         arg,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                     current_block = 7482270440933722938;
                 } else if val64 != 0 as libc::c_int as libc::c_longlong
@@ -4925,7 +4925,7 @@ unsafe extern "C" fn process_config_line_depth(
                                         b"Can't open user config file %.100s: %.100s\0" as *const u8
                                             as *const libc::c_char,
                                         *(gl.gl_pathv).offset(i as isize),
-                                        strerror(*libc::__errno_location()),
+                                        libc::strerror(*libc::__errno_location()),
                                     );
                                     _ssh__compat_globfree(&mut gl);
                                     current_block = 7482270440933722938;
@@ -6003,7 +6003,7 @@ unsafe extern "C" fn read_config_file_depth(
                 0 as *const libc::c_char,
                 b"libc::fstat %s: %s\0" as *const u8 as *const libc::c_char,
                 filename,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if sb.st_uid != 0 as libc::c_int as libc::c_uint && sb.st_uid != libc::getuid()

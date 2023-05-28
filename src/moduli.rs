@@ -58,7 +58,6 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -695,7 +694,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
             0 as *const libc::c_char,
             b"mkstemp(%s): %s\0" as *const u8 as *const libc::c_char,
             tmp.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return;
     }
@@ -710,7 +709,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
             SYSLOG_LEVEL_INFO,
             0 as *const libc::c_char,
             b"write_checkpoint: libc::fdopen: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         unlink(tmp.as_mut_ptr());
         close(r);
@@ -746,7 +745,7 @@ unsafe extern "C" fn write_checkpoint(mut cpfile: *mut libc::c_char, mut lineno:
             0 as *const libc::c_char,
             b"failed to write to checkpoint file '%s': %s\0" as *const u8 as *const libc::c_char,
             cpfile,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         unlink(tmp.as_mut_ptr());
     };

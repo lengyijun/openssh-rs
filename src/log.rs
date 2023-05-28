@@ -24,7 +24,7 @@ extern "C" {
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn closelog();
     fn openlog(__ident: *const libc::c_char, __option: libc::c_int, __facility: libc::c_int);
     fn syslog(__pri: libc::c_int, __fmt: *const libc::c_char, _: ...);
@@ -468,7 +468,7 @@ pub unsafe extern "C" fn log_redirect_stderr_to(mut logfile: *const libc::c_char
             stderr,
             b"Couldn't open logfile %s: %s\n\0" as *const u8 as *const libc::c_char,
             logfile,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         libc::exit(1 as libc::c_int);
     }

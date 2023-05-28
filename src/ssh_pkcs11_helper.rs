@@ -20,7 +20,6 @@ extern "C" {
 
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
@@ -910,7 +909,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"poll: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         } else {
             if pfd[0 as libc::c_int as usize].revents as libc::c_int
@@ -944,7 +943,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
                         b"read: %s\0" as *const u8 as *const libc::c_char,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                     cleanup_exit(1 as libc::c_int);
                 } else {
@@ -986,7 +985,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
                         b"write: %s\0" as *const u8 as *const libc::c_char,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                     cleanup_exit(1 as libc::c_int);
                 } else {

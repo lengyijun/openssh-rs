@@ -78,7 +78,7 @@ extern "C" {
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strtok(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
 
@@ -1207,7 +1207,7 @@ unsafe extern "C" fn tcpconnect(mut host: *mut libc::c_char) -> libc::c_int {
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"socket: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         } else {
             if crate::misc::set_nonblock(s) == -(1 as libc::c_int) {
@@ -1244,7 +1244,7 @@ unsafe extern "C" fn tcpconnect(mut host: *mut libc::c_char) -> libc::c_int {
                 0 as *const libc::c_char,
                 b"connect (`%s'): %s\0" as *const u8 as *const libc::c_char,
                 host,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             close(s);
             s = -(1 as libc::c_int);
@@ -1464,7 +1464,7 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
             0 as *const libc::c_char,
             b"write (%s): %s\0" as *const u8 as *const libc::c_char,
             (*c).c_name,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         confree(s);
         return;
@@ -1543,7 +1543,7 @@ unsafe extern "C" fn congreet(mut s: libc::c_int) {
                     0 as *const libc::c_char,
                     b"read (%s): %s\0" as *const u8 as *const libc::c_char,
                     (*c).c_name,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
         }
@@ -1660,7 +1660,7 @@ unsafe extern "C" fn conread(mut s: libc::c_int) {
             0 as *const libc::c_char,
             b"read (%s): %s\0" as *const u8 as *const libc::c_char,
             (*c).c_name,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         confree(s);
         return;
@@ -2188,7 +2188,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
                     __progname,
                     *argv.offset(j as isize),
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
         }
@@ -2227,7 +2227,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
                 __progname,
                 *argv.offset(j as isize),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         fclose(fp);

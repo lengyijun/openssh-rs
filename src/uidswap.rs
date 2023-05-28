@@ -11,7 +11,6 @@ extern "C" {
     fn setegid(__gid: __gid_t) -> libc::c_int;
     fn setresuid(__ruid: __uid_t, __euid: __uid_t, __suid: __uid_t) -> libc::c_int;
     fn setresgid(__rgid: __gid_t, __egid: __gid_t, __sgid: __gid_t) -> libc::c_int;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn setgroups(__n: size_t, __groups: *const __gid_t) -> libc::c_int;
     fn initgroups(__user: *const libc::c_char, __group: __gid_t) -> libc::c_int;
@@ -89,7 +88,7 @@ pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut libc::passwd) {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"getgroups: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if saved_egroupslen > 0 as libc::c_int {
@@ -110,7 +109,7 @@ pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut libc::passwd) {
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"getgroups: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     } else {
@@ -131,7 +130,7 @@ pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut libc::passwd) {
                 0 as *const libc::c_char,
                 b"initgroups: %s: %.100s\0" as *const u8 as *const libc::c_char,
                 (*pw).pw_name,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         user_groupslen = getgroups(0 as libc::c_int, 0 as *mut __gid_t);
@@ -147,7 +146,7 @@ pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut libc::passwd) {
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"getgroups: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if user_groupslen > 0 as libc::c_int {
@@ -168,7 +167,7 @@ pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut libc::passwd) {
                     SYSLOG_LEVEL_FATAL,
                     0 as *const libc::c_char,
                     b"getgroups: %.100s\0" as *const u8 as *const libc::c_char,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
         } else {
@@ -187,7 +186,7 @@ pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut libc::passwd) {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"setgroups: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if setegid((*pw).pw_gid) == -(1 as libc::c_int) {
@@ -201,7 +200,7 @@ pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut libc::passwd) {
             0 as *const libc::c_char,
             b"setegid %u: %.100s\0" as *const u8 as *const libc::c_char,
             (*pw).pw_gid,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if seteuid((*pw).pw_uid) == -(1 as libc::c_int) {
@@ -215,7 +214,7 @@ pub unsafe extern "C" fn temporarily_use_uid(mut pw: *mut libc::passwd) {
             0 as *const libc::c_char,
             b"seteuid %u: %.100s\0" as *const u8 as *const libc::c_char,
             (*pw).pw_uid,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
 }
@@ -264,7 +263,7 @@ pub unsafe extern "C" fn restore_uid() {
             0 as *const libc::c_char,
             b"seteuid %u: %.100s\0" as *const u8 as *const libc::c_char,
             saved_euid,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if setegid(saved_egid) == -(1 as libc::c_int) {
@@ -277,7 +276,7 @@ pub unsafe extern "C" fn restore_uid() {
             0 as *const libc::c_char,
             b"setegid %u: %.100s\0" as *const u8 as *const libc::c_char,
             saved_egid,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if setgroups(saved_egroupslen as size_t, saved_egroups) == -(1 as libc::c_int) {
@@ -289,7 +288,7 @@ pub unsafe extern "C" fn restore_uid() {
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"setgroups: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     temporarily_use_uid_effective = 0 as libc::c_int;
@@ -345,7 +344,7 @@ pub unsafe extern "C" fn permanently_set_uid(mut pw: *mut libc::passwd) {
             0 as *const libc::c_char,
             b"setresgid %u: %.100s\0" as *const u8 as *const libc::c_char,
             (*pw).pw_gid,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if setresuid((*pw).pw_uid, (*pw).pw_uid, (*pw).pw_uid) == -(1 as libc::c_int) {
@@ -359,7 +358,7 @@ pub unsafe extern "C" fn permanently_set_uid(mut pw: *mut libc::passwd) {
             0 as *const libc::c_char,
             b"setresuid %u: %.100s\0" as *const u8 as *const libc::c_char,
             (*pw).pw_uid,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if old_gid != (*pw).pw_gid

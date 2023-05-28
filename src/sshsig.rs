@@ -28,7 +28,7 @@ extern "C" {
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
@@ -1445,7 +1445,7 @@ unsafe extern "C" fn hash_file(
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"read: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             *libc::__errno_location() = oerrno;
             r = -(24 as libc::c_int);
@@ -2476,7 +2476,7 @@ pub unsafe extern "C" fn sshsig_check_allowed_keys(
             0 as *const libc::c_char,
             b"Unable to open allowed keys file \"%s\": %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
@@ -2537,7 +2537,7 @@ pub unsafe extern "C" fn sshsig_find_principals(
             0 as *const libc::c_char,
             b"Unable to open allowed keys file \"%s\": %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
@@ -2583,7 +2583,7 @@ pub unsafe extern "C" fn sshsig_find_principals(
             0 as *const libc::c_char,
             b"Unable to read allowed keys file \"%s\": %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);
@@ -2630,7 +2630,7 @@ pub unsafe extern "C" fn sshsig_match_principals(
             0 as *const libc::c_char,
             b"Unable to open allowed keys file \"%s\": %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         *libc::__errno_location() = oerrno;
         return -(24 as libc::c_int);

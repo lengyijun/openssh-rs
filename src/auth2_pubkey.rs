@@ -20,7 +20,7 @@ extern "C" {
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
@@ -1569,7 +1569,7 @@ unsafe extern "C" fn match_principals_command(
             b"AuthorizedPrincipalsCommandUser \"%s\" not found: %s\0" as *const u8
                 as *const libc::c_char,
             username,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     } else if argv_split(
         options.authorized_principals_command,
@@ -2099,7 +2099,7 @@ unsafe extern "C" fn user_key_command_allowed2(
             0 as *const libc::c_char,
             b"AuthorizedKeysCommandUser \"%s\" not found: %s\0" as *const u8 as *const libc::c_char,
             username,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     } else {
         key_fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);

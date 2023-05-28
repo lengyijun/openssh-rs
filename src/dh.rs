@@ -17,7 +17,6 @@ extern "C" {
     fn rewind(__stream: *mut libc::FILE);
     fn arc4random_uniform(_: uint32_t) -> uint32_t;
 
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
     fn BN_hex2bn(a: *mut *mut BIGNUM, str: *const libc::c_char) -> libc::c_int;
@@ -421,7 +420,7 @@ pub unsafe extern "C" fn choose_dh(
             b"WARNING: could not open %s (%s), using fixed modulus\0" as *const u8
                 as *const libc::c_char,
             get_moduli_filename(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return dh_new_group_fallback(max);
     }

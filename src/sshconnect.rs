@@ -75,7 +75,7 @@ extern "C" {
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn getifaddrs(__ifap: *mut *mut ifaddrs) -> libc::c_int;
     fn freeifaddrs(__ifa: *mut ifaddrs);
 
@@ -966,7 +966,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
             0 as *const libc::c_char,
             b"Could not create libc::socketpair to communicate with proxy dialer: %.100s\0"
                 as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     command_string = expand_proxy_command(
@@ -1047,7 +1047,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"libc::fork failed: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     close(sp[0 as libc::c_int as usize]);
@@ -1081,7 +1081,7 @@ unsafe extern "C" fn ssh_proxy_fdpass_connect(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"Couldn't wait for child: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     }
@@ -1119,7 +1119,7 @@ unsafe extern "C" fn ssh_proxy_connect(
             0 as *const libc::c_char,
             b"Could not create pipes to communicate with the proxy: %.100s\0" as *const u8
                 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     command_string = expand_proxy_command(
@@ -1195,7 +1195,7 @@ unsafe extern "C" fn ssh_proxy_connect(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"libc::fork failed: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     } else {
         proxy_command_pid = pid;
@@ -1490,7 +1490,7 @@ unsafe extern "C" fn ssh_create_socket(mut ai: *mut addrinfo) -> libc::c_int {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"socket: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -1565,7 +1565,7 @@ unsafe extern "C" fn ssh_create_socket(mut ai: *mut addrinfo) -> libc::c_int {
                 0 as *const libc::c_char,
                 b"getifaddrs: %s: %s\0" as *const u8 as *const libc::c_char,
                 options.bind_interface,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             current_block = 11409641321532490549;
         } else {
@@ -1645,7 +1645,7 @@ unsafe extern "C" fn ssh_create_socket(mut ai: *mut addrinfo) -> libc::c_int {
                     0 as *const libc::c_char,
                     b"bind %s: %s\0" as *const u8 as *const libc::c_char,
                     ntop.as_mut_ptr(),
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
                 current_block = 11409641321532490549;
             } else {
@@ -1811,7 +1811,7 @@ unsafe extern "C" fn ssh_connect_direct(
                                 as *const libc::c_char,
                             ntop.as_mut_ptr(),
                             strport.as_mut_ptr(),
-                            strerror(*libc::__errno_location()),
+                            libc::strerror(*libc::__errno_location()),
                         );
                         close(sock);
                         sock = -(1 as libc::c_int);
@@ -1842,7 +1842,7 @@ unsafe extern "C" fn ssh_connect_direct(
             if *libc::__errno_location() == 0 as libc::c_int {
                 b"failure\0" as *const u8 as *const libc::c_char
             } else {
-                strerror(*libc::__errno_location()) as *const libc::c_char
+                libc::strerror(*libc::__errno_location()) as *const libc::c_char
             },
         );
         return -(1 as libc::c_int);
@@ -1875,7 +1875,7 @@ unsafe extern "C" fn ssh_connect_direct(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"setsockopt SO_KEEPALIVE: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if (ssh_packet_set_connection(ssh, sock, sock)).is_null() {
@@ -4606,7 +4606,7 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
             b"Couldn't execute %s -c \"%s\": %s\0" as *const u8 as *const libc::c_char,
             shell,
             args,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         libc::_exit(1 as libc::c_int);
     } else if pid == -(1 as libc::c_int) {
@@ -4619,7 +4619,7 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"libc::fork failed: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     while libc::waitpid(pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
@@ -4633,7 +4633,7 @@ pub unsafe extern "C" fn ssh_local_cmd(mut args: *const libc::c_char) -> libc::c
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"Couldn't wait for child: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     }

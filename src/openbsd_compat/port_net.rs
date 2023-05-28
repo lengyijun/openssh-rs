@@ -26,7 +26,6 @@ extern "C" {
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strdup(_: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -366,7 +365,7 @@ pub unsafe extern "C" fn sys_get_rdomain(mut fd: libc::c_int) -> *mut libc::c_ch
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"sys_get_rdomain\0"))
                 .as_ptr(),
             fd,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return 0 as *mut libc::c_char;
     }
@@ -399,7 +398,7 @@ pub unsafe extern "C" fn sys_set_rdomain(
                 .as_ptr(),
             fd,
             name,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -467,7 +466,7 @@ pub unsafe extern "C" fn sys_tun_open(
                 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"sys_tun_open\0")).as_ptr(),
             b"/dev/net/tun\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -498,7 +497,7 @@ pub unsafe extern "C" fn sys_tun_open(
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"sys_tun_open\0"))
                     .as_ptr(),
                 tun,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             current_block = 3387529812613067600;
         } else {
@@ -540,7 +539,7 @@ pub unsafe extern "C" fn sys_tun_open(
                     (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"sys_tun_open\0"))
                         .as_ptr(),
                     mode,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             } else {
                 if tun == 0x7fffffff as libc::c_int {

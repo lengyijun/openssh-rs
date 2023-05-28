@@ -88,7 +88,7 @@ extern "C" {
     fn DSA_set0_pqg(d: *mut DSA, p: *mut BIGNUM, q: *mut BIGNUM, g: *mut BIGNUM) -> libc::c_int;
     fn DSA_set0_key(d: *mut DSA, pub_key: *mut BIGNUM, priv_key: *mut BIGNUM) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
@@ -1256,7 +1256,7 @@ unsafe extern "C" fn do_convert_to(mut pw: *mut libc::passwd) {
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     r = sshkey_load_public(
@@ -1886,7 +1886,7 @@ unsafe extern "C" fn get_line(
                         SYSLOG_LEVEL_FATAL,
                         0 as *const libc::c_char,
                         b"unget: %s\0" as *const u8 as *const libc::c_char,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                 }
                 return pos as libc::c_int;
@@ -1943,7 +1943,7 @@ unsafe extern "C" fn do_convert_from_ssh2(
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     encoded[0 as libc::c_int as usize] = '\0' as i32 as libc::c_char;
@@ -2083,7 +2083,7 @@ unsafe extern "C" fn do_convert_from_pkcs8(
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     pubkey = PEM_read_PUBKEY(fp, 0 as *mut *mut EVP_PKEY, None, 0 as *mut libc::c_void);
@@ -2197,7 +2197,7 @@ unsafe extern "C" fn do_convert_from_pem(mut k: *mut *mut sshkey, mut _private: 
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     rsa = PEM_read_RSAPublicKey(fp, 0 as *mut *mut RSA, None, 0 as *mut libc::c_void);
@@ -2257,7 +2257,7 @@ unsafe extern "C" fn do_convert_from(mut pw: *mut libc::passwd) {
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     match convert_format as libc::c_uint {
@@ -2381,7 +2381,7 @@ unsafe extern "C" fn do_print_public(mut pw: *mut libc::passwd) {
             0 as *const libc::c_char,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     prv = load_identity(identity_file.as_mut_ptr(), &mut comment);
@@ -2600,7 +2600,7 @@ unsafe extern "C" fn fingerprint_private(mut path: *const libc::c_char) {
             0 as *const libc::c_char,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             path,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     r = sshkey_load_public(path, &mut pubkey, &mut comment);
@@ -2694,7 +2694,7 @@ unsafe extern "C" fn do_fingerprint(mut pw: *mut libc::passwd) {
                 b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
                 __progname,
                 path,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     }
@@ -2886,7 +2886,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut libc::passwd) {
                 0 as *const libc::c_char,
                 b"Could not libc::stat %s: %s\0" as *const u8 as *const libc::c_char,
                 key_types[i as usize].path,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             current_block = 10340423718687530949;
         } else {
@@ -2940,7 +2940,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut libc::passwd) {
                         b"Could not save your private key in %s: %s\0" as *const u8
                             as *const libc::c_char,
                         prv_tmp,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                     current_block = 10340423718687530949;
                 } else {
@@ -3025,7 +3025,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut libc::passwd) {
                                     b"Could not save your public key in %s: %s\0" as *const u8
                                         as *const libc::c_char,
                                     pub_tmp,
-                                    strerror(*libc::__errno_location()),
+                                    libc::strerror(*libc::__errno_location()),
                                 );
                                 current_block = 10340423718687530949;
                             } else {
@@ -3062,7 +3062,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut libc::passwd) {
                                         b"Unable to move %s into position: %s\0" as *const u8
                                             as *const libc::c_char,
                                         pub_file,
-                                        strerror(*libc::__errno_location()),
+                                        libc::strerror(*libc::__errno_location()),
                                     );
                                     current_block = 10340423718687530949;
                                 } else if rename(prv_tmp, prv_file) != 0 as libc::c_int {
@@ -3079,7 +3079,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut libc::passwd) {
                                         b"Unable to move %s into position: %s\0" as *const u8
                                             as *const libc::c_char,
                                         key_types[i as usize].path,
-                                        strerror(*libc::__errno_location()),
+                                        libc::strerror(*libc::__errno_location()),
                                     );
                                     current_block = 10340423718687530949;
                                 } else {
@@ -3400,7 +3400,7 @@ unsafe extern "C" fn do_known_hosts(
             0 as *const libc::c_char,
             b"Cannot libc::stat %s: %s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     memset(
@@ -3458,7 +3458,7 @@ unsafe extern "C" fn do_known_hosts(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"mkstemp: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         ctx.out = libc::fdopen(fd, b"w\0" as *const u8 as *const libc::c_char);
@@ -3474,7 +3474,7 @@ unsafe extern "C" fn do_known_hosts(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"libc::fdopen: %s\0" as *const u8 as *const libc::c_char,
-                strerror(oerrno),
+                libc::strerror(oerrno),
             );
         }
         libc::fchmod(fd, sb.st_mode & 0o644 as libc::c_int as libc::c_uint);
@@ -3590,7 +3590,7 @@ unsafe extern "C" fn do_known_hosts(
                 0 as *const libc::c_char,
                 b"unlink %.100s: %s\0" as *const u8 as *const libc::c_char,
                 old.as_mut_ptr(),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if link(identity_file.as_mut_ptr(), old.as_mut_ptr()) == -(1 as libc::c_int) {
@@ -3605,7 +3605,7 @@ unsafe extern "C" fn do_known_hosts(
                 b"link %.100s to %.100s: %s\0" as *const u8 as *const libc::c_char,
                 identity_file.as_mut_ptr(),
                 old.as_mut_ptr(),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if rename(tmp.as_mut_ptr(), identity_file.as_mut_ptr()) == -(1 as libc::c_int) {
@@ -3620,7 +3620,7 @@ unsafe extern "C" fn do_known_hosts(
                 b"rename\"%s\" to \"%s\": %s\0" as *const u8 as *const libc::c_char,
                 tmp.as_mut_ptr(),
                 identity_file.as_mut_ptr(),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             unlink(tmp.as_mut_ptr());
             unlink(old.as_mut_ptr());
@@ -3686,7 +3686,7 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut libc::passwd) {
             0 as *const libc::c_char,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     r = sshkey_load_private(
@@ -3894,7 +3894,7 @@ unsafe extern "C" fn do_print_resource_record(
             0 as *const libc::c_char,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             fname,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     r = sshkey_load_public(fname, &mut public, &mut comment);
@@ -3946,7 +3946,7 @@ unsafe extern "C" fn do_change_comment(
             0 as *const libc::c_char,
             b"%s: %s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     r = sshkey_load_private(
@@ -5489,7 +5489,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut libc::passwd) {
             b"%s: %s: %s\0" as *const u8 as *const libc::c_char,
             __progname,
             identity_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     path = identity_file.as_mut_ptr();
@@ -5513,7 +5513,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut libc::passwd) {
                 0 as *const libc::c_char,
                 b"fopen %s: %s\0" as *const u8 as *const libc::c_char,
                 identity_file.as_mut_ptr(),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     }
@@ -5753,7 +5753,7 @@ unsafe extern "C" fn update_krl_from_file(
                 0 as *const libc::c_char,
                 b"fopen %s: %s\0" as *const u8 as *const libc::c_char,
                 path,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     }
@@ -6180,7 +6180,7 @@ unsafe extern "C" fn do_gen_krl(
                 0 as *const libc::c_char,
                 b"Cannot access KRL \"%s\": %s\0" as *const u8 as *const libc::c_char,
                 identity_file.as_mut_ptr(),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if updating != 0 {
@@ -6286,7 +6286,7 @@ unsafe extern "C" fn do_gen_krl(
             0 as *const libc::c_char,
             b"write %s: %s\0" as *const u8 as *const libc::c_char,
             identity_file.as_mut_ptr(),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     sshbuf_free(kbuf);
@@ -6683,7 +6683,7 @@ unsafe extern "C" fn sign_one(
                                 0 as *const libc::c_char,
                                 b"Cannot open %s: %s\0" as *const u8 as *const libc::c_char,
                                 wfile,
-                                strerror(*libc::__errno_location()),
+                                libc::strerror(*libc::__errno_location()),
                             );
                             *libc::__errno_location() = oerrno;
                             r = -(24 as libc::c_int);
@@ -6733,7 +6733,7 @@ unsafe extern "C" fn sign_one(
                                 0 as *const libc::c_char,
                                 b"Cannot write to %s: %s\0" as *const u8 as *const libc::c_char,
                                 wfile,
-                                strerror(*libc::__errno_location()),
+                                libc::strerror(*libc::__errno_location()),
                             );
                             *libc::__errno_location() = oerrno;
                             r = -(24 as libc::c_int);
@@ -7068,7 +7068,7 @@ unsafe extern "C" fn sig_sign(
                                         b"Cannot open %s for signing: %s\0" as *const u8
                                             as *const libc::c_char,
                                         *argv.offset(i as isize),
-                                        strerror(*libc::__errno_location()),
+                                        libc::strerror(*libc::__errno_location()),
                                     );
                                     current_block = 15713335055486353288;
                                     break;
@@ -7633,7 +7633,7 @@ unsafe extern "C" fn do_moduli_gen(
             b"Couldn't open modulus candidate file \"%s\": %s\0" as *const u8
                 as *const libc::c_char,
             out_file,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     setvbuf(
@@ -7803,7 +7803,7 @@ unsafe extern "C" fn do_moduli_screen(
                 b"Couldn't open modulus candidate file \"%s\": %s\0" as *const u8
                     as *const libc::c_char,
                 identity_file.as_mut_ptr(),
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
     }
@@ -7819,7 +7819,7 @@ unsafe extern "C" fn do_moduli_screen(
             0 as *const libc::c_char,
             b"Couldn't open moduli file \"%s\": %s\0" as *const u8 as *const libc::c_char,
             out_file,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     setvbuf(
@@ -8400,7 +8400,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"gethostname: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     sk_provider = getenv(b"SSH_SK_PROVIDER\0" as *const u8 as *const libc::c_char);
@@ -9136,7 +9136,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     0 as *const libc::c_char,
                     b"%s: %s\0" as *const u8 as *const libc::c_char,
                     identity_file.as_mut_ptr(),
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
             libc::exit(0 as libc::c_int);

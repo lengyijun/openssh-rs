@@ -45,7 +45,7 @@ extern "C" {
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
     fn DH_get0_pqg(
@@ -1299,7 +1299,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"log fd read: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     r = sshbuf_get_u32(logmsg, &mut len);
@@ -1358,7 +1358,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"log fd read: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     r = sshbuf_get_u32(logmsg, &mut level);
@@ -1460,7 +1460,7 @@ unsafe extern "C" fn monitor_read(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"poll: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         } else if pfd[1 as libc::c_int as usize].revents != 0 {
             monitor_read_log(pmonitor);
@@ -3870,7 +3870,7 @@ unsafe extern "C" fn mm_record_login(
                 SYSLOG_LEVEL_DEBUG1,
                 0 as *const libc::c_char,
                 b"getpeername: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             cleanup_exit(255 as libc::c_int);
         }
@@ -4022,7 +4022,7 @@ pub unsafe extern "C" fn mm_answer_pty(
                     SYSLOG_LEVEL_FATAL,
                     0 as *const libc::c_char,
                     b"open(/dev/null): %s\0" as *const u8 as *const libc::c_char,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
             if fd0 != 0 as libc::c_int {
@@ -4298,7 +4298,7 @@ unsafe extern "C" fn monitor_openfds(mut mon: *mut monitor, mut do_logfds: libc:
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if fcntl(
@@ -4350,7 +4350,7 @@ unsafe extern "C" fn monitor_openfds(mut mon: *mut monitor, mut do_logfds: libc:
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"pipe: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if fcntl(

@@ -4,7 +4,7 @@ extern "C" {
     fn recvmsg(__fd: libc::c_int, __message: *mut msghdr, __flags: libc::c_int) -> ssize_t;
 
     fn poll(__fds: *mut pollfd, __nfds: nfds_t, __timeout: libc::c_int) -> libc::c_int;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
 }
@@ -152,7 +152,7 @@ pub unsafe extern "C" fn mm_send_fd(mut sock: libc::c_int, mut fd: libc::c_int) 
             0 as *const libc::c_char,
             b"sendmsg(%d): %s\0" as *const u8 as *const libc::c_char,
             fd,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         poll(&mut pfd, 1 as libc::c_int as nfds_t, -(1 as libc::c_int));
     }
@@ -166,7 +166,7 @@ pub unsafe extern "C" fn mm_send_fd(mut sock: libc::c_int, mut fd: libc::c_int) 
             0 as *const libc::c_char,
             b"sendmsg(%d): %s\0" as *const u8 as *const libc::c_char,
             fd,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -251,7 +251,7 @@ pub unsafe extern "C" fn mm_receive_fd(mut sock: libc::c_int) -> libc::c_int {
             SYSLOG_LEVEL_DEBUG3,
             0 as *const libc::c_char,
             b"recvmsg: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         poll(&mut pfd, 1 as libc::c_int as nfds_t, -(1 as libc::c_int));
     }
@@ -265,7 +265,7 @@ pub unsafe extern "C" fn mm_receive_fd(mut sock: libc::c_int) -> libc::c_int {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"recvmsg: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }

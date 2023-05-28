@@ -19,7 +19,7 @@ extern "C" {
     fn freezero(_: *mut libc::c_void, _: size_t);
 
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn xvasprintf(
         _: *mut *mut libc::c_char,
         _: *const libc::c_char,
@@ -876,7 +876,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             0 as *const libc::c_char,
             b"%s: dup: %s\0" as *const u8 as *const libc::c_char,
             __progname,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     close(0 as libc::c_int);

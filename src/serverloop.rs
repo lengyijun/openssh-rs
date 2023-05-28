@@ -40,7 +40,6 @@ extern "C" {
 
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn sshpkt_fmt_connection_id(ssh: *mut ssh, s: *mut libc::c_char, l: size_t);
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
@@ -1062,7 +1061,7 @@ unsafe extern "C" fn wait_until_can_do_something(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"ppoll: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         return;
@@ -1149,7 +1148,7 @@ unsafe extern "C" fn process_input(
             b"Read error from remote host %s port %d: %s\0" as *const u8 as *const libc::c_char,
             ssh_remote_ipaddr(ssh),
             ssh_remote_port(ssh),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         cleanup_exit(255 as libc::c_int);
     }
@@ -1234,7 +1233,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"bsigset setup: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     crate::misc::ssh_signal(
@@ -1274,7 +1273,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"bsigset sigprocmask: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         collect_children(ssh);
@@ -1299,7 +1298,7 @@ pub unsafe extern "C" fn server_loop2(mut ssh: *mut ssh, mut _authctxt: *mut Aut
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"osigset sigprocmask: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if received_sigterm != 0 {

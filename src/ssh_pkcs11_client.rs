@@ -24,7 +24,6 @@ extern "C" {
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
     fn EC_KEY_METHOD_get_sign(
@@ -852,7 +851,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -867,7 +866,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     } else if pid == 0 as libc::c_int {
@@ -877,7 +876,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             libc::fprintf(
                 stderr,
                 b"libc::dup2: %s\n\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             libc::_exit(1 as libc::c_int);
         }
@@ -914,7 +913,7 @@ unsafe extern "C" fn pkcs11_start_helper() -> libc::c_int {
             stderr,
             b"exec: %s: %s\n\0" as *const u8 as *const libc::c_char,
             helper,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         libc::_exit(1 as libc::c_int);
     }

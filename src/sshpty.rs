@@ -9,7 +9,6 @@ extern "C" {
     fn ioctl(__fd: libc::c_int, __request: libc::c_ulong, _: ...) -> libc::c_int;
 
     fn getgrnam(__name: *const libc::c_char) -> *mut group;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -113,7 +112,7 @@ pub unsafe extern "C" fn pty_allocate(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"openpty: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return 0 as libc::c_int;
     }
@@ -163,7 +162,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"setsid: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     fd = libc::open(
@@ -212,7 +211,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"ioctl(TIOCSCTTY): %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     fd = libc::open(tty, 0o2 as libc::c_int);
@@ -229,7 +228,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
             0 as *const libc::c_char,
             b"%.100s: %.100s\0" as *const u8 as *const libc::c_char,
             tty,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     } else {
         close(fd);
@@ -251,7 +250,7 @@ pub unsafe extern "C" fn pty_make_controlling_tty(
             0 as *const libc::c_char,
             b"open /dev/tty failed - could not set controlling tty: %.100s\0" as *const u8
                 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     } else {
         close(fd);
@@ -318,7 +317,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut libc::passwd, mut tty: *const
             0 as *const libc::c_char,
             b"libc::stat(%.100s) failed: %.100s\0" as *const u8 as *const libc::c_char,
             tty,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if st.st_uid != (*pw).pw_uid || st.st_gid != gid {
@@ -338,7 +337,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut libc::passwd, mut tty: *const
                     tty,
                     (*pw).pw_uid,
                     gid,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             } else {
                 sshfatal(
@@ -353,7 +352,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut libc::passwd, mut tty: *const
                     tty,
                     (*pw).pw_uid,
                     gid,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
         }
@@ -388,7 +387,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut libc::passwd, mut tty: *const
                     b"chmod(%.100s, 0%o) failed: %.100s\0" as *const u8 as *const libc::c_char,
                     tty,
                     mode,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             } else {
                 sshfatal(
@@ -402,7 +401,7 @@ pub unsafe extern "C" fn pty_setowner(mut pw: *mut libc::passwd, mut tty: *const
                     b"chmod(%.100s, 0%o) failed: %.100s\0" as *const u8 as *const libc::c_char,
                     tty,
                     mode,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
         }

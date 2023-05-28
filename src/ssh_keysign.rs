@@ -11,7 +11,6 @@ extern "C" {
 
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
@@ -767,7 +766,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             b"%s: crate::openbsd_compat::bsd_misc::pledge: %s\0" as *const u8
                 as *const libc::c_char,
             __progname,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     fd = libc::open(
@@ -864,7 +863,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             b"%s: crate::openbsd_compat::bsd_misc::pledge: %s\0" as *const u8
                 as *const libc::c_char,
             __progname,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     found = 0 as libc::c_int;

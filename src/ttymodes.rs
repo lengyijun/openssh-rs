@@ -16,7 +16,6 @@ extern "C" {
         __termios_p: *const termios,
     ) -> libc::c_int;
 
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
     fn sshpkt_get_string_direct(
         ssh: *mut ssh,
         valp: *mut *const u_char,
@@ -241,7 +240,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                 SYSLOG_LEVEL_INFO,
                 0 as *const libc::c_char,
                 b"tcgetattr: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             current_block = 10500593165445915707;
         } else {
@@ -2075,7 +2074,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
             SYSLOG_LEVEL_INFO,
             0 as *const libc::c_char,
             b"tcgetattr: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         failure = -(1 as libc::c_int);
     }
@@ -3345,7 +3344,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
             SYSLOG_LEVEL_INFO,
             0 as *const libc::c_char,
             b"Setting tty modes failed: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
 }

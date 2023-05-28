@@ -36,7 +36,7 @@ extern "C" {
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
 
@@ -3007,7 +3007,7 @@ unsafe extern "C" fn load_identity_file(mut id: *mut Identity) -> *mut sshkey {
             0 as *const libc::c_char,
             b"no such identity: %s: %s\0" as *const u8 as *const libc::c_char,
             (*id).filename,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return 0 as *mut sshkey;
     }
@@ -4051,7 +4051,7 @@ unsafe extern "C" fn ssh_keysign(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"not installed: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -4064,7 +4064,7 @@ unsafe extern "C" fn ssh_keysign(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"libc::fflush: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -4077,7 +4077,7 @@ unsafe extern "C" fn ssh_keysign(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"pipe: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -4090,7 +4090,7 @@ unsafe extern "C" fn ssh_keysign(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"pipe: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -4104,7 +4104,7 @@ unsafe extern "C" fn ssh_keysign(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return -(1 as libc::c_int);
     }
@@ -4121,7 +4121,7 @@ unsafe extern "C" fn ssh_keysign(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         close(to[1 as libc::c_int as usize]);
@@ -4135,7 +4135,7 @@ unsafe extern "C" fn ssh_keysign(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         close(from[1 as libc::c_int as usize]);
@@ -4150,7 +4150,7 @@ unsafe extern "C" fn ssh_keysign(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         sock = 2 as libc::c_int + 1 as libc::c_int;
@@ -4164,7 +4164,7 @@ unsafe extern "C" fn ssh_keysign(
                 SYSLOG_LEVEL_DEBUG3,
                 0 as *const libc::c_char,
                 b"fcntl F_SETFD: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         closefrom(sock + 1 as libc::c_int);
@@ -4193,7 +4193,7 @@ unsafe extern "C" fn ssh_keysign(
             0 as *const libc::c_char,
             b"exec(%s): %s\0" as *const u8 as *const libc::c_char,
             b"/usr/local/libexec/ssh-keysign\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     close(from[1 as libc::c_int as usize]);
@@ -4271,7 +4271,7 @@ unsafe extern "C" fn ssh_keysign(
                 0 as *const libc::c_char,
                 b"libc::waitpid %ld: %s\0" as *const u8 as *const libc::c_char,
                 pid as libc::c_long,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             current_block = 8198075662177925590;
             break;

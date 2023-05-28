@@ -135,7 +135,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn OpenSSL_version(type_0: libc::c_int) -> *const libc::c_char;
     fn RAND_bytes(buf: *mut libc::c_uchar, num: libc::c_int) -> libc::c_int;
@@ -1336,7 +1336,7 @@ unsafe extern "C" fn sighup_restart() {
         0 as *const libc::c_char,
         b"RESTART FAILED: av[0]='%.100s', error: %.100s.\0" as *const u8 as *const libc::c_char,
         *saved_argv.offset(0 as libc::c_int as isize),
-        strerror(*libc::__errno_location()),
+        libc::strerror(*libc::__errno_location()),
     );
     libc::exit(1 as libc::c_int);
 }
@@ -1476,7 +1476,7 @@ unsafe extern "C" fn privsep_preauth_child() {
                 0 as *const libc::c_char,
                 b"chroot(\"%s\"): %s\0" as *const u8 as *const libc::c_char,
                 b"/var/empty\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if chdir(b"/\0" as *const u8 as *const libc::c_char) == -(1 as libc::c_int) {
@@ -1491,7 +1491,7 @@ unsafe extern "C" fn privsep_preauth_child() {
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"chdir(\"/\"): %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         crate::log::sshlog(
@@ -1519,7 +1519,7 @@ unsafe extern "C" fn privsep_preauth_child() {
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"setgroups: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         permanently_set_uid(privsep_pw);
@@ -1596,7 +1596,7 @@ unsafe extern "C" fn privsep_preauth(mut ssh: *mut ssh) -> libc::c_int {
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"libc::waitpid: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         privsep_is_preauth = 0 as libc::c_int;
@@ -2620,7 +2620,7 @@ unsafe extern "C" fn listen_on_addrs(mut la: *mut listenaddr) {
                         SYSLOG_LEVEL_VERBOSE,
                         0 as *const libc::c_char,
                         b"socket: %.100s\0" as *const u8 as *const libc::c_char,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                 } else if crate::misc::set_nonblock(listen_sock) == -(1 as libc::c_int) {
                     close(listen_sock);
@@ -2638,7 +2638,7 @@ unsafe extern "C" fn listen_on_addrs(mut la: *mut listenaddr) {
                         SYSLOG_LEVEL_VERBOSE,
                         0 as *const libc::c_char,
                         b"socket: CLOEXEC: %s\0" as *const u8 as *const libc::c_char,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                     close(listen_sock);
                 } else {
@@ -2687,7 +2687,7 @@ unsafe extern "C" fn listen_on_addrs(mut la: *mut listenaddr) {
                                     as *const libc::c_char,
                                 strport.as_mut_ptr(),
                                 ntop.as_mut_ptr(),
-                                strerror(*libc::__errno_location()),
+                                libc::strerror(*libc::__errno_location()),
                             );
                             close(listen_sock);
                         } else {
@@ -2709,7 +2709,7 @@ unsafe extern "C" fn listen_on_addrs(mut la: *mut listenaddr) {
                                         as *const libc::c_char,
                                     ntop.as_mut_ptr(),
                                     strport.as_mut_ptr(),
-                                    strerror(*libc::__errno_location()),
+                                    libc::strerror(*libc::__errno_location()),
                                 );
                             }
                             crate::log::sshlog(
@@ -2934,7 +2934,7 @@ unsafe extern "C" fn server_accept_loop(
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"ppoll: %.100s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             if *libc::__errno_location() == 22 as libc::c_int {
                 cleanup_exit(1 as libc::c_int);
@@ -2986,7 +2986,7 @@ unsafe extern "C" fn server_accept_loop(
                                                 as *const libc::c_char,
                                             i,
                                             *startup_pipes.offset(i as isize),
-                                            strerror(*libc::__errno_location()),
+                                            libc::strerror(*libc::__errno_location()),
                                         );
                                     }
                                     current_block_70 = 9703427005353754552;
@@ -3044,7 +3044,7 @@ unsafe extern "C" fn server_accept_loop(
                                                 as *const libc::c_char,
                                             i,
                                             *startup_pipes.offset(i as isize),
-                                            strerror(*libc::__errno_location()),
+                                            libc::strerror(*libc::__errno_location()),
                                         );
                                     }
                                     current_block_70 = 9703427005353754552;
@@ -3102,7 +3102,7 @@ unsafe extern "C" fn server_accept_loop(
                                                 as *const libc::c_char,
                                             i,
                                             *startup_pipes.offset(i as isize),
-                                            strerror(*libc::__errno_location()),
+                                            libc::strerror(*libc::__errno_location()),
                                         );
                                     }
                                     current_block_70 = 9703427005353754552;
@@ -3167,7 +3167,7 @@ unsafe extern "C" fn server_accept_loop(
                             SYSLOG_LEVEL_ERROR,
                             0 as *const libc::c_char,
                             b"accept: %.100s\0" as *const u8 as *const libc::c_char,
-                            strerror(*libc::__errno_location()),
+                            libc::strerror(*libc::__errno_location()),
                         );
                     }
                     if *libc::__errno_location() == 24 as libc::c_int
@@ -3189,7 +3189,7 @@ unsafe extern "C" fn server_accept_loop(
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
                         b"pipe(startup_p): %s\0" as *const u8 as *const libc::c_char,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                     close(*newsock);
                 } else if drop_connection(*newsock, startups, startup_p[0 as libc::c_int as usize])
@@ -3217,7 +3217,7 @@ unsafe extern "C" fn server_accept_loop(
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
                         b"reexec libc::socketpair: %s\0" as *const u8 as *const libc::c_char,
-                        strerror(*libc::__errno_location()),
+                        libc::strerror(*libc::__errno_location()),
                     );
                     close(*newsock);
                     close(startup_p[0 as libc::c_int as usize]);
@@ -3333,7 +3333,7 @@ unsafe extern "C" fn server_accept_loop(
                             SYSLOG_LEVEL_ERROR,
                             0 as *const libc::c_char,
                             b"libc::fork: %.100s\0" as *const u8 as *const libc::c_char,
-                            strerror(*libc::__errno_location()),
+                            libc::strerror(*libc::__errno_location()),
                         );
                     } else {
                         crate::log::sshlog(
@@ -3710,7 +3710,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"setgroups(): %.200s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     crate::misc::sanitise_stdfd();
@@ -4559,7 +4559,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"setgroups() failed: %.200s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if rexec_flag != 0 {
@@ -4631,7 +4631,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"daemon() failed: %.200s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         disconnect_controlling_tty();
@@ -4651,7 +4651,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"chdir(\"/\"): %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     crate::misc::ssh_signal(
@@ -4694,7 +4694,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     0 as *const libc::c_char,
                     b"Couldn't create pid file \"%s\": %s\0" as *const u8 as *const libc::c_char,
                     options.pid_file,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             } else {
                 libc::fprintf(
@@ -4725,7 +4725,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"setsid: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if rexec_flag != 0 {
@@ -4753,7 +4753,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 SYSLOG_LEVEL_DEBUG3,
                 0 as *const libc::c_char,
                 b"libc::dup2 stdin: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if libc::dup2(0 as libc::c_int, 1 as libc::c_int) == -(1 as libc::c_int) {
@@ -4765,7 +4765,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 SYSLOG_LEVEL_DEBUG3,
                 0 as *const libc::c_char,
                 b"libc::dup2 stdout: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if startup_pipe == -(1 as libc::c_int) {
@@ -4781,7 +4781,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     SYSLOG_LEVEL_DEBUG3,
                     0 as *const libc::c_char,
                     b"libc::dup2 startup_p: %s\0" as *const u8 as *const libc::c_char,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
             close(startup_pipe);
@@ -4800,7 +4800,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 SYSLOG_LEVEL_DEBUG3,
                 0 as *const libc::c_char,
                 b"libc::dup2 config_s: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         close(config_s[1 as libc::c_int as usize]);
@@ -4823,7 +4823,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             0 as *const libc::c_char,
             b"rexec of %s failed: %s\0" as *const u8 as *const libc::c_char,
             *rexec_argv.offset(0 as libc::c_int as isize),
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         recv_rexec_state(2 as libc::c_int + 3 as libc::c_int, 0 as *mut sshbuf);
         log_init(
@@ -4910,7 +4910,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"setsockopt SO_KEEPALIVE: %.100s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     remote_port = ssh_remote_port(ssh);
@@ -5337,7 +5337,7 @@ pub unsafe extern "C" fn cleanup_exit(mut i: libc::c_int) -> ! {
                     0 as *const libc::c_char,
                     b"kill(%d): %s\0" as *const u8 as *const libc::c_char,
                     (*pmonitor).m_pid,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
             }
         }

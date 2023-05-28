@@ -42,7 +42,7 @@ extern "C" {
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
     fn xvasprintf(
@@ -124,7 +124,7 @@ unsafe extern "C" fn ssh_askpass(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"libc::fflush: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if askpass.is_null() {
@@ -147,7 +147,7 @@ unsafe extern "C" fn ssh_askpass(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"pipe: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         return 0 as *mut libc::c_char;
     }
@@ -162,7 +162,7 @@ unsafe extern "C" fn ssh_askpass(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
         crate::misc::ssh_signal(17 as libc::c_int, osigchld);
         return 0 as *mut libc::c_char;
@@ -179,7 +179,7 @@ unsafe extern "C" fn ssh_askpass(
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
                 b"libc::dup2: %s\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
         }
         if !env_hint.is_null() {
@@ -204,7 +204,7 @@ unsafe extern "C" fn ssh_askpass(
             0 as *const libc::c_char,
             b"exec(%s): %s\0" as *const u8 as *const libc::c_char,
             askpass,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     close(p[1 as libc::c_int as usize]);
@@ -353,7 +353,7 @@ pub unsafe extern "C" fn read_passphrase(
                 0 as *const libc::c_char,
                 b"can't open %s: %s\0" as *const u8 as *const libc::c_char,
                 b"/dev/tty\0" as *const u8 as *const libc::c_char,
-                strerror(*libc::__errno_location()),
+                libc::strerror(*libc::__errno_location()),
             );
             use_askpass = 1 as libc::c_int;
         }
@@ -470,7 +470,7 @@ pub unsafe extern "C" fn notify_start(
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"libc::fflush: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if force_askpass == 0 && isatty(2 as libc::c_int) != 0 {
@@ -522,7 +522,7 @@ pub unsafe extern "C" fn notify_start(
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
                     b"libc::fork: %s\0" as *const u8 as *const libc::c_char,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
                 crate::misc::ssh_signal(17 as libc::c_int, osigchld);
                 libc::free(prompt as *mut libc::c_void);
@@ -567,7 +567,7 @@ pub unsafe extern "C" fn notify_start(
                     0 as *const libc::c_char,
                     b"exec(%s): %s\0" as *const u8 as *const libc::c_char,
                     askpass,
-                    strerror(*libc::__errno_location()),
+                    libc::strerror(*libc::__errno_location()),
                 );
                 libc::_exit(1 as libc::c_int);
             }
@@ -641,7 +641,7 @@ pub unsafe extern "C" fn notify_complete(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"libc::waitpid: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     crate::misc::ssh_signal(17 as libc::c_int, (*ctx).osigchld);

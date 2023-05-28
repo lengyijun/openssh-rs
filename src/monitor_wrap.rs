@@ -23,7 +23,6 @@ extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strerror(_: libc::c_int) -> *mut libc::c_char;
 
     fn dh_new_group(_: *mut BIGNUM, _: *mut BIGNUM) -> *mut DH;
     fn sshbuf_new() -> *mut sshbuf;
@@ -762,7 +761,7 @@ pub unsafe extern "C" fn mm_log_handler(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     sshbuf_free(log_msg);
@@ -831,7 +830,7 @@ pub unsafe extern "C" fn mm_request_send(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     if atomicio(
@@ -855,7 +854,7 @@ pub unsafe extern "C" fn mm_request_send(
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"write: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
 }
@@ -893,7 +892,7 @@ pub unsafe extern "C" fn mm_request_receive(mut sock: libc::c_int, mut m: *mut s
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"read: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     msg_len = (*(buf.as_mut_ptr() as *const u_char).offset(0 as libc::c_int as isize) as u_int32_t)
@@ -946,7 +945,7 @@ pub unsafe extern "C" fn mm_request_receive(mut sock: libc::c_int, mut m: *mut s
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"read: %s\0" as *const u8 as *const libc::c_char,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
 }
@@ -2739,7 +2738,7 @@ pub unsafe extern "C" fn mm_session_pty_cleanup2(mut s: *mut Session) {
             0 as *const libc::c_char,
             b"close(s->ptymaster/%d): %s\0" as *const u8 as *const libc::c_char,
             (*s).ptymaster,
-            strerror(*libc::__errno_location()),
+            libc::strerror(*libc::__errno_location()),
         );
     }
     (*s).ttyfd = -(1 as libc::c_int);
