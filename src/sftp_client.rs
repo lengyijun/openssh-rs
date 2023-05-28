@@ -101,7 +101,7 @@ extern "C" {
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
     fn put_u32(_: *mut libc::c_void, _: u_int32_t);
 
-    fn bandwidth_limit(_: *mut crate::misc::bwlimit, _: size_t);
+    
     fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn attrib_clear(_: *mut Attrib);
     fn stat_to_attrib(_: *const libc::stat, _: *mut Attrib);
@@ -296,7 +296,7 @@ unsafe extern "C" fn sftpio(mut _bwlimit: *mut libc::c_void, mut amount: size_t)
     let mut bwlimit: *mut crate::misc::bwlimit = _bwlimit as *mut crate::misc::bwlimit;
     refresh_progress_meter(0 as libc::c_int);
     if !bwlimit.is_null() {
-        bandwidth_limit(bwlimit, amount);
+        crate::misc::bandwidth_limit(bwlimit, amount);
     }
     return 0 as libc::c_int;
 }

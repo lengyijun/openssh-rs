@@ -111,7 +111,7 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn bandwidth_limit(_: *mut crate::misc::bwlimit, _: size_t);
+    
     fn ssh_signal(_: libc::c_int, _: sshsig_t) -> sshsig_t;
     fn start_progress_meter(_: *const libc::c_char, _: off_t, _: *mut off_t);
     fn refresh_progress_meter(_: libc::c_int);
@@ -1152,7 +1152,7 @@ unsafe extern "C" fn scpio(mut _cnt: *mut libc::c_void, mut s: size_t) -> libc::
     *cnt = (*cnt as libc::c_ulong).wrapping_add(s) as off_t as off_t;
     refresh_progress_meter(0 as libc::c_int);
     if limit_kbps > 0 as libc::c_int as libc::c_longlong {
-        bandwidth_limit(&mut bwlimit, s);
+        crate::misc::bandwidth_limit(&mut bwlimit, s);
     }
     return 0 as libc::c_int;
 }
