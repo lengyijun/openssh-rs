@@ -89,7 +89,7 @@ extern "C" {
         _: *const libc::c_char,
         _: libc::c_int,
     ) -> libc::c_int;
-    
+
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_equal(_: *const sshkey, _: *const sshkey) -> libc::c_int;
     fn sshkey_fingerprint(_: *const sshkey, _: libc::c_int, _: sshkey_fp_rep) -> *mut libc::c_char;

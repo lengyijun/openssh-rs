@@ -191,7 +191,7 @@ extern "C" {
     fn ask_permission(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn notify_start(_: libc::c_int, _: *const libc::c_char, _: ...) -> *mut notifier_ctx;
     fn notify_complete(_: *mut notifier_ctx, _: *const libc::c_char, _: ...);
-    
+
     fn ssh_digest_alg_by_name(name: *const libc::c_char) -> libc::c_int;
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn match_pattern_list(

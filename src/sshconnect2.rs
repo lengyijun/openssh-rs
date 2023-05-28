@@ -223,7 +223,7 @@ extern "C" {
     fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn notify_start(_: libc::c_int, _: *const libc::c_char, _: ...) -> *mut notifier_ctx;
     fn notify_complete(_: *mut notifier_ctx, _: *const libc::c_char, _: ...);
-    
+
     fn kex_default_pk_alg() -> *const libc::c_char;
     fn match_pattern_list(
         _: *const libc::c_char,

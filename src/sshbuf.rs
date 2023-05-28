@@ -8,7 +8,7 @@ extern "C" {
     fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
         -> *mut libc::c_void;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;

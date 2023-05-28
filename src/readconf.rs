@@ -145,7 +145,7 @@ extern "C" {
         lp: *mut u_int,
         s: *const libc::c_char,
     );
-    
+
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn match_pattern_list(
         _: *const libc::c_char,

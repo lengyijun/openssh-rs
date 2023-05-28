@@ -213,7 +213,7 @@ extern "C" {
     ) -> libc::c_int;
     fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn ask_permission(_: *const libc::c_char, _: ...) -> libc::c_int;
-    
+
     fn verify_host_key_dns(
         _: *const libc::c_char,
         _: *mut sockaddr,

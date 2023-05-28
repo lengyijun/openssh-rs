@@ -235,7 +235,7 @@ extern "C" {
     fn sock_set_v6only(_: libc::c_int);
     fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
     fn ssh_gai_strerror(_: libc::c_int) -> *const libc::c_char;
-    
+
     fn match_pattern_list(
         _: *const libc::c_char,
         _: *const libc::c_char,

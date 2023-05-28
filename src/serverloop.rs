@@ -114,7 +114,7 @@ extern "C" {
     fn ptimeout_deadline_ms(pt: *mut libc::timespec, ms: libc::c_long);
     fn ptimeout_deadline_monotime(pt: *mut libc::timespec, when: time_t);
     fn ptimeout_get_tsp(pt: *mut libc::timespec) -> *mut libc::timespec;
-    
+
     fn channel_lookup(_: *mut ssh, _: libc::c_int) -> *mut Channel;
     fn channel_new(
         _: *mut ssh,

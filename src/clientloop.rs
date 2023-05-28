@@ -280,7 +280,7 @@ extern "C" {
     fn ptimeout_deadline_monotime(pt: *mut libc::timespec, when: time_t);
     fn ptimeout_get_ms(pt: *mut libc::timespec) -> libc::c_int;
     fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
-    
+
     fn parse_forward(
         _: *mut Forward,
         _: *const libc::c_char,

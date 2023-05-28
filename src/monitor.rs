@@ -225,7 +225,7 @@ extern "C" {
     ) -> !;
     fn sshlogdirect(_: LogLevel, _: libc::c_int, _: *const libc::c_char, _: ...);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    
+
     fn mm_request_send(_: libc::c_int, _: monitor_reqtype, _: *mut sshbuf);
     fn mm_request_receive(_: libc::c_int, _: *mut sshbuf);
     fn mm_request_receive_expect(_: libc::c_int, _: monitor_reqtype, _: *mut sshbuf);

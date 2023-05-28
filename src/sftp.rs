@@ -128,7 +128,7 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_int;
     fn argv_free(_: *mut *mut libc::c_char, _: libc::c_int);
-    
+
     fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
 
     fn attrib_clear(_: *mut Attrib);

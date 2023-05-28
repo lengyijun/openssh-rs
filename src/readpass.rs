@@ -51,7 +51,7 @@ extern "C" {
         _: ::core::ffi::VaList,
     ) -> libc::c_int;
     fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
-    
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,

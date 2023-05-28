@@ -92,9 +92,7 @@ extern "C" {
         cb: Option<unsafe extern "C" fn(*mut libc::c_void, size_t) -> libc::c_int>,
         _: *mut libc::c_void,
     ) -> size_t;
-    
-    
-    
+
     fn path_absolute(_: *const libc::c_char) -> libc::c_int;
     fn put_u32(_: *mut libc::c_void, _: u_int32_t);
 

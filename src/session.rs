@@ -245,7 +245,7 @@ extern "C" {
         name: *const libc::c_char,
         value: *const libc::c_char,
     );
-    
+
     fn record_login(
         _: pid_t,
         _: *const libc::c_char,

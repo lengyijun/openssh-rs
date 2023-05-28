@@ -73,7 +73,7 @@ extern "C" {
         nenvs: size_t,
     ) -> *const libc::c_char;
     fn ask_permission(_: *const libc::c_char, _: ...) -> libc::c_int;
-    
+
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn sshbuf_get_string_direct(
         buf: *mut sshbuf,

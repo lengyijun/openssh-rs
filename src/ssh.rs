@@ -259,7 +259,7 @@ extern "C" {
         envs: *const *mut libc::c_char,
         nenvs: size_t,
     ) -> *const libc::c_char;
-    
+
     fn ssh_connection_hash(
         thishost: *const libc::c_char,
         host_0: *const libc::c_char,

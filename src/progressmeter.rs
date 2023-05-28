@@ -17,7 +17,7 @@ extern "C" {
         _: ...
     );
     fn monotime_double() -> libc::c_double;
-    
+
     fn asmprintf(
         _: *mut *mut libc::c_char,
         _: size_t,

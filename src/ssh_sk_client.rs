@@ -54,7 +54,7 @@ extern "C" {
     fn sshkey_private_deserialize(buf: *mut sshbuf, keyp: *mut *mut sshkey) -> libc::c_int;
     fn ssh_msg_send(_: libc::c_int, _: u_char, _: *mut sshbuf) -> libc::c_int;
     fn ssh_msg_recv(_: libc::c_int, _: *mut sshbuf) -> libc::c_int;
-    
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;

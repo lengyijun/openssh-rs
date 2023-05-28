@@ -96,11 +96,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    
-    
-    
-    
-
     static mut __progname: *mut libc::c_char;
     fn remote_glob(
         _: *mut sftp_conn,
@@ -3912,7 +3907,11 @@ pub unsafe extern "C" fn sink(
                                             wrerr = 0 as libc::c_int;
                                             statbytes = 0 as libc::c_int as off_t;
                                             if showprogress != 0 {
-                                                crate::progressmeter::start_progress_meter(curfile, size, &mut statbytes);
+                                                crate::progressmeter::start_progress_meter(
+                                                    curfile,
+                                                    size,
+                                                    &mut statbytes,
+                                                );
                                             }
                                             crate::misc::set_nonblock(remin);
                                             i = 0 as libc::c_int as off_t;
