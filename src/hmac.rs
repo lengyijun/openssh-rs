@@ -1,7 +1,7 @@
+use crate::digest_openssl::ssh_digest_ctx;
 use ::libc;
 extern "C" {
 
-    pub type ssh_digest_ctx;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 

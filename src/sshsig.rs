@@ -1,10 +1,9 @@
+use crate::digest_openssl::ssh_digest_ctx;
 use ::libc;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-
-    pub type ssh_digest_ctx;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn freezero(_: *mut libc::c_void, _: size_t);

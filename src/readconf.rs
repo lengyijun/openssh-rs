@@ -1,3 +1,4 @@
+use crate::digest_openssl::ssh_digest_ctx;
 use crate::misc::parse_uri;
 use ::libc;
 use libc::kill;
@@ -7,7 +8,6 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
 
-    pub type ssh_digest_ctx;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
     fn vis(

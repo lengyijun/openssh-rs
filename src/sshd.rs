@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::digest_openssl::ssh_digest_ctx;
 use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
 use crate::packet::session_state;
@@ -28,7 +29,6 @@ extern "C" {
     pub type ec_group_st;
     pub type dh_st;
 
-    pub type ssh_digest_ctx;
     pub type ssh_sandbox;
     static mut stderr: *mut libc::FILE;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
