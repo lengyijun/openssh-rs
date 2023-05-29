@@ -166,7 +166,7 @@ extern "C" {
         _: *const libc::c_char,
     ) -> libc::c_int;
     fn auth_activate_options(_: *mut ssh, _: *mut sshauthopt) -> libc::c_int;
-    fn fakepw() -> *mut libc::passwd;
+
     fn kexgex_server(_: *mut ssh) -> libc::c_int;
     fn kex_gen_server(_: *mut ssh) -> libc::c_int;
     fn choose_dh(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> *mut DH;
@@ -1908,10 +1908,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 ssh_err(r),
-                b"assemble fakepw\0" as *const u8 as *const libc::c_char,
+                b"assemble crate::auth::fakepw\0" as *const u8 as *const libc::c_char,
             );
         }
-        (*authctxt).pw = fakepw();
+        (*authctxt).pw = crate::auth::fakepw();
     } else {
         allowed = 1 as libc::c_int;
         (*authctxt).pw = pwent;

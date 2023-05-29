@@ -42,7 +42,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn fakepw() -> *mut libc::passwd;
     static mut use_privsep: libc::c_int;
 
     static mut options: ServerOptions;
@@ -774,7 +773,7 @@ unsafe extern "C" fn input_userauth_request(
                 );
             } else {
                 (*authctxt).valid = 0 as libc::c_int;
-                (*authctxt).pw = fakepw();
+                (*authctxt).pw = crate::auth::fakepw();
             }
             crate::packet::ssh_packet_set_log_preamble(
                 ssh,
