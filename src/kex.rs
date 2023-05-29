@@ -112,11 +112,7 @@ extern "C" {
         v: *const libc::c_void,
         len: size_t,
     ) -> libc::c_int;
-    fn sshbuf_putf(
-        buf: *mut crate::sshbuf::sshbuf,
-        fmt: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
@@ -2790,7 +2786,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
     if !version_addendum.is_null() && *version_addendum as libc::c_int == '\0' as i32 {
         version_addendum = 0 as *const libc::c_char;
     }
-    r = sshbuf_putf(
+    r = crate::sshbuf_getput_basic::sshbuf_putf(
         our_version,
         b"SSH-%d.%d-%.100s%s%s\r\n\0" as *const u8 as *const libc::c_char,
         2 as libc::c_int,
@@ -2819,7 +2815,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             ssh_err(r),
-            b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8 as *const libc::c_char,
         );
     } else if atomicio(
         ::core::mem::transmute::<

@@ -123,11 +123,7 @@ extern "C" {
         v: *const libc::c_void,
         len: size_t,
     ) -> libc::c_int;
-    fn sshbuf_putf(
-        buf: *mut crate::sshbuf::sshbuf,
-        fmt: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
@@ -1088,7 +1084,7 @@ unsafe extern "C" fn quit_message(mut fmt: *const libc::c_char, mut args: ...) {
     let mut r: libc::c_int = 0;
     args_0 = args.clone();
     xvasprintf(&mut msg, fmt, args_0.as_va_list());
-    r = sshbuf_putf(
+    r = crate::sshbuf_getput_basic::sshbuf_putf(
         stderr_buffer,
         b"%s\r\n\0" as *const u8 as *const libc::c_char,
         msg,
@@ -1101,7 +1097,7 @@ unsafe extern "C" fn quit_message(mut fmt: *const libc::c_char, mut args: ...) {
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             ssh_err(r),
-            b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8 as *const libc::c_char,
         );
     }
     ::core::ptr::write_volatile(&mut quit_pending as *mut sig_atomic_t, 1 as libc::c_int);
@@ -2619,7 +2615,7 @@ unsafe extern "C" fn print_escape_help(
     let mut i: libc::c_uint = 0;
     let mut suppress_flags: libc::c_uint = 0;
     let mut r: libc::c_int = 0;
-    r = sshbuf_putf(
+    r = crate::sshbuf_getput_basic::sshbuf_putf(
         b,
         b"%c?\r\nSupported escape sequences:\r\n\0" as *const u8 as *const libc::c_char,
         escape_char,
@@ -2633,7 +2629,7 @@ unsafe extern "C" fn print_escape_help(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             ssh_err(r),
-            b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8 as *const libc::c_char,
         );
     }
     suppress_flags = ((if mux_client != 0 {
@@ -2659,7 +2655,7 @@ unsafe extern "C" fn print_escape_help(
             .wrapping_div(::core::mem::size_of::<escape_help_text>() as libc::c_ulong)
     {
         if !(esc_txt[i as usize].flags & suppress_flags != 0) {
-            r = sshbuf_putf(
+            r = crate::sshbuf_getput_basic::sshbuf_putf(
                 b,
                 b" %c%-3s - %s\r\n\0" as *const u8 as *const libc::c_char,
                 escape_char,
@@ -2677,14 +2673,15 @@ unsafe extern "C" fn print_escape_help(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     ssh_err(r),
-                    b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                        as *const libc::c_char,
                 );
             }
         }
         i = i.wrapping_add(1);
         i;
     }
-    r = sshbuf_putf(
+    r = crate::sshbuf_getput_basic::sshbuf_putf(
         b,
         b" %c%c   - send the escape character by typing it twice\r\n(Note that escapes are only recognized immediately after newline.)\r\n\0"
             as *const u8 as *const libc::c_char,
@@ -2700,7 +2697,7 @@ unsafe extern "C" fn print_escape_help(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             ssh_err(r),
-            b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8 as *const libc::c_char,
         );
     }
 }
@@ -2733,7 +2730,7 @@ unsafe extern "C" fn process_escapes(
             (*efc).escape_pending = 0 as libc::c_int;
             match ch as libc::c_int {
                 46 => {
-                    r = sshbuf_putf(
+                    r = crate::sshbuf_getput_basic::sshbuf_putf(
                         berr,
                         b"%c.\r\n\0" as *const u8 as *const libc::c_char,
                         (*efc).escape_char,
@@ -2749,7 +2746,8 @@ unsafe extern "C" fn process_escapes(
                             1 as libc::c_int,
                             SYSLOG_LEVEL_FATAL,
                             ssh_err(r),
-                            b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                            b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                                as *const libc::c_char,
                         );
                     }
                     if !c.is_null() && (*c).ctl_chan != -(1 as libc::c_int) {
@@ -2768,7 +2766,7 @@ unsafe extern "C" fn process_escapes(
                         b = [0; 16];
                         current_block = 12169762034934395020;
                     } else {
-                        r = sshbuf_putf(
+                        r = crate::sshbuf_getput_basic::sshbuf_putf(
                             berr,
                             b"%c^Z [suspend ssh]\r\n\0" as *const u8 as *const libc::c_char,
                             (*efc).escape_char,
@@ -2784,7 +2782,8 @@ unsafe extern "C" fn process_escapes(
                                 1 as libc::c_int,
                                 SYSLOG_LEVEL_FATAL,
                                 ssh_err(r),
-                                b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                                b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                                    as *const libc::c_char,
                             );
                         }
                         client_suspend_self(bin, bout, berr);
@@ -2792,7 +2791,7 @@ unsafe extern "C" fn process_escapes(
                     }
                 }
                 66 => {
-                    r = sshbuf_putf(
+                    r = crate::sshbuf_getput_basic::sshbuf_putf(
                         berr,
                         b"%cB\r\n\0" as *const u8 as *const libc::c_char,
                         (*efc).escape_char,
@@ -2808,7 +2807,8 @@ unsafe extern "C" fn process_escapes(
                             1 as libc::c_int,
                             SYSLOG_LEVEL_FATAL,
                             ssh_err(r),
-                            b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                            b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                                as *const libc::c_char,
                         );
                     }
                     channel_request_start(
@@ -2862,7 +2862,7 @@ unsafe extern "C" fn process_escapes(
                         current_block = 12169762034934395020;
                     } else {
                         if log_is_on_stderr() == 0 {
-                            r = sshbuf_putf(
+                            r = crate::sshbuf_getput_basic::sshbuf_putf(
                                 berr,
                                 b"%c%c [Logging to syslog]\r\n\0" as *const u8
                                     as *const libc::c_char,
@@ -2880,7 +2880,8 @@ unsafe extern "C" fn process_escapes(
                                     1 as libc::c_int,
                                     SYSLOG_LEVEL_FATAL,
                                     ssh_err(r),
-                                    b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                                    b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                                        as *const libc::c_char,
                                 );
                             }
                         } else {
@@ -2898,7 +2899,7 @@ unsafe extern "C" fn process_escapes(
                                 options.log_level += 1;
                                 log_change_level(options.log_level);
                             }
-                            r = sshbuf_putf(
+                            r = crate::sshbuf_getput_basic::sshbuf_putf(
                                 berr,
                                 b"%c%c [LogLevel %s]\r\n\0" as *const u8 as *const libc::c_char,
                                 (*efc).escape_char,
@@ -2916,7 +2917,8 @@ unsafe extern "C" fn process_escapes(
                                     1 as libc::c_int,
                                     SYSLOG_LEVEL_FATAL,
                                     ssh_err(r),
-                                    b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                                    b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                                        as *const libc::c_char,
                                 );
                             }
                         }
@@ -2929,7 +2931,7 @@ unsafe extern "C" fn process_escapes(
                     } else {
                         leave_raw_mode((options.request_tty == 3 as libc::c_int) as libc::c_int);
                         channel_stop_listening(ssh);
-                        r = sshbuf_putf(
+                        r = crate::sshbuf_getput_basic::sshbuf_putf(
                             berr,
                             b"%c& [backgrounded]\n\0" as *const u8 as *const libc::c_char,
                             (*efc).escape_char,
@@ -2945,7 +2947,8 @@ unsafe extern "C" fn process_escapes(
                                 1 as libc::c_int,
                                 SYSLOG_LEVEL_FATAL,
                                 ssh_err(r),
-                                b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                                b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                                    as *const libc::c_char,
                             );
                         }
                         pid = libc::fork();
@@ -2997,7 +3000,7 @@ unsafe extern "C" fn process_escapes(
                     current_block = 820271813250567934;
                 }
                 35 => {
-                    r = sshbuf_putf(
+                    r = crate::sshbuf_getput_basic::sshbuf_putf(
                         berr,
                         b"%c#\r\n\0" as *const u8 as *const libc::c_char,
                         (*efc).escape_char,
@@ -3013,7 +3016,8 @@ unsafe extern "C" fn process_escapes(
                             1 as libc::c_int,
                             SYSLOG_LEVEL_FATAL,
                             ssh_err(r),
-                            b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                            b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                                as *const libc::c_char,
                         );
                     }
                     s = channel_open_message(ssh);
@@ -3040,7 +3044,7 @@ unsafe extern "C" fn process_escapes(
                         current_block = 12169762034934395020;
                     } else {
                         if options.enable_escape_commandline == 0 as libc::c_int {
-                            r = sshbuf_putf(
+                            r = crate::sshbuf_getput_basic::sshbuf_putf(
                                 berr,
                                 b"commandline disabled\r\n\0" as *const u8 as *const libc::c_char,
                             );
@@ -3055,7 +3059,8 @@ unsafe extern "C" fn process_escapes(
                                     1 as libc::c_int,
                                     SYSLOG_LEVEL_FATAL,
                                     ssh_err(r),
-                                    b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                                    b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                                        as *const libc::c_char,
                                 );
                             }
                         } else {
@@ -3105,7 +3110,7 @@ unsafe extern "C" fn process_escapes(
                             ch as libc::c_int,
                         );
                     }
-                    r = sshbuf_putf(
+                    r = crate::sshbuf_getput_basic::sshbuf_putf(
                         berr,
                         b"%c%s escape not available to multiplexed sessions\r\n\0" as *const u8
                             as *const libc::c_char,
@@ -3123,7 +3128,8 @@ unsafe extern "C" fn process_escapes(
                             1 as libc::c_int,
                             SYSLOG_LEVEL_FATAL,
                             ssh_err(r),
-                            b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                            b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                                as *const libc::c_char,
                         );
                     }
                     current_block = 820271813250567934;

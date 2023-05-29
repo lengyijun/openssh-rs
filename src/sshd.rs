@@ -200,11 +200,7 @@ extern "C" {
         v: *const libc::c_void,
         len: size_t,
     ) -> libc::c_int;
-    fn sshbuf_putf(
-        buf: *mut crate::sshbuf::sshbuf,
-        fmt: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_get_string(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1741,7 +1737,7 @@ unsafe extern "C" fn append_hostkey_type(
         );
         return;
     }
-    r = sshbuf_putf(
+    r = crate::sshbuf_getput_basic::sshbuf_putf(
         b,
         b"%s%s\0" as *const u8 as *const libc::c_char,
         if sshbuf_len(b) > 0 as libc::c_int as libc::c_ulong {
@@ -1760,7 +1756,7 @@ unsafe extern "C" fn append_hostkey_type(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             ssh_err(r),
-            b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8 as *const libc::c_char,
         );
     }
 }

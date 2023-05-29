@@ -79,11 +79,7 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_putf(
-        buf: *mut crate::sshbuf::sshbuf,
-        fmt: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
     fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
 }
@@ -843,7 +839,7 @@ pub unsafe extern "C" fn _ssh_send_banner(
 ) -> libc::c_int {
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
-    r = sshbuf_putf(
+    r = crate::sshbuf_getput_basic::sshbuf_putf(
         banner,
         b"SSH-2.0-%.100s\r\n\0" as *const u8 as *const libc::c_char,
         b"OpenSSH_9.3\0" as *const u8 as *const libc::c_char,

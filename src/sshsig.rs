@@ -97,11 +97,7 @@ extern "C" {
     fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_putf(
-        buf: *mut crate::sshbuf::sshbuf,
-        fmt: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -341,7 +337,7 @@ pub unsafe extern "C" fn sshsig_armor(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 ssh_err(r),
-                b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8 as *const libc::c_char,
             );
         } else {
             r = sshbuf_dtob64(blob, buf, 1 as libc::c_int);
@@ -2156,7 +2152,7 @@ unsafe extern "C" fn cert_filter_principals(
                 i = 0 as libc::c_int as u_int;
                 while i < (*(*cert).cert).nprincipals {
                     if match_pattern(*((*(*cert).cert).principals).offset(i as isize), cp) != 0 {
-                        r = sshbuf_putf(
+                        r = crate::sshbuf_getput_basic::sshbuf_putf(
                             nprincipals,
                             b"%s%s\0" as *const u8 as *const libc::c_char,
                             if sshbuf_len(nprincipals) != 0 as libc::c_int as libc::c_ulong {

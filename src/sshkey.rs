@@ -205,11 +205,7 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_putf(
-        buf: *mut crate::sshbuf::sshbuf,
-        fmt: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn sshbuf_get_u64(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int64_t) -> libc::c_int;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
@@ -1996,7 +1992,7 @@ pub unsafe extern "C" fn sshkey_format_text(
     let mut uu: *mut libc::c_char = 0 as *mut libc::c_char;
     r = sshkey_to_base64(key, &mut uu);
     if !(r != 0 as libc::c_int) {
-        r = sshbuf_putf(
+        r = crate::sshbuf_getput_basic::sshbuf_putf(
             b,
             b"%s %s\0" as *const u8 as *const libc::c_char,
             sshkey_ssh_name(key),

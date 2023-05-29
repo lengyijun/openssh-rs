@@ -100,11 +100,7 @@ extern "C" {
         v: *const libc::c_void,
         len: size_t,
     ) -> libc::c_int;
-    fn sshbuf_putf(
-        buf: *mut crate::sshbuf::sshbuf,
-        fmt: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn channel_init_channels(ssh: *mut ssh);
     fn channel_new(
         _: *mut ssh,
@@ -2898,7 +2894,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     } else {
         i = 0 as libc::c_int;
         while i < ac {
-            r = sshbuf_putf(
+            r = crate::sshbuf_getput_basic::sshbuf_putf(
                 command,
                 b"%s%s\0" as *const u8 as *const libc::c_char,
                 if i != 0 {

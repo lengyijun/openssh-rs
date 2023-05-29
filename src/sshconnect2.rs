@@ -66,11 +66,7 @@ extern "C" {
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_putf(
-        buf: *mut crate::sshbuf::sshbuf,
-        fmt: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_connection_is_on_socket(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_remaining(_: *mut ssh) -> libc::c_int;
@@ -4893,7 +4889,7 @@ unsafe extern "C" fn authmethods_get() -> *mut libc::c_char {
     method = authmethods.as_mut_ptr();
     while !((*method).name).is_null() {
         if authmethod_is_enabled(method) != 0 {
-            r = sshbuf_putf(
+            r = crate::sshbuf_getput_basic::sshbuf_putf(
                 b,
                 b"%s%s\0" as *const u8 as *const libc::c_char,
                 if sshbuf_len(b) != 0 {

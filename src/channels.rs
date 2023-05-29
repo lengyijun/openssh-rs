@@ -119,11 +119,7 @@ extern "C" {
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_putf(
-        buf: *mut crate::sshbuf::sshbuf,
-        fmt: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
     fn sshbuf_put(
@@ -1816,7 +1812,7 @@ pub unsafe extern "C" fn channel_open_message(mut ssh: *mut ssh) -> *mut libc::c
             b"crate::crate::sshbuf::sshbuf::sshbuf_new\0" as *const u8 as *const libc::c_char,
         );
     }
-    r = sshbuf_putf(
+    r = crate::sshbuf_getput_basic::sshbuf_putf(
         buf,
         b"The following connections are open:\r\n\0" as *const u8 as *const libc::c_char,
     );
@@ -1829,7 +1825,7 @@ pub unsafe extern "C" fn channel_open_message(mut ssh: *mut ssh) -> *mut libc::c
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             ssh_err(r),
-            b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8 as *const libc::c_char,
         );
     }
     let mut current_block_12: u64;
@@ -1859,7 +1855,7 @@ pub unsafe extern "C" fn channel_open_message(mut ssh: *mut ssh) -> *mut libc::c
                         }
                         _ => {
                             cp = channel_format_status(c);
-                            r = sshbuf_putf(
+                            r = crate::sshbuf_getput_basic::sshbuf_putf(
                                 buf,
                                 b"  #%d %.300s (%s)\r\n\0" as *const u8 as *const libc::c_char,
                                 (*c).self_0,
@@ -1878,7 +1874,8 @@ pub unsafe extern "C" fn channel_open_message(mut ssh: *mut ssh) -> *mut libc::c
                                     1 as libc::c_int,
                                     SYSLOG_LEVEL_FATAL,
                                     ssh_err(r),
-                                    b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                                    b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                                        as *const libc::c_char,
                                 );
                             }
                             libc::free(cp as *mut libc::c_void);
@@ -1905,7 +1902,7 @@ pub unsafe extern "C" fn channel_open_message(mut ssh: *mut ssh) -> *mut libc::c
                         }
                         _ => {
                             cp = channel_format_status(c);
-                            r = sshbuf_putf(
+                            r = crate::sshbuf_getput_basic::sshbuf_putf(
                                 buf,
                                 b"  #%d %.300s (%s)\r\n\0" as *const u8 as *const libc::c_char,
                                 (*c).self_0,
@@ -1924,7 +1921,8 @@ pub unsafe extern "C" fn channel_open_message(mut ssh: *mut ssh) -> *mut libc::c
                                     1 as libc::c_int,
                                     SYSLOG_LEVEL_FATAL,
                                     ssh_err(r),
-                                    b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                                    b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8
+                                        as *const libc::c_char,
                                 );
                             }
                             libc::free(cp as *mut libc::c_void);

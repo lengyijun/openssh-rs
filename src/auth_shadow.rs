@@ -4,11 +4,7 @@ extern "C" {
     pub type sshkey;
     fn getspnam(__name: *const libc::c_char) -> *mut spwd;
     fn time(__timer: *mut time_t) -> time_t;
-    fn sshbuf_putf(
-        buf: *mut crate::sshbuf::sshbuf,
-        fmt: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn sshfatal(
@@ -147,7 +143,7 @@ pub unsafe extern "C" fn auth_shadow_acctexpired(mut spw: *mut spwd) -> libc::c_
             b"account will expire in %lld days\0" as *const u8 as *const libc::c_char,
             daysleft,
         );
-        r = sshbuf_putf(
+        r = crate::sshbuf_getput_basic::sshbuf_putf(
             loginmsg,
             b"Your account will expire in %lld day%s.\n\0" as *const u8 as *const libc::c_char,
             daysleft,
@@ -280,7 +276,7 @@ pub unsafe extern "C" fn auth_shadow_pwexpired(mut ctxt: *mut Authctxt) -> libc:
             b"password will expire in %d days\0" as *const u8 as *const libc::c_char,
             daysleft,
         );
-        r = sshbuf_putf(
+        r = crate::sshbuf_getput_basic::sshbuf_putf(
             loginmsg,
             b"Your password will expire in %d day%s.\n\0" as *const u8 as *const libc::c_char,
             daysleft,

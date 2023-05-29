@@ -27,11 +27,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn sshbuf_putf(
-        buf: *mut crate::sshbuf::sshbuf,
-        fmt: *const libc::c_char,
-        _: ...
-    ) -> libc::c_int;
+
     static mut loginmsg: *mut crate::sshbuf::sshbuf;
     static mut options: ServerOptions;
 }
@@ -351,13 +347,13 @@ unsafe extern "C" fn store_lastlog_message(mut user: *const libc::c_char, mut ui
             b"\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
-            r = sshbuf_putf(
+            r = crate::sshbuf_getput_basic::sshbuf_putf(
                 loginmsg,
                 b"Last login: %s\r\n\0" as *const u8 as *const libc::c_char,
                 time_string,
             );
         } else {
-            r = sshbuf_putf(
+            r = crate::sshbuf_getput_basic::sshbuf_putf(
                 loginmsg,
                 b"Last login: %s from %s\r\n\0" as *const u8 as *const libc::c_char,
                 time_string,
@@ -375,7 +371,7 @@ unsafe extern "C" fn store_lastlog_message(mut user: *const libc::c_char, mut ui
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 ssh_err(r),
-                b"sshbuf_putf\0" as *const u8 as *const libc::c_char,
+                b"crate::sshbuf_getput_basic::sshbuf_putf\0" as *const u8 as *const libc::c_char,
             );
         }
     }
