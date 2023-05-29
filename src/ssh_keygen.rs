@@ -286,7 +286,7 @@ extern "C" {
         wrap: libc::c_int,
     ) -> *mut libc::c_char;
     fn sshbuf_b64tod(buf: *mut crate::sshbuf::sshbuf, b64: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
+    
     fn sshbuf_load_file(_: *const libc::c_char, _: *mut *mut crate::sshbuf::sshbuf) -> libc::c_int;
     fn sshbuf_write_file(path: *const libc::c_char, buf: *mut crate::sshbuf::sshbuf)
         -> libc::c_int;
@@ -6681,7 +6681,7 @@ unsafe extern "C" fn sign_one(
                 b"sshsig_armor\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            asig = sshbuf_dup_string(abuf);
+            asig = crate::sshbuf_misc::sshbuf_dup_string(abuf);
             if asig.is_null() {
                 crate::log::sshlog(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,

@@ -49,7 +49,7 @@ extern "C" {
         errstrp: *mut *const libc::c_char,
     ) -> *mut libc::c_char;
     fn opt_match(opts: *mut *const libc::c_char, term: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
+    
     fn sshbuf_find(
         b: *const crate::sshbuf::sshbuf,
         start_offset: size_t,
@@ -486,7 +486,7 @@ pub unsafe extern "C" fn sshsig_dearmor(
                         b"consume\0" as *const u8 as *const libc::c_char,
                     );
                 } else {
-                    b64 = sshbuf_dup_string(sbuf);
+                    b64 = crate::sshbuf_misc::sshbuf_dup_string(sbuf);
                     if b64.is_null() {
                         crate::log::sshlog(
                             b"sshsig.c\0" as *const u8 as *const libc::c_char,
@@ -498,7 +498,7 @@ pub unsafe extern "C" fn sshsig_dearmor(
                             1 as libc::c_int,
                             SYSLOG_LEVEL_ERROR,
                             0 as *const libc::c_char,
-                            b"sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
+                            b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
                         );
                         r = -(2 as libc::c_int);
                     } else {
@@ -2204,7 +2204,7 @@ unsafe extern "C" fn cert_filter_principals(
                     );
                     r = -(25 as libc::c_int);
                 } else {
-                    principals = sshbuf_dup_string(nprincipals);
+                    principals = crate::sshbuf_misc::sshbuf_dup_string(nprincipals);
                     if principals.is_null() {
                         crate::log::sshlog(
                             b"sshsig.c\0" as *const u8 as *const libc::c_char,

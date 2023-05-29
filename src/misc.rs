@@ -150,7 +150,7 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
+    
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -2467,7 +2467,7 @@ unsafe extern "C" fn vdollar_percent_expand(
     match current_block {
         13460095289871124136 => {
             if missingvar == 0 && {
-                ret = sshbuf_dup_string(buf);
+                ret = crate::sshbuf_misc::sshbuf_dup_string(buf);
                 ret.is_null()
             } {
                 sshfatal(
@@ -2480,7 +2480,7 @@ unsafe extern "C" fn vdollar_percent_expand(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     0 as *const libc::c_char,
-                    b"sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
                 );
             }
             *parseerror = 0 as libc::c_int;

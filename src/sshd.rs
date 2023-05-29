@@ -221,7 +221,7 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
+    
     fn daemonized() -> libc::c_int;
 
     fn set_reuseaddr(_: libc::c_int) -> libc::c_int;
@@ -1841,7 +1841,7 @@ unsafe extern "C" fn list_hostkey_types() -> *mut libc::c_char {
         i = i.wrapping_add(1);
         i;
     }
-    ret = sshbuf_dup_string(b);
+    ret = crate::sshbuf_misc::sshbuf_dup_string(b);
     if ret.is_null() {
         sshfatal(
             b"sshd.c\0" as *const u8 as *const libc::c_char,
@@ -1851,7 +1851,7 @@ unsafe extern "C" fn list_hostkey_types() -> *mut libc::c_char {
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
         );
     }
     crate::sshbuf::sshbuf_free(b);

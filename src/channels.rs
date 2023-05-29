@@ -89,7 +89,7 @@ extern "C" {
         _: size_t,
         _: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
+    
     fn sshbuf_get_string_direct(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *const u_char,
@@ -1934,7 +1934,7 @@ pub unsafe extern "C" fn channel_open_message(mut ssh: *mut ssh) -> *mut libc::c
         i = i.wrapping_add(1);
         i;
     }
-    ret = sshbuf_dup_string(buf);
+    ret = crate::sshbuf_misc::sshbuf_dup_string(buf);
     if ret.is_null() {
         sshfatal(
             b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -1944,7 +1944,7 @@ pub unsafe extern "C" fn channel_open_message(mut ssh: *mut ssh) -> *mut libc::c
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_dup_string\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_misc::sshbuf_dup_string\0" as *const u8 as *const libc::c_char,
         );
     }
     crate::sshbuf::sshbuf_free(buf);

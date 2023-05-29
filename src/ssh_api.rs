@@ -80,7 +80,7 @@ extern "C" {
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
-    fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
+    
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -777,7 +777,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
     if r != 0 as libc::c_int {
         return r;
     }
-    cp = sshbuf_dup_string(banner);
+    cp = crate::sshbuf_misc::sshbuf_dup_string(banner);
     if cp.is_null() || {
         remote_version =
             calloc(1 as libc::c_int as libc::c_ulong, sshbuf_len(banner)) as *mut libc::c_char;
@@ -857,7 +857,7 @@ pub unsafe extern "C" fn _ssh_send_banner(
     if r != 0 as libc::c_int {
         return r;
     }
-    cp = sshbuf_dup_string(banner);
+    cp = crate::sshbuf_misc::sshbuf_dup_string(banner);
     if cp.is_null() {
         return -(2 as libc::c_int);
     }

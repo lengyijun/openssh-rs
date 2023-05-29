@@ -65,7 +65,7 @@ extern "C" {
 
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
-    fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
+    
     fn monotime_double() -> libc::c_double;
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_equal_public(_: *const sshkey, _: *const sshkey) -> libc::c_int;
@@ -1241,7 +1241,7 @@ unsafe extern "C" fn authmethods_get(mut authctxt: *mut Authctxt) -> *mut libc::
         i += 1;
         i;
     }
-    list = sshbuf_dup_string(b);
+    list = crate::sshbuf_misc::sshbuf_dup_string(b);
     if list.is_null() {
         sshfatal(
             b"auth2.c\0" as *const u8 as *const libc::c_char,
@@ -1251,7 +1251,7 @@ unsafe extern "C" fn authmethods_get(mut authctxt: *mut Authctxt) -> *mut libc::
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
         );
     }
     crate::sshbuf::sshbuf_free(b);

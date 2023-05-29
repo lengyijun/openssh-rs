@@ -39,7 +39,7 @@ extern "C" {
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
 
-    fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
+    
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -4919,7 +4919,7 @@ unsafe extern "C" fn authmethods_get() -> *mut libc::c_char {
         method = method.offset(1);
         method;
     }
-    list = sshbuf_dup_string(b);
+    list = crate::sshbuf_misc::sshbuf_dup_string(b);
     if list.is_null() {
         sshfatal(
             b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
@@ -4929,7 +4929,7 @@ unsafe extern "C" fn authmethods_get() -> *mut libc::c_char {
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
         );
     }
     crate::sshbuf::sshbuf_free(b);
