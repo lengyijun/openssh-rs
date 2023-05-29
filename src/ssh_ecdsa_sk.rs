@@ -45,13 +45,7 @@ extern "C" {
         s: *const libc::c_void,
         len: size_t,
     ) -> libc::c_int;
-    fn ssh_digest_memory(
-        alg: libc::c_int,
-        m: *const libc::c_void,
-        mlen: size_t,
-        d: *mut u_char,
-        dlen: size_t,
-    ) -> libc::c_int;
+
     fn ssh_digest_buffer(
         alg: libc::c_int,
         b: *const crate::sshbuf::sshbuf,
@@ -548,7 +542,7 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
                                                 current_block = 7746103178988627676;
                                             }
                                         } else {
-                                            ret = ssh_digest_memory(
+                                            ret = crate::digest_openssl::ssh_digest_memory(
                                                 2 as libc::c_int,
                                                 data as *const libc::c_void,
                                                 dlen,
@@ -565,7 +559,7 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
                                         match current_block {
                                             3245404841433849185 => {}
                                             _ => {
-                                                ret = ssh_digest_memory(
+                                                ret = crate::digest_openssl::ssh_digest_memory(
                                                     2 as libc::c_int,
                                                     (*key).sk_application as *const libc::c_void,
                                                     strlen((*key).sk_application),

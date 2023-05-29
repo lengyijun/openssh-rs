@@ -10,13 +10,7 @@ extern "C" {
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
     fn ssh_digest_blocksize(ctx: *mut ssh_digest_ctx) -> size_t;
     fn ssh_digest_copy_state(from: *mut ssh_digest_ctx, to: *mut ssh_digest_ctx) -> libc::c_int;
-    fn ssh_digest_memory(
-        alg: libc::c_int,
-        m: *const libc::c_void,
-        mlen: size_t,
-        d: *mut u_char,
-        dlen: size_t,
-    ) -> libc::c_int;
+
     fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
     fn ssh_digest_update(
         ctx: *mut ssh_digest_ctx,
@@ -85,8 +79,13 @@ pub unsafe extern "C" fn ssh_hmac_init(
     if !key.is_null() {
         if klen <= (*ctx).buf_len {
             memcpy((*ctx).buf as *mut libc::c_void, key, klen);
-        } else if ssh_digest_memory((*ctx).alg, key, klen, (*ctx).buf, (*ctx).buf_len)
-            < 0 as libc::c_int
+        } else if crate::digest_openssl::ssh_digest_memory(
+            (*ctx).alg,
+            key,
+            klen,
+            (*ctx).buf,
+            (*ctx).buf_len,
+        ) < 0 as libc::c_int
         {
             return -(1 as libc::c_int);
         }

@@ -51,13 +51,7 @@ extern "C" {
     fn mm_getpwnamallow(_: *mut ssh, _: *const libc::c_char) -> *mut libc::passwd;
     fn mm_auth2_read_banner() -> *mut libc::c_char;
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
-    fn ssh_digest_memory(
-        alg: libc::c_int,
-        m: *const libc::c_void,
-        mlen: size_t,
-        d: *mut u_char,
-        dlen: size_t,
-    ) -> libc::c_int;
+
     static mut options: ServerOptions;
     static mut method_none: Authmethod;
     static mut method_pubkey: Authmethod;
@@ -596,7 +590,7 @@ unsafe extern "C" fn user_specific_delay(mut user: *const libc::c_char) -> libc:
         options.timing_secret as libc::c_ulonglong,
         user,
     );
-    if ssh_digest_memory(
+    if crate::digest_openssl::ssh_digest_memory(
         4 as libc::c_int,
         b.as_mut_ptr() as *const libc::c_void,
         strlen(b.as_mut_ptr()),
@@ -612,7 +606,7 @@ unsafe extern "C" fn user_specific_delay(mut user: *const libc::c_char) -> libc:
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"ssh_digest_memory\0" as *const u8 as *const libc::c_char,
+            b"crate::digest_openssl::ssh_digest_memory\0" as *const u8 as *const libc::c_char,
         );
     }
     delay = ((*(hash as *const u_char).offset(0 as libc::c_int as isize) as u_int32_t)

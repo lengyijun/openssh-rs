@@ -94,13 +94,7 @@ extern "C" {
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
     fn sshkey_check_rsa_length(_: *const crate::sshkey::sshkey, _: libc::c_int) -> libc::c_int;
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
-    fn ssh_digest_memory(
-        alg: libc::c_int,
-        m: *const libc::c_void,
-        mlen: size_t,
-        d: *mut u_char,
-        dlen: size_t,
-    ) -> libc::c_int;
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -728,7 +722,7 @@ unsafe extern "C" fn ssh_rsa_sign(
     if hlen == 0 as libc::c_int as libc::c_uint {
         return -(1 as libc::c_int);
     }
-    ret = ssh_digest_memory(
+    ret = crate::digest_openssl::ssh_digest_memory(
         hash_alg,
         data as *const libc::c_void,
         datalen,
@@ -934,7 +928,7 @@ unsafe extern "C" fn ssh_rsa_verify(
                                     if hlen == 0 as libc::c_int as libc::c_ulong {
                                         ret = -(1 as libc::c_int);
                                     } else {
-                                        ret = ssh_digest_memory(
+                                        ret = crate::digest_openssl::ssh_digest_memory(
                                             hash_alg,
                                             data as *const libc::c_void,
                                             dlen,

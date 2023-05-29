@@ -55,13 +55,7 @@ extern "C" {
     fn sshkey_sig_details_free(_: *mut sshkey_sig_details);
     fn sshkey_ssh_name_plain(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
-    fn ssh_digest_memory(
-        alg: libc::c_int,
-        m: *const libc::c_void,
-        mlen: size_t,
-        d: *mut u_char,
-        dlen: size_t,
-    ) -> libc::c_int;
+
     static mut sshkey_ed25519_funcs: sshkey_impl_funcs;
 }
 pub type __u_char = libc::c_uchar;
@@ -356,14 +350,14 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
         r = -(23 as libc::c_int);
     } else if len > 64 as libc::c_uint as libc::c_ulong {
         r = -(4 as libc::c_int);
-    } else if ssh_digest_memory(
+    } else if crate::digest_openssl::ssh_digest_memory(
         2 as libc::c_int,
         (*key).sk_application as *const libc::c_void,
         strlen((*key).sk_application),
         apphash.as_mut_ptr(),
         ::core::mem::size_of::<[u_char; 32]>() as libc::c_ulong,
     ) != 0 as libc::c_int
-        || ssh_digest_memory(
+        || crate::digest_openssl::ssh_digest_memory(
             2 as libc::c_int,
             data as *const libc::c_void,
             dlen,

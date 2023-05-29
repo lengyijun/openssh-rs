@@ -70,13 +70,7 @@ extern "C" {
     fn sshbuf_put_bignum2(buf: *mut crate::sshbuf::sshbuf, v: *const BIGNUM) -> libc::c_int;
     fn sshbuf_get_bignum2(buf: *mut crate::sshbuf::sshbuf, valp: *mut *mut BIGNUM) -> libc::c_int;
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
-    fn ssh_digest_memory(
-        alg: libc::c_int,
-        m: *const libc::c_void,
-        mlen: size_t,
-        d: *mut u_char,
-        dlen: size_t,
-    ) -> libc::c_int;
+
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
 }
@@ -511,7 +505,7 @@ unsafe extern "C" fn ssh_dss_sign(
     if dlen == 0 as libc::c_int as libc::c_ulong {
         return -(1 as libc::c_int);
     }
-    ret = ssh_digest_memory(
+    ret = crate::digest_openssl::ssh_digest_memory(
         1 as libc::c_int,
         data as *const libc::c_void,
         datalen,
@@ -681,7 +675,7 @@ unsafe extern "C" fn ssh_dss_verify(
         } else {
             sig_s = 0 as *mut BIGNUM;
             sig_r = sig_s;
-            ret = ssh_digest_memory(
+            ret = crate::digest_openssl::ssh_digest_memory(
                 1 as libc::c_int,
                 data as *const libc::c_void,
                 dlen,

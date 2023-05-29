@@ -253,13 +253,7 @@ extern "C" {
     fn cipher_ivlen(_: *const sshcipher) -> u_int;
     fn ssh_digest_alg_name(alg: libc::c_int) -> *const libc::c_char;
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
-    fn ssh_digest_memory(
-        alg: libc::c_int,
-        m: *const libc::c_void,
-        mlen: size_t,
-        d: *mut u_char,
-        dlen: size_t,
-    ) -> libc::c_int;
+
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn match_pattern_list(
         _: *const libc::c_char,
@@ -1299,7 +1293,7 @@ pub unsafe extern "C" fn sshkey_fingerprint_raw(
             if ret.is_null() {
                 r = -(2 as libc::c_int);
             } else {
-                r = ssh_digest_memory(
+                r = crate::digest_openssl::ssh_digest_memory(
                     dgst_alg,
                     blob as *const libc::c_void,
                     blob_len,
@@ -2331,7 +2325,7 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
                 prekey as *mut libc::c_void,
                 (16 as libc::c_int * 1024 as libc::c_int) as size_t,
             );
-            r = ssh_digest_memory(
+            r = crate::digest_openssl::ssh_digest_memory(
                 4 as libc::c_int,
                 prekey as *const libc::c_void,
                 (16 as libc::c_int * 1024 as libc::c_int) as size_t,
@@ -2530,7 +2524,7 @@ pub unsafe extern "C" fn sshkey_unshield_private(mut k: *mut sshkey) -> libc::c_
     {
         r = -(4 as libc::c_int);
     } else {
-        r = ssh_digest_memory(
+        r = crate::digest_openssl::ssh_digest_memory(
             4 as libc::c_int,
             (*k).shield_prekey as *const libc::c_void,
             (*k).shield_prekey_len,

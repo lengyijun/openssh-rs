@@ -68,13 +68,7 @@ extern "C" {
         v: *const crate::sshkey::EC_KEY,
     ) -> libc::c_int;
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
-    fn ssh_digest_memory(
-        alg: libc::c_int,
-        m: *const libc::c_void,
-        mlen: size_t,
-        d: *mut u_char,
-        dlen: size_t,
-    ) -> libc::c_int;
+
     fn sshkey_ssh_name_plain(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_ec_validate_private(_: *const crate::sshkey::EC_KEY) -> libc::c_int;
     fn sshkey_ec_validate_public(_: *const EC_GROUP, _: *const EC_POINT) -> libc::c_int;
@@ -450,7 +444,7 @@ unsafe extern "C" fn ssh_ecdsa_sign(
     } {
         return -(1 as libc::c_int);
     }
-    ret = ssh_digest_memory(
+    ret = crate::digest_openssl::ssh_digest_memory(
         hash_alg,
         data as *const libc::c_void,
         dlen,
@@ -587,7 +581,7 @@ unsafe extern "C" fn ssh_ecdsa_verify(
             if crate::sshbuf::sshbuf_len(sigbuf) != 0 as libc::c_int as libc::c_ulong {
                 ret = -(23 as libc::c_int);
             } else {
-                ret = ssh_digest_memory(
+                ret = crate::digest_openssl::ssh_digest_memory(
                     hash_alg,
                     data as *const libc::c_void,
                     dlen,
