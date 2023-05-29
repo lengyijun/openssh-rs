@@ -1,4 +1,5 @@
 use crate::kex::sshenc;
+use crate::umac::umac_ctx;
 
 use ::libc;
 extern "C" {
@@ -6,7 +7,7 @@ extern "C" {
 
     pub type ec_group_st;
     pub type dh_st;
-    pub type umac_ctx;
+
     pub type ssh_hmac_ctx;
 
     pub type session_state;

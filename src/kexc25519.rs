@@ -1,4 +1,5 @@
 use crate::kex::sshenc;
+use crate::umac::umac_ctx;
 
 use ::libc;
 extern "C" {
@@ -7,7 +8,7 @@ extern "C" {
     pub type dh_st;
 
     pub type ec_group_st;
-    pub type umac_ctx;
+
     pub type ssh_hmac_ctx;
 
     fn timingsafe_bcmp(_: *const libc::c_void, _: *const libc::c_void, _: size_t) -> libc::c_int;
