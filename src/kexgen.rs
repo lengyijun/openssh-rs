@@ -29,7 +29,7 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *mut *mut crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn kex_verify_host_key(_: *mut ssh, _: *mut crate::sshkey::sshkey) -> libc::c_int;
     fn kex_load_hostkey(
         _: *mut ssh,
@@ -619,7 +619,7 @@ unsafe extern "C" fn input_kex_gen_reply(
     crate::sshbuf::sshbuf_free(server_host_key_blob);
     libc::free(signature as *mut libc::c_void);
     crate::sshbuf::sshbuf_free(tmp);
-    sshkey_free(server_host_key);
+    crate::sshkey::sshkey_free(server_host_key);
     crate::sshbuf::sshbuf_free(server_blob);
     crate::sshbuf::sshbuf_free(shared_secret);
     crate::sshbuf::sshbuf_free((*kex).client_pub);

@@ -53,7 +53,6 @@ extern "C" {
     );
     fn DH_free(dh: *mut DH);
 
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
     fn sshkey_fingerprint(
         _: *const crate::sshkey::sshkey,
         _: libc::c_int,
@@ -3087,7 +3086,7 @@ pub unsafe extern "C" fn mm_answer_keyallowed(
         libc::free(cuser as *mut libc::c_void);
         libc::free(chost as *mut libc::c_void);
     }
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     crate::sshbuf::sshbuf_reset(m);
     r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, allowed as u_int32_t);
     if r != 0 as libc::c_int {
@@ -3374,7 +3373,7 @@ unsafe extern "C" fn monitor_valid_userblob(
                 b"hostbound hostkey does not match\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshkey_free(hostkey);
+        crate::sshkey::sshkey_free(hostkey);
     }
     return (fail == 0 as libc::c_int) as libc::c_int;
 }
@@ -3888,7 +3887,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
     mm_request_send(sock, MONITOR_ANS_KEYVERIFY, m);
     libc::free(sigalg as *mut libc::c_void);
     libc::free(fp as *mut libc::c_void);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     return (ret == 0 as libc::c_int) as libc::c_int;
 }
 unsafe extern "C" fn mm_record_login(

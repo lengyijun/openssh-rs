@@ -46,7 +46,6 @@ extern "C" {
     fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
 
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
@@ -392,7 +391,7 @@ unsafe extern "C" fn process_sign(
             );
         }
     }
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     crate::sshbuf::sshbuf_free(kbuf);
     libc::free(provider as *mut libc::c_void);
     if !sig.is_null() {
@@ -594,7 +593,7 @@ unsafe extern "C" fn process_enroll(
             );
         }
     }
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     crate::sshbuf::sshbuf_free(kbuf);
     crate::sshbuf::sshbuf_free(attest);
     crate::sshbuf::sshbuf_free(challenge);

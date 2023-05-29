@@ -64,7 +64,7 @@ extern "C" {
     fn cipher_keylen(_: *const sshcipher) -> u_int;
     fn cipher_blocksize(_: *const sshcipher) -> u_int;
     fn cipher_by_name(_: *const libc::c_char) -> *const sshcipher;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_alg_list(
         _: libc::c_int,
@@ -1774,7 +1774,7 @@ pub unsafe extern "C" fn kex_free(mut kex: *mut kex) {
     crate::sshbuf::sshbuf_free((*kex).client_pub);
     crate::sshbuf::sshbuf_free((*kex).session_id);
     crate::sshbuf::sshbuf_free((*kex).initial_sig);
-    sshkey_free((*kex).initial_hostkey);
+    crate::sshkey::sshkey_free((*kex).initial_hostkey);
     libc::free((*kex).failed_choice as *mut libc::c_void);
     libc::free((*kex).hostkey_alg as *mut libc::c_void);
     libc::free((*kex).name as *mut libc::c_void);

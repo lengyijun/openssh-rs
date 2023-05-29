@@ -117,7 +117,7 @@ extern "C" {
     fn sshpkt_fatal(ssh: *mut ssh, r: libc::c_int, fmt: *const libc::c_char, _: ...) -> !;
     fn sshkey_to_base64(_: *const crate::sshkey::sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
     fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -3934,7 +3934,7 @@ unsafe extern "C" fn check_host_key(
             }
             host_key = raw_key;
         } else {
-            sshkey_free(raw_key);
+            crate::sshkey::sshkey_free(raw_key);
             libc::free(ip as *mut libc::c_void);
             libc::free(host as *mut libc::c_void);
             if !host_hostkeys.is_null() {
@@ -4286,11 +4286,11 @@ pub unsafe extern "C" fn verify_host_key(
             }
         }
     }
-    sshkey_free(plain);
+    crate::sshkey::sshkey_free(plain);
     libc::free(fp as *mut libc::c_void);
     libc::free(cafp as *mut libc::c_void);
     if r == 0 as libc::c_int && !host_key.is_null() {
-        sshkey_free(previous_host_key);
+        crate::sshkey::sshkey_free(previous_host_key);
         r = sshkey_from_private(host_key, &mut previous_host_key);
     }
     return r;

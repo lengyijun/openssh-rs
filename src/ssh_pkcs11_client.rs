@@ -142,7 +142,7 @@ extern "C" {
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_ecdsa_key_to_nid(_: *mut crate::sshkey::EC_KEY) -> libc::c_int;
     fn sshkey_from_blob(
         _: *const u_char,
@@ -521,7 +521,7 @@ unsafe extern "C" fn rsa_encrypt(
         }
     }
     libc::free(blob as *mut libc::c_void);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     crate::sshbuf::sshbuf_free(msg);
     return ret;
 }
@@ -670,7 +670,7 @@ unsafe extern "C" fn ecdsa_do_sign(
         }
     }
     libc::free(blob as *mut libc::c_void);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     crate::sshbuf::sshbuf_free(msg);
     return ret;
 }

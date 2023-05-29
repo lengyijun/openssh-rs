@@ -34,7 +34,6 @@ extern "C" {
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
     fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_private_serialize(
         key: *mut crate::sshkey::sshkey,
@@ -802,7 +801,7 @@ pub unsafe extern "C" fn sshsk_enroll(
         }
     }
     oerrno = *libc::__errno_location();
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     crate::sshbuf::sshbuf_free(kbuf);
     crate::sshbuf::sshbuf_free(abuf);
     crate::sshbuf::sshbuf_free(req);
@@ -814,7 +813,7 @@ unsafe extern "C" fn sshsk_free_resident_key(mut srk: *mut sshsk_resident_key) {
     if srk.is_null() {
         return;
     }
-    sshkey_free((*srk).key);
+    crate::sshkey::sshkey_free((*srk).key);
     freezero((*srk).user_id as *mut libc::c_void, (*srk).user_id_len);
     libc::free(srk as *mut libc::c_void);
 }
@@ -1047,7 +1046,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
     sshsk_free_resident_key(srk);
     sshsk_free_resident_keys(srks, nsrks);
     freezero(userid as *mut libc::c_void, userid_len);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     crate::sshbuf::sshbuf_free(kbuf);
     crate::sshbuf::sshbuf_free(req);
     crate::sshbuf::sshbuf_free(resp);

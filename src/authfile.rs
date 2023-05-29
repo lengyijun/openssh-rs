@@ -34,7 +34,7 @@ extern "C" {
         openssh_format_cipher: *const libc::c_char,
         openssh_format_rounds: libc::c_int,
     ) -> libc::c_int;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_read(_: *mut crate::sshkey::sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_equal(
@@ -359,7 +359,7 @@ unsafe extern "C" fn sshkey_load_pubkey_from_private(
     }
     close(fd);
     crate::sshbuf::sshbuf_free(buffer);
-    sshkey_free(pubkey);
+    crate::sshkey::sshkey_free(pubkey);
     return r;
 }
 unsafe extern "C" fn sshkey_try_load_public(
@@ -500,7 +500,7 @@ pub unsafe extern "C" fn sshkey_load_cert(
     }
     r = sshkey_try_load_public(keyp, file, 0 as *mut *mut libc::c_char);
     libc::free(file as *mut libc::c_void);
-    sshkey_free(pub_0);
+    crate::sshkey::sshkey_free(pub_0);
     return r;
 }
 pub unsafe extern "C" fn sshkey_load_private_cert(
@@ -546,8 +546,8 @@ pub unsafe extern "C" fn sshkey_load_private_cert(
             }
         }
     }
-    sshkey_free(key);
-    sshkey_free(cert);
+    crate::sshkey::sshkey_free(key);
+    crate::sshkey::sshkey_free(cert);
     return r;
 }
 pub unsafe extern "C" fn sshkey_in_file(
@@ -594,7 +594,7 @@ pub unsafe extern "C" fn sshkey_in_file(
             current_block = 6009453772311597924;
             break;
         }
-        sshkey_free(pub_0);
+        crate::sshkey::sshkey_free(pub_0);
         pub_0 = 0 as *mut crate::sshkey::sshkey;
         cp = line;
         while *cp as libc::c_int != 0
@@ -648,7 +648,7 @@ pub unsafe extern "C" fn sshkey_in_file(
         _ => {}
     }
     libc::free(line as *mut libc::c_void);
-    sshkey_free(pub_0);
+    crate::sshkey::sshkey_free(pub_0);
     fclose(f);
     return r;
 }

@@ -19,7 +19,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_equal_public(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -541,7 +541,7 @@ unsafe extern "C" fn valid_request(
             pkalg = 0 as *mut libc::c_char;
         }
     }
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     libc::free(pkalg as *mut libc::c_void);
     libc::free(pkblob as *mut libc::c_void);
     return if fail != 0 {

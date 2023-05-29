@@ -99,7 +99,7 @@ extern "C" {
         _: u_int,
     ) -> libc::c_int;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_verify(
         _: *const crate::sshkey::sshkey,
         _: *const u_char,
@@ -1151,7 +1151,7 @@ unsafe extern "C" fn sshsig_wrap_verify(
     libc::free(sig_hashalg as *mut libc::c_void);
     crate::sshbuf::sshbuf_free(buf);
     crate::sshbuf::sshbuf_free(toverify);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     return r;
 }
 unsafe extern "C" fn hash_buffer(
@@ -2065,7 +2065,7 @@ unsafe extern "C" fn parse_principals_key_and_options(
     }
     libc::free(principals as *mut libc::c_void);
     sshsigopt_free(sigopts);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     return r;
 }
 unsafe extern "C" fn cert_filter_principals(
@@ -2436,7 +2436,7 @@ unsafe extern "C" fn check_allowed_keys_line(
         principals = 0 as *mut libc::c_char;
     }
     libc::free(principals as *mut libc::c_void);
-    sshkey_free(found_key);
+    crate::sshkey::sshkey_free(found_key);
     sshsigopt_free(sigopts);
     return if success != 0 {
         0 as libc::c_int

@@ -226,7 +226,7 @@ extern "C" {
     fn chan_rcvd_eow(_: *mut ssh, _: *mut Channel);
     fn chan_read_failed(_: *mut ssh, _: *mut Channel);
     fn chan_write_failed(_: *mut ssh, _: *mut Channel);
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -4685,7 +4685,7 @@ unsafe extern "C" fn hostkeys_update_ctx_free(mut ctx: *mut hostkeys_update_ctx)
     }
     i = 0 as libc::c_int as size_t;
     while i < (*ctx).nkeys {
-        sshkey_free(*((*ctx).keys).offset(i as isize));
+        crate::sshkey::sshkey_free(*((*ctx).keys).offset(i as isize));
         i = i.wrapping_add(1);
         i;
     }
@@ -4694,7 +4694,7 @@ unsafe extern "C" fn hostkeys_update_ctx_free(mut ctx: *mut hostkeys_update_ctx)
     libc::free((*ctx).keys_verified as *mut libc::c_void);
     i = 0 as libc::c_int as size_t;
     while i < (*ctx).nold {
-        sshkey_free(*((*ctx).old_keys).offset(i as isize));
+        crate::sshkey::sshkey_free(*((*ctx).old_keys).offset(i as isize));
         i = i.wrapping_add(1);
         i;
     }
@@ -5435,7 +5435,7 @@ unsafe extern "C" fn client_global_hostkeys_prove_confirm(
                         i,
                     );
                     libc::free(alg as *mut libc::c_void);
-                    sshkey_free(*((*ctx).keys).offset(i as isize));
+                    crate::sshkey::sshkey_free(*((*ctx).keys).offset(i as isize));
                     let ref mut fresh3 = *((*ctx).keys).offset(i as isize);
                     *fresh3 = 0 as *mut crate::sshkey::sshkey;
                     ndone = ndone.wrapping_add(1);
@@ -5609,7 +5609,7 @@ unsafe extern "C" fn client_input_hostkeys(mut ssh: *mut ssh) -> libc::c_int {
             current_block = 14648156034262866959;
             break;
         }
-        sshkey_free(key);
+        crate::sshkey::sshkey_free(key);
         key = 0 as *mut crate::sshkey::sshkey;
         r = sshpkt_get_string_direct(ssh, &mut blob, &mut len);
         if r != 0 as libc::c_int {
@@ -6174,7 +6174,7 @@ unsafe extern "C" fn client_input_hostkeys(mut ssh: *mut ssh) -> libc::c_int {
         _ => {}
     }
     hostkeys_update_ctx_free(ctx);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     crate::sshbuf::sshbuf_free(buf);
     if prove_sent == 0 {
         hostkeys_update_complete = 1 as libc::c_int;

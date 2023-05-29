@@ -71,7 +71,7 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
 
     fn sshfatal(
@@ -677,7 +677,7 @@ pub unsafe extern "C" fn free_hostkeys(mut hostkeys: *mut hostkeys) {
     while i < (*hostkeys).num_entries {
         libc::free((*((*hostkeys).entries).offset(i as isize)).host as *mut libc::c_void);
         libc::free((*((*hostkeys).entries).offset(i as isize)).file as *mut libc::c_void);
-        sshkey_free((*((*hostkeys).entries).offset(i as isize)).key);
+        crate::sshkey::sshkey_free((*((*hostkeys).entries).offset(i as isize)).key);
         explicit_bzero(
             ((*hostkeys).entries).offset(i as isize) as *mut libc::c_void,
             ::core::mem::size_of::<hostkey_entry>() as libc::c_ulong,
@@ -1577,7 +1577,7 @@ pub unsafe extern "C" fn hostkeys_foreach_file(
         *line.offset(strcspn(line, b"\n\0" as *const u8 as *const libc::c_char) as isize) =
             '\0' as i32 as libc::c_char;
         libc::free(lineinfo.line as *mut libc::c_void);
-        sshkey_free(lineinfo.key);
+        crate::sshkey::sshkey_free(lineinfo.key);
         memset(
             &mut lineinfo as *mut hostkey_foreach_line as *mut libc::c_void,
             0 as libc::c_int,
@@ -1860,7 +1860,7 @@ pub unsafe extern "C" fn hostkeys_foreach_file(
                     }
                 }
             }
-            sshkey_free(lineinfo.key);
+            crate::sshkey::sshkey_free(lineinfo.key);
             lineinfo.key = 0 as *mut crate::sshkey::sshkey;
             lineinfo.status = 1 as libc::c_int as u_int;
             r = callback.expect("non-null function pointer")(&mut lineinfo, ctx);
@@ -1869,7 +1869,7 @@ pub unsafe extern "C" fn hostkeys_foreach_file(
             }
         }
     }
-    sshkey_free(lineinfo.key);
+    crate::sshkey::sshkey_free(lineinfo.key);
     libc::free(lineinfo.line as *mut libc::c_void);
     libc::free(line as *mut libc::c_void);
     return r;

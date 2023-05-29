@@ -55,7 +55,7 @@ extern "C" {
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_equal_public(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -380,7 +380,7 @@ unsafe extern "C" fn delete_stdin(
     while getline(&mut line, &mut linesize, stdin) != -(1 as libc::c_int) as libc::c_long {
         lnum += 1;
         lnum;
-        sshkey_free(key);
+        crate::sshkey::sshkey_free(key);
         key = 0 as *mut crate::sshkey::sshkey;
         *line.offset(strcspn(line, b"\n\0" as *const u8 as *const libc::c_char) as isize) =
             '\0' as i32 as libc::c_char;
@@ -425,7 +425,7 @@ unsafe extern "C" fn delete_stdin(
             ret = 0 as libc::c_int;
         }
     }
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     libc::free(line as *mut libc::c_void);
     return ret;
 }
@@ -500,8 +500,8 @@ unsafe extern "C" fn delete_file(
             }
         }
     }
-    sshkey_free(cert);
-    sshkey_free(public);
+    crate::sshkey::sshkey_free(cert);
+    crate::sshkey::sshkey_free(public);
     libc::free(certpath as *mut libc::c_void);
     libc::free(comment as *mut libc::c_void);
     return ret;
@@ -881,7 +881,7 @@ unsafe extern "C" fn add_file(
                                                         certpath,
                                                         filename,
                                                     );
-                                                    sshkey_free(cert);
+                                                    crate::sshkey::sshkey_free(cert);
                                                 } else {
                                                     r = sshkey_to_certified(private);
                                                     if r != 0 as libc::c_int {
@@ -902,7 +902,7 @@ unsafe extern "C" fn add_file(
                                                             b"sshkey_to_certified\0" as *const u8
                                                                 as *const libc::c_char,
                                                         );
-                                                        sshkey_free(cert);
+                                                        crate::sshkey::sshkey_free(cert);
                                                     } else {
                                                         r = sshkey_cert_copy(cert, private);
                                                         if r != 0 as libc::c_int {
@@ -923,9 +923,9 @@ unsafe extern "C" fn add_file(
                                                                 b"sshkey_cert_copy\0" as *const u8
                                                                     as *const libc::c_char,
                                                             );
-                                                            sshkey_free(cert);
+                                                            crate::sshkey::sshkey_free(cert);
                                                         } else {
-                                                            sshkey_free(cert);
+                                                            crate::sshkey::sshkey_free(cert);
                                                             r = ssh_add_identity_constrained(
                                                                 agent_fd,
                                                                 private,
@@ -989,7 +989,7 @@ unsafe extern "C" fn add_file(
                         }
                         libc::free(certpath as *mut libc::c_void);
                         libc::free(comment as *mut libc::c_void);
-                        sshkey_free(private);
+                        crate::sshkey::sshkey_free(private);
                         return ret;
                     }
                 }
@@ -1145,7 +1145,7 @@ unsafe extern "C" fn test_key(
         }
     }
     libc::free(sig as *mut libc::c_void);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     return ret;
 }
 unsafe extern "C" fn list_identities(

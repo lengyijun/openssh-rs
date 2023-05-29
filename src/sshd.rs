@@ -284,7 +284,7 @@ extern "C" {
     ) -> libc::c_int;
     fn ssh_digest_final(ctx: *mut ssh_digest_ctx, d: *mut u_char, dlen: size_t) -> libc::c_int;
     fn ssh_digest_free(ctx: *mut ssh_digest_ctx);
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_equal_public(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -1355,12 +1355,12 @@ pub unsafe extern "C" fn destroy_sensitive_data() {
     i = 0 as libc::c_int as u_int;
     while i < options.num_host_key_files {
         if !(*(sensitive_data.host_keys).offset(i as isize)).is_null() {
-            sshkey_free(*(sensitive_data.host_keys).offset(i as isize));
+            crate::sshkey::sshkey_free(*(sensitive_data.host_keys).offset(i as isize));
             let ref mut fresh0 = *(sensitive_data.host_keys).offset(i as isize);
             *fresh0 = 0 as *mut crate::sshkey::sshkey;
         }
         if !(*(sensitive_data.host_certificates).offset(i as isize)).is_null() {
-            sshkey_free(*(sensitive_data.host_certificates).offset(i as isize));
+            crate::sshkey::sshkey_free(*(sensitive_data.host_certificates).offset(i as isize));
             let ref mut fresh1 = *(sensitive_data.host_certificates).offset(i as isize);
             *fresh1 = 0 as *mut crate::sshkey::sshkey;
         }
@@ -1391,7 +1391,7 @@ pub unsafe extern "C" fn demote_sensitive_data() {
                     sshkey_type(*(sensitive_data.host_keys).offset(i as isize)),
                 );
             }
-            sshkey_free(*(sensitive_data.host_keys).offset(i as isize));
+            crate::sshkey::sshkey_free(*(sensitive_data.host_keys).offset(i as isize));
             let ref mut fresh2 = *(sensitive_data.host_keys).offset(i as isize);
             *fresh2 = tmp;
         }
@@ -4224,7 +4224,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     b"Unable to shield host key \"%s\"\0" as *const u8 as *const libc::c_char,
                     *(options.host_key_files).offset(i as isize),
                 );
-                sshkey_free(key);
+                crate::sshkey::sshkey_free(key);
                 key = 0 as *mut crate::sshkey::sshkey;
             }
             r = sshkey_load_public(
@@ -4258,7 +4258,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             as *const libc::c_char,
                         *(options.host_key_files).offset(i as isize),
                     );
-                    sshkey_free(pubkey);
+                    crate::sshkey::sshkey_free(pubkey);
                     pubkey = 0 as *mut crate::sshkey::sshkey;
                 }
             }
@@ -4292,8 +4292,8 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     b"Host key %s\0" as *const u8 as *const libc::c_char,
                     *(options.host_key_files).offset(i as isize),
                 );
-                sshkey_free(pubkey);
-                sshkey_free(key);
+                crate::sshkey::sshkey_free(pubkey);
+                crate::sshkey::sshkey_free(key);
             } else {
                 let ref mut fresh7 = *(sensitive_data.host_keys).offset(i as isize);
                 *fresh7 = key;
@@ -4442,7 +4442,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         as *const libc::c_char,
                     *(options.host_cert_files).offset(i as isize),
                 );
-                sshkey_free(key);
+                crate::sshkey::sshkey_free(key);
             } else {
                 j = 0 as libc::c_int as u_int;
                 while j < options.num_host_key_files {
@@ -4471,7 +4471,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             as *const libc::c_char,
                         *(options.host_cert_files).offset(i as isize),
                     );
-                    sshkey_free(key);
+                    crate::sshkey::sshkey_free(key);
                 } else {
                     let ref mut fresh13 = *(sensitive_data.host_certificates).offset(j as isize);
                     *fresh13 = key;

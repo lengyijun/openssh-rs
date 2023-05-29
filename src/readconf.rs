@@ -76,7 +76,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_names_valid2(_: *const libc::c_char, _: libc::c_int) -> libc::c_int;
     fn sshkey_alg_list(
         _: libc::c_int,
@@ -6744,14 +6744,14 @@ pub unsafe extern "C" fn free_options(mut o: *mut Options) {
     i = 0 as libc::c_int;
     while i < (*o).num_identity_files {
         libc::free((*o).identity_files[i as usize] as *mut libc::c_void);
-        sshkey_free((*o).identity_keys[i as usize]);
+        crate::sshkey::sshkey_free((*o).identity_keys[i as usize]);
         i += 1;
         i;
     }
     i = 0 as libc::c_int;
     while i < (*o).num_certificate_files {
         libc::free((*o).certificate_files[i as usize] as *mut libc::c_void);
-        sshkey_free((*o).certificates[i as usize]);
+        crate::sshkey::sshkey_free((*o).certificates[i as usize]);
         i += 1;
         i;
     }

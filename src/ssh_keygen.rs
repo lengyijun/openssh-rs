@@ -161,7 +161,7 @@ extern "C" {
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
 
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_equal_public(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -1089,7 +1089,7 @@ unsafe extern "C" fn do_convert_to_ssh2(
         (*pw).pw_name,
         hostname.as_mut_ptr(),
     );
-    sshkey_free(k);
+    crate::sshkey::sshkey_free(k);
     crate::sshbuf::sshbuf_free(b);
     libc::fprintf(
         stdout,
@@ -1694,7 +1694,7 @@ unsafe extern "C" fn do_convert_private_ssh2(
             }
             if BN_set_word(rsa_e, e) == 0 {
                 BN_clear_free(rsa_e);
-                sshkey_free(key);
+                crate::sshkey::sshkey_free(key);
                 return 0 as *mut crate::sshkey::sshkey;
             }
             rsa_n = BN_new();
@@ -1854,7 +1854,7 @@ unsafe extern "C" fn do_convert_private_ssh2(
         }
     }
     if r != 0 as libc::c_int {
-        sshkey_free(key);
+        crate::sshkey::sshkey_free(key);
         libc::free(sig as *mut libc::c_void);
         return 0 as *mut crate::sshkey::sshkey;
     }
@@ -2380,7 +2380,7 @@ unsafe extern "C" fn do_convert_from(mut pw: *mut libc::passwd) {
             b"key write failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshkey_free(k);
+    crate::sshkey::sshkey_free(k);
     libc::exit(0 as libc::c_int);
 }
 unsafe extern "C" fn do_print_public(mut pw: *mut libc::passwd) {
@@ -2444,7 +2444,7 @@ unsafe extern "C" fn do_print_public(mut pw: *mut libc::passwd) {
             (*prv).sk_flags as libc::c_int,
         );
     }
-    sshkey_free(prv);
+    crate::sshkey::sshkey_free(prv);
     libc::free(comment as *mut libc::c_void);
     libc::exit(0 as libc::c_int);
 }
@@ -2527,7 +2527,7 @@ unsafe extern "C" fn do_download(mut _pw: *mut libc::passwd) {
             );
         }
         libc::free(*comments.offset(i as isize) as *mut libc::c_void);
-        sshkey_free(*keys.offset(i as isize));
+        crate::sshkey::sshkey_free(*keys.offset(i as isize));
         i += 1;
         i;
     }
@@ -2555,7 +2555,7 @@ unsafe extern "C" fn try_read_key(mut cpp: *mut *mut libc::c_char) -> *mut crate
     if r == 0 as libc::c_int {
         return ret;
     }
-    sshkey_free(ret);
+    crate::sshkey::sshkey_free(ret);
     return 0 as *mut crate::sshkey::sshkey;
 }
 unsafe extern "C" fn fingerprint_one_key(
@@ -2674,8 +2674,8 @@ unsafe extern "C" fn fingerprint_private(mut path: *const libc::c_char) {
         );
     }
     fingerprint_one_key(if pubkey.is_null() { privkey } else { pubkey }, comment);
-    sshkey_free(pubkey);
-    sshkey_free(privkey);
+    crate::sshkey::sshkey_free(pubkey);
+    crate::sshkey::sshkey_free(privkey);
     libc::free(comment as *mut libc::c_void);
 }
 unsafe extern "C" fn do_fingerprint(mut pw: *mut libc::passwd) {
@@ -2801,7 +2801,7 @@ unsafe extern "C" fn do_fingerprint(mut pw: *mut libc::passwd) {
                 comment = cp;
             }
             fingerprint_one_key(public, comment);
-            sshkey_free(public);
+            crate::sshkey::sshkey_free(public);
             invalid = 0 as libc::c_int;
         }
     }
@@ -3123,8 +3123,8 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut libc::passwd) {
             }
             _ => {}
         }
-        sshkey_free(private);
-        sshkey_free(public);
+        crate::sshkey::sshkey_free(private);
+        crate::sshkey::sshkey_free(public);
         libc::free(prv_tmp as *mut libc::c_void);
         libc::free(pub_tmp as *mut libc::c_void);
         libc::free(prv_file as *mut libc::c_void);
@@ -3818,12 +3818,12 @@ unsafe extern "C" fn do_change_passphrase(mut pw: *mut libc::passwd) {
             identity_file.as_mut_ptr(),
         );
         freezero(passphrase1 as *mut libc::c_void, strlen(passphrase1));
-        sshkey_free(private);
+        crate::sshkey::sshkey_free(private);
         libc::free(comment as *mut libc::c_void);
         libc::exit(1 as libc::c_int);
     }
     freezero(passphrase1 as *mut libc::c_void, strlen(passphrase1));
-    sshkey_free(private);
+    crate::sshkey::sshkey_free(private);
     libc::free(comment as *mut libc::c_void);
     printf(
         b"Your identification has been saved with the new passphrase.\n\0" as *const u8
@@ -3939,7 +3939,7 @@ unsafe extern "C" fn do_print_resource_record(
         );
     }
     export_dns_rr(hname, public, stdout, print_generic, hash);
-    sshkey_free(public);
+    crate::sshkey::sshkey_free(public);
     libc::free(comment as *mut libc::c_void);
     return 1 as libc::c_int;
 }
@@ -4042,7 +4042,7 @@ unsafe extern "C" fn do_change_comment(
                 as *const libc::c_char,
         );
         explicit_bzero(passphrase as *mut libc::c_void, strlen(passphrase));
-        sshkey_free(private);
+        crate::sshkey::sshkey_free(private);
         libc::exit(1 as libc::c_int);
     }
     if !comment.is_null() {
@@ -4070,7 +4070,7 @@ unsafe extern "C" fn do_change_comment(
         .is_null()
         {
             explicit_bzero(passphrase as *mut libc::c_void, strlen(passphrase));
-            sshkey_free(private);
+            crate::sshkey::sshkey_free(private);
             libc::exit(1 as libc::c_int);
         }
         new_comment[strcspn(
@@ -4081,7 +4081,7 @@ unsafe extern "C" fn do_change_comment(
     if !comment.is_null() && libc::strcmp(comment, new_comment.as_mut_ptr()) == 0 as libc::c_int {
         printf(b"No change to comment\n\0" as *const u8 as *const libc::c_char);
         libc::free(passphrase as *mut libc::c_void);
-        sshkey_free(private);
+        crate::sshkey::sshkey_free(private);
         libc::free(comment as *mut libc::c_void);
         libc::exit(0 as libc::c_int);
     }
@@ -4107,7 +4107,7 @@ unsafe extern "C" fn do_change_comment(
             identity_file.as_mut_ptr(),
         );
         freezero(passphrase as *mut libc::c_void, strlen(passphrase));
-        sshkey_free(private);
+        crate::sshkey::sshkey_free(private);
         libc::free(comment as *mut libc::c_void);
         libc::exit(1 as libc::c_int);
     }
@@ -4125,7 +4125,7 @@ unsafe extern "C" fn do_change_comment(
             b"sshkey_from_private\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshkey_free(private);
+    crate::sshkey::sshkey_free(private);
     strlcat(
         identity_file.as_mut_ptr(),
         b".pub\0" as *const u8 as *const libc::c_char,
@@ -4145,7 +4145,7 @@ unsafe extern "C" fn do_change_comment(
             identity_file.as_mut_ptr(),
         );
     }
-    sshkey_free(public);
+    crate::sshkey::sshkey_free(public);
     libc::free(comment as *mut libc::c_void);
     if strlen(new_comment.as_mut_ptr()) > 0 as libc::c_int as libc::c_ulong {
         printf(
@@ -4471,13 +4471,13 @@ unsafe extern "C" fn load_pkcs11_key(mut path: *mut libc::c_char) -> *mut crate:
         if sshkey_equal_public(public, *keys.offset(i as isize)) != 0 {
             private = *keys.offset(i as isize);
         } else {
-            sshkey_free(*keys.offset(i as isize));
+            crate::sshkey::sshkey_free(*keys.offset(i as isize));
         }
         i += 1;
         i;
     }
     libc::free(keys as *mut libc::c_void);
-    sshkey_free(public);
+    crate::sshkey::sshkey_free(public);
     return private;
 }
 unsafe extern "C" fn agent_signer(
@@ -4888,7 +4888,7 @@ unsafe extern "C" fn do_ca_sign(
                 valid.as_mut_ptr(),
             );
         }
-        sshkey_free(public);
+        crate::sshkey::sshkey_free(public);
         libc::free(out as *mut libc::c_void);
         if cert_serial_autoinc != 0 {
             cert_serial = cert_serial.wrapping_add(1);
@@ -5561,7 +5561,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut libc::passwd) {
     while getline(&mut line, &mut linesize, f) != -(1 as libc::c_int) as libc::c_long {
         lnum = lnum.wrapping_add(1);
         lnum;
-        sshkey_free(key);
+        crate::sshkey::sshkey_free(key);
         key = 0 as *mut crate::sshkey::sshkey;
         cp = line.offset(strspn(line, b" \t\0" as *const u8 as *const libc::c_char) as isize);
         if *cp as libc::c_int == '#' as i32 || *cp as libc::c_int == '\0' as i32 {
@@ -5622,7 +5622,7 @@ unsafe extern "C" fn do_show_cert(mut pw: *mut libc::passwd) {
         }
     }
     libc::free(line as *mut libc::c_void);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     fclose(f);
     libc::exit(if ok != 0 {
         0 as libc::c_int
@@ -6173,7 +6173,7 @@ unsafe extern "C" fn update_krl_from_file(
             freezero(blob as *mut libc::c_void, blen);
             blob = 0 as *mut u_char;
             blen = 0 as libc::c_int as size_t;
-            sshkey_free(key);
+            crate::sshkey::sshkey_free(key);
         }
     }
     if libc::strcmp(path, b"-\0" as *const u8 as *const libc::c_char) != 0 as libc::c_int {
@@ -6338,7 +6338,7 @@ unsafe extern "C" fn do_gen_krl(
     }
     crate::sshbuf::sshbuf_free(kbuf);
     ssh_krl_free(krl);
-    sshkey_free(ca);
+    crate::sshkey::sshkey_free(ca);
 }
 unsafe extern "C" fn do_check_krl(
     mut _pw: *mut libc::passwd,
@@ -6407,7 +6407,7 @@ unsafe extern "C" fn do_check_krl(
         if r != 0 as libc::c_int {
             ret = 1 as libc::c_int;
         }
-        sshkey_free(k);
+        crate::sshkey::sshkey_free(k);
         libc::free(comment as *mut libc::c_void);
         i += 1;
         i;
@@ -6569,7 +6569,7 @@ unsafe extern "C" fn load_sign_key(
             }
         }
     }
-    sshkey_free(privkey);
+    crate::sshkey::sshkey_free(privkey);
     libc::free(privpath as *mut libc::c_void);
     return ret;
 }
@@ -7155,8 +7155,8 @@ unsafe extern "C" fn sig_sign(
     if fd != -(1 as libc::c_int) && fd != 0 as libc::c_int {
         close(fd);
     }
-    sshkey_free(pubkey);
-    sshkey_free(privkey);
+    crate::sshkey::sshkey_free(pubkey);
+    crate::sshkey::sshkey_free(privkey);
     libc::free(hashalg as *mut libc::c_void);
     return ret;
 }
@@ -7387,7 +7387,7 @@ unsafe extern "C" fn sig_verify(
     }
     crate::sshbuf::sshbuf_free(sigbuf);
     crate::sshbuf::sshbuf_free(abuf);
-    sshkey_free(sign_key);
+    crate::sshkey::sshkey_free(sign_key);
     sshkey_sig_details_free(sig_details);
     libc::free(fp as *mut libc::c_void);
     return ret;
@@ -7505,7 +7505,7 @@ unsafe extern "C" fn sig_find_principals(
     }
     crate::sshbuf::sshbuf_free(sigbuf);
     crate::sshbuf::sshbuf_free(abuf);
-    sshkey_free(sign_key);
+    crate::sshkey::sshkey_free(sign_key);
     libc::free(principals as *mut libc::c_void);
     return ret;
 }
@@ -9592,7 +9592,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         libc::exit(1 as libc::c_int);
     }
     freezero(passphrase as *mut libc::c_void, strlen(passphrase));
-    sshkey_free(private);
+    crate::sshkey::sshkey_free(private);
     if quiet == 0 {
         printf(
             b"Your identification has been saved in %s\n\0" as *const u8 as *const libc::c_char,
@@ -9650,7 +9650,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         save_attestation(attest, sk_attestation_path);
     }
     crate::sshbuf::sshbuf_free(attest);
-    sshkey_free(public);
+    crate::sshkey::sshkey_free(public);
     libc::exit(0 as libc::c_int);
 }
 pub fn main() {

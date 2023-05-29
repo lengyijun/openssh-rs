@@ -74,7 +74,7 @@ extern "C" {
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
     fn compat_kex_proposal(_: *mut ssh, _: *const libc::c_char) -> *mut libc::c_char;
     fn compression_alg_list(_: libc::c_int) -> *const libc::c_char;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_equal_public(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -1845,7 +1845,7 @@ unsafe extern "C" fn input_userauth_pk_ok(
             }
         }
     }
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     libc::free(ident as *mut libc::c_void);
     libc::free(fp as *mut libc::c_void);
     libc::free(pkalg as *mut libc::c_void);
@@ -2391,7 +2391,7 @@ unsafe extern "C" fn identity_sign(
             0 as *const libc::c_char
         },
     );
-    sshkey_free(prv);
+    crate::sshkey::sshkey_free(prv);
     return r;
 }
 unsafe extern "C" fn id_filename_matches(
@@ -3099,7 +3099,7 @@ unsafe extern "C" fn load_identity_file(mut id: *mut Identity) -> *mut crate::ss
                     as *const u8 as *const libc::c_char,
                 (*id).filename,
             );
-            sshkey_free(private);
+            crate::sshkey::sshkey_free(private);
             private = 0 as *mut crate::sshkey::sshkey;
             quit = 1 as libc::c_int;
         }
@@ -3120,7 +3120,7 @@ unsafe extern "C" fn load_identity_file(mut id: *mut Identity) -> *mut crate::ss
                 b"Skipping key %s\0" as *const u8 as *const libc::c_char,
                 (*id).filename,
             );
-            sshkey_free(private);
+            crate::sshkey::sshkey_free(private);
             private = 0 as *mut crate::sshkey::sshkey;
             quit = 1 as libc::c_int;
         }
@@ -3565,7 +3565,7 @@ unsafe extern "C" fn pubkey_prepare(mut ssh: *mut ssh, mut authctxt: *mut Authct
                 (*preferred_0).tqh_last = (*id).next.tqe_prev;
             }
             *(*id).next.tqe_prev = (*id).next.tqe_next;
-            sshkey_free((*id).key);
+            crate::sshkey::sshkey_free((*id).key);
             libc::free((*id).filename as *mut libc::c_void);
             memset(
                 id as *mut libc::c_void,
@@ -3620,7 +3620,7 @@ unsafe extern "C" fn pubkey_cleanup(mut ssh: *mut ssh) {
             (*authctxt).keys.tqh_last = (*id).next.tqe_prev;
         }
         *(*id).next.tqe_prev = (*id).next.tqe_next;
-        sshkey_free((*id).key);
+        crate::sshkey::sshkey_free((*id).key);
         libc::free((*id).filename as *mut libc::c_void);
         libc::free(id as *mut libc::c_void);
         id = (*authctxt).keys.tqh_first;
@@ -3696,7 +3696,7 @@ unsafe extern "C" fn userauth_pubkey(mut ssh: *mut ssh) -> libc::c_int {
                     (*id).isprivate = 1 as libc::c_int;
                     sent = sign_and_send_pubkey(ssh, id);
                 }
-                sshkey_free((*id).key);
+                crate::sshkey::sshkey_free((*id).key);
                 (*id).key = 0 as *mut crate::sshkey::sshkey;
                 (*id).isprivate = 0 as libc::c_int;
             }
@@ -4699,7 +4699,7 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
     libc::free(lname as *mut libc::c_void);
     libc::free(fp as *mut libc::c_void);
     libc::free(chost as *mut libc::c_void);
-    sshkey_free(private);
+    crate::sshkey::sshkey_free(private);
     crate::sshbuf::sshbuf_free(b);
     return success;
 }

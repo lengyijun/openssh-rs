@@ -85,7 +85,6 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_int;
 
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -1441,8 +1440,8 @@ unsafe extern "C" fn userauth_pubkey(
     );
     crate::sshbuf::sshbuf_free(b);
     sshauthopt_free(authopts);
-    sshkey_free(key);
-    sshkey_free(hostkey);
+    crate::sshkey::sshkey_free(key);
+    crate::sshkey::sshkey_free(hostkey);
     libc::free(userstyle as *mut libc::c_void);
     libc::free(pkalg as *mut libc::c_void);
     libc::free(pkblob as *mut libc::c_void);

@@ -50,7 +50,7 @@ extern "C" {
         g: *const EC_GROUP,
     ) -> libc::c_int;
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
     fn sshkey_ec_validate_public(_: *const EC_GROUP, _: *const EC_POINT) -> libc::c_int;
@@ -596,7 +596,7 @@ unsafe extern "C" fn sshsk_ecdsa_assemble(
         }
     }
     EC_POINT_free(q);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     crate::sshbuf::sshbuf_free(b);
     return r;
 }
@@ -666,7 +666,7 @@ unsafe extern "C" fn sshsk_ed25519_assemble(
             }
         }
     }
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     return r;
 }
 unsafe extern "C" fn sshsk_key_from_response(
@@ -798,7 +798,7 @@ unsafe extern "C" fn sshsk_key_from_response(
             }
         }
     }
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     return r;
 }
 unsafe extern "C" fn skerr_to_ssherr(mut skerr: libc::c_int) -> libc::c_int {
@@ -1225,7 +1225,7 @@ pub unsafe extern "C" fn sshsk_enroll(
     }
     sshsk_free_options(opts);
     sshsk_free(skp);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     sshsk_free_enroll_response(resp);
     explicit_bzero(
         randchall.as_mut_ptr() as *mut libc::c_void,
@@ -1582,7 +1582,7 @@ unsafe extern "C" fn sshsk_free_resident_key(mut srk: *mut sshsk_resident_key) {
     if srk.is_null() {
         return;
     }
-    sshkey_free((*srk).key);
+    crate::sshkey::sshkey_free((*srk).key);
     freezero((*srk).user_id as *mut libc::c_void, (*srk).user_id_len);
     libc::free(srk as *mut libc::c_void);
 }
@@ -1837,7 +1837,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
     sshsk_free_options(opts);
     sshsk_free(skp);
     sshsk_free_sk_resident_keys(rks, nrks);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     sshsk_free_resident_key(srk);
     sshsk_free_resident_keys(srks, nsrks);
     return r;

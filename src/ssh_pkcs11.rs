@@ -214,7 +214,7 @@ extern "C" {
     ) -> !;
     fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -3075,7 +3075,7 @@ unsafe extern "C" fn pkcs11_fetch_certs(
                                         b"key already included\0" as *const u8
                                             as *const libc::c_char,
                                     );
-                                    sshkey_free(key);
+                                    crate::sshkey::sshkey_free(key);
                                 } else {
                                     *keysp = crate::xmalloc::xrecallocarray(
                                         *keysp as *mut libc::c_void,
@@ -3354,7 +3354,7 @@ unsafe extern "C" fn pkcs11_fetch_keys(
                                 0 as *const libc::c_char,
                                 b"key already included\0" as *const u8 as *const libc::c_char,
                             );
-                            sshkey_free(key);
+                            crate::sshkey::sshkey_free(key);
                         } else {
                             *keysp = crate::xmalloc::xrecallocarray(
                                 *keysp as *mut libc::c_void,

@@ -35,7 +35,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_fingerprint(
         _: *const crate::sshkey::sshkey,
         _: libc::c_int,
@@ -865,7 +865,7 @@ unsafe extern "C" fn userauth_hostbased(
         b"authenticated %d\0" as *const u8 as *const libc::c_char,
         authenticated,
     );
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     libc::free(pkalg as *mut libc::c_void);
     libc::free(pkblob as *mut libc::c_void);
     libc::free(cuser as *mut libc::c_void);

@@ -121,7 +121,7 @@ extern "C" {
         s: *const libc::c_void,
         len: size_t,
     ) -> libc::c_int;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -514,7 +514,7 @@ unsafe extern "C" fn close_socket(mut e: *mut SocketEntry) {
     crate::sshbuf::sshbuf_free((*e).request);
     i = 0 as libc::c_int as size_t;
     while i < (*e).nsession_ids {
-        sshkey_free((*((*e).session_ids).offset(i as isize)).key);
+        crate::sshkey::sshkey_free((*((*e).session_ids).offset(i as isize)).key);
         crate::sshbuf::sshbuf_free((*((*e).session_ids).offset(i as isize)).sid);
         i = i.wrapping_add(1);
         i;
@@ -546,7 +546,7 @@ unsafe extern "C" fn free_dest_constraint_hop(mut dch: *mut dest_constraint_hop)
     libc::free((*dch).hostname as *mut libc::c_void);
     i = 0 as libc::c_int as u_int;
     while i < (*dch).nkeys {
-        sshkey_free(*((*dch).keys).offset(i as isize));
+        crate::sshkey::sshkey_free(*((*dch).keys).offset(i as isize));
         i = i.wrapping_add(1);
         i;
     }
@@ -565,7 +565,7 @@ unsafe extern "C" fn free_dest_constraints(mut dcs: *mut dest_constraint, mut nd
     libc::free(dcs as *mut libc::c_void);
 }
 unsafe extern "C" fn free_identity(mut id: *mut Identity) {
-    sshkey_free((*id).key);
+    crate::sshkey::sshkey_free((*id).key);
     libc::free((*id).provider as *mut libc::c_void);
     libc::free((*id).comment as *mut libc::c_void);
     libc::free((*id).sk_provider as *mut libc::c_void);
@@ -1427,8 +1427,8 @@ unsafe extern "C" fn parse_userauth_request(
     libc::free(service as *mut libc::c_void);
     libc::free(method as *mut libc::c_void);
     libc::free(pkalg as *mut libc::c_void);
-    sshkey_free(mkey);
-    sshkey_free(hostkey);
+    crate::sshkey::sshkey_free(mkey);
+    crate::sshkey::sshkey_free(hostkey);
     return r;
 }
 unsafe extern "C" fn parse_sshsig_request(mut msg: *mut crate::sshbuf::sshbuf) -> libc::c_int {
@@ -2011,8 +2011,8 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
     crate::sshbuf::sshbuf_free(sid);
     crate::sshbuf::sshbuf_free(data);
     crate::sshbuf::sshbuf_free(msg);
-    sshkey_free(key);
-    sshkey_free(hostkey);
+    crate::sshkey::sshkey_free(key);
+    crate::sshkey::sshkey_free(hostkey);
     libc::free(fp as *mut libc::c_void);
     libc::free(signature as *mut libc::c_void);
     libc::free(sig_dest as *mut libc::c_void);
@@ -2101,7 +2101,7 @@ unsafe extern "C" fn process_remove_identity(mut e: *mut SocketEntry) {
             success = 1 as libc::c_int;
         }
     }
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     send_status(e, success);
 }
 unsafe extern "C" fn process_remove_all_identities(mut e: *mut SocketEntry) {
@@ -2331,7 +2331,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
             }
         }
     }
-    sshkey_free(k);
+    crate::sshkey::sshkey_free(k);
     return r;
 }
 unsafe extern "C" fn parse_dest_constraint(
@@ -3088,7 +3088,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                     {
                         current_block = 12326576695480106577;
                     } else {
-                        sshkey_free((*id).key);
+                        crate::sshkey::sshkey_free((*id).key);
                         libc::free((*id).comment as *mut libc::c_void);
                         libc::free((*id).sk_provider as *mut libc::c_void);
                         free_dest_constraints((*id).dest_constraints, (*id).ndest_constraints);
@@ -3160,7 +3160,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
     }
     libc::free(sk_provider as *mut libc::c_void);
     libc::free(comment as *mut libc::c_void);
-    sshkey_free(k);
+    crate::sshkey::sshkey_free(k);
     free_dest_constraints(dest_constraints, ndest_constraints);
     send_status(e, success);
 }
@@ -3531,7 +3531,7 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
                 (*idtab).nentries;
                 success = 1 as libc::c_int;
             }
-            sshkey_free(*keys.offset(i as isize));
+            crate::sshkey::sshkey_free(*keys.offset(i as isize));
             libc::free(*comments.offset(i as isize) as *mut libc::c_void);
             i += 1;
             i;
@@ -3909,7 +3909,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
         }
     }
     libc::free(fp as *mut libc::c_void);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     crate::sshbuf::sshbuf_free(sid);
     crate::sshbuf::sshbuf_free(sig);
     return if r == 0 as libc::c_int {

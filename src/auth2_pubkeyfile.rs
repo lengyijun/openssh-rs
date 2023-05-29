@@ -60,7 +60,7 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
     fn auth_log_authopts(_: *const libc::c_char, _: *const sshauthopt, _: libc::c_int);
     fn auth_debug_add(fmt: *const libc::c_char, _: ...);
@@ -919,7 +919,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
     sshauthopt_free(keyopts);
     sshauthopt_free(certopts);
     sshauthopt_free(finalopts);
-    sshkey_free(found);
+    crate::sshkey::sshkey_free(found);
     return ret;
 }
 pub unsafe extern "C" fn auth_check_authkeys_file(

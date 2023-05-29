@@ -61,7 +61,7 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -465,7 +465,7 @@ pub unsafe extern "C" fn ssh_free(mut ssh: *mut ssh) {
         }
         *(*k).next.tqe_prev = (*k).next.tqe_next;
         if !((*ssh).kex).is_null() && (*(*ssh).kex).server != 0 {
-            sshkey_free((*k).key);
+            crate::sshkey::sshkey_free((*k).key);
         }
         libc::free(k as *mut libc::c_void);
     }
@@ -510,7 +510,7 @@ pub unsafe extern "C" fn ssh_add_hostkey(
             k_prv.is_null()
         } {
             libc::free(k as *mut libc::c_void);
-            sshkey_free(pubkey);
+            crate::sshkey::sshkey_free(pubkey);
             return -(2 as libc::c_int);
         }
         (*k_prv).key = key;

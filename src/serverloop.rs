@@ -179,7 +179,7 @@ extern "C" {
     ) -> libc::c_int;
     fn channel_cancel_rport_listener(_: *mut ssh, _: *mut Forward) -> libc::c_int;
     fn chan_rcvd_eow(_: *mut ssh, _: *mut Channel);
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
@@ -2024,7 +2024,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
             current_block = 11057878835866523405;
             break;
         }
-        sshkey_free(key);
+        crate::sshkey::sshkey_free(key);
         key = 0 as *mut crate::sshkey::sshkey;
         r = sshpkt_get_string_direct(ssh, &mut blob, &mut blen);
         if r != 0 as libc::c_int || {
@@ -2188,7 +2188,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
     libc::free(sig as *mut libc::c_void);
     crate::sshbuf::sshbuf_free(resp);
     crate::sshbuf::sshbuf_free(sigbuf);
-    sshkey_free(key);
+    crate::sshkey::sshkey_free(key);
     return success;
 }
 unsafe extern "C" fn server_input_global_request(

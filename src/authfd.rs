@@ -43,7 +43,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
 
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
     fn sshkey_equal_public(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -592,7 +591,7 @@ pub unsafe extern "C" fn ssh_free_identitylist(mut idl: *mut ssh_identitylist) {
     i = 0 as libc::c_int as size_t;
     while i < (*idl).nkeys {
         if !((*idl).keys).is_null() {
-            sshkey_free(*((*idl).keys).offset(i as isize));
+            crate::sshkey::sshkey_free(*((*idl).keys).offset(i as isize));
         }
         if !((*idl).comments).is_null() {
             libc::free(*((*idl).comments).offset(i as isize) as *mut libc::c_void);

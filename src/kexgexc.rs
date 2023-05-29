@@ -21,7 +21,7 @@ extern "C" {
     );
     fn DH_free(dh: *mut DH);
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_fromb(
         _: *mut crate::sshbuf::sshbuf,
         _: *mut *mut crate::sshkey::sshkey,
@@ -610,7 +610,7 @@ unsafe extern "C" fn input_kex_dh_gex_reply(
     (*kex).dh = 0 as *mut DH;
     BN_clear_free(dh_server_pub);
     crate::sshbuf::sshbuf_free(shared_secret);
-    sshkey_free(server_host_key);
+    crate::sshkey::sshkey_free(server_host_key);
     crate::sshbuf::sshbuf_free(tmp);
     crate::sshbuf::sshbuf_free(server_host_key_blob);
     libc::free(signature as *mut libc::c_void);

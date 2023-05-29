@@ -60,7 +60,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
     fn sshkey_equal_public(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -1621,7 +1620,7 @@ pub unsafe extern "C" fn auth2_update_methods_lists(
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn auth2_authctxt_reset_info(mut authctxt: *mut Authctxt) {
-    sshkey_free((*authctxt).auth_method_key);
+    crate::sshkey::sshkey_free((*authctxt).auth_method_key);
     libc::free((*authctxt).auth_method_info as *mut libc::c_void);
     (*authctxt).auth_method_key = 0 as *mut crate::sshkey::sshkey;
     (*authctxt).auth_method_info = 0 as *mut libc::c_char;
@@ -1671,7 +1670,7 @@ pub unsafe extern "C" fn auth2_record_key(
             b"copy key\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshkey_free((*authctxt).auth_method_key);
+    crate::sshkey::sshkey_free((*authctxt).auth_method_key);
     (*authctxt).auth_method_key = dup;
     if authenticated == 0 {
         return;

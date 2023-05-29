@@ -159,7 +159,7 @@ extern "C" {
         _: *const libc::c_char,
         _: libc::c_int,
     );
-    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+
     fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
@@ -4290,7 +4290,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             b"clear hostkey %d\0" as *const u8 as *const libc::c_char,
                             i,
                         );
-                        sshkey_free(*(sensitive_data.keys).offset(i as isize));
+                        crate::sshkey::sshkey_free(*(sensitive_data.keys).offset(i as isize));
                         let ref mut fresh8 = *(sensitive_data.keys).offset(i as isize);
                         *fresh8 = 0 as *mut crate::sshkey::sshkey;
                     }
@@ -4304,7 +4304,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 libc::free(options.identity_files[i as usize] as *mut libc::c_void);
                 options.identity_files[i as usize] = 0 as *mut libc::c_char;
                 if !(options.identity_keys[i as usize]).is_null() {
-                    sshkey_free(options.identity_keys[i as usize]);
+                    crate::sshkey::sshkey_free(options.identity_keys[i as usize]);
                     options.identity_keys[i as usize] = 0 as *mut crate::sshkey::sshkey;
                 }
                 i += 1;
@@ -5604,7 +5604,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
         i = 0 as libc::c_int;
         while i < nkeys {
             if n_ids >= 100 as libc::c_int as libc::c_uint {
-                sshkey_free(*keys.offset(i as isize));
+                crate::sshkey::sshkey_free(*keys.offset(i as isize));
                 libc::free(*comments.offset(i as isize) as *mut libc::c_void);
             } else {
                 identity_keys[n_ids as usize] = *keys.offset(i as isize);
@@ -5711,7 +5711,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
                             cp,
                             sshkey_type(public),
                         );
-                        sshkey_free(public);
+                        crate::sshkey::sshkey_free(public);
                         libc::free(cp as *mut libc::c_void);
                     } else {
                         identity_files[n_ids as usize] = crate::xmalloc::xstrdup(filename);
@@ -5789,7 +5789,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
                 filename,
                 sshkey_type(public),
             );
-            sshkey_free(public);
+            crate::sshkey::sshkey_free(public);
             libc::free(filename as *mut libc::c_void);
         } else {
             certificate_files[n_certs as usize] = filename;
