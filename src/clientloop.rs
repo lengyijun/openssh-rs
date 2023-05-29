@@ -104,7 +104,6 @@ extern "C" {
     fn ssh_packet_set_interactive(_: *mut ssh, _: libc::c_int, _: libc::c_int, _: libc::c_int);
     fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
 
-    fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_get_connection_out(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_is_rekeying(_: *mut ssh) -> libc::c_int;
@@ -3013,7 +3012,11 @@ unsafe extern "C" fn process_escapes(
     return bytes;
 }
 unsafe extern "C" fn client_process_buffered_input_packets(mut ssh: *mut ssh) {
-    ssh_dispatch_run_fatal(ssh, DISPATCH_NONBLOCK as libc::c_int, &mut quit_pending);
+    crate::dispatch::ssh_dispatch_run_fatal(
+        ssh,
+        DISPATCH_NONBLOCK as libc::c_int,
+        &mut quit_pending,
+    );
 }
 pub unsafe extern "C" fn client_new_escape_filter_ctx(
     mut escape_char: libc::c_int,

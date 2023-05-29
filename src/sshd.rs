@@ -164,7 +164,6 @@ extern "C" {
     fn sshpkt_put_u8(ssh: *mut ssh, val: u_char) -> libc::c_int;
     fn sshpkt_put_cstring(ssh: *mut ssh, v: *const libc::c_void) -> libc::c_int;
     fn sshpkt_put_stringb(ssh: *mut ssh, v: *const crate::sshbuf::sshbuf) -> libc::c_int;
-    fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
 
     fn log_verbose_add(_: *const libc::c_char);
     fn set_log_handler(_: Option<log_handler_fn>, _: *mut libc::c_void);
@@ -5170,7 +5169,7 @@ unsafe extern "C" fn do_ssh2_kex(mut ssh: *mut ssh) {
                 *const libc::c_char,
             ) -> libc::c_int,
     );
-    ssh_dispatch_run_fatal(
+    crate::dispatch::ssh_dispatch_run_fatal(
         ssh,
         DISPATCH_BLOCK as libc::c_int,
         &mut (*kex).done as *mut sig_atomic_t as *mut sig_atomic_t,

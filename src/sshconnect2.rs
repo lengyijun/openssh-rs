@@ -70,7 +70,7 @@ extern "C" {
     fn ssh_packet_set_rekey_limits(_: *mut ssh, _: u_int64_t, _: u_int32_t);
 
     fn ssh_dispatch_range(_: *mut ssh, _: u_int, _: u_int, _: Option<dispatch_fn>);
-    fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
+
     fn compat_kex_proposal(_: *mut ssh, _: *const libc::c_char) -> *mut libc::c_char;
     fn compression_alg_list(_: libc::c_int) -> *const libc::c_char;
 
@@ -993,7 +993,7 @@ pub unsafe extern "C" fn ssh_kex2(
         verify_host_key_callback
             as unsafe extern "C" fn(*mut crate::sshkey::sshkey, *mut ssh) -> libc::c_int,
     );
-    ssh_dispatch_run_fatal(
+    crate::dispatch::ssh_dispatch_run_fatal(
         ssh,
         DISPATCH_BLOCK as libc::c_int,
         &mut (*(*ssh).kex).done as *mut sig_atomic_t as *mut sig_atomic_t,
@@ -1139,7 +1139,7 @@ pub unsafe extern "C" fn ssh_userauth2(
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_run_fatal(
+    crate::dispatch::ssh_dispatch_run_fatal(
         ssh,
         DISPATCH_BLOCK as libc::c_int,
         &mut authctxt.success as *mut sig_atomic_t as *mut sig_atomic_t,

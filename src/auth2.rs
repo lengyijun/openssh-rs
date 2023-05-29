@@ -41,7 +41,6 @@ extern "C" {
     fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
     fn dispatch_protocol_ignore(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
 
-    fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
     fn ssh_packet_set_log_preamble(_: *mut ssh, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
 
@@ -509,7 +508,7 @@ pub unsafe extern "C" fn do_authentication2(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_run_fatal(
+    crate::dispatch::ssh_dispatch_run_fatal(
         ssh,
         DISPATCH_BLOCK as libc::c_int,
         &mut (*authctxt).success as *mut sig_atomic_t as *mut sig_atomic_t,
