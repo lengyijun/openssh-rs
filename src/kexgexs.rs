@@ -1,3 +1,4 @@
+use crate::channels::ssh_channels;
 use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
 use crate::packet::session_state;
@@ -5,7 +6,6 @@ use crate::umac::umac_ctx;
 
 use ::libc;
 extern "C" {
-    pub type ssh_channels;
 
     pub type ec_group_st;
     pub type dh_st;

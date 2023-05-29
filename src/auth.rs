@@ -1,3 +1,4 @@
+use crate::channels::ssh_channels;
 use crate::packet::session_state;
 use ::libc;
 extern "C" {
@@ -11,7 +12,6 @@ extern "C" {
     pub type sockaddr_dl;
     pub type sockaddr_ax25;
     pub type sockaddr_at;
-    pub type ssh_channels;
 
     pub type kex;
 

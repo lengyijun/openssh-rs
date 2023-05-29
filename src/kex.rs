@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::channels::ssh_channels;
 use crate::cipher::sshcipher;
 use crate::digest_openssl::ssh_digest_ctx;
 use crate::hmac::ssh_hmac_ctx;
@@ -7,7 +8,6 @@ use crate::umac::umac_ctx;
 use ::libc;
 
 extern "C" {
-    pub type ssh_channels;
 
     pub type ec_group_st;
     pub type dh_st;

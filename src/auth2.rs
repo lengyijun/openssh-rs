@@ -1,10 +1,10 @@
 use crate::atomicio::atomicio;
+use crate::channels::ssh_channels;
 use crate::packet::session_state;
 use ::libc;
 use libc::close;
 
 extern "C" {
-    pub type ssh_channels;
 
     pub type kex;
 

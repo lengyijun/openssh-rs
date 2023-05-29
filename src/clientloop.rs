@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::channels::ssh_channels;
 use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
 use crate::packet::session_state;
@@ -11,7 +12,6 @@ extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-    pub type ssh_channels;
 
     pub type ec_group_st;
     pub type dh_st;
