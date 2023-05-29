@@ -270,15 +270,6 @@ extern "C" {
     );
     fn permanently_set_uid(_: *mut libc::passwd);
 
-    fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
-    fn ssh_digest_update(
-        ctx: *mut ssh_digest_ctx,
-        m: *const libc::c_void,
-        mlen: size_t,
-    ) -> libc::c_int;
-    fn ssh_digest_final(ctx: *mut ssh_digest_ctx, d: *mut u_char, dlen: size_t) -> libc::c_int;
-    fn ssh_digest_free(ctx: *mut ssh_digest_ctx);
-
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -3334,7 +3325,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
     let mut buf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut r: libc::c_int = 0;
     if ctx.is_null() && {
-        ctx = ssh_digest_start(4 as libc::c_int);
+        ctx = crate::digest_openssl::ssh_digest_start(4 as libc::c_int);
         ctx.is_null()
     } {
         sshfatal(
@@ -3347,11 +3338,11 @@ unsafe extern "C" fn accumulate_host_timing_secret(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"ssh_digest_start\0" as *const u8 as *const libc::c_char,
+            b"crate::digest_openssl::ssh_digest_start\0" as *const u8 as *const libc::c_char,
         );
     }
     if key.is_null() {
-        if ssh_digest_update(
+        if crate::digest_openssl::ssh_digest_update(
             ctx,
             crate::sshbuf::sshbuf_ptr(server_cfg) as *const libc::c_void,
             crate::sshbuf::sshbuf_len(server_cfg),
@@ -3367,12 +3358,12 @@ unsafe extern "C" fn accumulate_host_timing_secret(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"ssh_digest_update\0" as *const u8 as *const libc::c_char,
+                b"crate::digest_openssl::ssh_digest_update\0" as *const u8 as *const libc::c_char,
             );
         }
         len = crate::digest_openssl::ssh_digest_bytes(4 as libc::c_int);
         hash = crate::xmalloc::xmalloc(len) as *mut u_char;
-        if ssh_digest_final(ctx, hash, len) != 0 as libc::c_int {
+        if crate::digest_openssl::ssh_digest_final(ctx, hash, len) != 0 as libc::c_int {
             sshfatal(
                 b"sshd.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 30], &[libc::c_char; 30]>(
@@ -3383,7 +3374,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"ssh_digest_final\0" as *const u8 as *const libc::c_char,
+                b"crate::digest_openssl::ssh_digest_final\0" as *const u8 as *const libc::c_char,
             );
         }
         options.timing_secret = (*(hash as *const u_char).offset(0 as libc::c_int as isize)
@@ -3403,7 +3394,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
                 << 8 as libc::c_int
             | *(hash as *const u_char).offset(7 as libc::c_int as isize) as u_int64_t;
         freezero(hash as *mut libc::c_void, len);
-        ssh_digest_free(ctx);
+        crate::digest_openssl::ssh_digest_free(ctx);
         ctx = 0 as *mut ssh_digest_ctx;
         return;
     }
@@ -3438,7 +3429,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
             sshkey_ssh_name(key),
         );
     }
-    if ssh_digest_update(
+    if crate::digest_openssl::ssh_digest_update(
         ctx,
         crate::sshbuf::sshbuf_ptr(buf) as *const libc::c_void,
         crate::sshbuf::sshbuf_len(buf),
@@ -3454,7 +3445,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"ssh_digest_update\0" as *const u8 as *const libc::c_char,
+            b"crate::digest_openssl::ssh_digest_update\0" as *const u8 as *const libc::c_char,
         );
     }
     crate::sshbuf::sshbuf_reset(buf);

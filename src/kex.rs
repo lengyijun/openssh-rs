@@ -87,19 +87,6 @@ extern "C" {
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
-    fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
-    fn ssh_digest_update(
-        ctx: *mut ssh_digest_ctx,
-        m: *const libc::c_void,
-        mlen: size_t,
-    ) -> libc::c_int;
-    fn ssh_digest_update_buffer(
-        ctx: *mut ssh_digest_ctx,
-        b: *const crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-    fn ssh_digest_final(ctx: *mut ssh_digest_ctx, d: *mut u_char, dlen: size_t) -> libc::c_int;
-    fn ssh_digest_free(ctx: *mut ssh_digest_ctx);
-
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -2362,18 +2349,23 @@ unsafe extern "C" fn derive_key(
     if digest.is_null() {
         r = -(2 as libc::c_int);
     } else {
-        hashctx = ssh_digest_start((*kex).hash_alg);
+        hashctx = crate::digest_openssl::ssh_digest_start((*kex).hash_alg);
         if hashctx.is_null()
-            || ssh_digest_update_buffer(hashctx, shared_secret) != 0 as libc::c_int
-            || ssh_digest_update(hashctx, hash as *const libc::c_void, hashlen as size_t)
+            || crate::digest_openssl::ssh_digest_update_buffer(hashctx, shared_secret)
                 != 0 as libc::c_int
-            || ssh_digest_update(
+            || crate::digest_openssl::ssh_digest_update(
+                hashctx,
+                hash as *const libc::c_void,
+                hashlen as size_t,
+            ) != 0 as libc::c_int
+            || crate::digest_openssl::ssh_digest_update(
                 hashctx,
                 &mut c as *mut libc::c_char as *const libc::c_void,
                 1 as libc::c_int as size_t,
             ) != 0 as libc::c_int
-            || ssh_digest_update_buffer(hashctx, (*kex).session_id) != 0 as libc::c_int
-            || ssh_digest_final(hashctx, digest, mdsz) != 0 as libc::c_int
+            || crate::digest_openssl::ssh_digest_update_buffer(hashctx, (*kex).session_id)
+                != 0 as libc::c_int
+            || crate::digest_openssl::ssh_digest_final(hashctx, digest, mdsz) != 0 as libc::c_int
         {
             r = -(22 as libc::c_int);
             crate::log::sshlog(
@@ -2387,7 +2379,7 @@ unsafe extern "C" fn derive_key(
                 b"KEX hash failed\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            ssh_digest_free(hashctx);
+            crate::digest_openssl::ssh_digest_free(hashctx);
             hashctx = 0 as *mut ssh_digest_ctx;
             have = mdsz as u_int;
             loop {
@@ -2395,15 +2387,25 @@ unsafe extern "C" fn derive_key(
                     current_block = 8831408221741692167;
                     break;
                 }
-                hashctx = ssh_digest_start((*kex).hash_alg);
+                hashctx = crate::digest_openssl::ssh_digest_start((*kex).hash_alg);
                 if hashctx.is_null()
-                    || ssh_digest_update_buffer(hashctx, shared_secret) != 0 as libc::c_int
-                    || ssh_digest_update(hashctx, hash as *const libc::c_void, hashlen as size_t)
+                    || crate::digest_openssl::ssh_digest_update_buffer(hashctx, shared_secret)
                         != 0 as libc::c_int
-                    || ssh_digest_update(hashctx, digest as *const libc::c_void, have as size_t)
-                        != 0 as libc::c_int
-                    || ssh_digest_final(hashctx, digest.offset(have as isize), mdsz)
-                        != 0 as libc::c_int
+                    || crate::digest_openssl::ssh_digest_update(
+                        hashctx,
+                        hash as *const libc::c_void,
+                        hashlen as size_t,
+                    ) != 0 as libc::c_int
+                    || crate::digest_openssl::ssh_digest_update(
+                        hashctx,
+                        digest as *const libc::c_void,
+                        have as size_t,
+                    ) != 0 as libc::c_int
+                    || crate::digest_openssl::ssh_digest_final(
+                        hashctx,
+                        digest.offset(have as isize),
+                        mdsz,
+                    ) != 0 as libc::c_int
                 {
                     crate::log::sshlog(
                         b"kex.c\0" as *const u8 as *const libc::c_char,
@@ -2421,7 +2423,7 @@ unsafe extern "C" fn derive_key(
                     current_block = 8521021500030589103;
                     break;
                 } else {
-                    ssh_digest_free(hashctx);
+                    crate::digest_openssl::ssh_digest_free(hashctx);
                     hashctx = 0 as *mut ssh_digest_ctx;
                     have = (have as libc::c_ulong).wrapping_add(mdsz) as u_int as u_int;
                 }
@@ -2437,7 +2439,7 @@ unsafe extern "C" fn derive_key(
         }
     }
     libc::free(digest as *mut libc::c_void);
-    ssh_digest_free(hashctx);
+    crate::digest_openssl::ssh_digest_free(hashctx);
     return r;
 }
 pub unsafe extern "C" fn kex_derive_keys(

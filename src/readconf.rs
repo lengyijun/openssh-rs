@@ -158,14 +158,6 @@ extern "C" {
     fn ssh_digest_alg_by_name(name: *const libc::c_char) -> libc::c_int;
     fn ssh_digest_alg_name(alg: libc::c_int) -> *const libc::c_char;
 
-    fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
-    fn ssh_digest_update(
-        ctx: *mut ssh_digest_ctx,
-        m: *const libc::c_void,
-        mlen: size_t,
-    ) -> libc::c_int;
-    fn ssh_digest_final(ctx: *mut ssh_digest_ctx, d: *mut u_char, dlen: size_t) -> libc::c_int;
-    fn ssh_digest_free(ctx: *mut ssh_digest_ctx);
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -1429,14 +1421,23 @@ pub unsafe extern "C" fn ssh_connection_hash(
 ) -> *mut libc::c_char {
     let mut md: *mut ssh_digest_ctx = 0 as *mut ssh_digest_ctx;
     let mut conn_hash: [u_char; 64] = [0; 64];
-    md = ssh_digest_start(1 as libc::c_int);
+    md = crate::digest_openssl::ssh_digest_start(1 as libc::c_int);
     if md.is_null()
-        || ssh_digest_update(md, thishost as *const libc::c_void, strlen(thishost))
+        || crate::digest_openssl::ssh_digest_update(
+            md,
+            thishost as *const libc::c_void,
+            strlen(thishost),
+        ) < 0 as libc::c_int
+        || crate::digest_openssl::ssh_digest_update(md, host as *const libc::c_void, strlen(host))
             < 0 as libc::c_int
-        || ssh_digest_update(md, host as *const libc::c_void, strlen(host)) < 0 as libc::c_int
-        || ssh_digest_update(md, portstr as *const libc::c_void, strlen(portstr)) < 0 as libc::c_int
-        || ssh_digest_update(md, user as *const libc::c_void, strlen(user)) < 0 as libc::c_int
-        || ssh_digest_final(
+        || crate::digest_openssl::ssh_digest_update(
+            md,
+            portstr as *const libc::c_void,
+            strlen(portstr),
+        ) < 0 as libc::c_int
+        || crate::digest_openssl::ssh_digest_update(md, user as *const libc::c_void, strlen(user))
+            < 0 as libc::c_int
+        || crate::digest_openssl::ssh_digest_final(
             md,
             conn_hash.as_mut_ptr(),
             ::core::mem::size_of::<[u_char; 64]>() as libc::c_ulong,
@@ -1453,7 +1454,7 @@ pub unsafe extern "C" fn ssh_connection_hash(
             b"mux digest failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    ssh_digest_free(md);
+    crate::digest_openssl::ssh_digest_free(md);
     return tohex(
         conn_hash.as_mut_ptr() as *const libc::c_void,
         crate::digest_openssl::ssh_digest_bytes(1 as libc::c_int),

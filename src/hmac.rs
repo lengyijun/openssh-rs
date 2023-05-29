@@ -11,18 +11,6 @@ extern "C" {
     fn ssh_digest_blocksize(ctx: *mut ssh_digest_ctx) -> size_t;
     fn ssh_digest_copy_state(from: *mut ssh_digest_ctx, to: *mut ssh_digest_ctx) -> libc::c_int;
 
-    fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
-    fn ssh_digest_update(
-        ctx: *mut ssh_digest_ctx,
-        m: *const libc::c_void,
-        mlen: size_t,
-    ) -> libc::c_int;
-    fn ssh_digest_update_buffer(
-        ctx: *mut ssh_digest_ctx,
-        b: *const crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-    fn ssh_digest_final(ctx: *mut ssh_digest_ctx, d: *mut u_char, dlen: size_t) -> libc::c_int;
-    fn ssh_digest_free(ctx: *mut ssh_digest_ctx);
 }
 pub type __u_char = libc::c_uchar;
 pub type u_char = __u_char;
@@ -50,14 +38,14 @@ pub unsafe extern "C" fn ssh_hmac_start(mut alg: libc::c_int) -> *mut ssh_hmac_c
         return 0 as *mut ssh_hmac_ctx;
     }
     (*ret).alg = alg;
-    (*ret).ictx = ssh_digest_start(alg);
+    (*ret).ictx = crate::digest_openssl::ssh_digest_start(alg);
     if !(((*ret).ictx).is_null()
         || {
-            (*ret).octx = ssh_digest_start(alg);
+            (*ret).octx = crate::digest_openssl::ssh_digest_start(alg);
             ((*ret).octx).is_null()
         }
         || {
-            (*ret).digest = ssh_digest_start(alg);
+            (*ret).digest = crate::digest_openssl::ssh_digest_start(alg);
             ((*ret).digest).is_null()
         })
     {
@@ -96,7 +84,7 @@ pub unsafe extern "C" fn ssh_hmac_init(
             i = i.wrapping_add(1);
             i;
         }
-        if ssh_digest_update(
+        if crate::digest_openssl::ssh_digest_update(
             (*ctx).ictx,
             (*ctx).buf as *const libc::c_void,
             (*ctx).buf_len,
@@ -112,7 +100,7 @@ pub unsafe extern "C" fn ssh_hmac_init(
             i = i.wrapping_add(1);
             i;
         }
-        if ssh_digest_update(
+        if crate::digest_openssl::ssh_digest_update(
             (*ctx).octx,
             (*ctx).buf as *const libc::c_void,
             (*ctx).buf_len,
@@ -132,13 +120,13 @@ pub unsafe extern "C" fn ssh_hmac_update(
     mut m: *const libc::c_void,
     mut mlen: size_t,
 ) -> libc::c_int {
-    return ssh_digest_update((*ctx).digest, m, mlen);
+    return crate::digest_openssl::ssh_digest_update((*ctx).digest, m, mlen);
 }
 pub unsafe extern "C" fn ssh_hmac_update_buffer(
     mut ctx: *mut ssh_hmac_ctx,
     mut b: *const crate::sshbuf::sshbuf,
 ) -> libc::c_int {
-    return ssh_digest_update_buffer((*ctx).digest, b);
+    return crate::digest_openssl::ssh_digest_update_buffer((*ctx).digest, b);
 }
 pub unsafe extern "C" fn ssh_hmac_final(
     mut ctx: *mut ssh_hmac_ctx,
@@ -147,13 +135,16 @@ pub unsafe extern "C" fn ssh_hmac_final(
 ) -> libc::c_int {
     let mut len: size_t = 0;
     len = crate::digest_openssl::ssh_digest_bytes((*ctx).alg);
-    if dlen < len || ssh_digest_final((*ctx).digest, (*ctx).buf, len) != 0 {
+    if dlen < len || crate::digest_openssl::ssh_digest_final((*ctx).digest, (*ctx).buf, len) != 0 {
         return -(1 as libc::c_int);
     }
     if ssh_digest_copy_state((*ctx).octx, (*ctx).digest) < 0 as libc::c_int
-        || ssh_digest_update((*ctx).digest, (*ctx).buf as *const libc::c_void, len)
-            < 0 as libc::c_int
-        || ssh_digest_final((*ctx).digest, d, dlen) < 0 as libc::c_int
+        || crate::digest_openssl::ssh_digest_update(
+            (*ctx).digest,
+            (*ctx).buf as *const libc::c_void,
+            len,
+        ) < 0 as libc::c_int
+        || crate::digest_openssl::ssh_digest_final((*ctx).digest, d, dlen) < 0 as libc::c_int
     {
         return -(1 as libc::c_int);
     }
@@ -161,9 +152,9 @@ pub unsafe extern "C" fn ssh_hmac_final(
 }
 pub unsafe extern "C" fn ssh_hmac_free(mut ctx: *mut ssh_hmac_ctx) {
     if !ctx.is_null() {
-        ssh_digest_free((*ctx).ictx);
-        ssh_digest_free((*ctx).octx);
-        ssh_digest_free((*ctx).digest);
+        crate::digest_openssl::ssh_digest_free((*ctx).ictx);
+        crate::digest_openssl::ssh_digest_free((*ctx).octx);
+        crate::digest_openssl::ssh_digest_free((*ctx).digest);
         if !((*ctx).buf).is_null() {
             explicit_bzero((*ctx).buf as *mut libc::c_void, (*ctx).buf_len);
             libc::free((*ctx).buf as *mut libc::c_void);

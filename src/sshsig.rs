@@ -137,14 +137,7 @@ extern "C" {
         d: *mut u_char,
         dlen: size_t,
     ) -> libc::c_int;
-    fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
-    fn ssh_digest_update(
-        ctx: *mut ssh_digest_ctx,
-        m: *const libc::c_void,
-        mlen: size_t,
-    ) -> libc::c_int;
-    fn ssh_digest_final(ctx: *mut ssh_digest_ctx, d: *mut u_char, dlen: size_t) -> libc::c_int;
-    fn ssh_digest_free(ctx: *mut ssh_digest_ctx);
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -1393,7 +1386,7 @@ unsafe extern "C" fn hash_file(
         );
         return -(1 as libc::c_int);
     }
-    ctx = ssh_digest_start(alg);
+    ctx = crate::digest_openssl::ssh_digest_start(alg);
     if ctx.is_null() {
         crate::log::sshlog(
             b"sshsig.c\0" as *const u8 as *const libc::c_char,
@@ -1402,7 +1395,7 @@ unsafe extern "C" fn hash_file(
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"ssh_digest_start failed\0" as *const u8 as *const libc::c_char,
+            b"crate::digest_openssl::ssh_digest_start failed\0" as *const u8 as *const libc::c_char,
         );
         return -(1 as libc::c_int);
     }
@@ -1450,7 +1443,11 @@ unsafe extern "C" fn hash_file(
             break;
         } else {
             total = (total as libc::c_ulong).wrapping_add(n as size_t) as ssize_t as ssize_t;
-            r = ssh_digest_update(ctx, rbuf.as_mut_ptr() as *const libc::c_void, n as size_t);
+            r = crate::digest_openssl::ssh_digest_update(
+                ctx,
+                rbuf.as_mut_ptr() as *const libc::c_void,
+                n as size_t,
+            );
             if !(r != 0 as libc::c_int) {
                 continue;
             }
@@ -1462,7 +1459,7 @@ unsafe extern "C" fn hash_file(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 ssh_err(r),
-                b"ssh_digest_update\0" as *const u8 as *const libc::c_char,
+                b"crate::digest_openssl::ssh_digest_update\0" as *const u8 as *const libc::c_char,
             );
             current_block = 6182669104404250719;
             break;
@@ -1470,7 +1467,7 @@ unsafe extern "C" fn hash_file(
     }
     match current_block {
         5601891728916014340 => {
-            r = ssh_digest_final(
+            r = crate::digest_openssl::ssh_digest_final(
                 ctx,
                 hash.as_mut_ptr() as *mut u_char,
                 ::core::mem::size_of::<[libc::c_char; 64]>() as libc::c_ulong,
@@ -1484,7 +1481,8 @@ unsafe extern "C" fn hash_file(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     ssh_err(r),
-                    b"ssh_digest_final\0" as *const u8 as *const libc::c_char,
+                    b"crate::digest_openssl::ssh_digest_final\0" as *const u8
+                        as *const libc::c_char,
                 );
             } else {
                 hex = tohex(
@@ -1540,7 +1538,7 @@ unsafe extern "C" fn hash_file(
     }
     oerrno = *libc::__errno_location();
     crate::sshbuf::sshbuf_free(b);
-    ssh_digest_free(ctx);
+    crate::digest_openssl::ssh_digest_free(ctx);
     explicit_bzero(
         hash.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[libc::c_char; 64]>() as libc::c_ulong,
