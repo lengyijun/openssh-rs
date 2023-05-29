@@ -37,7 +37,6 @@ extern "C" {
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
@@ -2082,7 +2081,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
         );
         failure = -(1 as libc::c_int);
     }
-    while sshbuf_len(buf) > 0 as libc::c_int as libc::c_ulong {
+    while crate::sshbuf::sshbuf_len(buf) > 0 as libc::c_int as libc::c_ulong {
         r = sshbuf_get_u8(buf, &mut opcode);
         if r != 0 as libc::c_int {
             sshfatal(
@@ -3319,7 +3318,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
             }
         }
     }
-    len = sshbuf_len(buf);
+    len = crate::sshbuf::sshbuf_len(buf);
     crate::sshbuf::sshbuf_free(buf);
     if len > 0 as libc::c_int as libc::c_ulong {
         crate::log::sshlog(

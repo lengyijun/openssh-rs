@@ -27,7 +27,7 @@ extern "C" {
     fn dh_new_group(_: *mut BIGNUM, _: *mut BIGNUM) -> *mut DH;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
@@ -731,7 +731,7 @@ pub unsafe extern "C" fn mm_log_handler(
             b"assemble\0" as *const u8 as *const libc::c_char,
         );
     }
-    len = sshbuf_len(log_msg);
+    len = crate::sshbuf::sshbuf_len(log_msg);
     if len < 4 as libc::c_int as libc::c_ulong || len > 0xffffffff as libc::c_uint as libc::c_ulong
     {
         sshfatal(
@@ -789,7 +789,7 @@ pub unsafe extern "C" fn mm_request_send(
     mut type_0: monitor_reqtype,
     mut m: *mut crate::sshbuf::sshbuf,
 ) {
-    let mut mlen: size_t = sshbuf_len(m);
+    let mut mlen: size_t = crate::sshbuf::sshbuf_len(m);
     let mut buf: [u_char; 5] = [0; 5];
     crate::log::sshlog(
         b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
@@ -1119,7 +1119,7 @@ pub unsafe extern "C" fn mm_choose_dh(
         SYSLOG_LEVEL_DEBUG3,
         0 as *const libc::c_char,
         b"remaining %zu\0" as *const u8 as *const libc::c_char,
-        sshbuf_len(m),
+        crate::sshbuf::sshbuf_len(m),
     );
     crate::sshbuf::sshbuf_free(m);
     return dh_new_group(g, p);

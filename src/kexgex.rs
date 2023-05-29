@@ -3,7 +3,6 @@ extern "C" {
 
     pub type bignum_st;
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -69,8 +68,8 @@ pub unsafe extern "C" fn kexgex_hash(
         || {
             r = sshbuf_put_u32(
                 b,
-                (sshbuf_len(client_kexinit)).wrapping_add(1 as libc::c_int as libc::c_ulong)
-                    as u_int32_t,
+                (crate::sshbuf::sshbuf_len(client_kexinit))
+                    .wrapping_add(1 as libc::c_int as libc::c_ulong) as u_int32_t,
             );
             r != 0 as libc::c_int
         }
@@ -85,8 +84,8 @@ pub unsafe extern "C" fn kexgex_hash(
         || {
             r = sshbuf_put_u32(
                 b,
-                (sshbuf_len(server_kexinit)).wrapping_add(1 as libc::c_int as libc::c_ulong)
-                    as u_int32_t,
+                (crate::sshbuf::sshbuf_len(server_kexinit))
+                    .wrapping_add(1 as libc::c_int as libc::c_ulong) as u_int32_t,
             );
             r != 0 as libc::c_int
         }

@@ -190,7 +190,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1080,13 +1080,13 @@ unsafe extern "C" fn cert_compare(mut a: *mut sshkey_cert, mut b: *mut sshkey_ce
     if a.is_null() || b.is_null() {
         return 0 as libc::c_int;
     }
-    if sshbuf_len((*a).certblob) != sshbuf_len((*b).certblob) {
+    if crate::sshbuf::sshbuf_len((*a).certblob) != crate::sshbuf::sshbuf_len((*b).certblob) {
         return 0 as libc::c_int;
     }
     if timingsafe_bcmp(
         sshbuf_ptr((*a).certblob) as *const libc::c_void,
         sshbuf_ptr((*b).certblob) as *const libc::c_void,
-        sshbuf_len((*a).certblob),
+        crate::sshbuf::sshbuf_len((*a).certblob),
     ) != 0 as libc::c_int
     {
         return 0 as libc::c_int;
@@ -1166,7 +1166,7 @@ unsafe extern "C" fn to_blob_buf(
         if ((*key).cert).is_null() {
             return -(16 as libc::c_int);
         }
-        if sshbuf_len((*(*key).cert).certblob) == 0 as libc::c_int as libc::c_ulong {
+        if crate::sshbuf::sshbuf_len((*(*key).cert).certblob) == 0 as libc::c_int as libc::c_ulong {
             return -(17 as libc::c_int);
         }
         ret = sshbuf_putb(b, (*(*key).cert).certblob);
@@ -1245,7 +1245,7 @@ unsafe extern "C" fn to_blob(
     }
     ret = to_blob_buf(key, b, force_plain, opts);
     if !(ret != 0 as libc::c_int) {
-        len = sshbuf_len(b);
+        len = crate::sshbuf::sshbuf_len(b);
         if !lenp.is_null() {
             *lenp = len;
         }
@@ -2019,7 +2019,7 @@ pub unsafe extern "C" fn sshkey_write(
     if !(r != 0 as libc::c_int) {
         if fwrite(
             sshbuf_ptr(b) as *const libc::c_void,
-            sshbuf_len(b),
+            crate::sshbuf::sshbuf_len(b),
             1 as libc::c_int as libc::c_ulong,
             f,
         ) != 1 as libc::c_int as libc::c_ulong
@@ -2384,7 +2384,7 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
                         if !(r != 0 as libc::c_int) {
                             i = 0 as libc::c_int as size_t;
                             loop {
-                                if !((sshbuf_len(prvbuf))
+                                if !((crate::sshbuf::sshbuf_len(prvbuf))
                                     .wrapping_rem(cipher_blocksize(cipher) as libc::c_ulong)
                                     != 0)
                                 {
@@ -2404,7 +2404,7 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
                             match current_block {
                                 8858214262807371918 => {}
                                 _ => {
-                                    enclen = sshbuf_len(prvbuf);
+                                    enclen = crate::sshbuf::sshbuf_len(prvbuf);
                                     enc = libc::malloc(enclen as usize) as *mut u_char;
                                     if enc.is_null() {
                                         r = -(2 as libc::c_int);
@@ -2414,7 +2414,7 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
                                             0 as libc::c_int as u_int,
                                             enc,
                                             sshbuf_ptr(prvbuf),
-                                            sshbuf_len(prvbuf) as u_int,
+                                            crate::sshbuf::sshbuf_len(prvbuf) as u_int,
                                             0 as libc::c_int as u_int,
                                             0 as libc::c_int as u_int,
                                         );
@@ -2473,7 +2473,7 @@ unsafe extern "C" fn private2_check_padding(
     let mut r: libc::c_int = 0;
     i = 0 as libc::c_int as size_t;
     loop {
-        if !(sshbuf_len(decrypted) != 0) {
+        if !(crate::sshbuf::sshbuf_len(decrypted) != 0) {
             current_block = 15619007995458559411;
             break;
         }
@@ -2677,7 +2677,8 @@ unsafe extern "C" fn cert_parse(
     {
         ret = -(4 as libc::c_int);
     } else {
-        signed_len = (sshbuf_len((*(*key).cert).certblob)).wrapping_sub(sshbuf_len(b));
+        signed_len = (crate::sshbuf::sshbuf_len((*(*key).cert).certblob))
+            .wrapping_sub(crate::sshbuf::sshbuf_len(b));
         ret = sshbuf_get_string(b, &mut sig, &mut slen);
         if ret != 0 as libc::c_int {
             ret = -(4 as libc::c_int);
@@ -2687,7 +2688,7 @@ unsafe extern "C" fn cert_parse(
             ret = -(18 as libc::c_int);
         } else {
             loop {
-                if !(sshbuf_len(principals) > 0 as libc::c_int as libc::c_ulong) {
+                if !(crate::sshbuf::sshbuf_len(principals) > 0 as libc::c_int as libc::c_ulong) {
                     current_block = 5601891728916014340;
                     break;
                 }
@@ -2742,7 +2743,9 @@ unsafe extern "C" fn cert_parse(
                         })
                     {
                         loop {
-                            if !(sshbuf_len(crit) != 0 as libc::c_int as libc::c_ulong) {
+                            if !(crate::sshbuf::sshbuf_len(crit)
+                                != 0 as libc::c_int as libc::c_ulong)
+                            {
                                 current_block = 7056779235015430508;
                                 break;
                             }
@@ -2771,7 +2774,8 @@ unsafe extern "C" fn cert_parse(
                             _ => {
                                 loop {
                                     if !(!exts.is_null()
-                                        && sshbuf_len(exts) != 0 as libc::c_int as libc::c_ulong)
+                                        && crate::sshbuf::sshbuf_len(exts)
+                                            != 0 as libc::c_int as libc::c_ulong)
                                     {
                                         current_block = 8693738493027456495;
                                         break;
@@ -2916,7 +2920,8 @@ unsafe extern "C" fn sshkey_from_blob_internal(
                                     ret != 0 as libc::c_int
                                 }) {
                                     if !key.is_null()
-                                        && sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong
+                                        && crate::sshbuf::sshbuf_len(b)
+                                            != 0 as libc::c_int as libc::c_ulong
                                     {
                                         ret = -(4 as libc::c_int);
                                     } else {
@@ -3323,7 +3328,7 @@ pub unsafe extern "C" fn sshkey_certify_custom(
                                         &mut sig_blob,
                                         &mut sig_len,
                                         sshbuf_ptr(cert),
-                                        sshbuf_len(cert),
+                                        crate::sshbuf::sshbuf_len(cert),
                                         alg,
                                         sk_provider,
                                         sk_pin,
@@ -3539,7 +3544,7 @@ pub unsafe extern "C" fn sshkey_cert_check_host(
     if r != 0 as libc::c_int {
         return r;
     }
-    if sshbuf_len((*(*key).cert).critical) != 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len((*(*key).cert).critical) != 0 as libc::c_int as libc::c_ulong {
         *reason = b"Certificate contains unsupported critical options\0" as *const u8
             as *const libc::c_char;
         return -(25 as libc::c_int);
@@ -3659,7 +3664,8 @@ pub unsafe extern "C" fn sshkey_private_serialize_opt(
     if !(r != 0 as libc::c_int) {
         if sshkey_is_cert(key) != 0 {
             if ((*key).cert).is_null()
-                || sshbuf_len((*(*key).cert).certblob) == 0 as libc::c_int as libc::c_ulong
+                || crate::sshbuf::sshbuf_len((*(*key).cert).certblob)
+                    == 0 as libc::c_int as libc::c_ulong
             {
                 r = -(10 as libc::c_int);
                 current_block = 14051893294743041233;
@@ -4147,7 +4153,8 @@ unsafe extern "C" fn sshkey_private_to_blob2(
                                     }) {
                                         i = 0 as libc::c_int as size_t;
                                         loop {
-                                            if !((sshbuf_len(encrypted)).wrapping_rem(blocksize)
+                                            if !((crate::sshbuf::sshbuf_len(encrypted))
+                                                .wrapping_rem(blocksize)
                                                 != 0)
                                             {
                                                 current_block = 17500079516916021833;
@@ -4169,12 +4176,13 @@ unsafe extern "C" fn sshkey_private_to_blob2(
                                             _ => {
                                                 r = sshbuf_put_u32(
                                                     encoded,
-                                                    sshbuf_len(encrypted) as u_int32_t,
+                                                    crate::sshbuf::sshbuf_len(encrypted)
+                                                        as u_int32_t,
                                                 );
                                                 if !(r != 0 as libc::c_int) {
                                                     r = sshbuf_reserve(
                                                         encoded,
-                                                        (sshbuf_len(encrypted))
+                                                        (crate::sshbuf::sshbuf_len(encrypted))
                                                             .wrapping_add(authlen),
                                                         &mut cp,
                                                     );
@@ -4184,7 +4192,8 @@ unsafe extern "C" fn sshkey_private_to_blob2(
                                                             0 as libc::c_int as u_int,
                                                             cp,
                                                             sshbuf_ptr(encrypted),
-                                                            sshbuf_len(encrypted) as u_int,
+                                                            crate::sshbuf::sshbuf_len(encrypted)
+                                                                as u_int,
                                                             0 as libc::c_int as u_int,
                                                             authlen as u_int,
                                                         );
@@ -4274,7 +4283,7 @@ unsafe extern "C" fn private2_uudecode(
         r = -(2 as libc::c_int);
     } else {
         cp = sshbuf_ptr(blob);
-        encoded_len = sshbuf_len(blob);
+        encoded_len = crate::sshbuf::sshbuf_len(blob);
         if encoded_len
             < (::core::mem::size_of::<[libc::c_char; 37]>() as libc::c_ulong)
                 .wrapping_sub(1 as libc::c_int as libc::c_ulong)
@@ -4350,7 +4359,7 @@ unsafe extern "C" fn private2_uudecode(
                     } else {
                         r = sshbuf_b64tod(decoded, sshbuf_ptr(encoded) as *mut libc::c_char);
                         if !(r != 0 as libc::c_int) {
-                            if sshbuf_len(decoded)
+                            if crate::sshbuf::sshbuf_len(decoded)
                                 < ::core::mem::size_of::<[libc::c_char; 15]>() as libc::c_ulong
                                 || memcmp(
                                     sshbuf_ptr(decoded) as *const libc::c_void,
@@ -4513,8 +4522,9 @@ unsafe extern "C" fn private2_decrypt(
                                 match current_block {
                                     9806652011558982115 => {}
                                     _ => {
-                                        if sshbuf_len(decoded) < authlen
-                                            || (sshbuf_len(decoded)).wrapping_sub(authlen)
+                                        if crate::sshbuf::sshbuf_len(decoded) < authlen
+                                            || (crate::sshbuf::sshbuf_len(decoded))
+                                                .wrapping_sub(authlen)
                                                 < encrypted_len as libc::c_ulong
                                         {
                                             r = -(4 as libc::c_int);
@@ -4556,7 +4566,7 @@ unsafe extern "C" fn private2_decrypt(
                                                             .wrapping_add(authlen),
                                                     );
                                                     if !(r != 0 as libc::c_int) {
-                                                        if sshbuf_len(decoded)
+                                                        if crate::sshbuf::sshbuf_len(decoded)
                                                             != 0 as libc::c_int as libc::c_ulong
                                                         {
                                                             r = -(4 as libc::c_int);
@@ -4988,14 +4998,15 @@ unsafe extern "C" fn sshkey_parse_private_pem_fileblob(
         *keyp = 0 as *mut sshkey;
     }
     bio = BIO_new(BIO_s_mem());
-    if bio.is_null() || sshbuf_len(blob) > 2147483647 as libc::c_int as libc::c_ulong {
+    if bio.is_null() || crate::sshbuf::sshbuf_len(blob) > 2147483647 as libc::c_int as libc::c_ulong
+    {
         return -(2 as libc::c_int);
     }
     if BIO_write(
         bio,
         sshbuf_ptr(blob) as *const libc::c_void,
-        sshbuf_len(blob) as libc::c_int,
-    ) != sshbuf_len(blob) as libc::c_int
+        crate::sshbuf::sshbuf_len(blob) as libc::c_int,
+    ) != crate::sshbuf::sshbuf_len(blob) as libc::c_int
     {
         r = -(2 as libc::c_int);
     } else {

@@ -55,7 +55,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
@@ -337,7 +337,7 @@ unsafe extern "C" fn process_sign(
             __progname,
         );
     }
-    if sshbuf_len(req) != 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(req) != 0 as libc::c_int as libc::c_ulong {
         sshfatal(
             b"ssh-sk-helper.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"process_sign\0")).as_ptr(),
@@ -528,7 +528,7 @@ unsafe extern "C" fn process_enroll(
             __progname,
         );
     }
-    if sshbuf_len(req) != 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(req) != 0 as libc::c_int as libc::c_ulong {
         sshfatal(
             b"ssh-sk-helper.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"process_enroll\0"))
@@ -555,7 +555,7 @@ unsafe extern "C" fn process_enroll(
             type_0,
         );
     }
-    if sshbuf_len(challenge) == 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(challenge) == 0 as libc::c_int as libc::c_ulong {
         crate::sshbuf::sshbuf_free(challenge);
         challenge = 0 as *mut crate::sshbuf::sshbuf;
     }
@@ -700,7 +700,7 @@ unsafe extern "C" fn process_load_resident(
             __progname,
         );
     }
-    if sshbuf_len(req) != 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(req) != 0 as libc::c_int as libc::c_ulong {
         sshfatal(
             b"ssh-sk-helper.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(b"process_load_resident\0"))
@@ -940,7 +940,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         SYSLOG_LEVEL_DEBUG1,
         0 as *const libc::c_char,
         b"received message len %zu\0" as *const u8 as *const libc::c_char,
-        sshbuf_len(req),
+        crate::sshbuf::sshbuf_len(req),
     );
     r = sshbuf_get_u8(req, &mut version);
     if r != 0 as libc::c_int {
@@ -1031,7 +1031,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
         SYSLOG_LEVEL_DEBUG1,
         0 as *const libc::c_char,
         b"reply len %zu\0" as *const u8 as *const libc::c_char,
-        sshbuf_len(resp),
+        crate::sshbuf::sshbuf_len(resp),
     );
     if ssh_msg_send(out, 5 as libc::c_int as u_char, resp) == -(1 as libc::c_int) {
         sshfatal(

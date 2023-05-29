@@ -30,7 +30,7 @@ extern "C" {
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1087,7 +1087,7 @@ pub unsafe extern "C" fn sshsk_enroll(
         if challenge_buf.is_null() {
             0 as libc::c_int as libc::c_ulong
         } else {
-            sshbuf_len(challenge_buf)
+            crate::sshbuf::sshbuf_len(challenge_buf)
         },
         if !pin.is_null() && *pin as libc::c_int != '\0' as i32 {
             b" with-pin\0" as *const u8 as *const libc::c_char
@@ -1177,7 +1177,9 @@ pub unsafe extern "C" fn sshsk_enroll(
                         challenge = randchall.as_mut_ptr();
                         challenge_len = ::core::mem::size_of::<[u_char; 32]>() as libc::c_ulong;
                         current_block = 13550086250199790493;
-                    } else if sshbuf_len(challenge_buf) == 0 as libc::c_int as libc::c_ulong {
+                    } else if crate::sshbuf::sshbuf_len(challenge_buf)
+                        == 0 as libc::c_int as libc::c_ulong
+                    {
                         crate::log::sshlog(
                             b"ssh-sk.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
@@ -1194,7 +1196,7 @@ pub unsafe extern "C" fn sshsk_enroll(
                         current_block = 7177629584601204510;
                     } else {
                         challenge = sshbuf_ptr(challenge_buf);
-                        challenge_len = sshbuf_len(challenge_buf);
+                        challenge_len = crate::sshbuf::sshbuf_len(challenge_buf);
                         crate::log::sshlog(
                             b"ssh-sk.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
@@ -1474,7 +1476,7 @@ pub unsafe extern "C" fn sshsk_sign(
                 datalen,
                 (*key).sk_application,
                 sshbuf_ptr((*key).sk_key_handle),
-                sshbuf_len((*key).sk_key_handle),
+                crate::sshbuf::sshbuf_len((*key).sk_key_handle),
                 (*key).sk_flags,
                 pin,
                 opts,
@@ -1538,7 +1540,8 @@ pub unsafe extern "C" fn sshsk_sign(
                             7648509926025298111 => {}
                             _ => {
                                 if !sigp.is_null() {
-                                    *sigp = libc::malloc(sshbuf_len(sig) as usize) as *mut u_char;
+                                    *sigp = libc::malloc(crate::sshbuf::sshbuf_len(sig) as usize)
+                                        as *mut u_char;
                                     if (*sigp).is_null() {
                                         r = -(2 as libc::c_int);
                                         current_block = 7648509926025298111;
@@ -1546,7 +1549,7 @@ pub unsafe extern "C" fn sshsk_sign(
                                         memcpy(
                                             *sigp as *mut libc::c_void,
                                             sshbuf_ptr(sig) as *const libc::c_void,
-                                            sshbuf_len(sig),
+                                            crate::sshbuf::sshbuf_len(sig),
                                         );
                                         current_block = 8693738493027456495;
                                     }
@@ -1557,7 +1560,7 @@ pub unsafe extern "C" fn sshsk_sign(
                                     7648509926025298111 => {}
                                     _ => {
                                         if !lenp.is_null() {
-                                            *lenp = sshbuf_len(sig);
+                                            *lenp = crate::sshbuf::sshbuf_len(sig);
                                         }
                                         r = 0 as libc::c_int;
                                     }

@@ -156,7 +156,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
@@ -3686,8 +3685,9 @@ pub unsafe extern "C" fn argv_assemble(
         i += 1;
         i;
     }
-    ret = libc::malloc((sshbuf_len(buf) as usize).wrapping_add(1 as libc::c_int as usize))
-        as *mut libc::c_char;
+    ret = libc::malloc(
+        (crate::sshbuf::sshbuf_len(buf) as usize).wrapping_add(1 as libc::c_int as usize),
+    ) as *mut libc::c_char;
     if ret.is_null() {
         sshfatal(
             b"misc.c\0" as *const u8 as *const libc::c_char,
@@ -3703,9 +3703,9 @@ pub unsafe extern "C" fn argv_assemble(
     memcpy(
         ret as *mut libc::c_void,
         sshbuf_ptr(buf) as *const libc::c_void,
-        sshbuf_len(buf),
+        crate::sshbuf::sshbuf_len(buf),
     );
-    *ret.offset(sshbuf_len(buf) as isize) = '\0' as i32 as libc::c_char;
+    *ret.offset(crate::sshbuf::sshbuf_len(buf) as isize) = '\0' as i32 as libc::c_char;
     crate::sshbuf::sshbuf_free(buf);
     crate::sshbuf::sshbuf_free(arg);
     return ret;

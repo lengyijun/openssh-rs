@@ -91,7 +91,7 @@ extern "C" {
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1882,11 +1882,11 @@ pub unsafe extern "C" fn mm_answer_sign(
                 b"assemble private key proof\0" as *const u8 as *const libc::c_char,
             );
         }
-        if datlen != sshbuf_len(sigbuf)
+        if datlen != crate::sshbuf::sshbuf_len(sigbuf)
             || memcmp(
                 p as *const libc::c_void,
                 sshbuf_ptr(sigbuf) as *const libc::c_void,
-                sshbuf_len(sigbuf),
+                crate::sshbuf::sshbuf_len(sigbuf),
             ) != 0 as libc::c_int
         {
             sshfatal(
@@ -1900,7 +1900,7 @@ pub unsafe extern "C" fn mm_answer_sign(
                 b"bad data length: %zu, hostkey proof len %zu\0" as *const u8
                     as *const libc::c_char,
                 datlen,
-                sshbuf_len(sigbuf),
+                crate::sshbuf::sshbuf_len(sigbuf),
             );
         }
         crate::sshbuf::sshbuf_free(sigbuf);
@@ -3148,7 +3148,7 @@ unsafe extern "C" fn monitor_valid_userblob(
     }
     if (*ssh).compat & 0x10 as libc::c_int != 0 {
         p = sshbuf_ptr(b);
-        len = sshbuf_len(b);
+        len = crate::sshbuf::sshbuf_len(b);
         if session_id2.is_null()
             || len < session_id2_len as libc::c_ulong
             || timingsafe_bcmp(
@@ -3347,7 +3347,7 @@ unsafe extern "C" fn monitor_valid_userblob(
             b"parse pk\0" as *const u8 as *const libc::c_char,
         );
     }
-    if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
         fail += 1;
         fail;
     }
@@ -3585,7 +3585,7 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
         fail;
     }
     libc::free(cp as *mut libc::c_void);
-    if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
         fail += 1;
         fail;
     }
@@ -4214,7 +4214,7 @@ pub unsafe extern "C" fn monitor_apply_keystate(mut ssh: *mut ssh, mut _pmonitor
             b"internal error: ssh->kex == NULL\0" as *const u8 as *const libc::c_char,
         );
     }
-    if session_id2_len as libc::c_ulong != sshbuf_len((*(*ssh).kex).session_id) {
+    if session_id2_len as libc::c_ulong != crate::sshbuf::sshbuf_len((*(*ssh).kex).session_id) {
         sshfatal(
             b"monitor.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
@@ -4226,7 +4226,7 @@ pub unsafe extern "C" fn monitor_apply_keystate(mut ssh: *mut ssh, mut _pmonitor
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"incorrect session id length %zu (expected %u)\0" as *const u8 as *const libc::c_char,
-            sshbuf_len((*(*ssh).kex).session_id),
+            crate::sshbuf::sshbuf_len((*(*ssh).kex).session_id),
             session_id2_len,
         );
     }

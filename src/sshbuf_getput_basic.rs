@@ -18,7 +18,7 @@ extern "C" {
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_set_parent(
@@ -150,7 +150,7 @@ unsafe extern "C" fn check_offset(
     if offset >= (18446744073709551615 as libc::c_ulong).wrapping_sub(len) {
         return -(10 as libc::c_int);
     }
-    if offset.wrapping_add(len) > sshbuf_len(buf) {
+    if offset.wrapping_add(len) > crate::sshbuf::sshbuf_len(buf) {
         return if wr != 0 {
             -(9 as libc::c_int)
         } else {
@@ -340,7 +340,7 @@ pub unsafe extern "C" fn sshbuf_peek_string_direct(
     if !lenp.is_null() {
         *lenp = 0 as libc::c_int as size_t;
     }
-    if sshbuf_len(buf) < 4 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(buf) < 4 as libc::c_int as libc::c_ulong {
         return -(3 as libc::c_int);
     }
     len = (*p.offset(0 as libc::c_int as isize) as u_int32_t) << 24 as libc::c_int
@@ -350,7 +350,9 @@ pub unsafe extern "C" fn sshbuf_peek_string_direct(
     if len > (0x8000000 as libc::c_int - 4 as libc::c_int) as libc::c_uint {
         return -(6 as libc::c_int);
     }
-    if (sshbuf_len(buf)).wrapping_sub(4 as libc::c_int as libc::c_ulong) < len as libc::c_ulong {
+    if (crate::sshbuf::sshbuf_len(buf)).wrapping_sub(4 as libc::c_int as libc::c_ulong)
+        < len as libc::c_ulong
+    {
         return -(3 as libc::c_int);
     }
     if !valp.is_null() {
@@ -458,7 +460,11 @@ pub unsafe extern "C" fn sshbuf_putb(
     if v.is_null() {
         return 0 as libc::c_int;
     }
-    return sshbuf_put(buf, sshbuf_ptr(v) as *const libc::c_void, sshbuf_len(v));
+    return sshbuf_put(
+        buf,
+        sshbuf_ptr(v) as *const libc::c_void,
+        crate::sshbuf::sshbuf_len(v),
+    );
 }
 pub unsafe extern "C" fn sshbuf_putf(
     mut buf: *mut crate::sshbuf::sshbuf,
@@ -764,7 +770,11 @@ pub unsafe extern "C" fn sshbuf_put_stringb(
     if v.is_null() {
         return sshbuf_put_string(buf, 0 as *const libc::c_void, 0 as libc::c_int as size_t);
     }
-    return sshbuf_put_string(buf, sshbuf_ptr(v) as *const libc::c_void, sshbuf_len(v));
+    return sshbuf_put_string(
+        buf,
+        sshbuf_ptr(v) as *const libc::c_void,
+        crate::sshbuf::sshbuf_len(v),
+    );
 }
 pub unsafe extern "C" fn sshbuf_froms(
     mut buf: *mut crate::sshbuf::sshbuf,

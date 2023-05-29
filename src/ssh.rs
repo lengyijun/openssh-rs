@@ -94,7 +94,6 @@ extern "C" {
     fn sshpkt_put_cstring(ssh: *mut ssh, v: *const libc::c_void) -> libc::c_int;
     fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -3217,7 +3216,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     as *const libc::c_char,
             );
             options.update_hostkeys = 0 as libc::c_int;
-        } else if sshbuf_len(command) != 0 as libc::c_int as libc::c_ulong
+        } else if crate::sshbuf::sshbuf_len(command) != 0 as libc::c_int as libc::c_ulong
             || !(options.remote_command).is_null()
             || options.request_tty == 1 as libc::c_int
         {
@@ -3247,7 +3246,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             b"Invalid number of ConnectionAttempts\0" as *const u8 as *const libc::c_char,
         );
     }
-    if sshbuf_len(command) != 0 as libc::c_int as libc::c_ulong
+    if crate::sshbuf::sshbuf_len(command) != 0 as libc::c_int as libc::c_ulong
         && !(options.remote_command).is_null()
     {
         sshfatal(
@@ -3262,7 +3261,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         );
     }
     if options.fork_after_authentication != 0
-        && sshbuf_len(command) == 0 as libc::c_int as libc::c_ulong
+        && crate::sshbuf::sshbuf_len(command) == 0 as libc::c_int as libc::c_ulong
         && (options.remote_command).is_null()
         && options.session_type != 0 as libc::c_int
     {
@@ -3299,7 +3298,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     if options.request_tty == 2 as libc::c_int || options.request_tty == 3 as libc::c_int {
         tty_flag = 1 as libc::c_int;
     }
-    if sshbuf_len(command) == 0 as libc::c_int as libc::c_ulong
+    if crate::sshbuf::sshbuf_len(command) == 0 as libc::c_int as libc::c_ulong
         && (options.remote_command).is_null()
     {
         tty_flag = (options.request_tty != 1 as libc::c_int) as libc::c_int;

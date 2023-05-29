@@ -12,7 +12,7 @@ extern "C" {
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_max_size(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
@@ -45,7 +45,7 @@ pub unsafe extern "C" fn ssh_msg_send(
     mut m: *mut crate::sshbuf::sshbuf,
 ) -> libc::c_int {
     let mut buf: [u_char; 5] = [0; 5];
-    let mut mlen: u_int = sshbuf_len(m) as u_int;
+    let mut mlen: u_int = crate::sshbuf::sshbuf_len(m) as u_int;
     crate::log::sshlog(
         b"msg.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"ssh_msg_send\0")).as_ptr(),

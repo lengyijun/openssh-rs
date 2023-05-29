@@ -44,7 +44,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
 }
 pub type __u_char = libc::c_uchar;
@@ -129,14 +128,18 @@ pub unsafe extern "C" fn sshbuf_dump(
     libc::fprintf(
         f,
         b"buffer len = %zu\n\0" as *const u8 as *const libc::c_char,
-        sshbuf_len(buf),
+        crate::sshbuf::sshbuf_len(buf),
     );
-    sshbuf_dump_data(sshbuf_ptr(buf) as *const libc::c_void, sshbuf_len(buf), f);
+    sshbuf_dump_data(
+        sshbuf_ptr(buf) as *const libc::c_void,
+        crate::sshbuf::sshbuf_len(buf),
+        f,
+    );
 }
 pub unsafe extern "C" fn sshbuf_dtob16(mut buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char {
     let mut i: size_t = 0;
     let mut j: size_t = 0;
-    let mut len: size_t = sshbuf_len(buf);
+    let mut len: size_t = crate::sshbuf::sshbuf_len(buf);
     let mut p: *const u_char = sshbuf_ptr(buf);
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
     let hex: [libc::c_char; 17] =
@@ -186,16 +189,16 @@ pub unsafe extern "C" fn sshbuf_dtob64(
     let mut r: libc::c_int = 0;
     if d.is_null()
         || b64.is_null()
-        || sshbuf_len(d)
+        || crate::sshbuf::sshbuf_len(d)
             >= (18446744073709551615 as libc::c_ulong)
                 .wrapping_div(2 as libc::c_int as libc::c_ulong)
     {
         return -(10 as libc::c_int);
     }
-    if sshbuf_len(d) == 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(d) == 0 as libc::c_int as libc::c_ulong {
         return 0 as libc::c_int;
     }
-    slen = (sshbuf_len(d))
+    slen = (crate::sshbuf::sshbuf_len(d))
         .wrapping_add(2 as libc::c_int as libc::c_ulong)
         .wrapping_div(3 as libc::c_int as libc::c_ulong)
         .wrapping_mul(4 as libc::c_int as libc::c_ulong)
@@ -204,7 +207,7 @@ pub unsafe extern "C" fn sshbuf_dtob64(
     if s.is_null() {
         return -(2 as libc::c_int);
     }
-    if __b64_ntop(sshbuf_ptr(d), sshbuf_len(d), s, slen) == -(1 as libc::c_int) {
+    if __b64_ntop(sshbuf_ptr(d), crate::sshbuf::sshbuf_len(d), s, slen) == -(1 as libc::c_int) {
         r = -(1 as libc::c_int);
     } else {
         if wrap != 0 {
@@ -344,7 +347,7 @@ pub unsafe extern "C" fn sshbuf_dtourlb64(
                 break;
             }
             _ => {
-                l = sshbuf_len(b);
+                l = crate::sshbuf::sshbuf_len(b);
                 if l <= 1 as libc::c_int as libc::c_ulong || (sshbuf_ptr(b)).is_null() {
                     r = -(1 as libc::c_int);
                     current_block = 16561732456181174644;
@@ -353,7 +356,7 @@ pub unsafe extern "C" fn sshbuf_dtourlb64(
                     as libc::c_int
                     != '=' as i32
                 {
-                    l = sshbuf_len(b);
+                    l = crate::sshbuf::sshbuf_len(b);
                     p = sshbuf_mutable_ptr(b);
                     if p.is_null() {
                         r = -(1 as libc::c_int);
@@ -390,7 +393,7 @@ pub unsafe extern "C" fn sshbuf_dup_string(
 ) -> *mut libc::c_char {
     let mut p: *const u_char = 0 as *const u_char;
     let mut s: *const u_char = sshbuf_ptr(buf);
-    let mut l: size_t = sshbuf_len(buf);
+    let mut l: size_t = crate::sshbuf::sshbuf_len(buf);
     let mut r: *mut libc::c_char = 0 as *mut libc::c_char;
     if s.is_null() || l > 18446744073709551615 as libc::c_ulong {
         return 0 as *mut libc::c_char;
@@ -431,7 +434,7 @@ pub unsafe extern "C" fn sshbuf_cmp(
     {
         return -(10 as libc::c_int);
     }
-    if offset.wrapping_add(len) > sshbuf_len(b) {
+    if offset.wrapping_add(len) > crate::sshbuf::sshbuf_len(b) {
         return -(3 as libc::c_int);
     }
     if timingsafe_bcmp(
@@ -464,12 +467,14 @@ pub unsafe extern "C" fn sshbuf_find(
     {
         return -(10 as libc::c_int);
     }
-    if start_offset > sshbuf_len(b) || start_offset.wrapping_add(len) > sshbuf_len(b) {
+    if start_offset > crate::sshbuf::sshbuf_len(b)
+        || start_offset.wrapping_add(len) > crate::sshbuf::sshbuf_len(b)
+    {
         return -(3 as libc::c_int);
     }
     p = memmem(
         (sshbuf_ptr(b)).offset(start_offset as isize) as *const libc::c_void,
-        (sshbuf_len(b)).wrapping_sub(start_offset),
+        (crate::sshbuf::sshbuf_len(b)).wrapping_sub(start_offset),
         s,
         len,
     );

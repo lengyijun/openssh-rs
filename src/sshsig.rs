@@ -106,7 +106,6 @@ extern "C" {
     fn sshbuf_consume_end(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
@@ -471,7 +470,10 @@ pub unsafe extern "C" fn sshsig_dearmor(
                         as *const libc::c_char,
                 );
             } else {
-                r = sshbuf_consume_end(sbuf, (sshbuf_len(sbuf)).wrapping_sub(eoffset));
+                r = sshbuf_consume_end(
+                    sbuf,
+                    (crate::sshbuf::sshbuf_len(sbuf)).wrapping_sub(eoffset),
+                );
                 if r != 0 as libc::c_int {
                     crate::log::sshlog(
                         b"sshsig.c\0" as *const u8 as *const libc::c_char,
@@ -630,7 +632,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
                     &mut sig,
                     &mut slen,
                     sshbuf_ptr(tosign),
-                    sshbuf_len(tosign),
+                    crate::sshbuf::sshbuf_len(tosign),
                     sign_alg,
                     sk_provider,
                     sk_pin,
@@ -660,7 +662,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
                     &mut sig,
                     &mut slen,
                     sshbuf_ptr(tosign),
-                    sshbuf_len(tosign),
+                    crate::sshbuf::sshbuf_len(tosign),
                     sign_alg,
                     sk_provider,
                     sk_pin,
@@ -912,7 +914,7 @@ unsafe extern "C" fn sshsig_wrap_verify(
         SYSLOG_LEVEL_DEBUG1,
         0 as *const libc::c_char,
         b"verify message length %zu\0" as *const u8 as *const libc::c_char,
-        sshbuf_len(h_message),
+        crate::sshbuf::sshbuf_len(h_message),
     );
     if !sig_details.is_null() {
         *sig_details = 0 as *mut sshkey_sig_details;
@@ -1009,7 +1011,8 @@ unsafe extern "C" fn sshsig_wrap_verify(
                         ssh_err(r),
                         b"parse signature object\0" as *const u8 as *const libc::c_char,
                     );
-                } else if sshbuf_len(signature) != 0 as libc::c_int as libc::c_ulong {
+                } else if crate::sshbuf::sshbuf_len(signature) != 0 as libc::c_int as libc::c_ulong
+                {
                     crate::log::sshlog(
                         b"sshsig.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
@@ -1139,7 +1142,7 @@ unsafe extern "C" fn sshsig_wrap_verify(
                                 sig,
                                 siglen,
                                 sshbuf_ptr(toverify),
-                                sshbuf_len(toverify),
+                                crate::sshbuf::sshbuf_len(toverify),
                                 0 as *const libc::c_char,
                                 0 as libc::c_int as u_int,
                                 sig_details,
@@ -2156,7 +2159,9 @@ unsafe extern "C" fn cert_filter_principals(
                         r = crate::sshbuf_getput_basic::sshbuf_putf(
                             nprincipals,
                             b"%s%s\0" as *const u8 as *const libc::c_char,
-                            if sshbuf_len(nprincipals) != 0 as libc::c_int as libc::c_ulong {
+                            if crate::sshbuf::sshbuf_len(nprincipals)
+                                != 0 as libc::c_int as libc::c_ulong
+                            {
                                 b",\0" as *const u8 as *const libc::c_char
                             } else {
                                 b"\0" as *const u8 as *const libc::c_char
@@ -2188,7 +2193,7 @@ unsafe extern "C" fn cert_filter_principals(
         match current_block {
             14441937283647387424 => {}
             _ => {
-                if sshbuf_len(nprincipals) == 0 as libc::c_int as libc::c_ulong {
+                if crate::sshbuf::sshbuf_len(nprincipals) == 0 as libc::c_int as libc::c_ulong {
                     crate::log::sshlog(
                         b"sshsig.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(

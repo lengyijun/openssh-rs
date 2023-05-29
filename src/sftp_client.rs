@@ -67,7 +67,7 @@ extern "C" {
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
 
     fn sshbuf_froms(
@@ -293,7 +293,7 @@ unsafe extern "C" fn send_msg(mut conn: *mut sftp_conn, mut m: *mut crate::sshbu
         iov_base: 0 as *mut libc::c_void,
         iov_len: 0,
     }; 2];
-    if sshbuf_len(m) > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(m) > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_ulong {
         sshfatal(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 9], &[libc::c_char; 9]>(b"send_msg\0")).as_ptr(),
@@ -302,17 +302,17 @@ unsafe extern "C" fn send_msg(mut conn: *mut sftp_conn, mut m: *mut crate::sshbu
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
             b"Outbound message too long %zu\0" as *const u8 as *const libc::c_char,
-            sshbuf_len(m),
+            crate::sshbuf::sshbuf_len(m),
         );
     }
     put_u32(
         mlen.as_mut_ptr() as *mut libc::c_void,
-        sshbuf_len(m) as u_int32_t,
+        crate::sshbuf::sshbuf_len(m) as u_int32_t,
     );
     iov[0 as libc::c_int as usize].iov_base = mlen.as_mut_ptr() as *mut libc::c_void;
     iov[0 as libc::c_int as usize].iov_len = ::core::mem::size_of::<[u_char; 4]>() as libc::c_ulong;
     iov[1 as libc::c_int as usize].iov_base = sshbuf_ptr(m) as *mut u_char as *mut libc::c_void;
-    iov[1 as libc::c_int as usize].iov_len = sshbuf_len(m);
+    iov[1 as libc::c_int as usize].iov_len = crate::sshbuf::sshbuf_len(m);
     if atomiciov6(
         Some(writev as unsafe extern "C" fn(libc::c_int, *const iovec, libc::c_int) -> ssize_t),
         (*conn).fd_out,
@@ -324,7 +324,8 @@ unsafe extern "C" fn send_msg(mut conn: *mut sftp_conn, mut m: *mut crate::sshbu
         } else {
             0 as *mut crate::misc::bwlimit
         }) as *mut libc::c_void,
-    ) != (sshbuf_len(m)).wrapping_add(::core::mem::size_of::<[u_char; 4]>() as libc::c_ulong)
+    ) != (crate::sshbuf::sshbuf_len(m))
+        .wrapping_add(::core::mem::size_of::<[u_char; 4]>() as libc::c_ulong)
     {
         sshfatal(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -1318,7 +1319,7 @@ pub unsafe extern "C" fn do_init(
         b"Remote version: %u\0" as *const u8 as *const libc::c_char,
         (*ret).version,
     );
-    while sshbuf_len(msg) > 0 as libc::c_int as libc::c_ulong {
+    while crate::sshbuf::sshbuf_len(msg) > 0 as libc::c_int as libc::c_ulong {
         let mut name: *mut libc::c_char = 0 as *mut libc::c_char;
         let mut value: *mut u_char = 0 as *mut u_char;
         let mut vlen: size_t = 0;
@@ -7209,7 +7210,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
             i;
         }
     }
-    if sshbuf_len(uidbuf) != 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(uidbuf) != 0 as libc::c_int as libc::c_ulong {
         sshfatal(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(
@@ -7223,7 +7224,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
             b"unexpected extra username data\0" as *const u8 as *const libc::c_char,
         );
     }
-    if sshbuf_len(gidbuf) != 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(gidbuf) != 0 as libc::c_int as libc::c_ulong {
         sshfatal(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 26], &[libc::c_char; 26]>(

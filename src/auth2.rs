@@ -63,8 +63,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
-
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_equal_public(_: *const sshkey, _: *const sshkey) -> libc::c_int;
     fn sshkey_from_private(_: *const sshkey, _: *mut *mut sshkey) -> libc::c_int;
@@ -1212,7 +1210,7 @@ unsafe extern "C" fn authmethods_get(mut authctxt: *mut Authctxt) -> *mut libc::
                     r = crate::sshbuf_getput_basic::sshbuf_putf(
                         b,
                         b"%s%s\0" as *const u8 as *const libc::c_char,
-                        if sshbuf_len(b) != 0 {
+                        if crate::sshbuf::sshbuf_len(b) != 0 {
                             b",\0" as *const u8 as *const libc::c_char
                         } else {
                             b"\0" as *const u8 as *const libc::c_char

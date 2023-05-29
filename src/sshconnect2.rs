@@ -59,7 +59,7 @@ extern "C" {
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
@@ -2676,7 +2676,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
                     );
                 }
             }
-            skip = sshbuf_len(b);
+            skip = crate::sshbuf::sshbuf_len(b);
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 50 as libc::c_int as u_char);
             if r != 0 as libc::c_int
                 || {
@@ -2755,7 +2755,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
                 &mut signature,
                 &mut slen,
                 sshbuf_ptr(b),
-                sshbuf_len(b),
+                crate::sshbuf::sshbuf_len(b),
                 (*ssh).compat as u_int,
                 alg,
             );
@@ -4605,7 +4605,7 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
                                 &mut sig,
                                 &mut siglen,
                                 sshbuf_ptr(b),
-                                sshbuf_len(b),
+                                crate::sshbuf::sshbuf_len(b),
                             );
                             if r != 0 as libc::c_int {
                                 crate::log::sshlog(
@@ -4893,7 +4893,7 @@ unsafe extern "C" fn authmethods_get() -> *mut libc::c_char {
             r = crate::sshbuf_getput_basic::sshbuf_putf(
                 b,
                 b"%s%s\0" as *const u8 as *const libc::c_char,
-                if sshbuf_len(b) != 0 {
+                if crate::sshbuf::sshbuf_len(b) != 0 {
                     b",\0" as *const u8 as *const libc::c_char
                 } else {
                     b"\0" as *const u8 as *const libc::c_char

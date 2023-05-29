@@ -95,7 +95,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
@@ -1353,7 +1353,7 @@ unsafe extern "C" fn parse_userauth_request(
     }
     r = sshbuf_froms(b, &mut sess_id);
     if !(r != 0 as libc::c_int) {
-        if sshbuf_len(sess_id) == 0 as libc::c_int as libc::c_ulong {
+        if crate::sshbuf::sshbuf_len(sess_id) == 0 as libc::c_int as libc::c_ulong {
             r = -(4 as libc::c_int);
         } else {
             r = sshbuf_get_u8(b, &mut t);
@@ -1419,7 +1419,7 @@ unsafe extern "C" fn parse_userauth_request(
                     match current_block {
                         1189788983119488299 => {}
                         _ => {
-                            if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
+                            if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
                                 r = -(4 as libc::c_int);
                             } else {
                                 r = 0 as libc::c_int;
@@ -1508,7 +1508,7 @@ unsafe extern "C" fn parse_sshsig_request(mut msg: *mut crate::sshbuf::sshbuf) -
             r != 0 as libc::c_int
         })
     {
-        if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
+        if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
             r = -(4 as libc::c_int);
         } else {
             r = 0 as libc::c_int;
@@ -1580,13 +1580,13 @@ unsafe extern "C" fn buf_equal(
     if (sshbuf_ptr(a)).is_null() || (sshbuf_ptr(b)).is_null() {
         return -(10 as libc::c_int);
     }
-    if sshbuf_len(a) != sshbuf_len(b) {
+    if crate::sshbuf::sshbuf_len(a) != crate::sshbuf::sshbuf_len(b) {
         return -(4 as libc::c_int);
     }
     if timingsafe_bcmp(
         sshbuf_ptr(a) as *const libc::c_void,
         sshbuf_ptr(b) as *const libc::c_void,
-        sshbuf_len(a),
+        crate::sshbuf::sshbuf_len(a),
     ) != 0 as libc::c_int
     {
         return -(4 as libc::c_int);
@@ -1893,7 +1893,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                                     &mut signature,
                                     &mut slen,
                                     sshbuf_ptr(data),
-                                    sshbuf_len(data),
+                                    crate::sshbuf::sshbuf_len(data),
                                     agent_decode_alg(key, flags),
                                     (*id).sk_provider,
                                     pin,
@@ -2263,7 +2263,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
             (*dch).user = 0 as *mut libc::c_char;
         }
         loop {
-            if !(sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong) {
+            if !(crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong) {
                 current_block = 5783071609795492627;
                 break;
             }
@@ -2637,7 +2637,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
                     current_block = 4252588936699793226;
                 } else {
                     loop {
-                        if !(sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong) {
+                        if !(crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong) {
                             current_block = 15768484401365413375;
                             break;
                         }
@@ -2719,7 +2719,7 @@ unsafe extern "C" fn parse_key_constraints(
     let mut seconds: u_int = 0;
     let mut maxsign: u_int = 0 as libc::c_int as u_int;
     loop {
-        if !(sshbuf_len(m) != 0) {
+        if !(crate::sshbuf::sshbuf_len(m) != 0) {
             current_block = 7205609094909031804;
             break;
         }
@@ -3720,9 +3720,9 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
         r = sshkey_verify(
             key,
             sshbuf_ptr(sig),
-            sshbuf_len(sig),
+            crate::sshbuf::sshbuf_len(sig),
             sshbuf_ptr(sid),
-            sshbuf_len(sid),
+            crate::sshbuf::sshbuf_len(sid),
             0 as *const libc::c_char,
             0 as libc::c_int as u_int,
             0 as *mut *mut sshkey_sig_details,
@@ -3982,7 +3982,7 @@ unsafe extern "C" fn process_message(mut socknum: u_int) -> libc::c_int {
         );
     }
     e = &mut *sockets.offset(socknum as isize) as *mut SocketEntry;
-    if sshbuf_len((*e).input) < 5 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len((*e).input) < 5 as libc::c_int as libc::c_ulong {
         return 0 as libc::c_int;
     }
     cp = sshbuf_ptr((*e).input);
@@ -4007,7 +4007,7 @@ unsafe extern "C" fn process_message(mut socknum: u_int) -> libc::c_int {
         );
         return -(1 as libc::c_int);
     }
-    if sshbuf_len((*e).input)
+    if crate::sshbuf::sshbuf_len((*e).input)
         < msg_len.wrapping_add(4 as libc::c_int as libc::c_uint) as libc::c_ulong
     {
         return 0 as libc::c_int;
@@ -4355,13 +4355,15 @@ unsafe extern "C" fn handle_conn_read(mut socknum: u_int) -> libc::c_int {
 unsafe extern "C" fn handle_conn_write(mut socknum: u_int) -> libc::c_int {
     let mut len: ssize_t = 0;
     let mut r: libc::c_int = 0;
-    if sshbuf_len((*sockets.offset(socknum as isize)).output) == 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len((*sockets.offset(socknum as isize)).output)
+        == 0 as libc::c_int as libc::c_ulong
+    {
         return 0 as libc::c_int;
     }
     len = write(
         (*sockets.offset(socknum as isize)).fd,
         sshbuf_ptr((*sockets.offset(socknum as isize)).output) as *const libc::c_void,
-        sshbuf_len((*sockets.offset(socknum as isize)).output),
+        crate::sshbuf::sshbuf_len((*sockets.offset(socknum as isize)).output),
     );
     if len <= 0 as libc::c_int as libc::c_long {
         if len == -(1 as libc::c_int) as libc::c_long {
@@ -4629,7 +4631,7 @@ unsafe extern "C" fn prepare_poll(
                         b"reserve\0" as *const u8 as *const libc::c_char,
                     );
                 }
-                if sshbuf_len((*sockets.offset(i as isize)).output)
+                if crate::sshbuf::sshbuf_len((*sockets.offset(i as isize)).output)
                     > 0 as libc::c_int as libc::c_ulong
                 {
                     let ref mut fresh13 = (*pfd.offset(j as isize)).events;

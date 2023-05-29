@@ -119,7 +119,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_put(
@@ -277,7 +277,7 @@ static mut fd: libc::c_int = -(1 as libc::c_int);
 static mut pid: pid_t = -(1 as libc::c_int);
 unsafe extern "C" fn send_msg(mut m: *mut crate::sshbuf::sshbuf) {
     let mut buf: [u_char; 4] = [0; 4];
-    let mut mlen: size_t = sshbuf_len(m);
+    let mut mlen: size_t = crate::sshbuf::sshbuf_len(m);
     let mut r: libc::c_int = 0;
     let __v: u_int32_t = mlen as u_int32_t;
     *buf.as_mut_ptr().offset(0 as libc::c_int as isize) =
@@ -308,8 +308,8 @@ unsafe extern "C" fn send_msg(mut m: *mut crate::sshbuf::sshbuf) {
             )),
             fd,
             sshbuf_mutable_ptr(m) as *mut libc::c_void,
-            sshbuf_len(m),
-        ) != sshbuf_len(m)
+            crate::sshbuf::sshbuf_len(m),
+        ) != crate::sshbuf::sshbuf_len(m)
     {
         crate::log::sshlog(
             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,

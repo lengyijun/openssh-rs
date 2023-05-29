@@ -28,7 +28,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -372,7 +371,8 @@ unsafe extern "C" fn webauthn_check_prepare_hash(
     } else if !(libc::strchr(origin, '"' as i32)).is_null()
         || flags as libc::c_int & 0x40 as libc::c_int != 0 as libc::c_int
         || (flags as libc::c_int & 0x80 as libc::c_int == 0 as libc::c_int) as libc::c_int
-            != (sshbuf_len(extensions) == 0 as libc::c_int as libc::c_ulong) as libc::c_int
+            != (crate::sshbuf::sshbuf_len(extensions) == 0 as libc::c_int as libc::c_ulong)
+                as libc::c_int
     {
         r = -(4 as libc::c_int);
     } else {
@@ -416,7 +416,7 @@ unsafe extern "C" fn webauthn_check_prepare_hash(
                 wrapper,
                 0 as libc::c_int as size_t,
                 sshbuf_ptr(m) as *const libc::c_void,
-                sshbuf_len(m),
+                crate::sshbuf::sshbuf_len(m),
             );
             if !(r != 0 as libc::c_int) {
                 r = ssh_digest_buffer(2 as libc::c_int, wrapper, msghash, msghashlen);
@@ -529,13 +529,15 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
                     match current_block {
                         3245404841433849185 => {}
                         _ => {
-                            if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
+                            if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
                                 ret = -(23 as libc::c_int);
                             } else if sshbuf_get_bignum2(sigbuf, &mut sig_r) != 0 as libc::c_int
                                 || sshbuf_get_bignum2(sigbuf, &mut sig_s) != 0 as libc::c_int
                             {
                                 ret = -(4 as libc::c_int);
-                            } else if sshbuf_len(sigbuf) != 0 as libc::c_int as libc::c_ulong {
+                            } else if crate::sshbuf::sshbuf_len(sigbuf)
+                                != 0 as libc::c_int as libc::c_ulong
+                            {
                                 ret = -(23 as libc::c_int);
                             } else {
                                 esig = ECDSA_SIG_new();

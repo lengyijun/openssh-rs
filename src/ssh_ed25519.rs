@@ -46,7 +46,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
@@ -428,7 +427,7 @@ unsafe extern "C" fn ssh_ed25519_sign(
                 );
                 r != 0 as libc::c_int
             }) {
-                len = sshbuf_len(b);
+                len = crate::sshbuf::sshbuf_len(b);
                 if !sigp.is_null() {
                     *sigp = libc::malloc(len as usize) as *mut u_char;
                     if (*sigp).is_null() {
@@ -507,7 +506,7 @@ unsafe extern "C" fn ssh_ed25519_verify(
             != 0 as libc::c_int
         {
             r = -(13 as libc::c_int);
-        } else if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
+        } else if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
             r = -(23 as libc::c_int);
         } else if len > 64 as libc::c_uint as libc::c_ulong {
             r = -(4 as libc::c_int);

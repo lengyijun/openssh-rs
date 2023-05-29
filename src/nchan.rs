@@ -7,7 +7,6 @@ extern "C" {
 
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
@@ -336,7 +335,7 @@ pub unsafe extern "C" fn chan_ibuf_empty(mut ssh: *mut ssh, mut c: *mut Channel)
         b"channel %d: ibuf empty\0" as *const u8 as *const libc::c_char,
         (*c).self_0,
     );
-    if sshbuf_len((*c).input) != 0 {
+    if crate::sshbuf::sshbuf_len((*c).input) != 0 {
         crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"chan_ibuf_empty\0"))
@@ -385,7 +384,7 @@ pub unsafe extern "C" fn chan_obuf_empty(mut ssh: *mut ssh, mut c: *mut Channel)
         b"channel %d: obuf empty\0" as *const u8 as *const libc::c_char,
         (*c).self_0,
     );
-    if sshbuf_len((*c).output) != 0 {
+    if crate::sshbuf::sshbuf_len((*c).output) != 0 {
         crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"chan_obuf_empty\0"))
@@ -684,11 +683,11 @@ pub unsafe extern "C" fn chan_rcvd_ieof(mut ssh: *mut ssh, mut c: *mut Channel) 
         chan_set_ostate(c, 1 as libc::c_int as u_int);
     }
     if (*c).ostate == 1 as libc::c_int as libc::c_uint
-        && sshbuf_len((*c).output) == 0 as libc::c_int as libc::c_ulong
+        && crate::sshbuf::sshbuf_len((*c).output) == 0 as libc::c_int as libc::c_ulong
         && !((*c).extended_usage == 2 as libc::c_int
             && (*c).efd != -(1 as libc::c_int)
             && ((*c).flags & (0x8 as libc::c_int | 0x2 as libc::c_int) == 0
-                || sshbuf_len((*c).extended) > 0 as libc::c_int as libc::c_ulong))
+                || crate::sshbuf::sshbuf_len((*c).extended) > 0 as libc::c_int as libc::c_ulong))
     {
         chan_obuf_empty(ssh, c);
     }
@@ -816,7 +815,7 @@ pub unsafe extern "C" fn chan_is_dead(
     if (*ssh).compat & 0x200000 as libc::c_int != 0
         && (*c).extended_usage == 2 as libc::c_int
         && (*c).efd != -(1 as libc::c_int)
-        && sshbuf_len((*c).extended) > 0 as libc::c_int as libc::c_ulong
+        && crate::sshbuf::sshbuf_len((*c).extended) > 0 as libc::c_int as libc::c_ulong
     {
         crate::log::sshlog(
             b"nchan.c\0" as *const u8 as *const libc::c_char,
@@ -828,7 +827,7 @@ pub unsafe extern "C" fn chan_is_dead(
             b"channel %d: active efd: %d len %zu\0" as *const u8 as *const libc::c_char,
             (*c).self_0,
             (*c).efd,
-            sshbuf_len((*c).extended),
+            crate::sshbuf::sshbuf_len((*c).extended),
         );
         return 0 as libc::c_int;
     }

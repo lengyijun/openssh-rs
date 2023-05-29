@@ -55,7 +55,7 @@ extern "C" {
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
 
     fn sshkey_free(_: *mut sshkey);
@@ -671,7 +671,7 @@ pub unsafe extern "C" fn sshsk_sign(
                             b"parse signature\0" as *const u8 as *const libc::c_char,
                         );
                         r = -(4 as libc::c_int);
-                    } else if sshbuf_len(resp) != 0 as libc::c_int as libc::c_ulong {
+                    } else if crate::sshbuf::sshbuf_len(resp) != 0 as libc::c_int as libc::c_ulong {
                         crate::log::sshlog(
                             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(
@@ -805,7 +805,7 @@ pub unsafe extern "C" fn sshsk_enroll(
                         b"parse\0" as *const u8 as *const libc::c_char,
                     );
                     r = -(4 as libc::c_int);
-                } else if sshbuf_len(resp) != 0 as libc::c_int as libc::c_ulong {
+                } else if crate::sshbuf::sshbuf_len(resp) != 0 as libc::c_int as libc::c_ulong {
                     crate::log::sshlog(
                         b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(
@@ -953,7 +953,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
             r = client_converse(req, &mut resp, 3 as libc::c_int as u_int);
             if !(r != 0 as libc::c_int) {
                 loop {
-                    if !(sshbuf_len(resp) != 0 as libc::c_int as libc::c_ulong) {
+                    if !(crate::sshbuf::sshbuf_len(resp) != 0 as libc::c_int as libc::c_ulong) {
                         current_block = 17478428563724192186;
                         break;
                     }

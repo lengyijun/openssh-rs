@@ -54,7 +54,6 @@ extern "C" {
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_get_string(
         buf: *mut crate::sshbuf::sshbuf,
@@ -594,7 +593,7 @@ unsafe extern "C" fn ssh_dss_sign(
                         );
                         ret != 0 as libc::c_int
                     }) {
-                        len = sshbuf_len(b);
+                        len = crate::sshbuf::sshbuf_len(b);
                         if !sigp.is_null() {
                             *sigp = libc::malloc(len as usize) as *mut u_char;
                             if (*sigp).is_null() {
@@ -676,7 +675,7 @@ unsafe extern "C" fn ssh_dss_verify(
         != 0 as libc::c_int
     {
         ret = -(13 as libc::c_int);
-    } else if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
+    } else if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
         ret = -(23 as libc::c_int);
     } else if len != (2 as libc::c_int * 20 as libc::c_int) as libc::c_ulong {
         ret = -(4 as libc::c_int);

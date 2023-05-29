@@ -52,7 +52,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_get_cstring(
         buf: *mut crate::sshbuf::sshbuf,
@@ -505,7 +504,7 @@ unsafe extern "C" fn ssh_ecdsa_sign(
                         ret = sshbuf_put_stringb(b, bb);
                         ret != 0 as libc::c_int
                     }) {
-                        len = sshbuf_len(b);
+                        len = crate::sshbuf::sshbuf_len(b);
                         if !sigp.is_null() {
                             *sigp = libc::malloc(len as usize) as *mut u_char;
                             if (*sigp).is_null() {
@@ -590,7 +589,7 @@ unsafe extern "C" fn ssh_ecdsa_verify(
         ret = -(4 as libc::c_int);
     } else if libc::strcmp(sshkey_ssh_name_plain(key), ktype) != 0 as libc::c_int {
         ret = -(13 as libc::c_int);
-    } else if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
+    } else if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
         ret = -(23 as libc::c_int);
     } else if sshbuf_get_bignum2(sigbuf, &mut sig_r) != 0 as libc::c_int
         || sshbuf_get_bignum2(sigbuf, &mut sig_s) != 0 as libc::c_int
@@ -605,7 +604,7 @@ unsafe extern "C" fn ssh_ecdsa_verify(
         } else {
             sig_s = 0 as *mut BIGNUM;
             sig_r = sig_s;
-            if sshbuf_len(sigbuf) != 0 as libc::c_int as libc::c_ulong {
+            if crate::sshbuf::sshbuf_len(sigbuf) != 0 as libc::c_int as libc::c_ulong {
                 ret = -(23 as libc::c_int);
             } else {
                 ret = ssh_digest_memory(

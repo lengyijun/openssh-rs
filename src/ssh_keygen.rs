@@ -260,7 +260,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
@@ -1342,7 +1342,7 @@ unsafe extern "C" fn buffer_get_bignum_bits(
     bytes = bignum_bits
         .wrapping_add(7 as libc::c_int as libc::c_uint)
         .wrapping_div(8 as libc::c_int as libc::c_uint);
-    if sshbuf_len(b) < bytes as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(b) < bytes as libc::c_ulong {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
@@ -1355,7 +1355,7 @@ unsafe extern "C" fn buffer_get_bignum_bits(
             0 as *const libc::c_char,
             b"input buffer too small: need %d have %zu\0" as *const u8 as *const libc::c_char,
             bytes,
-            sshbuf_len(b),
+            crate::sshbuf::sshbuf_len(b),
         );
     }
     if (BN_bin2bn(sshbuf_ptr(b), bytes as libc::c_int, value)).is_null() {
@@ -1799,7 +1799,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut crate::sshbuf::sshbuf) 
         }
         _ => {}
     }
-    rlen = sshbuf_len(b) as libc::c_int;
+    rlen = crate::sshbuf::sshbuf_len(b) as libc::c_int;
     if rlen != 0 as libc::c_int {
         crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -5303,7 +5303,7 @@ unsafe extern "C" fn show_options(
             b"sshbuf_fromb failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    while sshbuf_len(options) != 0 as libc::c_int as libc::c_ulong {
+    while crate::sshbuf::sshbuf_len(options) != 0 as libc::c_int as libc::c_ulong {
         crate::sshbuf::sshbuf_free(option);
         option = 0 as *mut crate::sshbuf::sshbuf;
         r = sshbuf_get_cstring(options, &mut name, 0 as *mut size_t);
@@ -5381,12 +5381,12 @@ unsafe extern "C" fn show_options(
             ) == 0 as libc::c_int
         {
             printf(b"\n\0" as *const u8 as *const libc::c_char);
-        } else if sshbuf_len(option) > 0 as libc::c_int as libc::c_ulong {
+        } else if crate::sshbuf::sshbuf_len(option) > 0 as libc::c_int as libc::c_ulong {
             hex = sshbuf_dtob16(option);
             printf(
                 b" UNKNOWN OPTION: %s (len %zu)\n\0" as *const u8 as *const libc::c_char,
                 hex,
-                sshbuf_len(option),
+                crate::sshbuf::sshbuf_len(option),
             );
             sshbuf_reset(option);
             libc::free(hex as *mut libc::c_void);
@@ -5394,7 +5394,7 @@ unsafe extern "C" fn show_options(
             printf(b" UNKNOWN FLAG OPTION\n\0" as *const u8 as *const libc::c_char);
         }
         libc::free(name as *mut libc::c_void);
-        if sshbuf_len(option) != 0 as libc::c_int as libc::c_ulong {
+        if crate::sshbuf::sshbuf_len(option) != 0 as libc::c_int as libc::c_ulong {
             sshfatal(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 13], &[libc::c_char; 13]>(b"show_options\0"))
@@ -5481,14 +5481,14 @@ unsafe extern "C" fn print_cert(mut key: *mut sshkey) {
         printf(b"\n\0" as *const u8 as *const libc::c_char);
     }
     printf(b"        Critical Options: \0" as *const u8 as *const libc::c_char);
-    if sshbuf_len((*(*key).cert).critical) == 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len((*(*key).cert).critical) == 0 as libc::c_int as libc::c_ulong {
         printf(b"(none)\n\0" as *const u8 as *const libc::c_char);
     } else {
         printf(b"\n\0" as *const u8 as *const libc::c_char);
         show_options((*(*key).cert).critical, 1 as libc::c_int);
     }
     printf(b"        Extensions: \0" as *const u8 as *const libc::c_char);
-    if sshbuf_len((*(*key).cert).extensions) == 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len((*(*key).cert).extensions) == 0 as libc::c_int as libc::c_ulong {
         printf(b"(none)\n\0" as *const u8 as *const libc::c_char);
     } else {
         printf(b"\n\0" as *const u8 as *const libc::c_char);
@@ -5740,7 +5740,7 @@ unsafe extern "C" fn hash_to_blob(
         );
     }
     libc::free(tmp as *mut libc::c_void);
-    *lenp = sshbuf_len(b);
+    *lenp = crate::sshbuf::sshbuf_len(b);
     *blobp = crate::xmalloc::xmalloc(*lenp) as *mut u_char;
     memcpy(
         *blobp as *mut libc::c_void,
@@ -8260,7 +8260,7 @@ unsafe extern "C" fn save_attestation(
     if path.is_null() {
         return;
     }
-    if attest.is_null() || sshbuf_len(attest) == 0 as libc::c_int as libc::c_ulong {
+    if attest.is_null() || crate::sshbuf::sshbuf_len(attest) == 0 as libc::c_int as libc::c_ulong {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"save_attestation\0"))

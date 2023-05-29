@@ -114,7 +114,7 @@ extern "C" {
     fn ssh_packet_check_rekey(_: *mut ssh) -> libc::c_int;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
@@ -1721,7 +1721,7 @@ unsafe extern "C" fn client_suspend_self(
     mut bout: *mut crate::sshbuf::sshbuf,
     mut berr: *mut crate::sshbuf::sshbuf,
 ) {
-    if sshbuf_len(bout) > 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(bout) > 0 as libc::c_int as libc::c_ulong {
         atomicio(
             ::core::mem::transmute::<
                 Option<unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t>,
@@ -1731,10 +1731,10 @@ unsafe extern "C" fn client_suspend_self(
             )),
             fileno(stdout),
             sshbuf_mutable_ptr(bout) as *mut libc::c_void,
-            sshbuf_len(bout),
+            crate::sshbuf::sshbuf_len(bout),
         );
     }
-    if sshbuf_len(berr) > 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(berr) > 0 as libc::c_int as libc::c_ulong {
         atomicio(
             ::core::mem::transmute::<
                 Option<unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t>,
@@ -1744,7 +1744,7 @@ unsafe extern "C" fn client_suspend_self(
             )),
             fileno(stderr),
             sshbuf_mutable_ptr(berr) as *mut libc::c_void,
-            sshbuf_len(berr),
+            crate::sshbuf::sshbuf_len(berr),
         );
     }
     leave_raw_mode((options.request_tty == 3 as libc::c_int) as libc::c_int);
@@ -3694,7 +3694,7 @@ pub unsafe extern "C" fn client_loop(
             host,
         );
     }
-    if sshbuf_len(stderr_buffer) > 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(stderr_buffer) > 0 as libc::c_int as libc::c_ulong {
         len = atomicio(
             ::core::mem::transmute::<
                 Option<unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t>,
@@ -3704,9 +3704,11 @@ pub unsafe extern "C" fn client_loop(
             )),
             fileno(stderr),
             sshbuf_ptr(stderr_buffer) as *mut u_char as *mut libc::c_void,
-            sshbuf_len(stderr_buffer),
+            crate::sshbuf::sshbuf_len(stderr_buffer),
         ) as libc::c_int;
-        if len < 0 as libc::c_int || len as u_int as libc::c_ulong != sshbuf_len(stderr_buffer) {
+        if len < 0 as libc::c_int
+            || len as u_int as libc::c_ulong != crate::sshbuf::sshbuf_len(stderr_buffer)
+        {
             crate::log::sshlog(
                 b"clientloop.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"client_loop\0"))
@@ -5498,7 +5500,7 @@ unsafe extern "C" fn client_global_hostkeys_prove_confirm(
                         sig,
                         siglen,
                         sshbuf_ptr(signdata),
-                        sshbuf_len(signdata),
+                        crate::sshbuf::sshbuf_len(signdata),
                         if plaintype == KEY_RSA as libc::c_int {
                             rsa_kexalg
                         } else {
@@ -6550,7 +6552,7 @@ pub unsafe extern "C" fn client_session2_setup(
         i = i.wrapping_add(1);
         i;
     }
-    len = sshbuf_len(cmd);
+    len = crate::sshbuf::sshbuf_len(cmd);
     if len > 0 as libc::c_int as libc::c_ulong {
         if len > 900 as libc::c_int as libc::c_ulong {
             len = 900 as libc::c_int as size_t;

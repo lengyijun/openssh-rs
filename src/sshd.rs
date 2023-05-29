@@ -193,7 +193,7 @@ extern "C" {
     ) -> !;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1740,7 +1740,7 @@ unsafe extern "C" fn append_hostkey_type(
     r = crate::sshbuf_getput_basic::sshbuf_putf(
         b,
         b"%s%s\0" as *const u8 as *const libc::c_char,
-        if sshbuf_len(b) > 0 as libc::c_int as libc::c_ulong {
+        if crate::sshbuf::sshbuf_len(b) > 0 as libc::c_int as libc::c_ulong {
             b",\0" as *const u8 as *const libc::c_char
         } else {
             b"\0" as *const u8 as *const libc::c_char
@@ -2289,7 +2289,7 @@ unsafe extern "C" fn send_rexec_state(mut fd: libc::c_int, mut conf: *mut crate:
         0 as *const libc::c_char,
         b"entering fd = %d config len %zu\0" as *const u8 as *const libc::c_char,
         fd,
-        sshbuf_len(conf),
+        crate::sshbuf::sshbuf_len(conf),
     );
     m = crate::sshbuf::sshbuf_new();
     if m.is_null() || {
@@ -2477,7 +2477,7 @@ unsafe extern "C" fn recv_rexec_state(mut fd: libc::c_int, mut conf: *mut crate:
             b"sshbuf_put\0" as *const u8 as *const libc::c_char,
         );
     }
-    while sshbuf_len(inc) != 0 as libc::c_int as libc::c_ulong {
+    while crate::sshbuf::sshbuf_len(inc) != 0 as libc::c_int as libc::c_ulong {
         item = crate::xmalloc::xcalloc(
             1 as libc::c_int as size_t,
             ::core::mem::size_of::<include_item>() as libc::c_ulong,
@@ -3527,7 +3527,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
         if ssh_digest_update(
             ctx,
             sshbuf_ptr(server_cfg) as *const libc::c_void,
-            sshbuf_len(server_cfg),
+            crate::sshbuf::sshbuf_len(server_cfg),
         ) != 0 as libc::c_int
         {
             sshfatal(
@@ -3611,8 +3611,11 @@ unsafe extern "C" fn accumulate_host_timing_secret(
             sshkey_ssh_name(key),
         );
     }
-    if ssh_digest_update(ctx, sshbuf_ptr(buf) as *const libc::c_void, sshbuf_len(buf))
-        != 0 as libc::c_int
+    if ssh_digest_update(
+        ctx,
+        sshbuf_ptr(buf) as *const libc::c_void,
+        crate::sshbuf::sshbuf_len(buf),
+    ) != 0 as libc::c_int
     {
         sshfatal(
             b"sshd.c\0" as *const u8 as *const libc::c_char,

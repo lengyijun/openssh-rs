@@ -107,7 +107,7 @@ extern "C" {
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
 
     fn sshbuf_froms(
@@ -1234,7 +1234,7 @@ unsafe extern "C" fn mux_master_process_hello(
         (*c).self_0,
         ver,
     );
-    while sshbuf_len(m) > 0 as libc::c_int as libc::c_ulong {
+    while crate::sshbuf::sshbuf_len(m) > 0 as libc::c_int as libc::c_ulong {
         let mut name: *mut libc::c_char = 0 as *mut libc::c_char;
         let mut value_len: size_t = 0 as libc::c_int as size_t;
         r = sshbuf_get_cstring(m, &mut name, 0 as *mut size_t);
@@ -1383,7 +1383,7 @@ unsafe extern "C" fn mux_master_process_new_session(
         })
     {
         loop {
-            if !(sshbuf_len(m) > 0 as libc::c_int as libc::c_ulong) {
+            if !(crate::sshbuf::sshbuf_len(m) > 0 as libc::c_int as libc::c_ulong) {
                 current_block = 15089075282327824602;
                 break;
             }
@@ -3456,7 +3456,7 @@ unsafe extern "C" fn mux_master_read_cb(mut ssh: *mut ssh, mut c: *mut Channel) 
                     b"channel %d packet type 0x%08x len %zu\0" as *const u8 as *const libc::c_char,
                     (*c).self_0,
                     type_0,
-                    sshbuf_len(in_0),
+                    crate::sshbuf::sshbuf_len(in_0),
                 );
                 if type_0 == 0x1 as libc::c_int as libc::c_uint {
                     rid = 0 as libc::c_int as u_int;
@@ -3526,7 +3526,7 @@ unsafe extern "C" fn mux_master_read_cb(mut ssh: *mut ssh, mut c: *mut Channel) 
                             );
                             ret = 0 as libc::c_int;
                         }
-                        if sshbuf_len(out) != 0 as libc::c_int as libc::c_ulong && {
+                        if crate::sshbuf::sshbuf_len(out) != 0 as libc::c_int as libc::c_ulong && {
                             r = sshbuf_put_stringb((*c).output, out);
                             r != 0 as libc::c_int
                         } {
@@ -4235,7 +4235,7 @@ unsafe extern "C" fn mux_client_write_packet(
             b"enqueue\0" as *const u8 as *const libc::c_char,
         );
     }
-    need = sshbuf_len(queue) as u_int;
+    need = crate::sshbuf::sshbuf_len(queue) as u_int;
     ptr = sshbuf_ptr(queue);
     have = 0 as libc::c_int as u_int;
     while have < need {
@@ -4513,7 +4513,7 @@ unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_i
                         ver,
                     );
                     loop {
-                        if !(sshbuf_len(m) > 0 as libc::c_int as libc::c_ulong) {
+                        if !(crate::sshbuf::sshbuf_len(m) > 0 as libc::c_int as libc::c_ulong) {
                             current_block = 224731115979188411;
                             break;
                         }

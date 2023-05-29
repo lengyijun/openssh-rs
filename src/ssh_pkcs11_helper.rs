@@ -52,7 +52,6 @@ extern "C" {
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
     fn ECDSA_size(eckey: *const EC_KEY) -> libc::c_int;
     fn ECDSA_sign(
@@ -660,7 +659,7 @@ unsafe extern "C" fn process() {
     let mut type_0: u_char = 0;
     let mut cp: *const u_char = 0 as *const u_char;
     let mut r: libc::c_int = 0;
-    buf_len = sshbuf_len(iqueue) as u_int;
+    buf_len = crate::sshbuf::sshbuf_len(iqueue) as u_int;
     if buf_len < 5 as libc::c_int as libc::c_uint {
         return;
     }
@@ -749,7 +748,7 @@ unsafe extern "C" fn process() {
             );
         }
     }
-    if (buf_len as libc::c_ulong) < sshbuf_len(iqueue) {
+    if (buf_len as libc::c_ulong) < crate::sshbuf::sshbuf_len(iqueue) {
         crate::log::sshlog(
             b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"process\0")).as_ptr(),
@@ -761,7 +760,7 @@ unsafe extern "C" fn process() {
         );
         cleanup_exit(255 as libc::c_int);
     }
-    consumed = (buf_len as libc::c_ulong).wrapping_sub(sshbuf_len(iqueue)) as u_int;
+    consumed = (buf_len as libc::c_ulong).wrapping_sub(crate::sshbuf::sshbuf_len(iqueue)) as u_int;
     if msg_len < consumed {
         crate::log::sshlog(
             b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
@@ -905,7 +904,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 b"reserve\0" as *const u8 as *const libc::c_char,
             );
         }
-        if sshbuf_len(oqueue) > 0 as libc::c_int as libc::c_ulong {
+        if crate::sshbuf::sshbuf_len(oqueue) > 0 as libc::c_int as libc::c_ulong {
             pfd[1 as libc::c_int as usize].events = 0x4 as libc::c_int as libc::c_short;
         }
         r = poll(
@@ -989,7 +988,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 len = write(
                     out,
                     sshbuf_ptr(oqueue) as *const libc::c_void,
-                    sshbuf_len(oqueue),
+                    crate::sshbuf::sshbuf_len(oqueue),
                 );
                 if len < 0 as libc::c_int as libc::c_long {
                     crate::log::sshlog(

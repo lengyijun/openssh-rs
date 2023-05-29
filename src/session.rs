@@ -141,7 +141,7 @@ extern "C" {
     fn ssh_packet_get_connection_out(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
 
@@ -1078,7 +1078,7 @@ unsafe extern "C" fn auth_input_request_forwarding(
 }
 unsafe extern "C" fn display_loginmsg() {
     let mut r: libc::c_int = 0;
-    if sshbuf_len(loginmsg) == 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(loginmsg) == 0 as libc::c_int as libc::c_ulong {
         return;
     }
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(loginmsg, 0 as libc::c_int as u_char);
@@ -1137,8 +1137,8 @@ unsafe extern "C" fn prepare_auth_info_file(
         )),
         fd,
         sshbuf_mutable_ptr(info) as *mut libc::c_void,
-        sshbuf_len(info),
-    ) != sshbuf_len(info)
+        crate::sshbuf::sshbuf_len(info),
+    ) != crate::sshbuf::sshbuf_len(info)
     {
         crate::log::sshlog(
             b"session.c\0" as *const u8 as *const libc::c_char,

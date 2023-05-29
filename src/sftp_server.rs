@@ -123,7 +123,7 @@ extern "C" {
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
 
     fn sshbuf_froms(
@@ -4173,10 +4173,10 @@ unsafe extern "C" fn process_extended_get_users_groups_by_id(mut id: u_int32_t) 
         SYSLOG_LEVEL_DEBUG1,
         0 as *const libc::c_char,
         b"uids len = %zu, gids len = %zu\0" as *const u8 as *const libc::c_char,
-        sshbuf_len(uids),
-        sshbuf_len(gids),
+        crate::sshbuf::sshbuf_len(uids),
+        crate::sshbuf::sshbuf_len(gids),
     );
-    while sshbuf_len(uids) != 0 as libc::c_int as libc::c_ulong {
+    while crate::sshbuf::sshbuf_len(uids) != 0 as libc::c_int as libc::c_ulong {
         r = sshbuf_get_u32(uids, &mut n);
         if r != 0 as libc::c_int {
             sshfatal(
@@ -4230,7 +4230,7 @@ unsafe extern "C" fn process_extended_get_users_groups_by_id(mut id: u_int32_t) 
         nusers = nusers.wrapping_add(1);
         nusers;
     }
-    while sshbuf_len(gids) != 0 as libc::c_int as libc::c_ulong {
+    while crate::sshbuf::sshbuf_len(gids) != 0 as libc::c_int as libc::c_ulong {
         r = sshbuf_get_u32(gids, &mut n);
         if r != 0 as libc::c_int {
             sshfatal(
@@ -4380,7 +4380,7 @@ unsafe extern "C" fn process() {
     let mut i: libc::c_int = 0;
     let mut r: libc::c_int = 0;
     let mut id: u_int32_t = 0;
-    buf_len = sshbuf_len(iqueue) as u_int;
+    buf_len = crate::sshbuf::sshbuf_len(iqueue) as u_int;
     if buf_len < 5 as libc::c_int as libc::c_uint {
         return;
     }
@@ -4518,7 +4518,7 @@ unsafe extern "C" fn process() {
             }
         }
     }
-    if (buf_len as libc::c_ulong) < sshbuf_len(iqueue) {
+    if (buf_len as libc::c_ulong) < crate::sshbuf::sshbuf_len(iqueue) {
         crate::log::sshlog(
             b"sftp-server.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 8], &[libc::c_char; 8]>(b"process\0")).as_ptr(),
@@ -4530,7 +4530,7 @@ unsafe extern "C" fn process() {
         );
         sftp_server_cleanup_exit(255 as libc::c_int);
     }
-    consumed = (buf_len as libc::c_ulong).wrapping_sub(sshbuf_len(iqueue)) as u_int;
+    consumed = (buf_len as libc::c_ulong).wrapping_sub(crate::sshbuf::sshbuf_len(iqueue)) as u_int;
     if msg_len < consumed {
         crate::log::sshlog(
             b"sftp-server.c\0" as *const u8 as *const libc::c_char,

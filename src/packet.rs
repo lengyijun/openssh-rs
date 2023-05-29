@@ -168,7 +168,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_reserve(
@@ -903,7 +903,7 @@ pub unsafe extern "C" fn ssh_packet_stop_discard(mut ssh: *mut ssh) -> libc::c_i
             'a' as i32,
             ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong,
         );
-        while sshbuf_len((*state).incoming_packet) < dlen {
+        while crate::sshbuf::sshbuf_len((*state).incoming_packet) < dlen {
             r = sshbuf_put(
                 (*state).incoming_packet,
                 buf.as_mut_ptr() as *const libc::c_void,
@@ -956,11 +956,11 @@ unsafe extern "C" fn ssh_packet_start_discard(
         (*state).packet_discard_mac = mac;
         (*state).packet_discard_mac_already = mac_already;
     }
-    if sshbuf_len((*state).input) >= discard as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len((*state).input) >= discard as libc::c_ulong {
         return ssh_packet_stop_discard(ssh);
     }
     (*state).packet_discard =
-        (discard as libc::c_ulong).wrapping_sub(sshbuf_len((*state).input)) as u_int;
+        (discard as libc::c_ulong).wrapping_sub(crate::sshbuf::sshbuf_len((*state).input)) as u_int;
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn ssh_packet_connection_is_on_socket(mut ssh: *mut ssh) -> libc::c_int {
@@ -1290,14 +1290,14 @@ unsafe extern "C" fn compress_buffer(
     if (*(*ssh).state).compression_out_started != 1 as libc::c_int {
         return -(1 as libc::c_int);
     }
-    if sshbuf_len(in_0) == 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(in_0) == 0 as libc::c_int as libc::c_ulong {
         return 0 as libc::c_int;
     }
     (*(*ssh).state).compression_out_stream.next_in = sshbuf_mutable_ptr(in_0);
     if ((*(*ssh).state).compression_out_stream.next_in).is_null() {
         return -(1 as libc::c_int);
     }
-    (*(*ssh).state).compression_out_stream.avail_in = sshbuf_len(in_0) as uInt;
+    (*(*ssh).state).compression_out_stream.avail_in = crate::sshbuf::sshbuf_len(in_0) as uInt;
     loop {
         (*(*ssh).state).compression_out_stream.next_out = buf.as_mut_ptr();
         (*(*ssh).state).compression_out_stream.avail_out =
@@ -1347,7 +1347,7 @@ unsafe extern "C" fn uncompress_buffer(
     if ((*(*ssh).state).compression_in_stream.next_in).is_null() {
         return -(1 as libc::c_int);
     }
-    (*(*ssh).state).compression_in_stream.avail_in = sshbuf_len(in_0) as uInt;
+    (*(*ssh).state).compression_in_stream.avail_in = crate::sshbuf::sshbuf_len(in_0) as uInt;
     loop {
         (*(*ssh).state).compression_in_stream.next_out = buf.as_mut_ptr();
         (*(*ssh).state).compression_in_stream.avail_out =
@@ -1712,7 +1712,7 @@ pub unsafe extern "C" fn ssh_packet_send2_wrapped(mut ssh: *mut ssh) -> libc::c_
         );
     }
     if !comp.is_null() && (*comp).enabled != 0 {
-        len = sshbuf_len((*state).outgoing_packet) as u_int;
+        len = crate::sshbuf::sshbuf_len((*state).outgoing_packet) as u_int;
         r = sshbuf_consume((*state).outgoing_packet, 5 as libc::c_int as size_t);
         if r != 0 as libc::c_int {
             current_block = 17000309712211423364;
@@ -1743,7 +1743,7 @@ pub unsafe extern "C" fn ssh_packet_send2_wrapped(mut ssh: *mut ssh) -> libc::c_
     }
     match current_block {
         6057473163062296781 => {
-            len = sshbuf_len((*state).outgoing_packet) as u_int;
+            len = crate::sshbuf::sshbuf_len((*state).outgoing_packet) as u_int;
             len = (len as libc::c_uint).wrapping_sub(aadlen) as u_int as u_int;
             padlen = (block_size as libc::c_uint)
                 .wrapping_sub(len.wrapping_rem(block_size as libc::c_uint))
@@ -1782,7 +1782,7 @@ pub unsafe extern "C" fn ssh_packet_send2_wrapped(mut ssh: *mut ssh) -> libc::c_
                 } else {
                     explicit_bzero(cp as *mut libc::c_void, padlen as size_t);
                 }
-                len = sshbuf_len((*state).outgoing_packet) as u_int;
+                len = crate::sshbuf::sshbuf_len((*state).outgoing_packet) as u_int;
                 cp = sshbuf_mutable_ptr((*state).outgoing_packet);
                 if cp.is_null() {
                     r = -(1 as libc::c_int);
@@ -1819,7 +1819,7 @@ pub unsafe extern "C" fn ssh_packet_send2_wrapped(mut ssh: *mut ssh) -> libc::c_
                         _ => {
                             r = sshbuf_reserve(
                                 (*state).output,
-                                (sshbuf_len((*state).outgoing_packet))
+                                (crate::sshbuf::sshbuf_len((*state).outgoing_packet))
                                     .wrapping_add(authlen as libc::c_ulong),
                                 &mut cp,
                             );
@@ -1955,13 +1955,15 @@ pub unsafe extern "C" fn ssh_packet_send2(mut ssh: *mut ssh) -> libc::c_int {
     let mut type_0: u_char = 0;
     let mut r: libc::c_int = 0;
     let mut need_rekey: libc::c_int = 0;
-    if sshbuf_len((*state).outgoing_packet) < 6 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len((*state).outgoing_packet) < 6 as libc::c_int as libc::c_ulong {
         return -(1 as libc::c_int);
     }
     type_0 = *(sshbuf_ptr((*state).outgoing_packet)).offset(5 as libc::c_int as isize);
     need_rekey = (ssh_packet_type_is_kex(type_0) == 0
-        && ssh_packet_need_rekeying(ssh, sshbuf_len((*state).outgoing_packet) as u_int) != 0)
-        as libc::c_int;
+        && ssh_packet_need_rekeying(
+            ssh,
+            crate::sshbuf::sshbuf_len((*state).outgoing_packet) as u_int,
+        ) != 0) as libc::c_int;
     if (need_rekey != 0 || (*state).rekeying != 0) && ssh_packet_type_is_kex(type_0) == 0 {
         if need_rekey != 0 {
             crate::log::sshlog(
@@ -2024,7 +2026,8 @@ pub unsafe extern "C" fn ssh_packet_send2(mut ssh: *mut ssh) -> libc::c_int {
                 break;
             }
             type_0 = (*p).type_0;
-            if ssh_packet_need_rekeying(ssh, sshbuf_len((*p).payload) as u_int) != 0 {
+            if ssh_packet_need_rekeying(ssh, crate::sshbuf::sshbuf_len((*p).payload) as u_int) != 0
+            {
                 crate::log::sshlog(
                     b"packet.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(
@@ -2228,7 +2231,9 @@ unsafe extern "C" fn ssh_packet_read_poll2_mux(
     *typep = 0 as libc::c_int as u_char;
     cp = sshbuf_ptr((*state).input);
     if (*state).packlen == 0 as libc::c_int as libc::c_uint {
-        if sshbuf_len((*state).input) < (4 as libc::c_int + 1 as libc::c_int) as libc::c_ulong {
+        if crate::sshbuf::sshbuf_len((*state).input)
+            < (4 as libc::c_int + 1 as libc::c_int) as libc::c_ulong
+        {
             return 0 as libc::c_int;
         }
         (*state).packlen = (*cp.offset(0 as libc::c_int as isize) as u_int32_t)
@@ -2243,7 +2248,7 @@ unsafe extern "C" fn ssh_packet_read_poll2_mux(
         }
     }
     need = ((*state).packlen).wrapping_add(4 as libc::c_int as libc::c_uint) as size_t;
-    if sshbuf_len((*state).input) < need {
+    if crate::sshbuf::sshbuf_len((*state).input) < need {
         return 0 as libc::c_int;
     }
     sshbuf_reset((*state).incoming_packet);
@@ -2350,7 +2355,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
             &mut (*state).packlen,
             (*state).p_read.seqnr,
             sshbuf_ptr((*state).input),
-            sshbuf_len((*state).input) as u_int,
+            crate::sshbuf::sshbuf_len((*state).input) as u_int,
         ) != 0 as libc::c_int
         {
             return 0 as libc::c_int;
@@ -2380,7 +2385,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
         sshbuf_reset((*state).incoming_packet);
         current_block = 17281240262373992796;
     } else if (*state).packlen == 0 as libc::c_int as libc::c_uint {
-        if sshbuf_len((*state).input) < block_size as libc::c_ulong {
+        if crate::sshbuf::sshbuf_len((*state).input) < block_size as libc::c_ulong {
             return 0 as libc::c_int;
         }
         sshbuf_reset((*state).incoming_packet);
@@ -2481,7 +2486,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                         .wrapping_sub(block_size),
                 );
             }
-            if sshbuf_len((*state).input)
+            if crate::sshbuf::sshbuf_len((*state).input)
                 < aadlen
                     .wrapping_add(need)
                     .wrapping_add(authlen)
@@ -2553,7 +2558,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                                             mac,
                                             (*state).p_read.seqnr,
                                             sshbuf_ptr((*state).incoming_packet),
-                                            sshbuf_len((*state).incoming_packet),
+                                            crate::sshbuf::sshbuf_len((*state).incoming_packet),
                                             sshbuf_ptr((*state).input),
                                             maclen as size_t,
                                         );
@@ -2588,7 +2593,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                                                 ssh,
                                                 enc,
                                                 mac,
-                                                sshbuf_len((*state).incoming_packet),
+                                                crate::sshbuf::sshbuf_len((*state).incoming_packet),
                                                 ((256 as libc::c_int * 1024 as libc::c_int)
                                                     as libc::c_uint)
                                                     .wrapping_sub(need)
@@ -2990,7 +2995,7 @@ pub unsafe extern "C" fn ssh_packet_process_read(
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn ssh_packet_remaining(mut ssh: *mut ssh) -> libc::c_int {
-    return sshbuf_len((*(*ssh).state).incoming_packet) as libc::c_int;
+    return crate::sshbuf::sshbuf_len((*(*ssh).state).incoming_packet) as libc::c_int;
 }
 pub unsafe extern "C" fn ssh_packet_send_debug(
     mut ssh: *mut ssh,
@@ -3328,7 +3333,7 @@ pub unsafe extern "C" fn ssh_packet_disconnect(
 }
 pub unsafe extern "C" fn ssh_packet_write_poll(mut ssh: *mut ssh) -> libc::c_int {
     let mut state: *mut session_state = (*ssh).state;
-    let mut len: libc::c_int = sshbuf_len((*state).output) as libc::c_int;
+    let mut len: libc::c_int = crate::sshbuf::sshbuf_len((*state).output) as libc::c_int;
     let mut r: libc::c_int = 0;
     if len > 0 as libc::c_int {
         len = write(
@@ -3426,15 +3431,15 @@ pub unsafe extern "C" fn ssh_packet_write_wait(mut ssh: *mut ssh) -> libc::c_int
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn ssh_packet_have_data_to_write(mut ssh: *mut ssh) -> libc::c_int {
-    return (sshbuf_len((*(*ssh).state).output) != 0 as libc::c_int as libc::c_ulong)
+    return (crate::sshbuf::sshbuf_len((*(*ssh).state).output) != 0 as libc::c_int as libc::c_ulong)
         as libc::c_int;
 }
 pub unsafe extern "C" fn ssh_packet_not_very_much_data_to_write(mut ssh: *mut ssh) -> libc::c_int {
     if (*(*ssh).state).interactive_mode != 0 {
-        return (sshbuf_len((*(*ssh).state).output) < 16384 as libc::c_int as libc::c_ulong)
-            as libc::c_int;
+        return (crate::sshbuf::sshbuf_len((*(*ssh).state).output)
+            < 16384 as libc::c_int as libc::c_ulong) as libc::c_int;
     } else {
-        return (sshbuf_len((*(*ssh).state).output)
+        return (crate::sshbuf::sshbuf_len((*(*ssh).state).output)
             < (128 as libc::c_int * 1024 as libc::c_int) as libc::c_ulong)
             as libc::c_int;
     };
@@ -3904,7 +3909,8 @@ unsafe extern "C" fn newkeys_from_blob(
                                 r = sshbuf_get_cstring(b, &mut (*comp).name, 0 as *mut size_t);
                                 r != 0 as libc::c_int
                             }) {
-                                if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
+                                if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong
+                                {
                                     r = -(4 as libc::c_int);
                                 } else {
                                     (*enc).key_len = keylen as u_int;
@@ -4089,7 +4095,7 @@ pub unsafe extern "C" fn ssh_packet_set_state(
     {
         return r;
     }
-    if sshbuf_len(m) != 0 {
+    if crate::sshbuf::sshbuf_len(m) != 0 {
         return -(4 as libc::c_int);
     }
     crate::log::sshlog(
@@ -4228,14 +4234,16 @@ pub unsafe extern "C" fn sshpkt_get_bignum2(
     return sshbuf_get_bignum2((*(*ssh).state).incoming_packet, valp);
 }
 pub unsafe extern "C" fn sshpkt_get_end(mut ssh: *mut ssh) -> libc::c_int {
-    if sshbuf_len((*(*ssh).state).incoming_packet) > 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len((*(*ssh).state).incoming_packet)
+        > 0 as libc::c_int as libc::c_ulong
+    {
         return -(23 as libc::c_int);
     }
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn sshpkt_ptr(mut ssh: *mut ssh, mut lenp: *mut size_t) -> *const u_char {
     if !lenp.is_null() {
-        *lenp = sshbuf_len((*(*ssh).state).incoming_packet);
+        *lenp = crate::sshbuf::sshbuf_len((*(*ssh).state).incoming_packet);
     }
     return sshbuf_ptr((*(*ssh).state).incoming_packet);
 }
@@ -4264,7 +4272,7 @@ unsafe extern "C" fn ssh_packet_send_mux(mut ssh: *mut ssh) -> libc::c_int {
     if !((*ssh).kex).is_null() {
         return -(1 as libc::c_int);
     }
-    len = sshbuf_len((*state).outgoing_packet);
+    len = crate::sshbuf::sshbuf_len((*state).outgoing_packet);
     if len < 6 as libc::c_int as libc::c_ulong {
         return -(1 as libc::c_int);
     }

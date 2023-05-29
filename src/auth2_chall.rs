@@ -22,8 +22,6 @@ extern "C" {
         _: *const libc::c_char,
     ) -> libc::c_int;
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
-
     fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
@@ -252,7 +250,7 @@ unsafe extern "C" fn kbdint_alloc(mut devs: *const libc::c_char) -> *mut KbdintA
             r = crate::sshbuf_getput_basic::sshbuf_putf(
                 b,
                 b"%s%s\0" as *const u8 as *const libc::c_char,
-                if sshbuf_len(b) != 0 {
+                if crate::sshbuf::sshbuf_len(b) != 0 {
                     b",\0" as *const u8 as *const libc::c_char
                 } else {
                     b"\0" as *const u8 as *const libc::c_char

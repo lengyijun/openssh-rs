@@ -102,7 +102,7 @@ extern "C" {
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
@@ -1541,7 +1541,7 @@ pub unsafe extern "C" fn kex_send_kexinit(mut ssh: *mut ssh) -> libc::c_int {
         return 0 as libc::c_int;
     }
     (*kex).done = 0 as libc::c_int;
-    if sshbuf_len((*kex).my) < 16 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len((*kex).my) < 16 as libc::c_int as libc::c_ulong {
         crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"kex_send_kexinit\0"))
@@ -1551,7 +1551,7 @@ pub unsafe extern "C" fn kex_send_kexinit(mut ssh: *mut ssh) -> libc::c_int {
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
             b"bad kex length: %zu < %d\0" as *const u8 as *const libc::c_char,
-            sshbuf_len((*kex).my),
+            crate::sshbuf::sshbuf_len((*kex).my),
             16 as libc::c_int,
         );
         return -(4 as libc::c_int);
@@ -2563,7 +2563,7 @@ pub unsafe extern "C" fn kex_derive_keys(
     let mut ctos: u_int = 0;
     let mut r: libc::c_int = 0;
     if (*kex).flags & 0x2 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint {
-        if sshbuf_len((*kex).session_id) != 0 as libc::c_int as libc::c_ulong {
+        if crate::sshbuf::sshbuf_len((*kex).session_id) != 0 as libc::c_int as libc::c_ulong {
             crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"kex_derive_keys\0"))
@@ -2584,7 +2584,7 @@ pub unsafe extern "C" fn kex_derive_keys(
         if r != 0 as libc::c_int {
             return r;
         }
-    } else if sshbuf_len((*kex).session_id) == 0 as libc::c_int as libc::c_ulong {
+    } else if crate::sshbuf::sshbuf_len((*kex).session_id) == 0 as libc::c_int as libc::c_ulong {
         crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"kex_derive_keys\0"))
@@ -2826,8 +2826,8 @@ pub unsafe extern "C" fn kex_exchange_identification(
         )),
         ssh_packet_get_connection_out(ssh),
         sshbuf_mutable_ptr(our_version) as *mut libc::c_void,
-        sshbuf_len(our_version),
-    ) != sshbuf_len(our_version)
+        crate::sshbuf::sshbuf_len(our_version),
+    ) != crate::sshbuf::sshbuf_len(our_version)
     {
         oerrno = *libc::__errno_location();
         crate::log::sshlog(
@@ -3064,7 +3064,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                         current_block = 4276536258050058664;
                                         break 's_97;
                                     } else {
-                                        if !(sshbuf_len(peer_version)
+                                        if !(crate::sshbuf::sshbuf_len(peer_version)
                                             > 8192 as libc::c_int as libc::c_ulong)
                                         {
                                             continue;
@@ -3091,7 +3091,8 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                 }
                             }
                         }
-                        if sshbuf_len(peer_version) > 4 as libc::c_int as libc::c_ulong
+                        if crate::sshbuf::sshbuf_len(peer_version)
+                            > 4 as libc::c_int as libc::c_ulong
                             && memcmp(
                                 sshbuf_ptr(peer_version) as *const libc::c_void,
                                 b"SSH-\0" as *const u8 as *const libc::c_char
@@ -3184,7 +3185,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                 }
                                 remote_version = calloc(
                                     1 as libc::c_int as libc::c_ulong,
-                                    sshbuf_len(peer_version),
+                                    crate::sshbuf::sshbuf_len(peer_version),
                                 )
                                     as *mut libc::c_char;
                                 if remote_version.is_null() {

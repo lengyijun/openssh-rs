@@ -44,7 +44,7 @@ extern "C" {
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_get_string(
@@ -573,7 +573,7 @@ unsafe extern "C" fn valid_request(
         fail;
     }
     libc::free(luser as *mut libc::c_void);
-    if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
         fail += 1;
         fail;
     }

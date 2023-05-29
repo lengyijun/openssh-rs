@@ -31,7 +31,6 @@ extern "C" {
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u64(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int64_t) -> libc::c_int;
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
@@ -219,7 +218,7 @@ unsafe extern "C" fn cert_option_list(
         );
     } else {
         loop {
-            if !(sshbuf_len(c) > 0 as libc::c_int as libc::c_ulong) {
+            if !(crate::sshbuf::sshbuf_len(c) > 0 as libc::c_int as libc::c_ulong) {
                 current_block = 4741994311446740739;
                 break;
             }
@@ -258,7 +257,7 @@ unsafe extern "C" fn cert_option_list(
                     b"found certificate option \"%.100s\" len %zu\0" as *const u8
                         as *const libc::c_char,
                     name,
-                    sshbuf_len(data),
+                    crate::sshbuf::sshbuf_len(data),
                 );
                 found = 0 as libc::c_int;
                 if which & 2 as libc::c_int as libc::c_uint != 0 as libc::c_int as libc::c_uint {
@@ -458,7 +457,7 @@ unsafe extern "C" fn cert_option_list(
                             name,
                         );
                     }
-                } else if sshbuf_len(data) != 0 as libc::c_int as libc::c_ulong {
+                } else if crate::sshbuf::sshbuf_len(data) != 0 as libc::c_int as libc::c_ulong {
                     crate::log::sshlog(
                         b"auth-options.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(

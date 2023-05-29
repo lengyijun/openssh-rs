@@ -14,7 +14,6 @@ extern "C" {
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
@@ -308,7 +307,7 @@ pub unsafe extern "C" fn kex_c25519_enc(
     let mut r: libc::c_int = 0;
     *server_blobp = 0 as *mut crate::sshbuf::sshbuf;
     *shared_secretp = 0 as *mut crate::sshbuf::sshbuf;
-    if sshbuf_len(client_blob) != 32 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(client_blob) != 32 as libc::c_int as libc::c_ulong {
         r = -(21 as libc::c_int);
     } else {
         client_pub = sshbuf_ptr(client_blob);
@@ -356,7 +355,7 @@ pub unsafe extern "C" fn kex_c25519_dec(
     let mut server_pub: *const u_char = 0 as *const u_char;
     let mut r: libc::c_int = 0;
     *shared_secretp = 0 as *mut crate::sshbuf::sshbuf;
-    if sshbuf_len(server_blob) != 32 as libc::c_int as libc::c_ulong {
+    if crate::sshbuf::sshbuf_len(server_blob) != 32 as libc::c_int as libc::c_ulong {
         r = -(21 as libc::c_int);
     } else {
         server_pub = sshbuf_ptr(server_blob);

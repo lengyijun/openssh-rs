@@ -67,7 +67,7 @@ extern "C" {
     fn compat_banner(_: *mut ssh, _: *const libc::c_char);
 
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
@@ -592,8 +592,9 @@ pub unsafe extern "C" fn ssh_packet_next(mut ssh: *mut ssh, mut typep: *mut u_ch
     let mut seqnr: u_int32_t = 0;
     let mut type_0: u_char = 0;
     *typep = 0 as libc::c_int as u_char;
-    if sshbuf_len((*(*ssh).kex).client_version) == 0 as libc::c_int as libc::c_ulong
-        || sshbuf_len((*(*ssh).kex).server_version) == 0 as libc::c_int as libc::c_ulong
+    if crate::sshbuf::sshbuf_len((*(*ssh).kex).client_version) == 0 as libc::c_int as libc::c_ulong
+        || crate::sshbuf::sshbuf_len((*(*ssh).kex).server_version)
+            == 0 as libc::c_int as libc::c_ulong
     {
         return _ssh_exchange_banner(ssh);
     }
@@ -653,7 +654,7 @@ pub unsafe extern "C" fn ssh_packet_put(
 pub unsafe extern "C" fn ssh_output_ptr(mut ssh: *mut ssh, mut len: *mut size_t) -> *const u_char {
     let mut output: *mut crate::sshbuf::sshbuf =
         ssh_packet_get_output(ssh) as *mut crate::sshbuf::sshbuf;
-    *len = sshbuf_len(output);
+    *len = crate::sshbuf::sshbuf_len(output);
     return sshbuf_ptr(output);
 }
 pub unsafe extern "C" fn ssh_output_consume(mut ssh: *mut ssh, mut len: size_t) -> libc::c_int {
@@ -701,7 +702,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
         sshbuf_reset(banner);
         expect_nl = 0 as libc::c_int;
         loop {
-            if j >= sshbuf_len(input) {
+            if j >= crate::sshbuf::sshbuf_len(input) {
                 return 0 as libc::c_int;
             }
             let fresh0 = j;
@@ -722,7 +723,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
                 if r != 0 as libc::c_int {
                     return r;
                 }
-                if sshbuf_len(banner) > 8192 as libc::c_int as libc::c_ulong {
+                if crate::sshbuf::sshbuf_len(banner) > 8192 as libc::c_int as libc::c_ulong {
                     current_block = 5020065448061302065;
                     break;
                 }
@@ -730,7 +731,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
         }
         match current_block {
             1054647088692577877 => {
-                if sshbuf_len(banner) >= 4 as libc::c_int as libc::c_ulong
+                if crate::sshbuf::sshbuf_len(banner) >= 4 as libc::c_int as libc::c_ulong
                     && memcmp(
                         sshbuf_ptr(banner) as *const libc::c_void,
                         b"SSH-\0" as *const u8 as *const libc::c_char as *const libc::c_void,
@@ -750,7 +751,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
                     SYSLOG_LEVEL_DEBUG1,
                     0 as *const libc::c_char,
                     b"%.*s\0" as *const u8 as *const libc::c_char,
-                    sshbuf_len(banner) as libc::c_int,
+                    crate::sshbuf::sshbuf_len(banner) as libc::c_int,
                     sshbuf_ptr(banner),
                 );
                 if !((*(*ssh).kex).server != 0 || {
@@ -778,8 +779,10 @@ pub unsafe extern "C" fn _ssh_read_banner(
     }
     cp = crate::sshbuf_misc::sshbuf_dup_string(banner);
     if cp.is_null() || {
-        remote_version =
-            calloc(1 as libc::c_int as libc::c_ulong, sshbuf_len(banner)) as *mut libc::c_char;
+        remote_version = calloc(
+            1 as libc::c_int as libc::c_ulong,
+            crate::sshbuf::sshbuf_len(banner),
+        ) as *mut libc::c_char;
         remote_version.is_null()
     } {
         r = -(2 as libc::c_int);
@@ -878,22 +881,30 @@ pub unsafe extern "C" fn _ssh_exchange_banner(mut ssh: *mut ssh) -> libc::c_int 
     let mut r: libc::c_int = 0;
     r = 0 as libc::c_int;
     if (*kex).server != 0 {
-        if sshbuf_len((*(*ssh).kex).server_version) == 0 as libc::c_int as libc::c_ulong {
+        if crate::sshbuf::sshbuf_len((*(*ssh).kex).server_version)
+            == 0 as libc::c_int as libc::c_ulong
+        {
             r = _ssh_send_banner(ssh, (*(*ssh).kex).server_version);
         }
         if r == 0 as libc::c_int
-            && sshbuf_len((*(*ssh).kex).server_version) != 0 as libc::c_int as libc::c_ulong
-            && sshbuf_len((*(*ssh).kex).client_version) == 0 as libc::c_int as libc::c_ulong
+            && crate::sshbuf::sshbuf_len((*(*ssh).kex).server_version)
+                != 0 as libc::c_int as libc::c_ulong
+            && crate::sshbuf::sshbuf_len((*(*ssh).kex).client_version)
+                == 0 as libc::c_int as libc::c_ulong
         {
             r = _ssh_read_banner(ssh, (*(*ssh).kex).client_version);
         }
     } else {
-        if sshbuf_len((*(*ssh).kex).server_version) == 0 as libc::c_int as libc::c_ulong {
+        if crate::sshbuf::sshbuf_len((*(*ssh).kex).server_version)
+            == 0 as libc::c_int as libc::c_ulong
+        {
             r = _ssh_read_banner(ssh, (*(*ssh).kex).server_version);
         }
         if r == 0 as libc::c_int
-            && sshbuf_len((*(*ssh).kex).server_version) != 0 as libc::c_int as libc::c_ulong
-            && sshbuf_len((*(*ssh).kex).client_version) == 0 as libc::c_int as libc::c_ulong
+            && crate::sshbuf::sshbuf_len((*(*ssh).kex).server_version)
+                != 0 as libc::c_int as libc::c_ulong
+            && crate::sshbuf::sshbuf_len((*(*ssh).kex).client_version)
+                == 0 as libc::c_int as libc::c_ulong
         {
             r = _ssh_send_banner(ssh, (*(*ssh).kex).client_version);
         }
@@ -901,8 +912,9 @@ pub unsafe extern "C" fn _ssh_exchange_banner(mut ssh: *mut ssh) -> libc::c_int 
     if r != 0 as libc::c_int {
         return r;
     }
-    if sshbuf_len((*(*ssh).kex).server_version) != 0 as libc::c_int as libc::c_ulong
-        && sshbuf_len((*(*ssh).kex).client_version) != 0 as libc::c_int as libc::c_ulong
+    if crate::sshbuf::sshbuf_len((*(*ssh).kex).server_version) != 0 as libc::c_int as libc::c_ulong
+        && crate::sshbuf::sshbuf_len((*(*ssh).kex).client_version)
+            != 0 as libc::c_int as libc::c_ulong
     {
         r = _ssh_order_hostkeyalgs(ssh);
         if r != 0 as libc::c_int || {

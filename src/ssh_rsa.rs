@@ -40,7 +40,6 @@ extern "C" {
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put_bignum2(buf: *mut crate::sshbuf::sshbuf, v: *const BIGNUM) -> libc::c_int;
     fn sshbuf_get_bignum2(buf: *mut crate::sshbuf::sshbuf, valp: *mut *mut BIGNUM) -> libc::c_int;
@@ -813,7 +812,7 @@ unsafe extern "C" fn ssh_rsa_sign(
                             ret = sshbuf_put_string(b, sig as *const libc::c_void, slen);
                             ret != 0 as libc::c_int
                         }) {
-                            len = sshbuf_len(b) as u_int;
+                            len = crate::sshbuf::sshbuf_len(b) as u_int;
                             if !sigp.is_null() {
                                 *sigp = libc::malloc(len as usize) as *mut u_char;
                                 if (*sigp).is_null() {
@@ -929,7 +928,7 @@ unsafe extern "C" fn ssh_rsa_verify(
                 _ => {
                     if sshbuf_get_string(b, &mut sigblob, &mut len) != 0 as libc::c_int {
                         ret = -(4 as libc::c_int);
-                    } else if sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
+                    } else if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
                         ret = -(23 as libc::c_int);
                     } else {
                         modlen = RSA_size((*key).rsa) as size_t;
