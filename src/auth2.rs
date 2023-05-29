@@ -46,7 +46,6 @@ extern "C" {
     static mut use_privsep: libc::c_int;
     fn mm_inform_authserv(_: *mut libc::c_char, _: *mut libc::c_char);
     fn mm_getpwnamallow(_: *mut ssh, _: *const libc::c_char) -> *mut libc::passwd;
-    fn mm_auth2_read_banner() -> *mut libc::c_char;
 
     static mut options: ServerOptions;
     static mut method_none: Authmethod;
@@ -450,7 +449,7 @@ unsafe extern "C" fn userauth_banner(mut ssh: *mut ssh) {
         return;
     }
     banner = if use_privsep != 0 {
-        mm_auth2_read_banner()
+        crate::monitor_wrap::mm_auth2_read_banner()
     } else {
         auth2_read_banner()
     };
