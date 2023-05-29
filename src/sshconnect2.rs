@@ -60,7 +60,6 @@ extern "C" {
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -2633,7 +2632,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
                 alg,
                 fp,
             );
-            sshbuf_free(b);
+            crate::sshbuf::sshbuf_free(b);
             b = crate::sshbuf::sshbuf_new();
             if b.is_null() {
                 sshfatal(
@@ -2899,7 +2898,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
     }
     libc::free(fp as *mut libc::c_void);
     libc::free(alg as *mut libc::c_void);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     freezero(signature as *mut libc::c_void, slen);
     return sent;
 }
@@ -4365,7 +4364,7 @@ unsafe extern "C" fn ssh_keysign(
                             );
                         } else {
                             crate::misc::ssh_signal(17 as libc::c_int, osigchld);
-                            sshbuf_free(b);
+                            crate::sshbuf::sshbuf_free(b);
                             return 0 as libc::c_int;
                         }
                     }
@@ -4374,7 +4373,7 @@ unsafe extern "C" fn ssh_keysign(
         }
     }
     crate::misc::ssh_signal(17 as libc::c_int, osigchld);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return -(1 as libc::c_int);
 }
 unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
@@ -4720,7 +4719,7 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
     libc::free(fp as *mut libc::c_void);
     libc::free(chost as *mut libc::c_void);
     sshkey_free(private);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return success;
 }
 unsafe extern "C" fn authmethod_is_enabled(mut method: *mut Authmethod) -> libc::c_int {
@@ -4935,7 +4934,7 @@ unsafe extern "C" fn authmethods_get() -> *mut libc::c_char {
             b"sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return list;
 }
 unsafe extern "C" fn run_static_initializers() {

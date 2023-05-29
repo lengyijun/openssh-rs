@@ -36,7 +36,7 @@ extern "C" {
     ) -> !;
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
@@ -2014,7 +2014,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             b"compose end\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
 }
 pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_int) {
     let mut tio: termios = termios {
@@ -3317,7 +3317,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
         }
     }
     len = sshbuf_len(buf);
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
     if len > 0 as libc::c_int as libc::c_ulong {
         crate::log::sshlog(
             b"ttymodes.c\0" as *const u8 as *const libc::c_char,

@@ -125,7 +125,7 @@ extern "C" {
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
@@ -1269,7 +1269,7 @@ unsafe extern "C" fn send_status_errmsg(
         }
     }
     send_msg(msg);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn send_status(mut id: u_int32_t, mut status: u_int32_t) {
     send_status_errmsg(id, status, 0 as *const libc::c_char);
@@ -1319,7 +1319,7 @@ unsafe extern "C" fn send_data_or_handle(
         );
     }
     send_msg(msg);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn send_data(mut id: u_int32_t, mut data: *const u_char, mut dlen: libc::c_int) {
     crate::log::sshlog(
@@ -1430,7 +1430,7 @@ unsafe extern "C" fn send_names(mut id: u_int32_t, mut count: libc::c_int, mut s
         i;
     }
     send_msg(msg);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn send_attrib(mut id: u_int32_t, mut a: *const Attrib) {
     let mut msg: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
@@ -1481,7 +1481,7 @@ unsafe extern "C" fn send_attrib(mut id: u_int32_t, mut a: *const Attrib) {
         );
     }
     send_msg(msg);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn send_statvfs(mut id: u_int32_t, mut st: *mut statvfs) {
     let mut msg: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
@@ -1572,7 +1572,7 @@ unsafe extern "C" fn send_statvfs(mut id: u_int32_t, mut st: *mut statvfs) {
         );
     }
     send_msg(msg);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn compose_extension(
     mut msg: *mut crate::sshbuf::sshbuf,
@@ -1737,7 +1737,7 @@ unsafe extern "C" fn process_init() {
         b"1\0" as *const u8 as *const libc::c_char,
     );
     send_msg(msg);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn process_open(mut id: u_int32_t) {
     let mut pflags: u_int32_t = 0;
@@ -3659,7 +3659,7 @@ unsafe extern "C" fn process_extended_limits(mut id: u_int32_t) {
         );
     }
     send_msg(msg);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn process_extended_expand(mut id: u_int32_t) {
     let mut current_block: u64;
@@ -4327,11 +4327,11 @@ unsafe extern "C" fn process_extended_get_users_groups_by_id(mut id: u_int32_t) 
         );
     }
     send_msg(msg);
-    sshbuf_free(uids);
-    sshbuf_free(gids);
-    sshbuf_free(usernames);
-    sshbuf_free(groupnames);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(uids);
+    crate::sshbuf::sshbuf_free(gids);
+    crate::sshbuf::sshbuf_free(usernames);
+    crate::sshbuf::sshbuf_free(groupnames);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn process_extended(mut id: u_int32_t) {
     let mut request: *mut libc::c_char = 0 as *mut libc::c_char;

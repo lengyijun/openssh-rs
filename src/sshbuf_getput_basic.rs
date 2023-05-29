@@ -25,7 +25,7 @@ extern "C" {
         child: *mut crate::sshbuf::sshbuf,
         parent: *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 }
 pub type __builtin_va_list = [__va_list_tag; 1];
@@ -791,7 +791,7 @@ pub unsafe extern "C" fn sshbuf_froms(
         r = sshbuf_set_parent(ret, buf);
         r != 0 as libc::c_int
     } {
-        sshbuf_free(ret);
+        crate::sshbuf::sshbuf_free(ret);
         return r;
     }
     *bufp = ret;

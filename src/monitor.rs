@@ -89,7 +89,7 @@ extern "C" {
     fn sshkey_sig_details_free(_: *mut sshkey_sig_details);
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -1324,7 +1324,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
     ) != 4 as libc::c_int as libc::c_ulong
     {
         if *libc::__errno_location() == 32 as libc::c_int {
-            sshbuf_free(logmsg);
+            crate::sshbuf::sshbuf_free(logmsg);
             crate::log::sshlog(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"monitor_read_log\0"))
@@ -1451,7 +1451,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
         b"%s [preauth]\0" as *const u8 as *const libc::c_char,
         msg,
     );
-    sshbuf_free(logmsg);
+    crate::sshbuf::sshbuf_free(logmsg);
     libc::free(msg as *mut libc::c_void);
     return 0 as libc::c_int;
 }
@@ -1575,7 +1575,7 @@ unsafe extern "C" fn monitor_read(
         }
         ret = (Some(((*ent).f).expect("non-null function pointer")))
             .expect("non-null function pointer")(ssh, (*pmonitor).m_sendfd, m);
-        sshbuf_free(m);
+        crate::sshbuf::sshbuf_free(m);
         if (*ent).flags & 0x10 as libc::c_int != 0 {
             crate::log::sshlog(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -1903,7 +1903,7 @@ pub unsafe extern "C" fn mm_answer_sign(
                 sshbuf_len(sigbuf),
             );
         }
-        sshbuf_free(sigbuf);
+        crate::sshbuf::sshbuf_free(sigbuf);
         is_proof = 1 as libc::c_int;
     }
     if session_id2_len == 0 as libc::c_int as libc::c_uint {
@@ -3351,7 +3351,7 @@ unsafe extern "C" fn monitor_valid_userblob(
         fail += 1;
         fail;
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     if !hostkey.is_null() {
         if get_hostkey_index(hostkey, 1 as libc::c_int, ssh) == -(1 as libc::c_int) {
             sshfatal(
@@ -3589,7 +3589,7 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
         fail += 1;
         fail;
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return (fail == 0 as libc::c_int) as libc::c_int;
 }
 pub unsafe extern "C" fn mm_answer_keyverify(
@@ -4166,7 +4166,7 @@ pub unsafe extern "C" fn mm_answer_pty_cleanup(
 pub unsafe extern "C" fn monitor_clear_keystate(mut ssh: *mut ssh, mut _pmonitor: *mut monitor) {
     ssh_clear_newkeys(ssh, MODE_IN as libc::c_int);
     ssh_clear_newkeys(ssh, MODE_OUT as libc::c_int);
-    sshbuf_free(child_state);
+    crate::sshbuf::sshbuf_free(child_state);
     child_state = 0 as *mut crate::sshbuf::sshbuf;
 }
 pub unsafe extern "C" fn monitor_apply_keystate(mut ssh: *mut ssh, mut _pmonitor: *mut monitor) {
@@ -4197,7 +4197,7 @@ pub unsafe extern "C" fn monitor_apply_keystate(mut ssh: *mut ssh, mut _pmonitor
             b"packet_set_state\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(child_state);
+    crate::sshbuf::sshbuf_free(child_state);
     child_state = 0 as *mut crate::sshbuf::sshbuf;
     kex = (*ssh).kex;
     if kex.is_null() {

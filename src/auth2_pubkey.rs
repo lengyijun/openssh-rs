@@ -39,7 +39,7 @@ extern "C" {
     fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
@@ -822,7 +822,7 @@ unsafe extern "C" fn userauth_pubkey(
                 method,
             );
         }
-        sshbuf_free(b);
+        crate::sshbuf::sshbuf_free(b);
         b = 0 as *mut crate::sshbuf::sshbuf;
     }
     if log_level_get() as libc::c_int >= SYSLOG_LEVEL_DEBUG2 as libc::c_int {
@@ -877,7 +877,7 @@ unsafe extern "C" fn userauth_pubkey(
             pkalg,
             keystring,
         );
-        sshbuf_free(pkbuf);
+        crate::sshbuf::sshbuf_free(pkbuf);
         libc::free(keystring as *mut libc::c_void);
     }
     pktype = sshkey_type_from_name(pkalg);
@@ -1463,7 +1463,7 @@ unsafe extern "C" fn userauth_pubkey(
         authenticated,
         pkalg,
     );
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     sshauthopt_free(authopts);
     sshkey_free(key);
     sshkey_free(hostkey);

@@ -14,7 +14,6 @@ extern "C" {
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_reserve(
@@ -292,7 +291,7 @@ pub unsafe extern "C" fn kex_c25519_keypair(mut kex: *mut kex) -> libc::c_int {
         (*kex).client_pub = buf;
         buf = 0 as *mut crate::sshbuf::sshbuf;
     }
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
     return r;
 }
 pub unsafe extern "C" fn kex_c25519_enc(
@@ -344,8 +343,8 @@ pub unsafe extern "C" fn kex_c25519_enc(
         server_key.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[u_char; 32]>() as libc::c_ulong,
     );
-    sshbuf_free(server_blob);
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(server_blob);
+    crate::sshbuf::sshbuf_free(buf);
     return r;
 }
 pub unsafe extern "C" fn kex_c25519_dec(
@@ -377,6 +376,6 @@ pub unsafe extern "C" fn kex_c25519_dec(
             }
         }
     }
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
     return r;
 }

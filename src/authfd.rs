@@ -66,7 +66,6 @@ extern "C" {
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
 
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_equal_public(_: *const sshkey, _: *const sshkey) -> libc::c_int;
@@ -468,7 +467,7 @@ unsafe extern "C" fn ssh_request_reply_decode(
     {
         r = 0 as libc::c_int;
     }
-    sshbuf_free(reply);
+    crate::sshbuf::sshbuf_free(reply);
     return r;
 }
 pub unsafe extern "C" fn ssh_close_authentication_socket(mut sock: libc::c_int) {
@@ -505,7 +504,7 @@ pub unsafe extern "C" fn ssh_lock_agent(
     {
         r = 0 as libc::c_int;
     }
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     return r;
 }
 unsafe extern "C" fn deserialise_identity2(
@@ -634,7 +633,7 @@ pub unsafe extern "C" fn ssh_fetch_identitylist(
             }
         }
     }
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     if !idl.is_null() {
         ssh_free_identitylist(idl);
     }
@@ -780,7 +779,7 @@ pub unsafe extern "C" fn ssh_agent_sign(
         }
     }
     freezero(sig as *mut libc::c_void, len);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     return r;
 }
 unsafe extern "C" fn encode_dest_constraint_hop(
@@ -837,7 +836,7 @@ unsafe extern "C" fn encode_dest_constraint_hop(
             }
         }
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 unsafe extern "C" fn encode_dest_constraint(
@@ -866,7 +865,7 @@ unsafe extern "C" fn encode_dest_constraint(
             r = 0 as libc::c_int;
         }
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 unsafe extern "C" fn encode_constraints(
@@ -1023,7 +1022,7 @@ unsafe extern "C" fn encode_constraints(
         }
         _ => {}
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 pub unsafe extern "C" fn ssh_add_identity_constrained(
@@ -1090,7 +1089,7 @@ pub unsafe extern "C" fn ssh_add_identity_constrained(
             r = -(10 as libc::c_int);
         }
     }
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     return r;
 }
 pub unsafe extern "C" fn ssh_remove_identity(
@@ -1125,7 +1124,7 @@ pub unsafe extern "C" fn ssh_remove_identity(
     if !blob.is_null() {
         freezero(blob as *mut libc::c_void, blen);
     }
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     return r;
 }
 pub unsafe extern "C" fn ssh_update_card(
@@ -1185,7 +1184,7 @@ pub unsafe extern "C" fn ssh_update_card(
             }
         }
     }
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     return r;
 }
 pub unsafe extern "C" fn ssh_remove_all_identities(
@@ -1210,7 +1209,7 @@ pub unsafe extern "C" fn ssh_remove_all_identities(
             r = 0 as libc::c_int;
         }
     }
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     return r;
 }
 pub unsafe extern "C" fn ssh_agent_bind_hostkey(
@@ -1267,6 +1266,6 @@ pub unsafe extern "C" fn ssh_agent_bind_hostkey(
             r = 0 as libc::c_int;
         }
     }
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     return r;
 }

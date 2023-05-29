@@ -29,7 +29,6 @@ extern "C" {
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -650,7 +649,7 @@ unsafe extern "C" fn sshsk_ecdsa_assemble(
     }
     EC_POINT_free(q);
     sshkey_free(key);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 unsafe extern "C" fn sshsk_ed25519_assemble(
@@ -1358,7 +1357,7 @@ unsafe extern "C" fn sshsk_ecdsa_sig(
             }
         }
     }
-    sshbuf_free(inner_sig);
+    crate::sshbuf::sshbuf_free(inner_sig);
     return r;
 }
 unsafe extern "C" fn sshsk_ed25519_sig(
@@ -1573,8 +1572,8 @@ pub unsafe extern "C" fn sshsk_sign(
     sshsk_free_options(opts);
     sshsk_free(skp);
     sshsk_free_sign_response(resp);
-    sshbuf_free(sig);
-    sshbuf_free(inner_sig);
+    crate::sshbuf::sshbuf_free(sig);
+    crate::sshbuf::sshbuf_free(inner_sig);
     return r;
 }
 unsafe extern "C" fn sshsk_free_sk_resident_keys(

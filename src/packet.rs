@@ -166,7 +166,7 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -719,10 +719,10 @@ pub unsafe extern "C" fn ssh_alloc_session_state() -> *mut ssh {
             libc::free(ssh as *mut libc::c_void);
         }
         if !state.is_null() {
-            sshbuf_free((*state).input);
-            sshbuf_free((*state).output);
-            sshbuf_free((*state).incoming_packet);
-            sshbuf_free((*state).outgoing_packet);
+            crate::sshbuf::sshbuf_free((*state).input);
+            crate::sshbuf::sshbuf_free((*state).output);
+            crate::sshbuf::sshbuf_free((*state).incoming_packet);
+            crate::sshbuf::sshbuf_free((*state).outgoing_packet);
             libc::free(state as *mut libc::c_void);
         }
         return 0 as *mut ssh;
@@ -1121,10 +1121,10 @@ unsafe extern "C" fn ssh_packet_close_internal(mut ssh: *mut ssh, mut do_close: 
             close((*state).connection_out);
         }
     }
-    sshbuf_free((*state).input);
-    sshbuf_free((*state).output);
-    sshbuf_free((*state).outgoing_packet);
-    sshbuf_free((*state).incoming_packet);
+    crate::sshbuf::sshbuf_free((*state).input);
+    crate::sshbuf::sshbuf_free((*state).output);
+    crate::sshbuf::sshbuf_free((*state).outgoing_packet);
+    crate::sshbuf::sshbuf_free((*state).incoming_packet);
     mode = 0 as libc::c_int as u_int;
     while mode < MODE_MAX as libc::c_int as libc::c_uint {
         kex_free_newkeys((*state).newkeys[mode as usize]);
@@ -1134,7 +1134,7 @@ unsafe extern "C" fn ssh_packet_close_internal(mut ssh: *mut ssh, mut do_close: 
         mode;
     }
     if do_close != 0 && !((*state).compression_buffer).is_null() {
-        sshbuf_free((*state).compression_buffer);
+        crate::sshbuf::sshbuf_free((*state).compression_buffer);
         if (*state).compression_out_started != 0 {
             let mut stream: z_streamp = &mut (*state).compression_out_stream;
             crate::log::sshlog(
@@ -2050,7 +2050,7 @@ pub unsafe extern "C" fn ssh_packet_send2(mut ssh: *mut ssh) -> libc::c_int {
                 b"dequeue packet: %u\0" as *const u8 as *const libc::c_char,
                 type_0 as libc::c_int,
             );
-            sshbuf_free((*state).outgoing_packet);
+            crate::sshbuf::sshbuf_free((*state).outgoing_packet);
             (*state).outgoing_packet = (*p).payload;
             if !((*p).next.tqe_next).is_null() {
                 (*(*p).next.tqe_next).next.tqe_prev = (*p).next.tqe_prev;
@@ -3744,7 +3744,7 @@ unsafe extern "C" fn newkeys_to_blob(
             }
         }
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 pub unsafe extern "C" fn ssh_packet_get_state(
@@ -3921,7 +3921,7 @@ unsafe extern "C" fn newkeys_from_blob(
         }
     }
     libc::free(newkey as *mut libc::c_void);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 unsafe extern "C" fn kex_from_blob(

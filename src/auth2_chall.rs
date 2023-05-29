@@ -22,7 +22,6 @@ extern "C" {
         _: *const libc::c_char,
     ) -> libc::c_int;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_putf(
         buf: *mut crate::sshbuf::sshbuf,
@@ -293,7 +292,7 @@ unsafe extern "C" fn kbdint_alloc(mut devs: *const libc::c_char) -> *mut KbdintA
                 b"sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
             );
         }
-        sshbuf_free(b);
+        crate::sshbuf::sshbuf_free(b);
     } else {
         (*kbdintctxt).devices = crate::xmalloc::xstrdup(devs);
     }

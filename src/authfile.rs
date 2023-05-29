@@ -58,7 +58,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_set_filename(_: *mut sshkey, _: *const libc::c_char) -> libc::c_int;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_load_fd(_: libc::c_int, _: *mut *mut crate::sshbuf::sshbuf) -> libc::c_int;
     fn sshbuf_write_file(path: *const libc::c_char, buf: *mut crate::sshbuf::sshbuf)
         -> libc::c_int;
@@ -211,7 +210,7 @@ pub unsafe extern "C" fn sshkey_save_private(
             r = 0 as libc::c_int;
         }
     }
-    sshbuf_free(keyblob);
+    crate::sshbuf::sshbuf_free(keyblob);
     return r;
 }
 pub unsafe extern "C" fn sshkey_perm_ok(
@@ -357,7 +356,7 @@ pub unsafe extern "C" fn sshkey_load_private_type_fd(
     }) {
         r = 0 as libc::c_int;
     }
-    sshbuf_free(buffer);
+    crate::sshbuf::sshbuf_free(buffer);
     return r;
 }
 unsafe extern "C" fn sshkey_load_pubkey_from_private(
@@ -394,7 +393,7 @@ unsafe extern "C" fn sshkey_load_pubkey_from_private(
         }
     }
     close(fd);
-    sshbuf_free(buffer);
+    crate::sshbuf::sshbuf_free(buffer);
     sshkey_free(pubkey);
     return r;
 }

@@ -30,7 +30,6 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_int;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -224,7 +223,7 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_keypair(mut kex: *mut kex) -> l
         (*kex).client_pub = buf;
         buf = 0 as *mut crate::sshbuf::sshbuf;
     }
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
     return r;
 }
 pub unsafe extern "C" fn kex_kem_sntrup761x25519_enc(
@@ -308,8 +307,8 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_enc(
         server_key.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[u_char; 32]>() as libc::c_ulong,
     );
-    sshbuf_free(server_blob);
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(server_blob);
+    crate::sshbuf::sshbuf_free(buf);
     return r;
 }
 pub unsafe extern "C" fn kex_kem_sntrup761x25519_dec(
@@ -380,6 +379,6 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_dec(
         hash.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[u_char; 64]>() as libc::c_ulong,
     );
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
     return r;
 }

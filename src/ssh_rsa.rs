@@ -39,7 +39,7 @@ extern "C" {
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put_bignum2(buf: *mut crate::sshbuf::sshbuf, v: *const BIGNUM) -> libc::c_int;
@@ -850,7 +850,7 @@ unsafe extern "C" fn ssh_rsa_sign(
         ::core::mem::size_of::<[u_char; 64]>() as libc::c_ulong,
     );
     freezero(sig as *mut libc::c_void, slen);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return ret;
 }
 unsafe extern "C" fn ssh_rsa_verify(
@@ -993,7 +993,7 @@ unsafe extern "C" fn ssh_rsa_verify(
     }
     freezero(sigblob as *mut libc::c_void, len);
     libc::free(sigtype as *mut libc::c_void);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     explicit_bzero(
         digest.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[u_char; 64]>() as libc::c_ulong,

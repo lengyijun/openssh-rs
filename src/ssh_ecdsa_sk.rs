@@ -27,7 +27,7 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put(
@@ -426,8 +426,8 @@ unsafe extern "C" fn webauthn_check_prepare_hash(
             }
         }
     }
-    sshbuf_free(chall);
-    sshbuf_free(m);
+    crate::sshbuf::sshbuf_free(chall);
+    crate::sshbuf::sshbuf_free(m);
     return r;
 }
 unsafe extern "C" fn ssh_ecdsa_sk_verify(
@@ -702,12 +702,12 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
         ::core::mem::size_of::<[u_char; 32]>() as libc::c_ulong,
     );
     sshkey_sig_details_free(details);
-    sshbuf_free(webauthn_wrapper);
-    sshbuf_free(webauthn_exts);
+    crate::sshbuf::sshbuf_free(webauthn_wrapper);
+    crate::sshbuf::sshbuf_free(webauthn_exts);
     libc::free(webauthn_origin as *mut libc::c_void);
-    sshbuf_free(original_signed);
-    sshbuf_free(sigbuf);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(original_signed);
+    crate::sshbuf::sshbuf_free(sigbuf);
+    crate::sshbuf::sshbuf_free(b);
     ECDSA_SIG_free(esig);
     BN_clear_free(sig_r);
     BN_clear_free(sig_s);

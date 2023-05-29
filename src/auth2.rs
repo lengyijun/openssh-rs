@@ -63,7 +63,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_putf(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1260,7 +1259,7 @@ unsafe extern "C" fn authmethods_get(mut authctxt: *mut Authctxt) -> *mut libc::
             b"sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return list;
 }
 unsafe extern "C" fn authmethod_byname(mut name: *const libc::c_char) -> *mut Authmethod {

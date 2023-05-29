@@ -100,7 +100,7 @@ extern "C" {
     fn waitrfd(_: libc::c_int, _: *mut libc::c_int) -> libc::c_int;
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -1118,7 +1118,7 @@ pub unsafe extern "C" fn kex_buf2prop(
     if r != 0 as libc::c_int && !proposal.is_null() {
         kex_prop_free(proposal);
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 pub unsafe extern "C" fn kex_prop_free(mut proposal: *mut *mut libc::c_char) {
@@ -1824,13 +1824,13 @@ pub unsafe extern "C" fn kex_free(mut kex: *mut kex) {
         mode = mode.wrapping_add(1);
         mode;
     }
-    sshbuf_free((*kex).peer);
-    sshbuf_free((*kex).my);
-    sshbuf_free((*kex).client_version);
-    sshbuf_free((*kex).server_version);
-    sshbuf_free((*kex).client_pub);
-    sshbuf_free((*kex).session_id);
-    sshbuf_free((*kex).initial_sig);
+    crate::sshbuf::sshbuf_free((*kex).peer);
+    crate::sshbuf::sshbuf_free((*kex).my);
+    crate::sshbuf::sshbuf_free((*kex).client_version);
+    crate::sshbuf::sshbuf_free((*kex).server_version);
+    crate::sshbuf::sshbuf_free((*kex).client_pub);
+    crate::sshbuf::sshbuf_free((*kex).session_id);
+    crate::sshbuf::sshbuf_free((*kex).initial_sig);
     sshkey_free((*kex).initial_hostkey);
     libc::free((*kex).failed_choice as *mut libc::c_void);
     libc::free((*kex).hostkey_alg as *mut libc::c_void);

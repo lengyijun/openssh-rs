@@ -144,7 +144,7 @@ extern "C" {
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_set_max_size(buf: *mut crate::sshbuf::sshbuf, max_size: size_t) -> libc::c_int;
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
     fn ssh_packet_is_rekeying(_: *mut ssh) -> libc::c_int;
@@ -1497,9 +1497,9 @@ pub unsafe extern "C" fn channel_free(mut ssh: *mut ssh, mut c: *mut Channel) {
         libc::free(s as *mut libc::c_void);
     }
     channel_close_fds(ssh, c);
-    sshbuf_free((*c).input);
-    sshbuf_free((*c).output);
-    sshbuf_free((*c).extended);
+    crate::sshbuf::sshbuf_free((*c).input);
+    crate::sshbuf::sshbuf_free((*c).output);
+    crate::sshbuf::sshbuf_free((*c).extended);
     (*c).extended = 0 as *mut crate::sshbuf::sshbuf;
     (*c).output = (*c).extended;
     (*c).input = (*c).output;
@@ -1949,7 +1949,7 @@ pub unsafe extern "C" fn channel_open_message(mut ssh: *mut ssh) -> *mut libc::c
             b"sshbuf_dup_string\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
     return ret;
 }
 unsafe extern "C" fn open_preamble(
@@ -6799,8 +6799,8 @@ pub unsafe extern "C" fn channel_proxy_downstream(
     }
     libc::free(ctype as *mut libc::c_void);
     libc::free(listen_host as *mut libc::c_void);
-    sshbuf_free(original);
-    sshbuf_free(modified);
+    crate::sshbuf::sshbuf_free(original);
+    crate::sshbuf::sshbuf_free(modified);
     return ret;
 }
 pub unsafe extern "C" fn channel_proxy_upstream(
@@ -6940,7 +6940,7 @@ pub unsafe extern "C" fn channel_proxy_upstream(
         }
         _ => {}
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return 1 as libc::c_int;
 }
 unsafe extern "C" fn channel_parse_id(

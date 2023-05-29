@@ -258,7 +258,7 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -1104,7 +1104,7 @@ unsafe extern "C" fn do_convert_to_ssh2(mut pw: *mut libc::passwd, mut k: *mut s
         hostname.as_mut_ptr(),
     );
     sshkey_free(k);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     libc::fprintf(
         stdout,
         b"%s\n\0" as *const u8 as *const libc::c_char,
@@ -2086,7 +2086,7 @@ unsafe extern "C" fn do_convert_from_ssh2(
             );
         }
     }
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
     fclose(fp);
 }
 unsafe extern "C" fn do_convert_from_pkcs8(
@@ -4323,7 +4323,7 @@ unsafe extern "C" fn prepare_options_buf(
         i = i.wrapping_add(1);
         i;
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
 }
 unsafe extern "C" fn finalise_cert_exts() {
     if !certflags_command.is_null() {
@@ -5304,7 +5304,7 @@ unsafe extern "C" fn show_options(
         );
     }
     while sshbuf_len(options) != 0 as libc::c_int as libc::c_ulong {
-        sshbuf_free(option);
+        crate::sshbuf::sshbuf_free(option);
         option = 0 as *mut crate::sshbuf::sshbuf;
         r = sshbuf_get_cstring(options, &mut name, 0 as *mut size_t);
         if r != 0 as libc::c_int || {
@@ -5407,8 +5407,8 @@ unsafe extern "C" fn show_options(
             );
         }
     }
-    sshbuf_free(option);
-    sshbuf_free(options);
+    crate::sshbuf::sshbuf_free(option);
+    crate::sshbuf::sshbuf_free(options);
 }
 unsafe extern "C" fn print_cert(mut key: *mut sshkey) {
     let mut valid: [libc::c_char; 64] = [0; 64];
@@ -5663,7 +5663,7 @@ unsafe extern "C" fn load_krl(mut path: *const libc::c_char, mut krlp: *mut *mut
             path,
         );
     }
-    sshbuf_free(krlbuf);
+    crate::sshbuf::sshbuf_free(krlbuf);
 }
 unsafe extern "C" fn hash_to_blob(
     mut cp: *const libc::c_char,
@@ -5747,7 +5747,7 @@ unsafe extern "C" fn hash_to_blob(
         sshbuf_ptr(b) as *const libc::c_void,
         *lenp,
     );
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
 }
 unsafe extern "C" fn update_krl_from_file(
     mut pw: *mut libc::passwd,
@@ -6331,7 +6331,7 @@ unsafe extern "C" fn do_gen_krl(
             libc::strerror(*libc::__errno_location()),
         );
     }
-    sshbuf_free(kbuf);
+    crate::sshbuf::sshbuf_free(kbuf);
     ssh_krl_free(krl);
     sshkey_free(ca);
 }
@@ -6810,8 +6810,8 @@ unsafe extern "C" fn sign_one(
     if !pin.is_null() {
         freezero(pin as *mut libc::c_void, strlen(pin));
     }
-    sshbuf_free(abuf);
-    sshbuf_free(sigbuf);
+    crate::sshbuf::sshbuf_free(abuf);
+    crate::sshbuf::sshbuf_free(sigbuf);
     if wfd != -(1 as libc::c_int) {
         close(wfd);
     }
@@ -7380,8 +7380,8 @@ unsafe extern "C" fn sig_verify(
             ret = -(1 as libc::c_int);
         }
     }
-    sshbuf_free(sigbuf);
-    sshbuf_free(abuf);
+    crate::sshbuf::sshbuf_free(sigbuf);
+    crate::sshbuf::sshbuf_free(abuf);
     sshkey_free(sign_key);
     sshkey_sig_details_free(sig_details);
     libc::free(fp as *mut libc::c_void);
@@ -7498,8 +7498,8 @@ unsafe extern "C" fn sig_find_principals(
             b"No principal matched.\n\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(sigbuf);
-    sshbuf_free(abuf);
+    crate::sshbuf::sshbuf_free(sigbuf);
+    crate::sshbuf::sshbuf_free(abuf);
     sshkey_free(sign_key);
     libc::free(principals as *mut libc::c_void);
     return ret;
@@ -9644,7 +9644,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     if !sk_attestation_path.is_null() {
         save_attestation(attest, sk_attestation_path);
     }
-    sshbuf_free(attest);
+    crate::sshbuf::sshbuf_free(attest);
     sshkey_free(public);
     libc::exit(0 as libc::c_int);
 }

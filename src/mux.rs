@@ -109,7 +109,7 @@ extern "C" {
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
@@ -1517,7 +1517,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                         }
                         libc::free((*cctx).env as *mut libc::c_void);
                         libc::free((*cctx).term as *mut libc::c_void);
-                        sshbuf_free((*cctx).cmd);
+                        crate::sshbuf::sshbuf_free((*cctx).cmd);
                         libc::free(cctx as *mut libc::c_void);
                         reply_error(
                             reply,
@@ -1736,7 +1736,7 @@ unsafe extern "C" fn mux_master_process_new_session(
                     }
                     libc::free((*cctx).env as *mut libc::c_void);
                 }
-                sshbuf_free((*cctx).cmd);
+                crate::sshbuf::sshbuf_free((*cctx).cmd);
                 libc::free(cctx as *mut libc::c_void);
                 return 0 as libc::c_int;
             }
@@ -2224,7 +2224,7 @@ unsafe extern "C" fn mux_confirm_remote_forward(
             b"enqueue\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(out);
+    crate::sshbuf::sshbuf_free(out);
     if (*c).mux_pause <= 0 as libc::c_int {
         sshfatal(
             b"mux.c\0" as *const u8 as *const libc::c_char,
@@ -3227,7 +3227,7 @@ unsafe extern "C" fn mux_stdio_confirm(
             b"enqueue\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(reply);
+    crate::sshbuf::sshbuf_free(reply);
     if (*cc).mux_pause <= 0 as libc::c_int {
         sshfatal(
             b"mux.c\0" as *const u8 as *const libc::c_char,
@@ -3566,8 +3566,8 @@ unsafe extern "C" fn mux_master_read_cb(mut ssh: *mut ssh, mut c: *mut Channel) 
             }
         }
     }
-    sshbuf_free(in_0);
-    sshbuf_free(out);
+    crate::sshbuf::sshbuf_free(in_0);
+    crate::sshbuf::sshbuf_free(out);
     return ret;
 }
 pub unsafe extern "C" fn mux_exit_message(
@@ -3643,7 +3643,7 @@ pub unsafe extern "C" fn mux_exit_message(
             b"reply\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(m);
+    crate::sshbuf::sshbuf_free(m);
 }
 pub unsafe extern "C" fn mux_tty_alloc_failed(mut ssh: *mut ssh, mut c: *mut Channel) {
     let mut m: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
@@ -3710,7 +3710,7 @@ pub unsafe extern "C" fn mux_tty_alloc_failed(mut ssh: *mut ssh, mut c: *mut Cha
             b"reply\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(m);
+    crate::sshbuf::sshbuf_free(m);
 }
 pub unsafe extern "C" fn muxserver_listen(mut ssh: *mut ssh) {
     let mut old_umask: mode_t = 0;
@@ -4090,7 +4090,7 @@ unsafe extern "C" fn mux_session_confirm(
             b"enqueue\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(reply);
+    crate::sshbuf::sshbuf_free(reply);
     if (*cc).mux_pause <= 0 as libc::c_int {
         sshfatal(
             b"mux.c\0" as *const u8 as *const libc::c_char,
@@ -4106,7 +4106,7 @@ unsafe extern "C" fn mux_session_confirm(
     }
     (*cc).mux_pause = 0 as libc::c_int;
     (*c).open_confirm_ctx = 0 as *mut libc::c_void;
-    sshbuf_free((*cctx).cmd);
+    crate::sshbuf::sshbuf_free((*cctx).cmd);
     libc::free((*cctx).term as *mut libc::c_void);
     if !((*cctx).env).is_null() {
         i = 0 as libc::c_int;
@@ -4240,7 +4240,7 @@ unsafe extern "C" fn mux_client_write_packet(
     have = 0 as libc::c_int as u_int;
     while have < need {
         if muxclient_terminate != 0 {
-            sshbuf_free(queue);
+            crate::sshbuf::sshbuf_free(queue);
             *libc::__errno_location() = 4 as libc::c_int;
             return -(1 as libc::c_int);
         }
@@ -4257,21 +4257,21 @@ unsafe extern "C" fn mux_client_write_packet(
                 4 => {}
                 _ => {
                     oerrno = *libc::__errno_location();
-                    sshbuf_free(queue);
+                    crate::sshbuf::sshbuf_free(queue);
                     *libc::__errno_location() = oerrno;
                     return -(1 as libc::c_int);
                 }
             }
         } else {
             if len == 0 as libc::c_int {
-                sshbuf_free(queue);
+                crate::sshbuf::sshbuf_free(queue);
                 *libc::__errno_location() = 32 as libc::c_int;
                 return -(1 as libc::c_int);
             }
             have = (have as libc::c_uint).wrapping_add(len as u_int) as u_int as u_int;
         }
     }
-    sshbuf_free(queue);
+    crate::sshbuf::sshbuf_free(queue);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn mux_client_read_packet(
@@ -4316,7 +4316,7 @@ unsafe extern "C" fn mux_client_read_packet(
                 libc::strerror(*libc::__errno_location()),
             );
         }
-        sshbuf_free(queue);
+        crate::sshbuf::sshbuf_free(queue);
         *libc::__errno_location() = oerrno;
         return -(1 as libc::c_int);
     }
@@ -4341,7 +4341,7 @@ unsafe extern "C" fn mux_client_read_packet(
             b"read body failed: %s\0" as *const u8 as *const libc::c_char,
             libc::strerror(*libc::__errno_location()),
         );
-        sshbuf_free(queue);
+        crate::sshbuf::sshbuf_free(queue);
         *libc::__errno_location() = oerrno;
         return -(1 as libc::c_int);
     }
@@ -4363,7 +4363,7 @@ unsafe extern "C" fn mux_client_read_packet(
             b"dequeue\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(queue);
+    crate::sshbuf::sshbuf_free(queue);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_int {
@@ -4569,7 +4569,7 @@ unsafe extern "C" fn mux_client_hello_exchange(mut fd: libc::c_int) -> libc::c_i
             }
         }
     }
-    sshbuf_free(m);
+    crate::sshbuf::sshbuf_free(m);
     return ret;
 }
 unsafe extern "C" fn mux_client_request_alive(mut fd: libc::c_int) -> u_int {
@@ -4639,7 +4639,7 @@ unsafe extern "C" fn mux_client_request_alive(mut fd: libc::c_int) -> u_int {
     }
     sshbuf_reset(m);
     if mux_client_read_packet(fd, m) != 0 as libc::c_int {
-        sshbuf_free(m);
+        crate::sshbuf::sshbuf_free(m);
         return 0 as libc::c_int as u_int;
     }
     r = sshbuf_get_u32(m, &mut type_0);
@@ -4733,7 +4733,7 @@ unsafe extern "C" fn mux_client_request_alive(mut fd: libc::c_int) -> u_int {
             b"parse PID\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(m);
+    crate::sshbuf::sshbuf_free(m);
     crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(b"mux_client_request_alive\0"))
@@ -4818,7 +4818,7 @@ unsafe extern "C" fn mux_client_request_terminate(mut fd: libc::c_int) {
     sshbuf_reset(m);
     if mux_client_read_packet(fd, m) != 0 as libc::c_int {
         if *libc::__errno_location() == 32 as libc::c_int {
-            sshbuf_free(m);
+            crate::sshbuf::sshbuf_free(m);
             return;
         }
         sshfatal(
@@ -4947,7 +4947,7 @@ unsafe extern "C" fn mux_client_request_terminate(mut fd: libc::c_int) {
             );
         }
     }
-    sshbuf_free(m);
+    crate::sshbuf::sshbuf_free(m);
     muxclient_request_id = muxclient_request_id.wrapping_add(1);
     muxclient_request_id;
 }
@@ -5070,7 +5070,7 @@ unsafe extern "C" fn mux_client_forward(
     }
     sshbuf_reset(m);
     if mux_client_read_packet(fd, m) != 0 as libc::c_int {
-        sshbuf_free(m);
+        crate::sshbuf::sshbuf_free(m);
         return -(1 as libc::c_int);
     }
     r = sshbuf_get_u32(m, &mut type_0);
@@ -5182,7 +5182,7 @@ unsafe extern "C" fn mux_client_forward(
                     b"parse error message\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshbuf_free(m);
+            crate::sshbuf::sshbuf_free(m);
             crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
@@ -5214,7 +5214,7 @@ unsafe extern "C" fn mux_client_forward(
                     b"parse error message\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshbuf_free(m);
+            crate::sshbuf::sshbuf_free(m);
             crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(
@@ -5246,7 +5246,7 @@ unsafe extern "C" fn mux_client_forward(
             );
         }
     }
-    sshbuf_free(m);
+    crate::sshbuf::sshbuf_free(m);
     muxclient_request_id = muxclient_request_id.wrapping_add(1);
     muxclient_request_id;
     return 0 as libc::c_int;
@@ -5569,7 +5569,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
             b"read from master failed: %s\0" as *const u8 as *const libc::c_char,
             libc::strerror(*libc::__errno_location()),
         );
-        sshbuf_free(m);
+        crate::sshbuf::sshbuf_free(m);
         return -(1 as libc::c_int);
     }
     r = sshbuf_get_u32(m, &mut type_0);
@@ -5666,7 +5666,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
                 b"Master refused session request: %s\0" as *const u8 as *const libc::c_char,
                 e,
             );
-            sshbuf_free(m);
+            crate::sshbuf::sshbuf_free(m);
             return -(1 as libc::c_int);
         }
         2147483651 => {
@@ -5698,11 +5698,11 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
                 b"session request failed: %s\0" as *const u8 as *const libc::c_char,
                 e,
             );
-            sshbuf_free(m);
+            crate::sshbuf::sshbuf_free(m);
             return -(1 as libc::c_int);
         }
         _ => {
-            sshbuf_free(m);
+            crate::sshbuf::sshbuf_free(m);
             crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 27], &[libc::c_char; 27]>(
@@ -6023,7 +6023,7 @@ unsafe extern "C" fn mux_client_proxy(mut fd: libc::c_int) -> libc::c_int {
     }
     sshbuf_reset(m);
     if mux_client_read_packet(fd, m) != 0 as libc::c_int {
-        sshbuf_free(m);
+        crate::sshbuf::sshbuf_free(m);
         return 0 as libc::c_int;
     }
     r = sshbuf_get_u32(m, &mut type_0);
@@ -6082,7 +6082,7 @@ unsafe extern "C" fn mux_client_proxy(mut fd: libc::c_int) -> libc::c_int {
             e,
         );
     }
-    sshbuf_free(m);
+    crate::sshbuf::sshbuf_free(m);
     crate::log::sshlog(
         b"mux.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"mux_client_proxy\0")).as_ptr(),
@@ -6279,7 +6279,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
             b"read from master failed: %s\0" as *const u8 as *const libc::c_char,
             libc::strerror(*libc::__errno_location()),
         );
-        sshbuf_free(m);
+        crate::sshbuf::sshbuf_free(m);
         return -(1 as libc::c_int);
     }
     r = sshbuf_get_u32(m, &mut type_0);
@@ -6363,7 +6363,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
                     b"parse error message\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshbuf_free(m);
+            crate::sshbuf::sshbuf_free(m);
             sshfatal(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
@@ -6395,7 +6395,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
                     b"parse error message\0" as *const u8 as *const libc::c_char,
                 );
             }
-            sshbuf_free(m);
+            crate::sshbuf::sshbuf_free(m);
             sshfatal(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
@@ -6411,7 +6411,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
             );
         }
         _ => {
-            sshbuf_free(m);
+            crate::sshbuf::sshbuf_free(m);
             crate::log::sshlog(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 29], &[libc::c_char; 29]>(
@@ -6676,7 +6676,7 @@ unsafe extern "C" fn mux_client_request_stop_listening(mut fd: libc::c_int) {
             );
         }
     }
-    sshbuf_free(m);
+    crate::sshbuf::sshbuf_free(m);
     muxclient_request_id = muxclient_request_id.wrapping_add(1);
     muxclient_request_id;
 }

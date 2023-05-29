@@ -53,7 +53,6 @@ extern "C" {
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
 
     fn ECDSA_size(eckey: *const EC_KEY) -> libc::c_int;
     fn ECDSA_sign(
@@ -435,7 +434,7 @@ unsafe extern "C" fn process_add() {
     libc::free(pin as *mut libc::c_void);
     libc::free(name as *mut libc::c_void);
     send_msg(msg);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn process_del() {
     let mut name: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -493,7 +492,7 @@ unsafe extern "C" fn process_del() {
     libc::free(pin as *mut libc::c_void);
     libc::free(name as *mut libc::c_void);
     send_msg(msg);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn process_sign() {
     let mut blob: *mut u_char = 0 as *mut u_char;
@@ -652,7 +651,7 @@ unsafe extern "C" fn process_sign() {
     libc::free(blob as *mut libc::c_void);
     libc::free(signature as *mut libc::c_void);
     send_msg(msg);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn process() {
     let mut msg_len: u_int = 0;

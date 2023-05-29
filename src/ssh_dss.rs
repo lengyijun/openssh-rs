@@ -53,7 +53,7 @@ extern "C" {
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_get_string(
@@ -630,7 +630,7 @@ unsafe extern "C" fn ssh_dss_sign(
         ::core::mem::size_of::<[u_char; 64]>() as libc::c_ulong,
     );
     DSA_SIG_free(sig);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return ret;
 }
 unsafe extern "C" fn ssh_dss_verify(
@@ -736,7 +736,7 @@ unsafe extern "C" fn ssh_dss_verify(
     DSA_SIG_free(dsig);
     BN_clear_free(sig_r);
     BN_clear_free(sig_s);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     libc::free(ktype as *mut libc::c_void);
     if !sigblob.is_null() {
         freezero(sigblob as *mut libc::c_void, len);

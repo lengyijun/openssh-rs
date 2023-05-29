@@ -42,7 +42,7 @@ extern "C" {
     fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
@@ -577,7 +577,7 @@ unsafe extern "C" fn valid_request(
         fail += 1;
         fail;
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     crate::log::sshlog(
         b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"valid_request\0")).as_ptr(),

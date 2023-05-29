@@ -57,7 +57,6 @@ extern "C" {
         -> libc::c_int;
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
 
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
@@ -578,8 +577,8 @@ unsafe extern "C" fn client_converse(
         *respp = resp;
         resp = 0 as *mut crate::sshbuf::sshbuf;
     }
-    sshbuf_free(req);
-    sshbuf_free(resp);
+    crate::sshbuf::sshbuf_free(req);
+    crate::sshbuf::sshbuf_free(resp);
     crate::misc::ssh_signal(17 as libc::c_int, osigchld);
     *libc::__errno_location() = oerrno;
     return r;
@@ -699,9 +698,9 @@ pub unsafe extern "C" fn sshsk_sign(
         *sigp = 0 as *mut u_char;
         *lenp = 0 as libc::c_int as size_t;
     }
-    sshbuf_free(kbuf);
-    sshbuf_free(req);
-    sshbuf_free(resp);
+    crate::sshbuf::sshbuf_free(kbuf);
+    crate::sshbuf::sshbuf_free(req);
+    crate::sshbuf::sshbuf_free(resp);
     *libc::__errno_location() = oerrno;
     return r;
 }
@@ -862,10 +861,10 @@ pub unsafe extern "C" fn sshsk_enroll(
     }
     oerrno = *libc::__errno_location();
     sshkey_free(key);
-    sshbuf_free(kbuf);
-    sshbuf_free(abuf);
-    sshbuf_free(req);
-    sshbuf_free(resp);
+    crate::sshbuf::sshbuf_free(kbuf);
+    crate::sshbuf::sshbuf_free(abuf);
+    crate::sshbuf::sshbuf_free(req);
+    crate::sshbuf::sshbuf_free(resp);
     *libc::__errno_location() = oerrno;
     return r;
 }
@@ -1103,9 +1102,9 @@ pub unsafe extern "C" fn sshsk_load_resident(
     sshsk_free_resident_keys(srks, nsrks);
     freezero(userid as *mut libc::c_void, userid_len);
     sshkey_free(key);
-    sshbuf_free(kbuf);
-    sshbuf_free(req);
-    sshbuf_free(resp);
+    crate::sshbuf::sshbuf_free(kbuf);
+    crate::sshbuf::sshbuf_free(req);
+    crate::sshbuf::sshbuf_free(resp);
     *libc::__errno_location() = oerrno;
     return r;
 }

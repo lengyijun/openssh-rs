@@ -51,7 +51,7 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_get_cstring(
@@ -540,8 +540,8 @@ unsafe extern "C" fn ssh_ecdsa_sign(
         digest.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[u_char; 64]>() as libc::c_ulong,
     );
-    sshbuf_free(b);
-    sshbuf_free(bb);
+    crate::sshbuf::sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(bb);
     ECDSA_SIG_free(esig);
     return ret;
 }
@@ -640,8 +640,8 @@ unsafe extern "C" fn ssh_ecdsa_verify(
         digest.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[u_char; 64]>() as libc::c_ulong,
     );
-    sshbuf_free(sigbuf);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(sigbuf);
+    crate::sshbuf::sshbuf_free(b);
     ECDSA_SIG_free(esig);
     BN_clear_free(sig_r);
     BN_clear_free(sig_s);

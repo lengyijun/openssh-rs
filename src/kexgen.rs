@@ -96,7 +96,7 @@ extern "C" {
     fn sshpkt_get_string(ssh: *mut ssh, valp: *mut *mut u_char, lenp: *mut size_t) -> libc::c_int;
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -426,14 +426,14 @@ unsafe extern "C" fn kex_gen_hash(
             r != 0 as libc::c_int
         }
     {
-        sshbuf_free(b);
+        crate::sshbuf::sshbuf_free(b);
         return r;
     }
     if ssh_digest_buffer(hash_alg, b, hash, *hashlen) != 0 as libc::c_int {
-        sshbuf_free(b);
+        crate::sshbuf::sshbuf_free(b);
         return -(22 as libc::c_int);
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     *hashlen = ssh_digest_bytes(hash_alg);
     return 0 as libc::c_int;
 }
@@ -650,13 +650,13 @@ unsafe extern "C" fn input_kex_gen_reply(
         ((*kex).sntrup761_client_key).as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[u_char; 1763]>() as libc::c_ulong,
     );
-    sshbuf_free(server_host_key_blob);
+    crate::sshbuf::sshbuf_free(server_host_key_blob);
     libc::free(signature as *mut libc::c_void);
-    sshbuf_free(tmp);
+    crate::sshbuf::sshbuf_free(tmp);
     sshkey_free(server_host_key);
-    sshbuf_free(server_blob);
-    sshbuf_free(shared_secret);
-    sshbuf_free((*kex).client_pub);
+    crate::sshbuf::sshbuf_free(server_blob);
+    crate::sshbuf::sshbuf_free(shared_secret);
+    crate::sshbuf::sshbuf_free((*kex).client_pub);
     (*kex).client_pub = 0 as *mut crate::sshbuf::sshbuf;
     return r;
 }
@@ -830,10 +830,10 @@ unsafe extern "C" fn input_kex_gen_init(
         hash.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[u_char; 64]>() as libc::c_ulong,
     );
-    sshbuf_free(server_host_key_blob);
+    crate::sshbuf::sshbuf_free(server_host_key_blob);
     libc::free(signature as *mut libc::c_void);
-    sshbuf_free(shared_secret);
-    sshbuf_free(client_pubkey);
-    sshbuf_free(server_pubkey);
+    crate::sshbuf::sshbuf_free(shared_secret);
+    crate::sshbuf::sshbuf_free(client_pubkey);
+    crate::sshbuf::sshbuf_free(server_pubkey);
     return r;
 }

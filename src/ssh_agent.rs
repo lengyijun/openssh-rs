@@ -93,7 +93,7 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -561,13 +561,13 @@ static mut restrict_websafe: libc::c_int = 1 as libc::c_int;
 unsafe extern "C" fn close_socket(mut e: *mut SocketEntry) {
     let mut i: size_t = 0;
     close((*e).fd);
-    sshbuf_free((*e).input);
-    sshbuf_free((*e).output);
-    sshbuf_free((*e).request);
+    crate::sshbuf::sshbuf_free((*e).input);
+    crate::sshbuf::sshbuf_free((*e).output);
+    crate::sshbuf::sshbuf_free((*e).request);
     i = 0 as libc::c_int as size_t;
     while i < (*e).nsession_ids {
         sshkey_free((*((*e).session_ids).offset(i as isize)).key);
-        sshbuf_free((*((*e).session_ids).offset(i as isize)).sid);
+        crate::sshbuf::sshbuf_free((*((*e).session_ids).offset(i as isize)).sid);
         i = i.wrapping_add(1);
         i;
     }
@@ -1287,8 +1287,8 @@ unsafe extern "C" fn process_request_identities(mut e: *mut SocketEntry) {
             b"enqueue\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(msg);
-    sshbuf_free(keys);
+    crate::sshbuf::sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(keys);
 }
 unsafe extern "C" fn agent_decode_alg(mut key: *mut sshkey, mut flags: u_int) -> *mut libc::c_char {
     if (*key).type_0 == KEY_RSA as libc::c_int {
@@ -1454,8 +1454,8 @@ unsafe extern "C" fn parse_userauth_request(
             }
         }
     }
-    sshbuf_free(b);
-    sshbuf_free(sess_id);
+    crate::sshbuf::sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(sess_id);
     libc::free(user as *mut libc::c_void);
     libc::free(service as *mut libc::c_void);
     libc::free(method as *mut libc::c_void);
@@ -1514,7 +1514,7 @@ unsafe extern "C" fn parse_sshsig_request(mut msg: *mut crate::sshbuf::sshbuf) -
             r = 0 as libc::c_int;
         }
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 unsafe extern "C" fn check_websafe_message_contents(
@@ -2029,9 +2029,9 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
             b"enqueue\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(sid);
-    sshbuf_free(data);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(sid);
+    crate::sshbuf::sshbuf_free(data);
+    crate::sshbuf::sshbuf_free(msg);
     sshkey_free(key);
     sshkey_free(hostkey);
     libc::free(fp as *mut libc::c_void);
@@ -2497,9 +2497,9 @@ unsafe extern "C" fn parse_dest_constraint(
             }
         }
     }
-    sshbuf_free(b);
-    sshbuf_free(frombuf);
-    sshbuf_free(tobuf);
+    crate::sshbuf::sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(frombuf);
+    crate::sshbuf::sshbuf_free(tobuf);
     return r;
 }
 unsafe extern "C" fn parse_key_constraint_extension(
@@ -2700,7 +2700,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
         }
     }
     libc::free(ext_name as *mut libc::c_void);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 unsafe extern "C" fn parse_key_constraints(
@@ -3372,7 +3372,7 @@ unsafe extern "C" fn no_identities(mut e: *mut SocketEntry) {
             b"compose\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
 }
 unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
     let mut provider: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -3903,8 +3903,8 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
     }
     libc::free(fp as *mut libc::c_void);
     sshkey_free(key);
-    sshbuf_free(sid);
-    sshbuf_free(sig);
+    crate::sshbuf::sshbuf_free(sid);
+    crate::sshbuf::sshbuf_free(sig);
     return if r == 0 as libc::c_int {
         1 as libc::c_int
     } else {

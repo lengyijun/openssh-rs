@@ -113,7 +113,6 @@ extern "C" {
     fn ssh_packet_is_rekeying(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_check_rekey(_: *mut ssh) -> libc::c_int;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -3719,7 +3718,7 @@ pub unsafe extern "C" fn client_loop(
             }
         }
     }
-    sshbuf_free(stderr_buffer);
+    crate::sshbuf::sshbuf_free(stderr_buffer);
     total_time = monotime_double() - start_time;
     ssh_packet_get_bytes(ssh, &mut ibytes, &mut obytes);
     crate::log::sshlog(
@@ -3931,7 +3930,7 @@ unsafe extern "C" fn client_request_forwarded_tcpip(
             }
         }
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     libc::free(originator_address as *mut libc::c_void);
     libc::free(listen_address as *mut libc::c_void);
     return c;
@@ -6195,7 +6194,7 @@ unsafe extern "C" fn client_input_hostkeys(mut ssh: *mut ssh) -> libc::c_int {
     }
     hostkeys_update_ctx_free(ctx);
     sshkey_free(key);
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
     if prove_sent == 0 {
         hostkeys_update_complete = 1 as libc::c_int;
         client_repledge();

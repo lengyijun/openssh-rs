@@ -84,7 +84,6 @@ extern "C" {
     fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -2232,8 +2231,8 @@ unsafe extern "C" fn server_input_hostkeys_prove(
         _ => {}
     }
     libc::free(sig as *mut libc::c_void);
-    sshbuf_free(resp);
-    sshbuf_free(sigbuf);
+    crate::sshbuf::sshbuf_free(resp);
+    crate::sshbuf::sshbuf_free(sigbuf);
     sshkey_free(key);
     return success;
 }
@@ -2568,7 +2567,7 @@ unsafe extern "C" fn server_input_global_request(
     libc::free(fwd.listen_host as *mut libc::c_void);
     libc::free(fwd.listen_path as *mut libc::c_void);
     libc::free(rtype as *mut libc::c_void);
-    sshbuf_free(resp);
+    crate::sshbuf::sshbuf_free(resp);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn server_input_channel_req(

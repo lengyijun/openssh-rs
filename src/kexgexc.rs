@@ -84,7 +84,7 @@ extern "C" {
     fn dh_estimate(_: libc::c_int) -> u_int;
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put(
@@ -650,10 +650,10 @@ unsafe extern "C" fn input_kex_dh_gex_reply(
     DH_free((*kex).dh);
     (*kex).dh = 0 as *mut DH;
     BN_clear_free(dh_server_pub);
-    sshbuf_free(shared_secret);
+    crate::sshbuf::sshbuf_free(shared_secret);
     sshkey_free(server_host_key);
-    sshbuf_free(tmp);
-    sshbuf_free(server_host_key_blob);
+    crate::sshbuf::sshbuf_free(tmp);
+    crate::sshbuf::sshbuf_free(server_host_key_blob);
     libc::free(signature as *mut libc::c_void);
     return r;
 }

@@ -3,7 +3,6 @@ extern "C" {
 
     pub type bignum_st;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -136,14 +135,14 @@ pub unsafe extern "C" fn kexgex_hash(
             r != 0 as libc::c_int
         }
     {
-        sshbuf_free(b);
+        crate::sshbuf::sshbuf_free(b);
         return r;
     }
     if ssh_digest_buffer(hash_alg, b, hash, *hashlen) != 0 as libc::c_int {
-        sshbuf_free(b);
+        crate::sshbuf::sshbuf_free(b);
         return -(22 as libc::c_int);
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     *hashlen = ssh_digest_bytes(hash_alg);
     return 0 as libc::c_int;
 }

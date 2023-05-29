@@ -74,7 +74,6 @@ extern "C" {
     static mut use_privsep: libc::c_int;
     fn mm_choose_dh(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> *mut DH;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 }
@@ -612,8 +611,8 @@ unsafe extern "C" fn input_kex_dh_gex_init(
     DH_free((*kex).dh);
     (*kex).dh = 0 as *mut DH;
     BN_clear_free(dh_client_pub);
-    sshbuf_free(shared_secret);
-    sshbuf_free(server_host_key_blob);
+    crate::sshbuf::sshbuf_free(shared_secret);
+    crate::sshbuf::sshbuf_free(server_host_key_blob);
     libc::free(signature as *mut libc::c_void);
     return r;
 }

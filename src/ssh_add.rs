@@ -89,7 +89,7 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_set_filename(_: *mut sshkey, _: *const libc::c_char) -> libc::c_int;
     fn sshkey_signatures_left(_: *const sshkey) -> u_int32_t;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_load_fd(_: libc::c_int, _: *mut *mut crate::sshbuf::sshbuf) -> libc::c_int;
     fn ssh_get_authentication_socket(fdp: *mut libc::c_int) -> libc::c_int;
     fn ssh_close_authentication_socket(sock: libc::c_int);
@@ -606,7 +606,7 @@ unsafe extern "C" fn add_file(
             filename,
             ssh_err(r),
         );
-        sshbuf_free(keyblob);
+        crate::sshbuf::sshbuf_free(keyblob);
         close(fd);
         return -(1 as libc::c_int);
     }
@@ -711,7 +711,7 @@ unsafe extern "C" fn add_file(
                         if comment.is_null() || *comment as libc::c_int == '\0' as i32 {
                             comment = crate::xmalloc::xstrdup(filename);
                         }
-                        sshbuf_free(keyblob);
+                        crate::sshbuf::sshbuf_free(keyblob);
                         r = sshkey_set_filename(private, filename);
                         if r != 0 as libc::c_int {
                             libc::fprintf(
@@ -1032,7 +1032,7 @@ unsafe extern "C" fn add_file(
         }
     }
     clear_pass();
-    sshbuf_free(keyblob);
+    crate::sshbuf::sshbuf_free(keyblob);
     return -(1 as libc::c_int);
 }
 unsafe extern "C" fn update_card(

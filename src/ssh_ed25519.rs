@@ -47,7 +47,7 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
@@ -457,7 +457,7 @@ unsafe extern "C" fn ssh_ed25519_sign(
             }
         }
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     if !sig.is_null() {
         freezero(sig as *mut libc::c_void, slen);
     }
@@ -560,7 +560,7 @@ unsafe extern "C" fn ssh_ed25519_verify(
     if !m.is_null() {
         freezero(m as *mut libc::c_void, smlen as size_t);
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     libc::free(ktype as *mut libc::c_void);
     return r;
 }

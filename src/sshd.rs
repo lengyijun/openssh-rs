@@ -192,7 +192,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -1859,7 +1858,7 @@ unsafe extern "C" fn list_hostkey_types() -> *mut libc::c_char {
             b"sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     crate::log::sshlog(
         b"sshd.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 19], &[libc::c_char; 19]>(b"list_hostkey_types\0"))
@@ -2131,7 +2130,7 @@ unsafe extern "C" fn notify_hostkeys(mut ssh: *mut ssh) {
                 .as_ptr(),
         );
     }
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
 }
 unsafe extern "C" fn should_drop_connection(mut startups: libc::c_int) -> libc::c_int {
     let mut p: libc::c_int = 0;
@@ -2367,8 +2366,8 @@ unsafe extern "C" fn send_rexec_state(mut fd: libc::c_int, mut conf: *mut crate:
             b"ssh_msg_send failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(m);
-    sshbuf_free(inc);
+    crate::sshbuf::sshbuf_free(m);
+    crate::sshbuf::sshbuf_free(inc);
     crate::log::sshlog(
         b"sshd.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"send_rexec_state\0")).as_ptr(),
@@ -2529,7 +2528,7 @@ unsafe extern "C" fn recv_rexec_state(mut fd: libc::c_int, mut conf: *mut crate:
         includes.tqh_last = &mut (*item).entry.tqe_next;
     }
     libc::free(cp as *mut libc::c_void);
-    sshbuf_free(m);
+    crate::sshbuf::sshbuf_free(m);
     crate::log::sshlog(
         b"sshd.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 17], &[libc::c_char; 17]>(b"recv_rexec_state\0")).as_ptr(),
@@ -3633,7 +3632,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
         );
     }
     sshbuf_reset(buf);
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
 }
 unsafe extern "C" fn prepare_proctitle(
     mut ac: libc::c_int,

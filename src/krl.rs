@@ -78,7 +78,7 @@ extern "C" {
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
@@ -2771,7 +2771,7 @@ unsafe extern "C" fn revoked_certs_generate(
         _ => {}
     }
     bitmap_free(bitmap);
-    sshbuf_free(sect);
+    crate::sshbuf::sshbuf_free(sect);
     return r;
 }
 pub unsafe extern "C" fn ssh_krl_to_blob(
@@ -3050,7 +3050,7 @@ pub unsafe extern "C" fn ssh_krl_to_blob(
         }
     }
     libc::free(sblob as *mut libc::c_void);
-    sshbuf_free(sect);
+    crate::sshbuf::sshbuf_free(sect);
     return r;
 }
 unsafe extern "C" fn format_timestamp(
@@ -3109,7 +3109,7 @@ unsafe extern "C" fn parse_revoked_certs(
                     current_block = 1356832168064818221;
                     break;
                 }
-                sshbuf_free(subsect);
+                crate::sshbuf::sshbuf_free(subsect);
                 subsect = 0 as *mut crate::sshbuf::sshbuf;
                 r = sshbuf_get_u8(buf, &mut type_0);
                 if r != 0 as libc::c_int || {
@@ -3287,7 +3287,7 @@ unsafe extern "C" fn parse_revoked_certs(
     }
     libc::free(key_id as *mut libc::c_void);
     sshkey_free(ca_key);
-    sshbuf_free(subsect);
+    crate::sshbuf::sshbuf_free(subsect);
     return r;
 }
 unsafe extern "C" fn blob_section(
@@ -3593,7 +3593,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                         if sshbuf_len(copy) != 0 as libc::c_int as libc::c_ulong {
                                             r = -(1 as libc::c_int);
                                         } else {
-                                            sshbuf_free(copy);
+                                            crate::sshbuf::sshbuf_free(copy);
                                             copy = sshbuf_fromb(buf);
                                             if copy.is_null() {
                                                 r = -(2 as libc::c_int);
@@ -3607,7 +3607,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                                             current_block = 5684854171168229155;
                                                             break;
                                                         }
-                                                        sshbuf_free(sect);
+                                                        crate::sshbuf::sshbuf_free(sect);
                                                         sect = 0 as *mut crate::sshbuf::sshbuf;
                                                         r = sshbuf_get_u8(copy, &mut type_0);
                                                         if r != 0 as libc::c_int || {
@@ -3663,7 +3663,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                                                 }
                                                             }
                                                             4 => {
-                                                                sshbuf_free(sect);
+                                                                crate::sshbuf::sshbuf_free(sect);
                                                                 sect =
                                                                     0 as *mut crate::sshbuf::sshbuf;
                                                                 r = sshbuf_get_string_direct(
@@ -3867,8 +3867,8 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
     }
     libc::free(ca_used as *mut libc::c_void);
     sshkey_free(key);
-    sshbuf_free(copy);
-    sshbuf_free(sect);
+    crate::sshbuf::sshbuf_free(copy);
+    crate::sshbuf::sshbuf_free(sect);
     return r;
 }
 unsafe extern "C" fn is_cert_revoked(
@@ -4068,7 +4068,7 @@ pub unsafe extern "C" fn ssh_krl_file_contains_key(
             r = ssh_krl_check_key(krl, key);
         }
     }
-    sshbuf_free(krlbuf);
+    crate::sshbuf::sshbuf_free(krlbuf);
     ssh_krl_free(krl);
     if r != 0 as libc::c_int {
         *libc::__errno_location() = oerrno;

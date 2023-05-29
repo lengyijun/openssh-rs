@@ -32,7 +32,7 @@ extern "C" {
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u64(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int64_t) -> libc::c_int;
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
@@ -223,7 +223,7 @@ unsafe extern "C" fn cert_option_list(
                 current_block = 4741994311446740739;
                 break;
             }
-            sshbuf_free(data);
+            crate::sshbuf::sshbuf_free(data);
             data = 0 as *mut crate::sshbuf::sshbuf;
             r = sshbuf_get_cstring(c, &mut name, 0 as *mut size_t);
             if r != 0 as libc::c_int || {
@@ -488,8 +488,8 @@ unsafe extern "C" fn cert_option_list(
         }
     }
     libc::free(name as *mut libc::c_void);
-    sshbuf_free(data);
-    sshbuf_free(c);
+    crate::sshbuf::sshbuf_free(data);
+    crate::sshbuf::sshbuf_free(c);
     return ret;
 }
 pub unsafe extern "C" fn sshauthopt_new() -> *mut sshauthopt {
@@ -1446,7 +1446,7 @@ unsafe extern "C" fn serialise_array(
         }
         _ => {}
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 unsafe extern "C" fn deserialise_array(
@@ -1515,7 +1515,7 @@ unsafe extern "C" fn deserialise_array(
         }
         libc::free(a as *mut libc::c_void);
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 unsafe extern "C" fn serialise_nullable_string(

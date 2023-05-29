@@ -41,7 +41,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_ec_validate_public(_: *const EC_GROUP, _: *const EC_POINT) -> libc::c_int;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_put_stringb(
@@ -250,7 +249,7 @@ pub unsafe extern "C" fn kex_ecdh_keypair(mut kex: *mut kex) -> libc::c_int {
         }
     }
     EC_KEY_free(client_key);
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
     return r;
 }
 pub unsafe extern "C" fn kex_ecdh_enc(
@@ -292,7 +291,7 @@ pub unsafe extern "C" fn kex_ecdh_enc(
         }
     }
     EC_KEY_free(server_key);
-    sshbuf_free(server_blob);
+    crate::sshbuf::sshbuf_free(server_blob);
     return r;
 }
 unsafe extern "C" fn kex_ecdh_dec_key_group(
@@ -358,7 +357,7 @@ unsafe extern "C" fn kex_ecdh_dec_key_group(
     EC_POINT_clear_free(dh_pub);
     BN_clear_free(shared_secret);
     freezero(kbuf as *mut libc::c_void, klen);
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
     return r;
 }
 pub unsafe extern "C" fn kex_ecdh_dec(

@@ -45,7 +45,6 @@ extern "C" {
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
 
 }
 pub type __u_char = libc::c_uchar;
@@ -279,11 +278,11 @@ pub unsafe extern "C" fn sshbuf_dtob64_string(
         return 0 as *mut libc::c_char;
     }
     if sshbuf_dtob64(buf, tmp, wrap) != 0 as libc::c_int {
-        sshbuf_free(tmp);
+        crate::sshbuf::sshbuf_free(tmp);
         return 0 as *mut libc::c_char;
     }
     ret = sshbuf_dup_string(tmp);
-    sshbuf_free(tmp);
+    crate::sshbuf::sshbuf_free(tmp);
     return ret;
 }
 pub unsafe extern "C" fn sshbuf_b64tod(
@@ -338,7 +337,7 @@ pub unsafe extern "C" fn sshbuf_dtourlb64(
     loop {
         match current_block {
             16561732456181174644 => {
-                sshbuf_free(b);
+                crate::sshbuf::sshbuf_free(b);
                 break;
             }
             _ => {

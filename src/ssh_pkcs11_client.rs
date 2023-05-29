@@ -118,7 +118,6 @@ extern "C" {
         >,
     ) -> libc::c_int;
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
@@ -561,7 +560,7 @@ unsafe extern "C" fn rsa_encrypt(
     }
     libc::free(blob as *mut libc::c_void);
     sshkey_free(key);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     return ret;
 }
 unsafe extern "C" fn ecdsa_do_sign(
@@ -695,7 +694,7 @@ unsafe extern "C" fn ecdsa_do_sign(
     }
     libc::free(blob as *mut libc::c_void);
     sshkey_free(key);
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     return ret;
 }
 static mut helper_rsa: *mut RSA_METHOD = 0 as *const RSA_METHOD as *mut RSA_METHOD;
@@ -1069,7 +1068,7 @@ pub unsafe extern "C" fn pkcs11_add_provider(
     } else {
         nkeys = -(1 as libc::c_int) as u_int;
     }
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     return nkeys as libc::c_int;
 }
 pub unsafe extern "C" fn pkcs11_del_provider(mut name: *mut libc::c_char) -> libc::c_int {
@@ -1117,6 +1116,6 @@ pub unsafe extern "C" fn pkcs11_del_provider(mut name: *mut libc::c_char) -> lib
     if recv_msg(msg) == 6 as libc::c_int {
         ret = 0 as libc::c_int;
     }
-    sshbuf_free(msg);
+    crate::sshbuf::sshbuf_free(msg);
     return ret;
 }

@@ -10,7 +10,6 @@ extern "C" {
 
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_put(
@@ -114,7 +113,7 @@ pub unsafe extern "C" fn sshbuf_load_fd(
         buf.as_mut_ptr() as *mut libc::c_void,
         ::core::mem::size_of::<[u_char; 4096]>() as libc::c_ulong,
     );
-    sshbuf_free(blob);
+    crate::sshbuf::sshbuf_free(blob);
     return r;
 }
 pub unsafe extern "C" fn sshbuf_load_file(

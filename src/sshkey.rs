@@ -188,7 +188,7 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -961,9 +961,9 @@ unsafe extern "C" fn cert_free(mut cert: *mut sshkey_cert) {
     if cert.is_null() {
         return;
     }
-    sshbuf_free((*cert).certblob);
-    sshbuf_free((*cert).critical);
-    sshbuf_free((*cert).extensions);
+    crate::sshbuf::sshbuf_free((*cert).certblob);
+    crate::sshbuf::sshbuf_free((*cert).critical);
+    crate::sshbuf::sshbuf_free((*cert).extensions);
     libc::free((*cert).key_id as *mut libc::c_void);
     i = 0 as libc::c_int as u_int;
     while i < (*cert).nprincipals {
@@ -1043,8 +1043,8 @@ pub unsafe extern "C" fn sshkey_new(mut type_0: libc::c_int) -> *mut sshkey {
 }
 pub unsafe extern "C" fn sshkey_sk_cleanup(mut k: *mut sshkey) {
     libc::free((*k).sk_application as *mut libc::c_void);
-    sshbuf_free((*k).sk_key_handle);
-    sshbuf_free((*k).sk_reserved);
+    crate::sshbuf::sshbuf_free((*k).sk_key_handle);
+    crate::sshbuf::sshbuf_free((*k).sk_reserved);
     (*k).sk_application = 0 as *mut libc::c_char;
     (*k).sk_reserved = 0 as *mut crate::sshbuf::sshbuf;
     (*k).sk_key_handle = (*k).sk_reserved;
@@ -1211,7 +1211,7 @@ pub unsafe extern "C" fn sshkey_puts_opts(
     if r == 0 as libc::c_int {
         r = sshbuf_put_stringb(b, tmp);
     }
-    sshbuf_free(tmp);
+    crate::sshbuf::sshbuf_free(tmp);
     return r;
 }
 pub unsafe extern "C" fn sshkey_puts(
@@ -1276,7 +1276,7 @@ unsafe extern "C" fn to_blob(
             }
         }
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return ret;
 }
 pub unsafe extern "C" fn sshkey_to_blob(
@@ -1919,22 +1919,22 @@ pub unsafe extern "C" fn sshkey_read(
     space = strcspn(cp, b" \t\0" as *const u8 as *const libc::c_char);
     blobcopy = strndup(cp, space);
     if blobcopy.is_null() {
-        sshbuf_free(blob);
+        crate::sshbuf::sshbuf_free(blob);
         return -(2 as libc::c_int);
     }
     r = sshbuf_b64tod(blob, blobcopy);
     if r != 0 as libc::c_int {
         libc::free(blobcopy as *mut libc::c_void);
-        sshbuf_free(blob);
+        crate::sshbuf::sshbuf_free(blob);
         return r;
     }
     libc::free(blobcopy as *mut libc::c_void);
     r = sshkey_fromb(blob, &mut k);
     if r != 0 as libc::c_int {
-        sshbuf_free(blob);
+        crate::sshbuf::sshbuf_free(blob);
         return r;
     }
-    sshbuf_free(blob);
+    crate::sshbuf::sshbuf_free(blob);
     cp = cp.offset(space as isize);
     while *cp as libc::c_int == ' ' as i32 || *cp as libc::c_int == '\t' as i32 {
         cp = cp.offset(1);
@@ -1984,7 +1984,7 @@ pub unsafe extern "C" fn sshkey_to_base64(
             r = 0 as libc::c_int;
         }
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     libc::free(uu as *mut libc::c_void);
     return r;
 }
@@ -2036,7 +2036,7 @@ pub unsafe extern "C" fn sshkey_write(
             r = 0 as libc::c_int;
         }
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 pub unsafe extern "C" fn sshkey_cert_type(mut k: *const sshkey) -> *const libc::c_char {
@@ -2465,7 +2465,7 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
         (16 as libc::c_int * 1024 as libc::c_int) as size_t,
     );
     sshkey_free(kswap);
-    sshbuf_free(prvbuf);
+    crate::sshbuf::sshbuf_free(prvbuf);
     return r;
 }
 unsafe extern "C" fn private2_check_padding(
@@ -2618,7 +2618,7 @@ pub unsafe extern "C" fn sshkey_unshield_private(mut k: *mut sshkey) -> libc::c_
         ::core::mem::size_of::<sshkey>() as libc::c_ulong,
     );
     sshkey_free(kswap);
-    sshbuf_free(prvbuf);
+    crate::sshbuf::sshbuf_free(prvbuf);
     return r;
 }
 unsafe extern "C" fn cert_parse(
@@ -2846,10 +2846,10 @@ unsafe extern "C" fn cert_parse(
             }
         }
     }
-    sshbuf_free(ca);
-    sshbuf_free(crit);
-    sshbuf_free(exts);
-    sshbuf_free(principals);
+    crate::sshbuf::sshbuf_free(ca);
+    crate::sshbuf::sshbuf_free(crit);
+    crate::sshbuf::sshbuf_free(exts);
+    crate::sshbuf::sshbuf_free(principals);
     libc::free(sig as *mut libc::c_void);
     return ret;
 }
@@ -2938,7 +2938,7 @@ unsafe extern "C" fn sshkey_from_blob_internal(
             }
         }
     }
-    sshbuf_free(copy);
+    crate::sshbuf::sshbuf_free(copy);
     sshkey_free(key);
     libc::free(ktype as *mut libc::c_void);
     return ret;
@@ -2955,7 +2955,7 @@ pub unsafe extern "C" fn sshkey_from_blob(
         return -(2 as libc::c_int);
     }
     r = sshkey_from_blob_internal(b, keyp, 1 as libc::c_int);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 pub unsafe extern "C" fn sshkey_fromb(
@@ -2975,7 +2975,7 @@ pub unsafe extern "C" fn sshkey_froms(
         return r;
     }
     r = sshkey_from_blob_internal(b, keyp, 1 as libc::c_int);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 pub unsafe extern "C" fn sshkey_get_sigtype(
@@ -3002,7 +3002,7 @@ pub unsafe extern "C" fn sshkey_get_sigtype(
         r = 0 as libc::c_int;
     }
     libc::free(sigtype as *mut libc::c_void);
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 pub unsafe extern "C" fn sshkey_check_cert_sigtype(
@@ -3371,7 +3371,7 @@ pub unsafe extern "C" fn sshkey_certify_custom(
     libc::free(sig_blob as *mut libc::c_void);
     libc::free(ca_blob as *mut libc::c_void);
     libc::free(sigtype as *mut libc::c_void);
-    sshbuf_free(principals);
+    crate::sshbuf::sshbuf_free(principals);
     return ret;
 }
 unsafe extern "C" fn default_key_sign(
@@ -3696,7 +3696,7 @@ pub unsafe extern "C" fn sshkey_private_serialize_opt(
     if r == 0 as libc::c_int {
         r = sshbuf_putb(buf, b);
     }
-    sshbuf_free(b);
+    crate::sshbuf::sshbuf_free(b);
     return r;
 }
 pub unsafe extern "C" fn sshkey_private_serialize(
@@ -4239,9 +4239,9 @@ unsafe extern "C" fn sshkey_private_to_blob2(
             }
         }
     }
-    sshbuf_free(kdf);
-    sshbuf_free(encoded);
-    sshbuf_free(encrypted);
+    crate::sshbuf::sshbuf_free(kdf);
+    crate::sshbuf::sshbuf_free(encoded);
+    crate::sshbuf::sshbuf_free(encrypted);
     cipher_free(ciphercontext);
     explicit_bzero(
         salt.as_mut_ptr() as *mut libc::c_void,
@@ -4375,8 +4375,8 @@ unsafe extern "C" fn private2_uudecode(
             }
         }
     }
-    sshbuf_free(encoded);
-    sshbuf_free(decoded);
+    crate::sshbuf::sshbuf_free(encoded);
+    crate::sshbuf::sshbuf_free(decoded);
     return r;
 }
 unsafe extern "C" fn private2_decrypt(
@@ -4612,8 +4612,8 @@ unsafe extern "C" fn private2_decrypt(
         explicit_bzero(key as *mut libc::c_void, keylen.wrapping_add(ivlen));
         libc::free(key as *mut libc::c_void);
     }
-    sshbuf_free(kdf);
-    sshbuf_free(decrypted);
+    crate::sshbuf::sshbuf_free(kdf);
+    crate::sshbuf::sshbuf_free(decrypted);
     return r;
 }
 unsafe extern "C" fn sshkey_parse_private2(
@@ -4670,8 +4670,8 @@ unsafe extern "C" fn sshkey_parse_private2(
         }
     }
     libc::free(comment as *mut libc::c_void);
-    sshbuf_free(decoded);
-    sshbuf_free(decrypted);
+    crate::sshbuf::sshbuf_free(decoded);
+    crate::sshbuf::sshbuf_free(decrypted);
     sshkey_free(k);
     sshkey_free(pubkey);
     return r;
@@ -4732,7 +4732,7 @@ unsafe extern "C" fn sshkey_parse_private2_pubkey(
             }
         }
     }
-    sshbuf_free(decoded);
+    crate::sshbuf::sshbuf_free(decoded);
     sshkey_free(pubkey);
     return r;
 }
@@ -4883,7 +4883,7 @@ unsafe extern "C" fn sshkey_private_to_blob_pem_pkcs8(
         r = sshbuf_putb(buf, blob);
     }
     EVP_PKEY_free(pkey);
-    sshbuf_free(blob);
+    crate::sshbuf::sshbuf_free(blob);
     BIO_free(bio);
     return r;
 }

@@ -53,7 +53,7 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
@@ -441,7 +441,7 @@ unsafe extern "C" fn process_sign(
         }
     }
     sshkey_free(key);
-    sshbuf_free(kbuf);
+    crate::sshbuf::sshbuf_free(kbuf);
     libc::free(provider as *mut libc::c_void);
     if !sig.is_null() {
         freezero(sig as *mut libc::c_void, siglen);
@@ -556,7 +556,7 @@ unsafe extern "C" fn process_enroll(
         );
     }
     if sshbuf_len(challenge) == 0 as libc::c_int as libc::c_ulong {
-        sshbuf_free(challenge);
+        crate::sshbuf::sshbuf_free(challenge);
         challenge = 0 as *mut crate::sshbuf::sshbuf;
     }
     null_empty(&mut device);
@@ -635,9 +635,9 @@ unsafe extern "C" fn process_enroll(
         }
     }
     sshkey_free(key);
-    sshbuf_free(kbuf);
-    sshbuf_free(attest);
-    sshbuf_free(challenge);
+    crate::sshbuf::sshbuf_free(kbuf);
+    crate::sshbuf::sshbuf_free(attest);
+    crate::sshbuf::sshbuf_free(challenge);
     libc::free(provider as *mut libc::c_void);
     libc::free(application as *mut libc::c_void);
     if !pin.is_null() {
@@ -826,7 +826,7 @@ unsafe extern "C" fn process_load_resident(
         }
     }
     sshsk_free_resident_keys(srks, nsrks);
-    sshbuf_free(kbuf);
+    crate::sshbuf::sshbuf_free(kbuf);
     libc::free(provider as *mut libc::c_void);
     libc::free(device as *mut libc::c_void);
     if !pin.is_null() {
@@ -1022,7 +1022,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             );
         }
     }
-    sshbuf_free(req);
+    crate::sshbuf::sshbuf_free(req);
     crate::log::sshlog(
         b"ssh-sk-helper.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0")).as_ptr(),
@@ -1044,7 +1044,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             b"ssh_msg_send failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_free(resp);
+    crate::sshbuf::sshbuf_free(resp);
     close(out);
     return 0 as libc::c_int;
 }

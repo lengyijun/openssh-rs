@@ -149,7 +149,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -2487,7 +2487,7 @@ unsafe extern "C" fn vdollar_percent_expand(
         }
         _ => {}
     }
-    sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(buf);
     return if *parseerror != 0 {
         0 as *mut libc::c_char
     } else {
@@ -3705,8 +3705,8 @@ pub unsafe extern "C" fn argv_assemble(
         sshbuf_len(buf),
     );
     *ret.offset(sshbuf_len(buf) as isize) = '\0' as i32 as libc::c_char;
-    sshbuf_free(buf);
-    sshbuf_free(arg);
+    crate::sshbuf::sshbuf_free(buf);
+    crate::sshbuf::sshbuf_free(arg);
     return ret;
 }
 pub unsafe extern "C" fn argv_next(
