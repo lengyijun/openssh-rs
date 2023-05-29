@@ -1,3 +1,4 @@
+use crate::cipher::sshcipher;
 use ::libc;
 use libc::close;
 use libc::kill;
@@ -21,7 +22,7 @@ extern "C" {
     pub type dh_st;
     pub type umac_ctx;
     pub type ssh_hmac_ctx;
-    pub type sshcipher;
+
     pub type session_state;
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
 

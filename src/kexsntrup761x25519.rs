@@ -1,3 +1,4 @@
+use crate::cipher::sshcipher;
 use ::libc;
 extern "C" {
     pub type ssh;
@@ -7,7 +8,7 @@ extern "C" {
     pub type ec_group_st;
     pub type umac_ctx;
     pub type ssh_hmac_ctx;
-    pub type sshcipher;
+
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn crypto_kem_sntrup761_enc(
         cstr: *mut libc::c_uchar,

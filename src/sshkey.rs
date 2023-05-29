@@ -1,3 +1,4 @@
+use crate::cipher::sshcipher;
 use ::libc;
 extern "C" {
     pub type _IO_wide_data;
@@ -16,7 +17,7 @@ extern "C" {
     pub type ec_method_st;
     pub type ec_group_st;
     pub type ec_point_st;
-    pub type sshcipher;
+
     pub type sshcipher_ctx;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 

@@ -1,3 +1,4 @@
+use crate::cipher::sshcipher;
 use ::libc;
 use libc::close;
 extern "C" {
@@ -17,7 +18,7 @@ extern "C" {
     pub type dh_st;
     pub type umac_ctx;
     pub type ssh_hmac_ctx;
-    pub type sshcipher;
+
     pub type internal_state;
     pub type sshcipher_ctx;
     pub type bignum_st;

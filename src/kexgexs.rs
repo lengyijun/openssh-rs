@@ -1,3 +1,4 @@
+use crate::cipher::sshcipher;
 use ::libc;
 extern "C" {
     pub type ssh_channels;
@@ -6,7 +7,7 @@ extern "C" {
     pub type dh_st;
     pub type umac_ctx;
     pub type ssh_hmac_ctx;
-    pub type sshcipher;
+
     pub type session_state;
     pub type bignum_st;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);

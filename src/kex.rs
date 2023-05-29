@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::cipher::sshcipher;
 use ::libc;
 
 extern "C" {
@@ -8,7 +9,7 @@ extern "C" {
     pub type dh_st;
     pub type umac_ctx;
     pub type ssh_hmac_ctx;
-    pub type sshcipher;
+
     pub type session_state;
     pub type ssh_digest_ctx;
 

@@ -1,3 +1,4 @@
+use crate::cipher::sshcipher;
 use ::libc;
 extern "C" {
     pub type ssh;
@@ -9,7 +10,7 @@ extern "C" {
     pub type ec_point_st;
     pub type umac_ctx;
     pub type ssh_hmac_ctx;
-    pub type sshcipher;
+
     fn freezero(_: *mut libc::c_void, _: size_t);
 
     fn BN_new() -> *mut BIGNUM;

@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::cipher::sshcipher;
 use ::libc;
 use libc::close;
 extern "C" {
@@ -20,7 +21,7 @@ extern "C" {
     pub type dh_st;
     pub type umac_ctx;
     pub type ssh_hmac_ctx;
-    pub type sshcipher;
+
     pub type session_state;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;

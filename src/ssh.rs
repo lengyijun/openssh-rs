@@ -1,3 +1,4 @@
+use crate::cipher::sshcipher;
 use crate::log::log_init;
 use crate::utf8::msetlocale;
 use ::libc;
@@ -14,7 +15,7 @@ extern "C" {
     pub type dh_st;
     pub type umac_ctx;
     pub type ssh_hmac_ctx;
-    pub type sshcipher;
+
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 

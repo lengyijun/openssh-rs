@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::cipher::sshcipher;
 use crate::log::log_init;
 use crate::utf8::msetlocale;
 use ::libc;
@@ -15,7 +16,7 @@ extern "C" {
 
     pub type notifier_ctx;
     pub type ssh_krl;
-    pub type sshcipher;
+
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strncasecmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> libc::c_int;

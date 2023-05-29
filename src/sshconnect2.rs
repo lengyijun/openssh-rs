@@ -1,3 +1,4 @@
+use crate::cipher::sshcipher;
 use crate::utf8::fmprintf;
 use ::libc;
 use libc::close;
@@ -12,7 +13,7 @@ extern "C" {
     pub type dh_st;
     pub type umac_ctx;
     pub type ssh_hmac_ctx;
-    pub type sshcipher;
+
     pub type session_state;
     pub type notifier_ctx;
 
