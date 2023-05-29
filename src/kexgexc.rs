@@ -1,5 +1,6 @@
 use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
+use crate::packet::session_state;
 use crate::umac::umac_ctx;
 
 use ::libc;
@@ -9,7 +10,6 @@ extern "C" {
     pub type ec_group_st;
     pub type dh_st;
 
-    pub type session_state;
     pub type bignum_st;
 
     fn BN_num_bits(a: *const BIGNUM) -> libc::c_int;

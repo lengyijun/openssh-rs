@@ -1,10 +1,11 @@
+use crate::packet::session_state;
 use ::libc;
 
 extern "C" {
     pub type ssh_channels;
 
     pub type kex;
-    pub type session_state;
+
     fn freezero(_: *mut libc::c_void, _: size_t);
 
     fn strncmp(_: *const libc::c_char, _: *const libc::c_char, _: libc::c_ulong) -> libc::c_int;

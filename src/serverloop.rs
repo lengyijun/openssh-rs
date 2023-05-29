@@ -1,5 +1,6 @@
 use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
+use crate::packet::session_state;
 use crate::umac::umac_ctx;
 
 use ::libc;
@@ -8,8 +9,6 @@ extern "C" {
 
     pub type ec_group_st;
     pub type dh_st;
-
-    pub type session_state;
 
     fn sigemptyset(__set: *mut sigset_t) -> libc::c_int;
     fn sigaddset(__set: *mut sigset_t, __signo: libc::c_int) -> libc::c_int;

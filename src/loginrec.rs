@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::packet::session_state;
 use ::libc;
 use libc::close;
 
@@ -16,7 +17,7 @@ extern "C" {
     pub type ssh_channels;
 
     pub type kex;
-    pub type session_state;
+
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
     fn gettimeofday(__tv: *mut libc::timeval, __tz: *mut libc::c_void) -> libc::c_int;

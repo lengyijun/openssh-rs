@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::packet::session_state;
 use ::libc;
 use libc::close;
 
@@ -6,7 +7,6 @@ extern "C" {
     pub type ssh_channels;
 
     pub type kex;
-    pub type session_state;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn freezero(_: *mut libc::c_void, _: size_t);

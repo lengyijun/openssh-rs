@@ -1,6 +1,7 @@
 use crate::atomicio::atomicio;
 use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
+use crate::packet::session_state;
 use crate::umac::umac_ctx;
 
 use crate::log::log_init;
@@ -27,7 +28,6 @@ extern "C" {
     pub type ec_group_st;
     pub type dh_st;
 
-    pub type session_state;
     pub type ssh_digest_ctx;
     pub type ssh_sandbox;
     static mut stderr: *mut libc::FILE;

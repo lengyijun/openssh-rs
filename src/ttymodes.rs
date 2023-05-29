@@ -1,9 +1,9 @@
+use crate::packet::session_state;
 use ::libc;
 extern "C" {
     pub type ssh_channels;
 
     pub type kex;
-    pub type session_state;
 
     fn cfgetospeed(__termios_p: *const termios) -> speed_t;
     fn cfgetispeed(__termios_p: *const termios) -> speed_t;

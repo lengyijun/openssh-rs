@@ -1,5 +1,6 @@
 use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
+use crate::packet::session_state;
 use crate::umac::umac_ctx;
 
 use ::libc;
@@ -9,7 +10,6 @@ extern "C" {
     pub type ec_group_st;
     pub type dh_st;
 
-    pub type session_state;
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn seed_rng();
     fn strlcat(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;

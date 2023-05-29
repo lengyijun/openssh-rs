@@ -1,9 +1,9 @@
+use crate::packet::session_state;
 use ::libc;
 extern "C" {
     pub type ssh_channels;
 
     pub type kex;
-    pub type session_state;
 
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn ssh_packet_read_seqnr(_: *mut ssh, _: *mut u_char, seqnr_p: *mut u_int32_t) -> libc::c_int;

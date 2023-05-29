@@ -1,5 +1,6 @@
 use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
+use crate::packet::session_state;
 use crate::umac::umac_ctx;
 
 use crate::utf8::fmprintf;
@@ -15,7 +16,6 @@ extern "C" {
     pub type ec_group_st;
     pub type dh_st;
 
-    pub type session_state;
     pub type notifier_ctx;
 
     fn closefrom(__lowfd: libc::c_int);

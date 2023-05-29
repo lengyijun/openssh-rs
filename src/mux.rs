@@ -1,3 +1,4 @@
+use crate::packet::session_state;
 use ::libc;
 use libc::close;
 use libc::kill;
@@ -17,7 +18,7 @@ extern "C" {
     pub type ssh_channels;
 
     pub type kex;
-    pub type session_state;
+
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
     fn connect(__fd: libc::c_int, __addr: __CONST_SOCKADDR_ARG, __len: socklen_t) -> libc::c_int;
     fn tcgetattr(__fd: libc::c_int, __termios_p: *mut termios) -> libc::c_int;

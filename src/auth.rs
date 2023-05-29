@@ -1,3 +1,4 @@
+use crate::packet::session_state;
 use ::libc;
 extern "C" {
     pub type sockaddr_x25;
@@ -13,7 +14,7 @@ extern "C" {
     pub type ssh_channels;
 
     pub type kex;
-    pub type session_state;
+
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;

@@ -1,9 +1,9 @@
+use crate::packet::session_state;
 use ::libc;
 extern "C" {
     pub type ssh_channels;
 
     pub type kex;
-    pub type session_state;
 
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
 

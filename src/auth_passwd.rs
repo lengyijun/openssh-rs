@@ -1,9 +1,10 @@
+use crate::packet::session_state;
 use ::libc;
 extern "C" {
     pub type ssh_channels;
 
     pub type kex;
-    pub type session_state;
+
     fn xcrypt(password: *const libc::c_char, salt: *const libc::c_char) -> *mut libc::c_char;
     fn shadow_pw(pw: *mut libc::passwd) -> *mut libc::c_char;
 

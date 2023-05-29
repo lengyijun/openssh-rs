@@ -1,6 +1,7 @@
 use crate::atomicio::atomicio;
 use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
+use crate::packet::session_state;
 use crate::umac::umac_ctx;
 
 use ::libc;
@@ -23,7 +24,6 @@ extern "C" {
     pub type ec_group_st;
     pub type dh_st;
 
-    pub type session_state;
     static mut stdout: *mut libc::FILE;
     static mut stderr: *mut libc::FILE;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
