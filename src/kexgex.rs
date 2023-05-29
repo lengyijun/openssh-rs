@@ -16,7 +16,7 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
     fn sshbuf_put_bignum2(buf: *mut crate::sshbuf::sshbuf, v: *const BIGNUM) -> libc::c_int;
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
+
     fn ssh_digest_buffer(
         alg: libc::c_int,
         b: *const crate::sshbuf::sshbuf,
@@ -51,7 +51,7 @@ pub unsafe extern "C" fn kexgex_hash(
 ) -> libc::c_int {
     let mut b: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut r: libc::c_int = 0;
-    if *hashlen < ssh_digest_bytes(1 as libc::c_int) {
+    if *hashlen < crate::digest_openssl::ssh_digest_bytes(1 as libc::c_int) {
         return -(10 as libc::c_int);
     }
     b = crate::sshbuf::sshbuf_new();
@@ -141,6 +141,6 @@ pub unsafe extern "C" fn kexgex_hash(
         return -(22 as libc::c_int);
     }
     crate::sshbuf::sshbuf_free(b);
-    *hashlen = ssh_digest_bytes(hash_alg);
+    *hashlen = crate::digest_openssl::ssh_digest_bytes(hash_alg);
     return 0 as libc::c_int;
 }

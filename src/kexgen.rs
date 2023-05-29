@@ -110,7 +110,7 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
+
     fn ssh_digest_buffer(
         alg: libc::c_int,
         b: *const crate::sshbuf::sshbuf,
@@ -199,7 +199,7 @@ unsafe extern "C" fn kex_gen_hash(
 ) -> libc::c_int {
     let mut b: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut r: libc::c_int = 0;
-    if *hashlen < ssh_digest_bytes(hash_alg) {
+    if *hashlen < crate::digest_openssl::ssh_digest_bytes(hash_alg) {
         return -(10 as libc::c_int);
     }
     b = crate::sshbuf::sshbuf_new();
@@ -269,7 +269,7 @@ unsafe extern "C" fn kex_gen_hash(
         return -(22 as libc::c_int);
     }
     crate::sshbuf::sshbuf_free(b);
-    *hashlen = ssh_digest_bytes(hash_alg);
+    *hashlen = crate::digest_openssl::ssh_digest_bytes(hash_alg);
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn kex_gen_client(mut ssh: *mut ssh) -> libc::c_int {

@@ -7,7 +7,7 @@ extern "C" {
 
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
+
     fn ssh_digest_blocksize(ctx: *mut ssh_digest_ctx) -> size_t;
     fn ssh_digest_copy_state(from: *mut ssh_digest_ctx, to: *mut ssh_digest_ctx) -> libc::c_int;
 
@@ -38,7 +38,7 @@ pub struct ssh_hmac_ctx {
     pub buf_len: size_t,
 }
 pub unsafe extern "C" fn ssh_hmac_bytes(mut alg: libc::c_int) -> size_t {
-    return ssh_digest_bytes(alg);
+    return crate::digest_openssl::ssh_digest_bytes(alg);
 }
 pub unsafe extern "C" fn ssh_hmac_start(mut alg: libc::c_int) -> *mut ssh_hmac_ctx {
     let mut ret: *mut ssh_hmac_ctx = 0 as *mut ssh_hmac_ctx;
@@ -146,7 +146,7 @@ pub unsafe extern "C" fn ssh_hmac_final(
     mut dlen: size_t,
 ) -> libc::c_int {
     let mut len: size_t = 0;
-    len = ssh_digest_bytes((*ctx).alg);
+    len = crate::digest_openssl::ssh_digest_bytes((*ctx).alg);
     if dlen < len || ssh_digest_final((*ctx).digest, (*ctx).buf, len) != 0 {
         return -(1 as libc::c_int);
     }

@@ -50,7 +50,6 @@ extern "C" {
     fn mm_inform_authserv(_: *mut libc::c_char, _: *mut libc::c_char);
     fn mm_getpwnamallow(_: *mut ssh, _: *const libc::c_char) -> *mut libc::passwd;
     fn mm_auth2_read_banner() -> *mut libc::c_char;
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
 
     static mut options: ServerOptions;
     static mut method_none: Authmethod;
@@ -580,7 +579,7 @@ unsafe extern "C" fn input_service_request(
 }
 unsafe extern "C" fn user_specific_delay(mut user: *const libc::c_char) -> libc::c_double {
     let mut b: [libc::c_char; 512] = [0; 512];
-    let mut len: size_t = ssh_digest_bytes(4 as libc::c_int);
+    let mut len: size_t = crate::digest_openssl::ssh_digest_bytes(4 as libc::c_int);
     let mut hash: *mut u_char = crate::xmalloc::xmalloc(len) as *mut u_char;
     let mut delay: libc::c_double = 0.;
     libc::snprintf(

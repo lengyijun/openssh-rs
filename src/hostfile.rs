@@ -77,7 +77,7 @@ extern "C" {
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn tilde_expand_filename(_: *const libc::c_char, _: uid_t) -> *mut libc::c_char;
     fn lowercase(s: *mut libc::c_char);
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
+
     fn ssh_hmac_bytes(alg: libc::c_int) -> size_t;
     fn ssh_hmac_start(alg: libc::c_int) -> *mut ssh_hmac_ctx;
     fn ssh_hmac_init(ctx: *mut ssh_hmac_ctx, key: *const libc::c_void, klen: size_t)
@@ -352,7 +352,7 @@ pub unsafe extern "C" fn host_hash(
     let mut uu_result: [libc::c_char; 512] = [0; 512];
     let mut encoded: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut len: u_int = 0;
-    len = ssh_digest_bytes(1 as libc::c_int) as u_int;
+    len = crate::digest_openssl::ssh_digest_bytes(1 as libc::c_int) as u_int;
     if name_from_hostfile.is_null() {
         arc4random_buf(salt.as_mut_ptr() as *mut libc::c_void, len as size_t);
     } else if extract_salt(

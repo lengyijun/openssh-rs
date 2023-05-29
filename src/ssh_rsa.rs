@@ -93,7 +93,6 @@ extern "C" {
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
     fn sshkey_check_rsa_length(_: *const crate::sshkey::sshkey, _: libc::c_int) -> libc::c_int;
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
 
 }
 pub type __u_char = libc::c_uchar;
@@ -718,7 +717,7 @@ unsafe extern "C" fn ssh_rsa_sign(
         return -(10 as libc::c_int);
     }
     nid = rsa_hash_alg_nid(hash_alg);
-    hlen = ssh_digest_bytes(hash_alg) as u_int;
+    hlen = crate::digest_openssl::ssh_digest_bytes(hash_alg) as u_int;
     if hlen == 0 as libc::c_int as libc::c_uint {
         return -(1 as libc::c_int);
     }
@@ -924,7 +923,7 @@ unsafe extern "C" fn ssh_rsa_verify(
                             match current_block {
                                 17539625483582710546 => {}
                                 _ => {
-                                    hlen = ssh_digest_bytes(hash_alg);
+                                    hlen = crate::digest_openssl::ssh_digest_bytes(hash_alg);
                                     if hlen == 0 as libc::c_int as libc::c_ulong {
                                         ret = -(1 as libc::c_int);
                                     } else {
@@ -1066,7 +1065,7 @@ unsafe extern "C" fn openssh_RSA_verify(
         return ret;
     }
     ret = -(1 as libc::c_int);
-    hlen = ssh_digest_bytes(hash_alg);
+    hlen = crate::digest_openssl::ssh_digest_bytes(hash_alg);
     if hashlen != hlen {
         ret = -(10 as libc::c_int);
     } else {

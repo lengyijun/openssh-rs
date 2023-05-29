@@ -275,7 +275,7 @@ extern "C" {
         path: *const libc::c_char,
     );
     fn permanently_set_uid(_: *mut libc::passwd);
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
+
     fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
     fn ssh_digest_update(
         ctx: *mut ssh_digest_ctx,
@@ -3376,7 +3376,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
                 b"ssh_digest_update\0" as *const u8 as *const libc::c_char,
             );
         }
-        len = ssh_digest_bytes(4 as libc::c_int);
+        len = crate::digest_openssl::ssh_digest_bytes(4 as libc::c_int);
         hash = crate::xmalloc::xmalloc(len) as *mut u_char;
         if ssh_digest_final(ctx, hash, len) != 0 as libc::c_int {
             sshfatal(

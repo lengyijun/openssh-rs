@@ -69,7 +69,6 @@ extern "C" {
 
     fn sshbuf_put_bignum2(buf: *mut crate::sshbuf::sshbuf, v: *const BIGNUM) -> libc::c_int;
     fn sshbuf_get_bignum2(buf: *mut crate::sshbuf::sshbuf, valp: *mut *mut BIGNUM) -> libc::c_int;
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
 
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
@@ -487,7 +486,7 @@ unsafe extern "C" fn ssh_dss_sign(
     let mut rlen: size_t = 0;
     let mut slen: size_t = 0;
     let mut len: size_t = 0;
-    let mut dlen: size_t = ssh_digest_bytes(1 as libc::c_int);
+    let mut dlen: size_t = crate::digest_openssl::ssh_digest_bytes(1 as libc::c_int);
     let mut b: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut ret: libc::c_int = -(10 as libc::c_int);
     if !lenp.is_null() {
@@ -615,7 +614,7 @@ unsafe extern "C" fn ssh_dss_verify(
     let mut digest: [u_char; 64] = [0; 64];
     let mut sigblob: *mut u_char = 0 as *mut u_char;
     let mut len: size_t = 0;
-    let mut hlen: size_t = ssh_digest_bytes(1 as libc::c_int);
+    let mut hlen: size_t = crate::digest_openssl::ssh_digest_bytes(1 as libc::c_int);
     let mut ret: libc::c_int = -(1 as libc::c_int);
     let mut b: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut ktype: *mut libc::c_char = 0 as *mut libc::c_char;

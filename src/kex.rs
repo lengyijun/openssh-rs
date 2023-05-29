@@ -102,7 +102,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
     fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
     fn ssh_digest_update(
         ctx: *mut ssh_digest_ctx,
@@ -2362,7 +2361,7 @@ unsafe extern "C" fn derive_key(
     let mut mdsz: size_t = 0;
     let mut digest: *mut u_char = 0 as *mut u_char;
     let mut r: libc::c_int = 0;
-    mdsz = ssh_digest_bytes((*kex).hash_alg);
+    mdsz = crate::digest_openssl::ssh_digest_bytes((*kex).hash_alg);
     if mdsz == 0 as libc::c_int as libc::c_ulong {
         return -(10 as libc::c_int);
     }

@@ -252,7 +252,6 @@ extern "C" {
     fn cipher_authlen(_: *const sshcipher) -> u_int;
     fn cipher_ivlen(_: *const sshcipher) -> u_int;
     fn ssh_digest_alg_name(alg: libc::c_int) -> *const libc::c_char;
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
 
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn match_pattern_list(
@@ -1275,7 +1274,7 @@ pub unsafe extern "C" fn sshkey_fingerprint_raw(
     if !lenp.is_null() {
         *lenp = 0 as libc::c_int as size_t;
     }
-    if ssh_digest_bytes(dgst_alg) == 0 as libc::c_int as libc::c_ulong {
+    if crate::digest_openssl::ssh_digest_bytes(dgst_alg) == 0 as libc::c_int as libc::c_ulong {
         r = -(10 as libc::c_int);
     } else {
         r = to_blob(
@@ -1306,7 +1305,7 @@ pub unsafe extern "C" fn sshkey_fingerprint_raw(
                         ret = 0 as *mut u_char;
                     }
                     if !lenp.is_null() {
-                        *lenp = ssh_digest_bytes(dgst_alg);
+                        *lenp = crate::digest_openssl::ssh_digest_bytes(dgst_alg);
                     }
                     r = 0 as libc::c_int;
                 }
@@ -2313,7 +2312,7 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
     if cipher.is_null() {
         r = -(10 as libc::c_int);
     } else if (cipher_keylen(cipher)).wrapping_add(cipher_ivlen(cipher)) as libc::c_ulong
-        > ssh_digest_bytes(4 as libc::c_int)
+        > crate::digest_openssl::ssh_digest_bytes(4 as libc::c_int)
     {
         r = -(1 as libc::c_int);
     } else {
@@ -2515,7 +2514,7 @@ pub unsafe extern "C" fn sshkey_unshield_private(mut k: *mut sshkey) -> libc::c_
     if cipher.is_null() {
         r = -(10 as libc::c_int);
     } else if (cipher_keylen(cipher)).wrapping_add(cipher_ivlen(cipher)) as libc::c_ulong
-        > ssh_digest_bytes(4 as libc::c_int)
+        > crate::digest_openssl::ssh_digest_bytes(4 as libc::c_int)
     {
         r = -(1 as libc::c_int);
     } else if (*k).shielded_len < cipher_blocksize(cipher) as libc::c_ulong

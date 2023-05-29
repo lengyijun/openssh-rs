@@ -157,7 +157,7 @@ extern "C" {
     fn kex_alg_list(_: libc::c_char) -> *mut libc::c_char;
     fn ssh_digest_alg_by_name(name: *const libc::c_char) -> libc::c_int;
     fn ssh_digest_alg_name(alg: libc::c_int) -> *const libc::c_char;
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
+
     fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
     fn ssh_digest_update(
         ctx: *mut ssh_digest_ctx,
@@ -1456,7 +1456,7 @@ pub unsafe extern "C" fn ssh_connection_hash(
     ssh_digest_free(md);
     return tohex(
         conn_hash.as_mut_ptr() as *const libc::c_void,
-        ssh_digest_bytes(1 as libc::c_int),
+        crate::digest_openssl::ssh_digest_bytes(1 as libc::c_int),
     );
 }
 pub unsafe extern "C" fn add_local_forward(mut options: *mut Options, mut newfwd: *const Forward) {

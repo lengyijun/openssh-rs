@@ -138,7 +138,7 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_int;
     fn ssh_digest_alg_by_name(name: *const libc::c_char) -> libc::c_int;
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
+
     fn ssh_digest_buffer(
         alg: libc::c_int,
         b: *const crate::sshbuf::sshbuf,
@@ -1204,7 +1204,7 @@ unsafe extern "C" fn hash_buffer(
     }
     hex = tohex(
         hash.as_mut_ptr() as *const libc::c_void,
-        ssh_digest_bytes(alg),
+        crate::digest_openssl::ssh_digest_bytes(alg),
     );
     if !hex.is_null() {
         crate::log::sshlog(
@@ -1226,7 +1226,7 @@ unsafe extern "C" fn hash_buffer(
         r = sshbuf_put(
             b,
             hash.as_mut_ptr() as *const libc::c_void,
-            ssh_digest_bytes(alg),
+            crate::digest_openssl::ssh_digest_bytes(alg),
         );
         if r != 0 as libc::c_int {
             crate::log::sshlog(
@@ -1496,7 +1496,7 @@ unsafe extern "C" fn hash_file(
             } else {
                 hex = tohex(
                     hash.as_mut_ptr() as *const libc::c_void,
-                    ssh_digest_bytes(alg),
+                    crate::digest_openssl::ssh_digest_bytes(alg),
                 );
                 if !hex.is_null() {
                     crate::log::sshlog(
@@ -1519,7 +1519,7 @@ unsafe extern "C" fn hash_file(
                     r = sshbuf_put(
                         b,
                         hash.as_mut_ptr() as *const libc::c_void,
-                        ssh_digest_bytes(alg),
+                        crate::digest_openssl::ssh_digest_bytes(alg),
                     );
                     if r != 0 as libc::c_int {
                         crate::log::sshlog(

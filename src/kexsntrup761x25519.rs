@@ -33,7 +33,6 @@ extern "C" {
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
 
-    fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
     fn ssh_digest_buffer(
         alg: libc::c_int,
         b: *const crate::sshbuf::sshbuf,
@@ -133,7 +132,7 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_enc(
                                 r = crate::sshbuf_getput_basic::sshbuf_put_string(
                                     buf,
                                     hash.as_mut_ptr() as *const libc::c_void,
-                                    ssh_digest_bytes((*kex).hash_alg),
+                                    crate::digest_openssl::ssh_digest_bytes((*kex).hash_alg),
                                 );
                                 if !(r != 0 as libc::c_int) {
                                     *server_blobp = server_blob;
@@ -209,7 +208,7 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_dec(
                         r = crate::sshbuf_getput_basic::sshbuf_put_string(
                             buf,
                             hash.as_mut_ptr() as *const libc::c_void,
-                            ssh_digest_bytes((*kex).hash_alg),
+                            crate::digest_openssl::ssh_digest_bytes((*kex).hash_alg),
                         );
                         if !(r != 0 as libc::c_int) {
                             if decoded != 0 as libc::c_int {
