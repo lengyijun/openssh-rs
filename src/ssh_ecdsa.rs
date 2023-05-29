@@ -1,3 +1,4 @@
+use crate::sshkey::EC_GROUP;
 use ::libc;
 extern "C" {
 
@@ -99,7 +100,6 @@ pub type uint8_t = __uint8_t;
 pub type BIGNUM = bignum_st;
 pub type BN_CTX = bignum_ctx;
 
-pub type EC_GROUP = ec_group_st;
 pub type EC_POINT = ec_point_st;
 pub type ECDSA_SIG = ECDSA_SIG_st;
 pub type sshkey_types = libc::c_uint;

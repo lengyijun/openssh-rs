@@ -1,3 +1,4 @@
+use crate::sshkey::EC_GROUP;
 use ::libc;
 extern "C" {
 
@@ -284,7 +285,7 @@ pub type CRYPTO_EX_dup = unsafe extern "C" fn(
     libc::c_long,
     *mut libc::c_void,
 ) -> libc::c_int;
-pub type EC_GROUP = ec_group_st;
+
 pub type ECDSA_SIG = ECDSA_SIG_st;
 pub type CK_FLAGS = libc::c_ulong;
 #[derive(Copy, Clone)]

@@ -1,4 +1,5 @@
 use crate::mac::sshmac;
+use crate::sshkey::EC_GROUP;
 
 use crate::kex::sshenc;
 
@@ -50,8 +51,6 @@ pub type uint8_t = __uint8_t;
 pub type sig_atomic_t = __sig_atomic_t;
 pub type BIGNUM = bignum_st;
 pub type DH = dh_st;
-
-pub type EC_GROUP = ec_group_st;
 
 pub type kex_exchange = libc::c_uint;
 pub const KEX_MAX: kex_exchange = 10;

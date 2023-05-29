@@ -1,4 +1,5 @@
 use crate::mac::sshmac;
+use crate::sshkey::EC_GROUP;
 
 use crate::kex::sshenc;
 
@@ -47,8 +48,6 @@ pub type u_int64_t = __uint64_t;
 pub type uint8_t = __uint8_t;
 pub type sig_atomic_t = __sig_atomic_t;
 pub type DH = dh_st;
-
-pub type EC_GROUP = ec_group_st;
 
 #[derive(Copy, Clone)]
 #[repr(C)]

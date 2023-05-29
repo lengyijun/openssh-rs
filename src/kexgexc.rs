@@ -1,5 +1,6 @@
 use crate::channels::ssh_channels;
 use crate::mac::sshmac;
+use crate::sshkey::EC_GROUP;
 
 use crate::kex::sshenc;
 use crate::packet::session_state;
@@ -214,7 +215,7 @@ pub struct kex {
     pub sntrup761_client_key: [u_char; 1763],
     pub client_pub: *mut crate::sshbuf::sshbuf,
 }
-pub type EC_GROUP = ec_group_st;
+
 pub type DH = dh_st;
 #[derive(Copy, Clone)]
 #[repr(C)]

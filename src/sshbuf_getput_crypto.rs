@@ -1,3 +1,4 @@
+use crate::sshkey::EC_GROUP;
 use ::libc;
 extern "C" {
 
@@ -62,7 +63,7 @@ pub type point_conversion_form_t = libc::c_uint;
 pub const POINT_CONVERSION_HYBRID: point_conversion_form_t = 6;
 pub const POINT_CONVERSION_UNCOMPRESSED: point_conversion_form_t = 4;
 pub const POINT_CONVERSION_COMPRESSED: point_conversion_form_t = 2;
-pub type EC_GROUP = ec_group_st;
+
 pub type EC_POINT = ec_point_st;
 pub unsafe extern "C" fn sshbuf_get_bignum2(
     mut buf: *mut crate::sshbuf::sshbuf,

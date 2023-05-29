@@ -1,3 +1,4 @@
+use crate::sshkey::EC_GROUP;
 use ::libc;
 extern "C" {
 
@@ -70,7 +71,6 @@ pub type u_int64_t = __uint64_t;
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
 
-pub type EC_GROUP = ec_group_st;
 pub type EC_POINT = ec_point_st;
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;
