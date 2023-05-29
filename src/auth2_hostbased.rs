@@ -22,7 +22,6 @@ extern "C" {
     fn sshpkt_get_string(ssh: *mut ssh, valp: *mut *mut u_char, lenp: *mut size_t) -> libc::c_int;
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -790,15 +789,18 @@ unsafe extern "C" fn userauth_hostbased(
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_put_cstring(b, (*authctxt).user);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*authctxt).user);
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_put_cstring(b, (*authctxt).service);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                                b,
+                                (*authctxt).service,
+                            );
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_put_cstring(b, method);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, method);
                             r != 0 as libc::c_int
                         }
                         || {
@@ -818,11 +820,11 @@ unsafe extern "C" fn userauth_hostbased(
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_put_cstring(b, chost);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, chost);
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_put_cstring(b, cuser);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, cuser);
                             r != 0 as libc::c_int
                         }
                     {

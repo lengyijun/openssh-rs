@@ -109,7 +109,6 @@ extern "C" {
         v: *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -1197,7 +1196,7 @@ unsafe extern "C" fn process_request_identities(mut e: *mut SocketEntry) {
         {
             r = sshkey_puts_opts((*id).key, keys, SSHKEY_SERIALIZE_INFO);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_cstring(keys, (*id).comment);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(keys, (*id).comment);
                 r != 0 as libc::c_int
             } {
                 crate::log::sshlog(

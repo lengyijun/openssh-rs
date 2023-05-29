@@ -19,7 +19,6 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1422,7 +1421,7 @@ unsafe extern "C" fn serialise_array(
             current_block = 10886091980245723256;
             break;
         }
-        r = sshbuf_put_cstring(b, *a.offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, *a.offset(i as isize));
         if r != 0 as libc::c_int {
             current_block = 16579542207699466909;
             break;
@@ -1528,7 +1527,7 @@ unsafe extern "C" fn serialise_nullable_string(
         (s == 0 as *mut libc::c_void as *const libc::c_char) as libc::c_int as u_char,
     );
     if r != 0 as libc::c_int || {
-        r = sshbuf_put_cstring(m, s);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, s);
         r != 0 as libc::c_int
     } {
         return r;

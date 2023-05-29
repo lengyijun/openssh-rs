@@ -208,7 +208,6 @@ extern "C" {
         v: *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -1115,7 +1114,7 @@ pub unsafe extern "C" fn sshkey_serialize_sk(
     mut b: *mut crate::sshbuf::sshbuf,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    r = sshbuf_put_cstring(b, (*key).sk_application);
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*key).sk_application);
     if r != 0 as libc::c_int {
         return r;
     }
@@ -1157,7 +1156,7 @@ unsafe extern "C" fn to_blob_buf(
         return -(14 as libc::c_int);
     }
     typename = sshkey_ssh_name_from_type_nid(type_0, (*key).ecdsa_nid);
-    ret = sshbuf_put_cstring(b, typename);
+    ret = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, typename);
     if ret != 0 as libc::c_int {
         return ret;
     }
@@ -3227,7 +3226,7 @@ pub unsafe extern "C" fn sshkey_certify_custom(
     }
     cert = (*(*k).cert).certblob;
     crate::sshbuf::sshbuf_reset(cert);
-    ret = sshbuf_put_cstring(cert, sshkey_ssh_name(k));
+    ret = crate::sshbuf_getput_basic::sshbuf_put_cstring(cert, sshkey_ssh_name(k));
     if !(ret != 0 as libc::c_int) {
         arc4random_buf(
             &mut nonce as *mut [u_char; 32] as *mut libc::c_void,
@@ -3252,7 +3251,10 @@ pub unsafe extern "C" fn sshkey_certify_custom(
                         ret != 0 as libc::c_int
                     }
                     || {
-                        ret = sshbuf_put_cstring(cert, (*(*k).cert).key_id);
+                        ret = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                            cert,
+                            (*(*k).cert).key_id,
+                        );
                         ret != 0 as libc::c_int
                     })
                 {
@@ -3266,7 +3268,7 @@ pub unsafe extern "C" fn sshkey_certify_custom(
                                 current_block = 18386322304582297246;
                                 break;
                             }
-                            ret = sshbuf_put_cstring(
+                            ret = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                                 principals,
                                 *((*(*k).cert).principals).offset(i as isize),
                             );
@@ -3617,7 +3619,7 @@ pub unsafe extern "C" fn sshkey_serialize_private_sk(
     mut b: *mut crate::sshbuf::sshbuf,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    r = sshbuf_put_cstring(b, (*key).sk_application);
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*key).sk_application);
     if r != 0 as libc::c_int
         || {
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, (*key).sk_flags);
@@ -3658,7 +3660,7 @@ pub unsafe extern "C" fn sshkey_private_serialize_opt(
     if b.is_null() {
         return -(2 as libc::c_int);
     }
-    r = sshbuf_put_cstring(b, sshkey_ssh_name(key));
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, sshkey_ssh_name(key));
     if !(r != 0 as libc::c_int) {
         if sshkey_is_cert(key) != 0 {
             if ((*key).cert).is_null()
@@ -4113,11 +4115,15 @@ unsafe extern "C" fn sshkey_private_to_blob2(
                             );
                             if !(r != 0 as libc::c_int
                                 || {
-                                    r = sshbuf_put_cstring(encoded, ciphername);
+                                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                                        encoded, ciphername,
+                                    );
                                     r != 0 as libc::c_int
                                 }
                                 || {
-                                    r = sshbuf_put_cstring(encoded, kdfname);
+                                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                                        encoded, kdfname,
+                                    );
                                     r != 0 as libc::c_int
                                 }
                                 || {
@@ -4158,7 +4164,9 @@ unsafe extern "C" fn sshkey_private_to_blob2(
                                         SSHKEY_SERIALIZE_FULL,
                                     );
                                     if !(r != 0 as libc::c_int || {
-                                        r = sshbuf_put_cstring(encrypted, comment);
+                                        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                                            encrypted, comment,
+                                        );
                                         r != 0 as libc::c_int
                                     }) {
                                         i = 0 as libc::c_int as size_t;

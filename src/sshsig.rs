@@ -78,7 +78,6 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -577,7 +576,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
         );
         if r != 0 as libc::c_int
             || {
-                r = sshbuf_put_cstring(tosign, sig_namespace);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(tosign, sig_namespace);
                 r != 0 as libc::c_int
             }
             || {
@@ -589,7 +588,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(tosign, hashalg);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(tosign, hashalg);
                 r != 0 as libc::c_int
             }
             || {
@@ -693,7 +692,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_put_cstring(blob, sig_namespace);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(blob, sig_namespace);
                             r != 0 as libc::c_int
                         }
                         || {
@@ -705,7 +704,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_put_cstring(blob, hashalg);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(blob, hashalg);
                             r != 0 as libc::c_int
                         }
                         || {
@@ -945,7 +944,7 @@ unsafe extern "C" fn sshsig_wrap_verify(
         );
         if r != 0 as libc::c_int
             || {
-                r = sshbuf_put_cstring(toverify, expect_namespace);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(toverify, expect_namespace);
                 r != 0 as libc::c_int
             }
             || {
@@ -957,7 +956,7 @@ unsafe extern "C" fn sshsig_wrap_verify(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(toverify, hashalg);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(toverify, hashalg);
                 r != 0 as libc::c_int
             }
             || {

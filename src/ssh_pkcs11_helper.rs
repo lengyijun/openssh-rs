@@ -24,7 +24,6 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -372,7 +371,10 @@ unsafe extern "C" fn process_add() {
                     blen,
                 );
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_cstring(msg, *labels.offset(i as isize));
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                        msg,
+                        *labels.offset(i as isize),
+                    );
                     r != 0 as libc::c_int
                 } {
                     sshfatal(

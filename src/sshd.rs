@@ -202,7 +202,7 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
+
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -2296,10 +2296,10 @@ unsafe extern "C" fn send_rexec_state(mut fd: libc::c_int, mut conf: *mut crate:
     }
     item = includes.tqh_first;
     while !item.is_null() {
-        r = sshbuf_put_cstring(inc, (*item).selector);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(inc, (*item).selector);
         if r != 0 as libc::c_int
             || {
-                r = sshbuf_put_cstring(inc, (*item).filename);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(inc, (*item).filename);
                 r != 0 as libc::c_int
             }
             || {

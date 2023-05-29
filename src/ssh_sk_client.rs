@@ -29,7 +29,6 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_get_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -604,7 +603,7 @@ pub unsafe extern "C" fn sshsk_sign(
             r = sshbuf_put_stringb(req, kbuf);
             if r != 0 as libc::c_int
                 || {
-                    r = sshbuf_put_cstring(req, provider);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(req, provider);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -616,7 +615,10 @@ pub unsafe extern "C" fn sshsk_sign(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_cstring(req, 0 as *const libc::c_char);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                        req,
+                        0 as *const libc::c_char,
+                    );
                     r != 0 as libc::c_int
                 }
                 || {
@@ -624,7 +626,7 @@ pub unsafe extern "C" fn sshsk_sign(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_cstring(req, pin);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(req, pin);
                     r != 0 as libc::c_int
                 }
             {
@@ -731,19 +733,19 @@ pub unsafe extern "C" fn sshsk_enroll(
         r = crate::sshbuf_getput_basic::sshbuf_put_u32(req, type_0 as u_int);
         if r != 0 as libc::c_int
             || {
-                r = sshbuf_put_cstring(req, provider_path);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(req, provider_path);
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(req, device);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(req, device);
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(req, application);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(req, application);
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(req, userid);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(req, userid);
                 r != 0 as libc::c_int
             }
             || {
@@ -751,7 +753,7 @@ pub unsafe extern "C" fn sshsk_enroll(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(req, pin);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(req, pin);
                 r != 0 as libc::c_int
             }
             || {
@@ -907,14 +909,14 @@ pub unsafe extern "C" fn sshsk_load_resident(
     } {
         r = -(2 as libc::c_int);
     } else {
-        r = sshbuf_put_cstring(req, provider_path);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(req, provider_path);
         if r != 0 as libc::c_int
             || {
-                r = sshbuf_put_cstring(req, device);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(req, device);
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(req, pin);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(req, pin);
                 r != 0 as libc::c_int
             }
             || {

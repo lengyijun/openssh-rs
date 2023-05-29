@@ -99,7 +99,6 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
@@ -6470,7 +6469,7 @@ pub unsafe extern "C" fn channel_proxy_downstream(
                     );
                     (*c).mux_ctx = downstream as *mut libc::c_void;
                     (*c).mux_downstream_id = id as libc::c_int;
-                    r = sshbuf_put_cstring(modified, ctype);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(modified, ctype);
                     if r != 0 as libc::c_int
                         || {
                             r = crate::sshbuf_getput_basic::sshbuf_put_u32(

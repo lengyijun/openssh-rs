@@ -39,7 +39,6 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1614,7 +1613,7 @@ pub unsafe extern "C" fn do_limits(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 msg,
                 b"limits@openssh.com\0" as *const u8 as *const libc::c_char,
             );
@@ -1857,7 +1856,7 @@ unsafe extern "C" fn do_lsreaddir(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, path);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, path);
             r != 0 as libc::c_int
         }
     {
@@ -2615,14 +2614,14 @@ unsafe extern "C" fn do_realpath_expand(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                     msg,
                     b"expand-path@openssh.com\0" as *const u8 as *const libc::c_char,
                 );
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(msg, path);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, path);
                 r != 0 as libc::c_int
             }
         {
@@ -2938,7 +2937,7 @@ pub unsafe extern "C" fn do_copy(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, oldpath);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, oldpath);
             r != 0 as libc::c_int
         }
         || {
@@ -2996,7 +2995,7 @@ pub unsafe extern "C" fn do_copy(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, newpath);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, newpath);
             r != 0 as libc::c_int
         }
         || {
@@ -3058,7 +3057,10 @@ pub unsafe extern "C" fn do_copy(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, b"copy-data\0" as *const u8 as *const libc::c_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                msg,
+                b"copy-data\0" as *const u8 as *const libc::c_char,
+            );
             r != 0 as libc::c_int
         }
         || {
@@ -3188,7 +3190,7 @@ pub unsafe extern "C" fn do_rename(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                     msg,
                     b"posix-rename@openssh.com\0" as *const u8 as *const libc::c_char,
                 );
@@ -3235,9 +3237,9 @@ pub unsafe extern "C" fn do_rename(
             );
         }
     }
-    r = sshbuf_put_cstring(msg, oldpath);
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, oldpath);
     if r != 0 as libc::c_int || {
-        r = sshbuf_put_cstring(msg, newpath);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, newpath);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -3346,18 +3348,18 @@ pub unsafe extern "C" fn do_hardlink(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 msg,
                 b"hardlink@openssh.com\0" as *const u8 as *const libc::c_char,
             );
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, oldpath);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, oldpath);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, newpath);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, newpath);
             r != 0 as libc::c_int
         }
     {
@@ -3461,11 +3463,11 @@ pub unsafe extern "C" fn do_symlink(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, oldpath);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, oldpath);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, newpath);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, newpath);
             r != 0 as libc::c_int
         }
     {
@@ -3557,7 +3559,7 @@ pub unsafe extern "C" fn do_fsync(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 msg,
                 b"fsync@openssh.com\0" as *const u8 as *const libc::c_char,
             );
@@ -3669,14 +3671,14 @@ pub unsafe extern "C" fn do_statvfs(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 msg,
                 b"statvfs@openssh.com\0" as *const u8 as *const libc::c_char,
             );
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, path);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, path);
             r != 0 as libc::c_int
         }
     {
@@ -3750,14 +3752,14 @@ pub unsafe extern "C" fn do_lsetstat(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 msg,
                 b"lsetstat@openssh.com\0" as *const u8 as *const libc::c_char,
             );
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, path);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, path);
             r != 0 as libc::c_int
         }
         || {
@@ -3920,7 +3922,7 @@ unsafe extern "C" fn send_open(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, path);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, path);
             r != 0 as libc::c_int
         }
         || {
@@ -7036,7 +7038,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 msg,
                 b"users-groups-by-id@openssh.com\0" as *const u8 as *const libc::c_char,
             );

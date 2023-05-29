@@ -35,7 +35,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -987,7 +986,7 @@ unsafe extern "C" fn fill_attestation_blob(
     if attest.is_null() {
         return 0 as libc::c_int;
     }
-    r = sshbuf_put_cstring(
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
         attest,
         b"ssh-sk-attest-v01\0" as *const u8 as *const libc::c_char,
     );
@@ -1500,7 +1499,10 @@ pub unsafe extern "C" fn sshsk_sign(
                 if sig.is_null() {
                     r = -(2 as libc::c_int);
                 } else {
-                    r = sshbuf_put_cstring(sig, sshkey_ssh_name_plain(key));
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                        sig,
+                        sshkey_ssh_name_plain(key),
+                    );
                     if r != 0 as libc::c_int {
                         crate::log::sshlog(
                             b"ssh-sk.c\0" as *const u8 as *const libc::c_char,

@@ -110,8 +110,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
-
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
     fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
     fn ssh_digest_update(
@@ -948,7 +946,7 @@ pub unsafe extern "C" fn kex_prop2buf(
     }
     i = 0 as libc::c_int as u_int;
     while i < PROPOSAL_MAX as libc::c_int as libc::c_uint {
-        r = sshbuf_put_cstring(b, *proposal.offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, *proposal.offset(i as isize));
         if r != 0 as libc::c_int {
             return r;
         }

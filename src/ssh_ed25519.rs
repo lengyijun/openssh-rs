@@ -29,7 +29,6 @@ extern "C" {
         valp: *mut *const u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
@@ -402,7 +401,10 @@ unsafe extern "C" fn ssh_ed25519_sign(
         if b.is_null() {
             r = -(2 as libc::c_int);
         } else {
-            r = sshbuf_put_cstring(b, b"ssh-ed25519\0" as *const u8 as *const libc::c_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                b,
+                b"ssh-ed25519\0" as *const u8 as *const libc::c_char,
+            );
             if !(r != 0 as libc::c_int || {
                 r = crate::sshbuf_getput_basic::sshbuf_put_string(
                     b,

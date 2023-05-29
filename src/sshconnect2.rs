@@ -43,7 +43,6 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
@@ -2664,15 +2663,15 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 50 as libc::c_int as u_char);
             if r != 0 as libc::c_int
                 || {
-                    r = sshbuf_put_cstring(b, (*authctxt).server_user);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*authctxt).server_user);
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_cstring(b, (*authctxt).service);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*authctxt).service);
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_cstring(b, method);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, method);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -2680,7 +2679,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_cstring(b, alg);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, alg);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -4546,19 +4545,31 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
                                 r != 0 as libc::c_int
                             }
                             || {
-                                r = sshbuf_put_cstring(b, (*authctxt).server_user);
+                                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                                    b,
+                                    (*authctxt).server_user,
+                                );
                                 r != 0 as libc::c_int
                             }
                             || {
-                                r = sshbuf_put_cstring(b, (*authctxt).service);
+                                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                                    b,
+                                    (*authctxt).service,
+                                );
                                 r != 0 as libc::c_int
                             }
                             || {
-                                r = sshbuf_put_cstring(b, (*(*authctxt).method).name);
+                                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                                    b,
+                                    (*(*authctxt).method).name,
+                                );
                                 r != 0 as libc::c_int
                             }
                             || {
-                                r = sshbuf_put_cstring(b, (*authctxt).active_ktype);
+                                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                                    b,
+                                    (*authctxt).active_ktype,
+                                );
                                 r != 0 as libc::c_int
                             }
                             || {
@@ -4570,11 +4581,14 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
                                 r != 0 as libc::c_int
                             }
                             || {
-                                r = sshbuf_put_cstring(b, chost);
+                                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, chost);
                                 r != 0 as libc::c_int
                             }
                             || {
-                                r = sshbuf_put_cstring(b, (*authctxt).local_user);
+                                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                                    b,
+                                    (*authctxt).local_user,
+                                );
                                 r != 0 as libc::c_int
                             }
                         {

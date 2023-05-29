@@ -38,7 +38,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_get_string_direct(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *const u_char,
@@ -697,7 +696,7 @@ pub unsafe extern "C" fn mm_log_handler(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(log_msg, msg);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(log_msg, msg);
             r != 0 as libc::c_int
         }
     {
@@ -1157,7 +1156,7 @@ pub unsafe extern "C" fn mm_sshkey_sign(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(m, hostkey_alg);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, hostkey_alg);
             r != 0 as libc::c_int
         }
         || {
@@ -1238,7 +1237,7 @@ pub unsafe extern "C" fn mm_getpwnamallow(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_cstring(m, username);
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, username);
     if r != 0 as libc::c_int {
         sshfatal(
             b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
@@ -2159,9 +2158,9 @@ pub unsafe extern "C" fn mm_inform_authserv(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_cstring(m, service);
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, service);
     if r != 0 as libc::c_int || {
-        r = sshbuf_put_cstring(
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
             m,
             if !style.is_null() {
                 style as *const libc::c_char
@@ -2215,7 +2214,7 @@ pub unsafe extern "C" fn mm_auth_password(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_cstring(m, password);
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, password);
     if r != 0 as libc::c_int {
         sshfatal(
             b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
@@ -2345,7 +2344,7 @@ pub unsafe extern "C" fn mm_key_allowed(
     r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, type_0 as u_int32_t);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 m,
                 if !user.is_null() {
                     user
@@ -2356,7 +2355,7 @@ pub unsafe extern "C" fn mm_key_allowed(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 m,
                 if !host.is_null() {
                     host
@@ -2497,7 +2496,7 @@ pub unsafe extern "C" fn mm_sshkey_verify(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 m,
                 if sigalg.is_null() {
                     b"\0" as *const u8 as *const libc::c_char
@@ -2783,7 +2782,7 @@ pub unsafe extern "C" fn mm_session_pty_cleanup2(mut s: *mut Session) {
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_cstring(m, ((*s).tty).as_mut_ptr());
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, ((*s).tty).as_mut_ptr());
     if r != 0 as libc::c_int {
         sshfatal(
             b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,
@@ -2984,7 +2983,10 @@ pub unsafe extern "C" fn mm_bsdauth_respond(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_cstring(m, *responses.offset(0 as libc::c_int as isize));
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+        m,
+        *responses.offset(0 as libc::c_int as isize),
+    );
     if r != 0 as libc::c_int {
         sshfatal(
             b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,

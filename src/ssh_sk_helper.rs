@@ -54,7 +54,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -801,7 +800,10 @@ unsafe extern "C" fn process_load_resident(
             r = sshbuf_put_stringb(resp, kbuf);
             if r != 0 as libc::c_int
                 || {
-                    r = sshbuf_put_cstring(resp, b"\0" as *const u8 as *const libc::c_char);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                        resp,
+                        b"\0" as *const u8 as *const libc::c_char,
+                    );
                     r != 0 as libc::c_int
                 }
                 || {

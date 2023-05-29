@@ -47,7 +47,6 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -2725,7 +2724,10 @@ unsafe extern "C" fn revoked_certs_generate(
                                         current_block = 2706659501864706830;
                                         break;
                                     }
-                                    r = sshbuf_put_cstring(sect, (*rki).key_id);
+                                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                                        sect,
+                                        (*rki).key_id,
+                                    );
                                     if r != 0 as libc::c_int {
                                         current_block = 9009306676914022655;
                                         break;
@@ -2826,7 +2828,7 @@ pub unsafe extern "C" fn ssh_krl_to_blob(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(buf, (*krl).comment);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(buf, (*krl).comment);
             r != 0 as libc::c_int
         })
     {

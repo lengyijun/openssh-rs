@@ -83,7 +83,6 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1293,7 +1292,7 @@ unsafe extern "C" fn reply_error(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(reply, msg);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(reply, msg);
             r != 0 as libc::c_int
         }
     {
@@ -5046,7 +5045,7 @@ unsafe extern "C" fn mux_client_forward(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(m, lhost);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, lhost);
             r != 0 as libc::c_int
         }
         || {
@@ -5054,7 +5053,7 @@ unsafe extern "C" fn mux_client_forward(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(m, chost);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, chost);
             r != 0 as libc::c_int
         }
         || {
@@ -5460,7 +5459,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 m,
                 if term.is_null() {
                     b"\0" as *const u8 as *const libc::c_char
@@ -5492,7 +5491,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
         i = 0 as libc::c_int as u_int;
         while !(*environ.offset(i as isize)).is_null() {
             if !(env_permitted(*environ.offset(i as isize)) == 0) {
-                r = sshbuf_put_cstring(m, *environ.offset(i as isize));
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, *environ.offset(i as isize));
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"mux.c\0" as *const u8 as *const libc::c_char,
@@ -5514,7 +5513,7 @@ unsafe extern "C" fn mux_client_request_session(mut fd: libc::c_int) -> libc::c_
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_setenv {
-        r = sshbuf_put_cstring(m, *(options.setenv).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, *(options.setenv).offset(i as isize));
         if r != 0 as libc::c_int {
             sshfatal(
                 b"mux.c\0" as *const u8 as *const libc::c_char,
@@ -6206,7 +6205,7 @@ unsafe extern "C" fn mux_client_request_stdio_fwd(mut fd: libc::c_int) -> libc::
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(m, options.stdio_forward_host);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.stdio_forward_host);
             r != 0 as libc::c_int
         }
         || {

@@ -84,7 +84,6 @@ extern "C" {
     fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -2162,7 +2161,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
                             sigalg
                         },
                     );
-                    r = sshbuf_put_cstring(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                         sigbuf,
                         b"hostkeys-prove-00@openssh.com\0" as *const u8 as *const libc::c_char,
                     );

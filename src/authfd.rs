@@ -38,7 +38,6 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -474,7 +473,7 @@ pub unsafe extern "C" fn ssh_lock_agent(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, type_0);
     if !(r != 0 as libc::c_int
         || {
-            r = sshbuf_put_cstring(msg, password);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, password);
             r != 0 as libc::c_int
         }
         || {
@@ -778,10 +777,10 @@ unsafe extern "C" fn encode_dest_constraint_hop(
     if b.is_null() {
         return -(2 as libc::c_int);
     }
-    r = sshbuf_put_cstring(b, (*dch).user);
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*dch).user);
     if !(r != 0 as libc::c_int
         || {
-            r = sshbuf_put_cstring(b, (*dch).hostname);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*dch).hostname);
             r != 0 as libc::c_int
         }
         || {
@@ -927,7 +926,7 @@ unsafe extern "C" fn encode_constraints(
                                 );
                                 if r != 0 as libc::c_int
                                     || {
-                                        r = sshbuf_put_cstring(
+                                        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                                             m,
                                             b"sk-provider@openssh.com\0" as *const u8
                                                 as *const libc::c_char,
@@ -935,7 +934,9 @@ unsafe extern "C" fn encode_constraints(
                                         r != 0 as libc::c_int
                                     }
                                     || {
-                                        r = sshbuf_put_cstring(m, provider);
+                                        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                                            m, provider,
+                                        );
                                         r != 0 as libc::c_int
                                     }
                                 {
@@ -983,7 +984,7 @@ unsafe extern "C" fn encode_constraints(
                                                     );
                                                     if r != 0 as libc::c_int
                                                         || {
-                                                            r = sshbuf_put_cstring(
+                                                            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                                                                 m,
                                                                 b"restrict-destination-v00@openssh.com\0" as *const u8
                                                                     as *const libc::c_char,
@@ -1060,7 +1061,7 @@ pub unsafe extern "C" fn ssh_add_identity_constrained(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_cstring(msg, comment);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, comment);
                     r != 0 as libc::c_int
                 })
             {
@@ -1160,11 +1161,11 @@ pub unsafe extern "C" fn ssh_update_card(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, type_0);
     if !(r != 0 as libc::c_int
         || {
-            r = sshbuf_put_cstring(msg, reader_id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, reader_id);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_cstring(msg, pin);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(msg, pin);
             r != 0 as libc::c_int
         })
     {
@@ -1233,7 +1234,7 @@ pub unsafe extern "C" fn ssh_agent_bind_hostkey(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 27 as libc::c_int as u_char);
     if !(r != 0 as libc::c_int
         || {
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 msg,
                 b"session-bind@openssh.com\0" as *const u8 as *const libc::c_char,
             );

@@ -121,7 +121,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -3891,7 +3890,7 @@ unsafe extern "C" fn client_request_forwarded_tcpip(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_cstring(b, request_type);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, request_type);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -3907,7 +3906,7 @@ unsafe extern "C" fn client_request_forwarded_tcpip(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_cstring(b, listen_address);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, listen_address);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -3915,7 +3914,7 @@ unsafe extern "C" fn client_request_forwarded_tcpip(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_cstring(b, originator_address);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, originator_address);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -5380,7 +5379,7 @@ unsafe extern "C" fn client_global_hostkeys_prove_confirm(
         if !(*((*ctx).keys_match).offset(i as isize) != 0) {
             plaintype = sshkey_type_plain((**((*ctx).keys).offset(i as isize)).type_0);
             crate::sshbuf::sshbuf_reset(signdata);
-            r = sshbuf_put_cstring(
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
                 signdata,
                 b"hostkeys-prove-00@openssh.com\0" as *const u8 as *const libc::c_char,
             );

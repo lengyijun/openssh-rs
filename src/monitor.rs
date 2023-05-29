@@ -97,7 +97,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -1835,7 +1834,7 @@ pub unsafe extern "C" fn mm_answer_sign(
                 b"crate::crate::sshbuf::sshbuf::sshbuf_new\0" as *const u8 as *const libc::c_char,
             );
         }
-        r = sshbuf_put_cstring(sigbuf, proof_req.as_ptr());
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(sigbuf, proof_req.as_ptr());
         if r != 0 as libc::c_int
             || {
                 r = crate::sshbuf_getput_basic::sshbuf_put_string(
@@ -2129,22 +2128,25 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
                 b"pw_gid\0" as *const u8 as *const libc::c_char,
             );
         }
-        r = sshbuf_put_cstring(m, (*pwent).pw_name);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, (*pwent).pw_name);
         if r != 0 as libc::c_int
             || {
-                r = sshbuf_put_cstring(m, b"*\0" as *const u8 as *const libc::c_char);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+                    m,
+                    b"*\0" as *const u8 as *const libc::c_char,
+                );
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(m, (*pwent).pw_gecos);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, (*pwent).pw_gecos);
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(m, (*pwent).pw_dir);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, (*pwent).pw_dir);
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_cstring(m, (*pwent).pw_shell);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, (*pwent).pw_shell);
                 r != 0 as libc::c_int
             }
         {
@@ -2190,7 +2192,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.banner).is_null() && {
-        r = sshbuf_put_cstring(m, options.banner);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.banner);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2206,7 +2208,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.trusted_user_ca_keys).is_null() && {
-        r = sshbuf_put_cstring(m, options.trusted_user_ca_keys);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.trusted_user_ca_keys);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2222,7 +2224,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.revoked_keys_file).is_null() && {
-        r = sshbuf_put_cstring(m, options.revoked_keys_file);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.revoked_keys_file);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2238,7 +2240,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.authorized_keys_command).is_null() && {
-        r = sshbuf_put_cstring(m, options.authorized_keys_command);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.authorized_keys_command);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2254,7 +2256,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.authorized_keys_command_user).is_null() && {
-        r = sshbuf_put_cstring(m, options.authorized_keys_command_user);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.authorized_keys_command_user);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2270,7 +2272,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.authorized_principals_file).is_null() && {
-        r = sshbuf_put_cstring(m, options.authorized_principals_file);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.authorized_principals_file);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2286,7 +2288,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.authorized_principals_command).is_null() && {
-        r = sshbuf_put_cstring(m, options.authorized_principals_command);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            options.authorized_principals_command,
+        );
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2302,7 +2307,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.authorized_principals_command_user).is_null() && {
-        r = sshbuf_put_cstring(m, options.authorized_principals_command_user);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            options.authorized_principals_command_user,
+        );
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2318,7 +2326,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.hostbased_accepted_algos).is_null() && {
-        r = sshbuf_put_cstring(m, options.hostbased_accepted_algos);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.hostbased_accepted_algos);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2334,7 +2342,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.pubkey_accepted_algos).is_null() && {
-        r = sshbuf_put_cstring(m, options.pubkey_accepted_algos);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.pubkey_accepted_algos);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2350,7 +2358,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.ca_sign_algorithms).is_null() && {
-        r = sshbuf_put_cstring(m, options.ca_sign_algorithms);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.ca_sign_algorithms);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2366,7 +2374,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.routing_domain).is_null() && {
-        r = sshbuf_put_cstring(m, options.routing_domain);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.routing_domain);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2382,7 +2390,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         );
     }
     if !(options.permit_user_env_allowlist).is_null() && {
-        r = sshbuf_put_cstring(m, options.permit_user_env_allowlist);
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, options.permit_user_env_allowlist);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2399,7 +2407,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_authkeys_files {
-        r = sshbuf_put_cstring(m, *(options.authorized_keys_files).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            *(options.authorized_keys_files).offset(i as isize),
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2420,7 +2431,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_allow_users {
-        r = sshbuf_put_cstring(m, *(options.allow_users).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            *(options.allow_users).offset(i as isize),
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2441,7 +2455,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_deny_users {
-        r = sshbuf_put_cstring(m, *(options.deny_users).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            *(options.deny_users).offset(i as isize),
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2462,7 +2479,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_allow_groups {
-        r = sshbuf_put_cstring(m, *(options.allow_groups).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            *(options.allow_groups).offset(i as isize),
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2483,7 +2503,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_deny_groups {
-        r = sshbuf_put_cstring(m, *(options.deny_groups).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            *(options.deny_groups).offset(i as isize),
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2504,7 +2527,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_accept_env {
-        r = sshbuf_put_cstring(m, *(options.accept_env).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            *(options.accept_env).offset(i as isize),
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2525,7 +2551,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_setenv {
-        r = sshbuf_put_cstring(m, *(options.setenv).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, *(options.setenv).offset(i as isize));
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2546,7 +2572,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_auth_methods {
-        r = sshbuf_put_cstring(m, *(options.auth_methods).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            *(options.auth_methods).offset(i as isize),
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2567,7 +2596,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_permitted_opens {
-        r = sshbuf_put_cstring(m, *(options.permitted_opens).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            *(options.permitted_opens).offset(i as isize),
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2588,7 +2620,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_permitted_listens {
-        r = sshbuf_put_cstring(m, *(options.permitted_listens).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            *(options.permitted_listens).offset(i as isize),
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2609,7 +2644,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_channel_timeouts {
-        r = sshbuf_put_cstring(m, *(options.channel_timeouts).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            *(options.channel_timeouts).offset(i as isize),
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2630,7 +2668,10 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     }
     i = 0 as libc::c_int as u_int;
     while i < options.num_log_verbose {
-        r = sshbuf_put_cstring(m, *(options.log_verbose).offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
+            m,
+            *(options.log_verbose).offset(i as isize),
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2690,7 +2731,7 @@ pub unsafe extern "C" fn mm_answer_auth2_read_banner(
     let mut r: libc::c_int = 0;
     crate::sshbuf::sshbuf_reset(m);
     banner = auth2_read_banner();
-    r = sshbuf_put_cstring(
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(
         m,
         if !banner.is_null() {
             banner as *const libc::c_char
@@ -3987,7 +4028,7 @@ pub unsafe extern "C" fn mm_answer_pty(
             pty_setowner((*authctxt).pw, ((*s).tty).as_mut_ptr());
             r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, 1 as libc::c_int as u_int32_t);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_cstring(m, ((*s).tty).as_mut_ptr());
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, ((*s).tty).as_mut_ptr());
                 r != 0 as libc::c_int
             } {
                 sshfatal(

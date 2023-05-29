@@ -193,7 +193,6 @@ extern "C" {
         v: *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -3601,7 +3600,7 @@ unsafe extern "C" fn kex_to_blob(
     r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, (*kex).we_need);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_cstring(m, (*kex).hostkey_alg);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(m, (*kex).hostkey_alg);
             r != 0 as libc::c_int
         }
         || {
@@ -3678,7 +3677,7 @@ unsafe extern "C" fn newkeys_to_blob(
     if b.is_null() {
         return -(2 as libc::c_int);
     }
-    r = sshbuf_put_cstring(b, (*enc).name);
+    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*enc).name);
     if !(r != 0 as libc::c_int
         || {
             r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*enc).enabled as u_int32_t);
@@ -3706,7 +3705,7 @@ unsafe extern "C" fn newkeys_to_blob(
         })
     {
         if cipher_authlen((*enc).cipher) == 0 as libc::c_int as libc::c_uint {
-            r = sshbuf_put_cstring(b, (*mac).name);
+            r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*mac).name);
             if r != 0 as libc::c_int
                 || {
                     r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*mac).enabled as u_int32_t);
@@ -3733,7 +3732,7 @@ unsafe extern "C" fn newkeys_to_blob(
             _ => {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*comp).type_0);
                 if !(r != 0 as libc::c_int || {
-                    r = sshbuf_put_cstring(b, (*comp).name);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*comp).name);
                     r != 0 as libc::c_int
                 }) {
                     r = sshbuf_put_stringb(m, b);
@@ -4169,7 +4168,10 @@ pub unsafe extern "C" fn sshpkt_put_cstring(
     mut ssh: *mut ssh,
     mut v: *const libc::c_void,
 ) -> libc::c_int {
-    return sshbuf_put_cstring((*(*ssh).state).outgoing_packet, v as *const libc::c_char);
+    return crate::sshbuf_getput_basic::sshbuf_put_cstring(
+        (*(*ssh).state).outgoing_packet,
+        v as *const libc::c_char,
+    );
 }
 pub unsafe extern "C" fn sshpkt_put_stringb(
     mut ssh: *mut ssh,

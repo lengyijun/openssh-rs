@@ -261,7 +261,6 @@ extern "C" {
 
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
 
-    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -4246,7 +4245,7 @@ unsafe extern "C" fn prepare_options_buf(
                     b"%s\0" as *const u8 as *const libc::c_char,
                     (*ext).key,
                 );
-                r = sshbuf_put_cstring(c, (*ext).key);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(c, (*ext).key);
                 if r != 0 as libc::c_int || {
                     r = crate::sshbuf_getput_basic::sshbuf_put_string(
                         c,
@@ -4284,10 +4283,10 @@ unsafe extern "C" fn prepare_options_buf(
                     (*ext).val,
                 );
                 crate::sshbuf::sshbuf_reset(b);
-                r = sshbuf_put_cstring(c, (*ext).key);
+                r = crate::sshbuf_getput_basic::sshbuf_put_cstring(c, (*ext).key);
                 if r != 0 as libc::c_int
                     || {
-                        r = sshbuf_put_cstring(b, (*ext).val);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*ext).val);
                         r != 0 as libc::c_int
                     }
                     || {
