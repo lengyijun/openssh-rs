@@ -1,5 +1,5 @@
 use crate::atomicio::atomicio;
-use crate::cipher::sshcipher;
+
 use crate::log::log_init;
 use crate::utf8::msetlocale;
 use ::libc;
@@ -488,7 +488,7 @@ extern "C" {
         nsrksp: *mut size_t,
     ) -> libc::c_int;
     fn sshsk_free_resident_keys(srks: *mut *mut sshsk_resident_key, nsrks: size_t);
-    fn cipher_by_name(_: *const libc::c_char) -> *const sshcipher;
+
     static mut __progname: *mut libc::c_char;
     fn gen_candidates(
         _: *mut libc::FILE,
@@ -8623,7 +8623,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             }
             90 => {
                 openssh_format_cipher = BSDoptarg;
-                if (cipher_by_name(openssh_format_cipher)).is_null() {
+                if (crate::cipher::cipher_by_name(openssh_format_cipher)).is_null() {
                     sshfatal(
                         b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 5], &[libc::c_char; 5]>(b"main\0"))

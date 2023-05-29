@@ -76,7 +76,6 @@ extern "C" {
         stream_size: libc::c_int,
     ) -> libc::c_int;
 
-    fn cipher_by_name(_: *const libc::c_char) -> *const sshcipher;
     fn cipher_warning_message(_: *const sshcipher_ctx) -> *const libc::c_char;
     fn cipher_init(
         _: *mut *mut sshcipher_ctx,
@@ -104,7 +103,7 @@ extern "C" {
         _: u_int,
     ) -> libc::c_int;
     fn cipher_free(_: *mut sshcipher_ctx);
-    fn cipher_authlen(_: *const sshcipher) -> u_int;
+
     fn cipher_is_cbc(_: *const sshcipher) -> u_int;
     fn cipher_ctx_is_plaintext(_: *mut sshcipher_ctx) -> u_int;
     fn cipher_get_keyiv(_: *mut sshcipher_ctx, _: *mut u_char, _: size_t) -> libc::c_int;
@@ -578,7 +577,8 @@ pub unsafe extern "C" fn ssh_packet_set_connection(
     mut fd_out: libc::c_int,
 ) -> *mut ssh {
     let mut state: *mut session_state = 0 as *mut session_state;
-    let mut none: *const sshcipher = cipher_by_name(b"none\0" as *const u8 as *const libc::c_char);
+    let mut none: *const sshcipher =
+        crate::cipher::cipher_by_name(b"none\0" as *const u8 as *const libc::c_char);
     let mut r: libc::c_int = 0;
     if none.is_null() {
         crate::log::sshlog(
@@ -1264,7 +1264,7 @@ pub unsafe extern "C" fn ssh_set_newkeys(mut ssh: *mut ssh, mut mode: libc::c_in
     enc = &mut (**((*state).newkeys).as_mut_ptr().offset(mode as isize)).enc;
     mac = &mut (**((*state).newkeys).as_mut_ptr().offset(mode as isize)).mac;
     comp = &mut (**((*state).newkeys).as_mut_ptr().offset(mode as isize)).comp;
-    if cipher_authlen((*enc).cipher) == 0 as libc::c_int as libc::c_uint {
+    if crate::cipher::cipher_authlen((*enc).cipher) == 0 as libc::c_int as libc::c_uint {
         r = crate::mac::mac_init(mac);
         if r != 0 as libc::c_int {
             return r;
@@ -1494,7 +1494,7 @@ pub unsafe extern "C" fn ssh_packet_send2_wrapped(mut ssh: *mut ssh) -> libc::c_
             .as_mut_ptr()
             .offset(MODE_OUT as libc::c_int as isize))
         .comp;
-        authlen = cipher_authlen((*enc).cipher);
+        authlen = crate::cipher::cipher_authlen((*enc).cipher);
         if authlen != 0 as libc::c_int as libc::c_uint {
             mac = 0 as *mut sshmac;
         }
@@ -2148,7 +2148,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
             .as_mut_ptr()
             .offset(MODE_IN as libc::c_int as isize))
         .comp;
-        authlen = cipher_authlen((*enc).cipher);
+        authlen = crate::cipher::cipher_authlen((*enc).cipher);
         if authlen != 0 as libc::c_int as libc::c_uint {
             mac = 0 as *mut sshmac;
         }
@@ -3545,7 +3545,7 @@ unsafe extern "C" fn newkeys_to_blob(
             r != 0 as libc::c_int
         })
     {
-        if cipher_authlen((*enc).cipher) == 0 as libc::c_int as libc::c_uint {
+        if crate::cipher::cipher_authlen((*enc).cipher) == 0 as libc::c_int as libc::c_uint {
             r = crate::sshbuf_getput_basic::sshbuf_put_cstring(b, (*mac).name);
             if r != 0 as libc::c_int
                 || {
@@ -3714,11 +3714,13 @@ unsafe extern "C" fn newkeys_from_blob(
                     r != 0 as libc::c_int
                 })
             {
-                (*enc).cipher = cipher_by_name((*enc).name);
+                (*enc).cipher = crate::cipher::cipher_by_name((*enc).name);
                 if ((*enc).cipher).is_null() {
                     r = -(4 as libc::c_int);
                 } else {
-                    if cipher_authlen((*enc).cipher) == 0 as libc::c_int as libc::c_uint {
+                    if crate::cipher::cipher_authlen((*enc).cipher)
+                        == 0 as libc::c_int as libc::c_uint
+                    {
                         r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
                             b,
                             &mut (*mac).name,

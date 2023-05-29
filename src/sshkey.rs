@@ -241,11 +241,7 @@ extern "C" {
         _: u_int,
         _: libc::c_int,
     ) -> libc::c_int;
-    fn cipher_by_name(_: *const libc::c_char) -> *const sshcipher;
-    fn cipher_blocksize(_: *const sshcipher) -> u_int;
-    fn cipher_keylen(_: *const sshcipher) -> u_int;
-    fn cipher_authlen(_: *const sshcipher) -> u_int;
-    fn cipher_ivlen(_: *const sshcipher) -> u_int;
+
     fn ssh_digest_alg_name(alg: libc::c_int) -> *const libc::c_char;
 
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -2303,10 +2299,11 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
         shield_prekey_len: 0,
     };
     let mut r: libc::c_int = -(1 as libc::c_int);
-    cipher = cipher_by_name(b"aes256-ctr\0" as *const u8 as *const libc::c_char);
+    cipher = crate::cipher::cipher_by_name(b"aes256-ctr\0" as *const u8 as *const libc::c_char);
     if cipher.is_null() {
         r = -(10 as libc::c_int);
-    } else if (cipher_keylen(cipher)).wrapping_add(cipher_ivlen(cipher)) as libc::c_ulong
+    } else if (crate::cipher::cipher_keylen(cipher))
+        .wrapping_add(crate::cipher::cipher_ivlen(cipher)) as libc::c_ulong
         > crate::digest_openssl::ssh_digest_bytes(4 as libc::c_int)
     {
         r = -(1 as libc::c_int);
@@ -2331,9 +2328,11 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
                     &mut cctx,
                     cipher,
                     keyiv.as_mut_ptr(),
-                    cipher_keylen(cipher),
-                    keyiv.as_mut_ptr().offset(cipher_keylen(cipher) as isize),
-                    cipher_ivlen(cipher),
+                    crate::cipher::cipher_keylen(cipher),
+                    keyiv
+                        .as_mut_ptr()
+                        .offset(crate::cipher::cipher_keylen(cipher) as isize),
+                    crate::cipher::cipher_ivlen(cipher),
                     1 as libc::c_int,
                 );
                 if !(r != 0 as libc::c_int) {
@@ -2348,9 +2347,9 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
                         if !(r != 0 as libc::c_int) {
                             i = 0 as libc::c_int as size_t;
                             loop {
-                                if !((crate::sshbuf::sshbuf_len(prvbuf))
-                                    .wrapping_rem(cipher_blocksize(cipher) as libc::c_ulong)
-                                    != 0)
+                                if !((crate::sshbuf::sshbuf_len(prvbuf)).wrapping_rem(
+                                    crate::cipher::cipher_blocksize(cipher) as libc::c_ulong,
+                                ) != 0)
                                 {
                                     current_block = 5948590327928692120;
                                     break;
@@ -2505,15 +2504,17 @@ pub unsafe extern "C" fn sshkey_unshield_private(mut k: *mut sshkey) -> libc::c_
     if sshkey_is_shielded(k) == 0 {
         return 0 as libc::c_int;
     }
-    cipher = cipher_by_name(b"aes256-ctr\0" as *const u8 as *const libc::c_char);
+    cipher = crate::cipher::cipher_by_name(b"aes256-ctr\0" as *const u8 as *const libc::c_char);
     if cipher.is_null() {
         r = -(10 as libc::c_int);
-    } else if (cipher_keylen(cipher)).wrapping_add(cipher_ivlen(cipher)) as libc::c_ulong
+    } else if (crate::cipher::cipher_keylen(cipher))
+        .wrapping_add(crate::cipher::cipher_ivlen(cipher)) as libc::c_ulong
         > crate::digest_openssl::ssh_digest_bytes(4 as libc::c_int)
     {
         r = -(1 as libc::c_int);
-    } else if (*k).shielded_len < cipher_blocksize(cipher) as libc::c_ulong
-        || ((*k).shielded_len).wrapping_rem(cipher_blocksize(cipher) as libc::c_ulong)
+    } else if (*k).shielded_len < crate::cipher::cipher_blocksize(cipher) as libc::c_ulong
+        || ((*k).shielded_len)
+            .wrapping_rem(crate::cipher::cipher_blocksize(cipher) as libc::c_ulong)
             != 0 as libc::c_int as libc::c_ulong
     {
         r = -(4 as libc::c_int);
@@ -2530,9 +2531,11 @@ pub unsafe extern "C" fn sshkey_unshield_private(mut k: *mut sshkey) -> libc::c_
                 &mut cctx,
                 cipher,
                 keyiv.as_mut_ptr(),
-                cipher_keylen(cipher),
-                keyiv.as_mut_ptr().offset(cipher_keylen(cipher) as isize),
-                cipher_ivlen(cipher),
+                crate::cipher::cipher_keylen(cipher),
+                keyiv
+                    .as_mut_ptr()
+                    .offset(crate::cipher::cipher_keylen(cipher) as isize),
+                crate::cipher::cipher_ivlen(cipher),
                 0 as libc::c_int,
             );
             if !(r != 0 as libc::c_int) {
@@ -4009,7 +4012,7 @@ unsafe extern "C" fn sshkey_private_to_blob2(
     } else if ciphername.is_null() {
         ciphername = b"aes256-ctr\0" as *const u8 as *const libc::c_char;
     }
-    cipher = cipher_by_name(ciphername);
+    cipher = crate::cipher::cipher_by_name(ciphername);
     if cipher.is_null() {
         r = -(10 as libc::c_int);
     } else {
@@ -4026,10 +4029,10 @@ unsafe extern "C" fn sshkey_private_to_blob2(
         {
             r = -(2 as libc::c_int);
         } else {
-            blocksize = cipher_blocksize(cipher) as size_t;
-            keylen = cipher_keylen(cipher) as size_t;
-            ivlen = cipher_ivlen(cipher) as size_t;
-            authlen = cipher_authlen(cipher) as size_t;
+            blocksize = crate::cipher::cipher_blocksize(cipher) as size_t;
+            keylen = crate::cipher::cipher_keylen(cipher) as size_t;
+            ivlen = crate::cipher::cipher_ivlen(cipher) as size_t;
+            authlen = crate::cipher::cipher_authlen(cipher) as size_t;
             key = calloc(
                 1 as libc::c_int as libc::c_ulong,
                 keylen.wrapping_add(ivlen),
@@ -4468,7 +4471,7 @@ unsafe extern "C" fn private2_decrypt(
                     r = crate::sshbuf_getput_basic::sshbuf_get_u32(decoded, &mut encrypted_len);
                     r != 0 as libc::c_int
                 }) {
-                    cipher = cipher_by_name(ciphername);
+                    cipher = crate::cipher::cipher_by_name(ciphername);
                     if cipher.is_null() {
                         r = -(42 as libc::c_int);
                     } else if libc::strcmp(kdfname, b"none\0" as *const u8 as *const libc::c_char)
@@ -4490,16 +4493,16 @@ unsafe extern "C" fn private2_decrypt(
                     {
                         r = -(43 as libc::c_int);
                     } else {
-                        blocksize = cipher_blocksize(cipher);
+                        blocksize = crate::cipher::cipher_blocksize(cipher);
                         if encrypted_len < blocksize
                             || encrypted_len.wrapping_rem(blocksize)
                                 != 0 as libc::c_int as libc::c_uint
                         {
                             r = -(4 as libc::c_int);
                         } else {
-                            keylen = cipher_keylen(cipher) as size_t;
-                            ivlen = cipher_ivlen(cipher) as size_t;
-                            authlen = cipher_authlen(cipher) as size_t;
+                            keylen = crate::cipher::cipher_keylen(cipher) as size_t;
+                            ivlen = crate::cipher::cipher_ivlen(cipher) as size_t;
+                            authlen = crate::cipher::cipher_authlen(cipher) as size_t;
                             key = calloc(
                                 1 as libc::c_int as libc::c_ulong,
                                 keylen.wrapping_add(ivlen),

@@ -53,12 +53,6 @@ extern "C" {
     fn sshpkt_ptr(_: *mut ssh, lenp: *mut size_t) -> *const u_char;
     fn compat_banner(_: *mut ssh, _: *const libc::c_char);
     fn compat_kex_proposal(_: *mut ssh, _: *const libc::c_char) -> *mut libc::c_char;
-    fn cipher_ivlen(_: *const sshcipher) -> u_int;
-    fn cipher_authlen(_: *const sshcipher) -> u_int;
-    fn cipher_seclen(_: *const sshcipher) -> u_int;
-    fn cipher_keylen(_: *const sshcipher) -> u_int;
-    fn cipher_blocksize(_: *const sshcipher) -> u_int;
-    fn cipher_by_name(_: *const libc::c_char) -> *const sshcipher;
 
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_alg_list(
@@ -1805,7 +1799,7 @@ unsafe extern "C" fn choose_enc(
     if name.is_null() {
         return -(31 as libc::c_int);
     }
-    (*enc).cipher = cipher_by_name(name);
+    (*enc).cipher = crate::cipher::cipher_by_name(name);
     if ((*enc).cipher).is_null() {
         crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
@@ -1823,10 +1817,10 @@ unsafe extern "C" fn choose_enc(
     (*enc).name = name;
     (*enc).enabled = 0 as libc::c_int;
     (*enc).iv = 0 as *mut u_char;
-    (*enc).iv_len = cipher_ivlen((*enc).cipher);
+    (*enc).iv_len = crate::cipher::cipher_ivlen((*enc).cipher);
     (*enc).key = 0 as *mut u_char;
-    (*enc).key_len = cipher_keylen((*enc).cipher);
-    (*enc).block_size = cipher_blocksize((*enc).cipher);
+    (*enc).key_len = crate::cipher::cipher_keylen((*enc).cipher);
+    (*enc).block_size = crate::cipher::cipher_blocksize((*enc).cipher);
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn choose_mac(
@@ -2202,7 +2196,7 @@ unsafe extern "C" fn kex_choose_conf(mut ssh: *mut ssh) -> libc::c_int {
                                 current_block = 11763037568314306996;
                                 break;
                             } else {
-                                authlen = cipher_authlen((*newkeys).enc.cipher);
+                                authlen = crate::cipher::cipher_authlen((*newkeys).enc.cipher);
                                 if authlen == 0 as libc::c_int as libc::c_uint && {
                                     r = choose_mac(
                                         ssh,
@@ -2296,10 +2290,12 @@ unsafe extern "C" fn kex_choose_conf(mut ssh: *mut ssh) -> libc::c_int {
                                 } else {
                                     (*newkeys).mac.key_len
                                 };
-                                dh_need = if dh_need > cipher_seclen((*newkeys).enc.cipher) {
+                                dh_need = if dh_need
+                                    > crate::cipher::cipher_seclen((*newkeys).enc.cipher)
+                                {
                                     dh_need
                                 } else {
-                                    cipher_seclen((*newkeys).enc.cipher)
+                                    crate::cipher::cipher_seclen((*newkeys).enc.cipher)
                                 };
                                 dh_need = if dh_need > (*newkeys).enc.block_size {
                                     dh_need
