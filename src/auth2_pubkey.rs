@@ -20,9 +20,6 @@ extern "C" {
 
     fn sshpkt_getb_froms(ssh: *mut ssh, valp: *mut *mut crate::sshbuf::sshbuf) -> libc::c_int;
 
-    fn sshpkt_get_string(ssh: *mut ssh, valp: *mut *mut u_char, lenp: *mut size_t) -> libc::c_int;
-    fn sshpkt_get_u8(ssh: *mut ssh, valp: *mut u_char) -> libc::c_int;
-
     fn sshpkt_put_string(ssh: *mut ssh, v: *const libc::c_void, len: size_t) -> libc::c_int;
 
     fn ssh_remote_port(_: *mut ssh) -> libc::c_int;
@@ -582,14 +579,14 @@ unsafe extern "C" fn userauth_pubkey(
         method,
         b"publickey-hostbound-v00@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int) as libc::c_int;
-    r = sshpkt_get_u8(ssh, &mut have_sig);
+    r = crate::packet::sshpkt_get_u8(ssh, &mut have_sig);
     if r != 0 as libc::c_int
         || {
             r = crate::packet::sshpkt_get_cstring(ssh, &mut pkalg, 0 as *mut size_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_string(ssh, &mut pkblob, &mut blen);
+            r = crate::packet::sshpkt_get_string(ssh, &mut pkblob, &mut blen);
             r != 0 as libc::c_int
         }
     {
@@ -854,7 +851,7 @@ unsafe extern "C" fn userauth_pubkey(
                                 ca_s as *const libc::c_char
                             },
                         );
-                        r = sshpkt_get_string(ssh, &mut sig, &mut slen);
+                        r = crate::packet::sshpkt_get_string(ssh, &mut sig, &mut slen);
                         if r != 0 as libc::c_int || {
                             r = crate::packet::sshpkt_get_end(ssh);
                             r != 0 as libc::c_int

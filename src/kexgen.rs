@@ -94,7 +94,6 @@ extern "C" {
     fn sshpkt_put_stringb(ssh: *mut ssh, v: *const crate::sshbuf::sshbuf) -> libc::c_int;
 
     fn sshpkt_getb_froms(ssh: *mut ssh, valp: *mut *mut crate::sshbuf::sshbuf) -> libc::c_int;
-    fn sshpkt_get_string(ssh: *mut ssh, valp: *mut *mut u_char, lenp: *mut size_t) -> libc::c_int;
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
@@ -369,7 +368,7 @@ unsafe extern "C" fn input_kex_gen_reply(
                     r = sshpkt_getb_froms(ssh, &mut server_blob);
                     if !(r != 0 as libc::c_int
                         || {
-                            r = sshpkt_get_string(ssh, &mut signature, &mut slen);
+                            r = crate::packet::sshpkt_get_string(ssh, &mut signature, &mut slen);
                             r != 0 as libc::c_int
                         }
                         || {

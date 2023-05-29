@@ -13,8 +13,6 @@ extern "C" {
     fn sshpkt_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> libc::c_int;
     fn sshpkt_fatal(ssh: *mut ssh, r: libc::c_int, fmt: *const libc::c_char, _: ...) -> !;
 
-    fn sshpkt_put_u32(ssh: *mut ssh, val: u_int32_t) -> libc::c_int;
-
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -79,7 +77,7 @@ pub unsafe extern "C" fn dispatch_protocol_error(
     r = crate::packet::sshpkt_start(ssh, 3 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshpkt_put_u32(ssh, seq);
+            r = crate::packet::sshpkt_put_u32(ssh, seq);
             r != 0 as libc::c_int
         }
         || {

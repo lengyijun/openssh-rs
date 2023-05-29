@@ -19,10 +19,6 @@ extern "C" {
         _: *const libc::c_char,
     ) -> libc::c_int;
 
-    fn sshpkt_put_u32(ssh: *mut ssh, val: u_int32_t) -> libc::c_int;
-
-    fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
-
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn sshfatal(
@@ -448,7 +444,7 @@ unsafe extern "C" fn send_userauth_info_request(mut ssh: *mut ssh) -> libc::c_in
             r != 0 as libc::c_int as libc::c_uint
         }
         || {
-            r = sshpkt_put_u32(ssh, (*kbdintctxt).nreq) as u_int;
+            r = crate::packet::sshpkt_put_u32(ssh, (*kbdintctxt).nreq) as u_int;
             r != 0 as libc::c_int as libc::c_uint
         }
     {
@@ -579,7 +575,7 @@ unsafe extern "C" fn input_userauth_info_response(
         );
     }
     (*authctxt).postponed = 0 as libc::c_int;
-    r = sshpkt_get_u32(ssh, &mut nresp);
+    r = crate::packet::sshpkt_get_u32(ssh, &mut nresp);
     if r != 0 as libc::c_int {
         sshfatal(
             b"auth2-chall.c\0" as *const u8 as *const libc::c_char,

@@ -6,7 +6,6 @@ extern "C" {
 
     fn freezero(_: *mut libc::c_void, _: size_t);
 
-    fn sshpkt_get_u8(ssh: *mut ssh, valp: *mut u_char) -> libc::c_int;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn sshfatal(
@@ -269,7 +268,7 @@ unsafe extern "C" fn userauth_passwd(
     let mut r: libc::c_int = 0;
     let mut change: u_char = 0;
     let mut len: size_t = 0 as libc::c_int as size_t;
-    r = sshpkt_get_u8(ssh, &mut change);
+    r = crate::packet::sshpkt_get_u8(ssh, &mut change);
     if r != 0 as libc::c_int
         || {
             r = crate::packet::sshpkt_get_cstring(ssh, &mut password, &mut len);

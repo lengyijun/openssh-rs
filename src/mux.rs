@@ -165,7 +165,6 @@ extern "C" {
     fn chan_rcvd_oclose(_: *mut ssh, _: *mut Channel);
     fn chan_read_failed(_: *mut ssh, _: *mut Channel);
     fn chan_write_failed(_: *mut ssh, _: *mut Channel);
-    fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
 
     fn mm_send_fd(_: libc::c_int, _: libc::c_int) -> libc::c_int;
     fn mm_receive_fd(_: libc::c_int) -> libc::c_int;
@@ -1976,7 +1975,7 @@ unsafe extern "C" fn mux_confirm_remote_forward(
         );
         if type_0 == 81 as libc::c_int {
             if (*rfwd).listen_port == 0 as libc::c_int {
-                r = sshpkt_get_u32(ssh, &mut port);
+                r = crate::packet::sshpkt_get_u32(ssh, &mut port);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"mux.c\0" as *const u8 as *const libc::c_char,

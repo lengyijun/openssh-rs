@@ -49,14 +49,11 @@ extern "C" {
     fn ssh_packet_remaining(_: *mut ssh) -> libc::c_int;
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
     fn ssh_remote_port(_: *mut ssh) -> libc::c_int;
-    fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshpkt_get_string(ssh: *mut ssh, valp: *mut *mut u_char, lenp: *mut size_t) -> libc::c_int;
 
     fn sshpkt_put_string(ssh: *mut ssh, v: *const libc::c_void, len: size_t) -> libc::c_int;
-    fn sshpkt_put_u32(ssh: *mut ssh, val: u_int32_t) -> libc::c_int;
 
     fn sshpkt_putb(ssh: *mut ssh, b: *const crate::sshbuf::sshbuf) -> libc::c_int;
-    fn sshpkt_get_u8(ssh: *mut ssh, valp: *mut u_char) -> libc::c_int;
+
     fn sshpkt_add_padding(_: *mut ssh, _: u_char) -> libc::c_int;
 
     fn ssh_packet_set_rekey_limits(_: *mut ssh, _: u_int64_t, _: u_int32_t);
@@ -1476,7 +1473,7 @@ unsafe extern "C" fn input_userauth_failure(
     }
     if !(crate::packet::sshpkt_get_cstring(ssh, &mut authlist, 0 as *mut size_t)
         != 0 as libc::c_int
-        || sshpkt_get_u8(ssh, &mut partial) != 0 as libc::c_int
+        || crate::packet::sshpkt_get_u8(ssh, &mut partial) != 0 as libc::c_int
         || crate::packet::sshpkt_get_end(ssh) != 0 as libc::c_int)
     {
         if partial as libc::c_int != 0 as libc::c_int {
@@ -1596,7 +1593,7 @@ unsafe extern "C" fn input_userauth_pk_ok(
     r = crate::packet::sshpkt_get_cstring(ssh, &mut pkalg, 0 as *mut size_t);
     if !(r != 0 as libc::c_int
         || {
-            r = sshpkt_get_string(ssh, &mut pkblob, &mut blen);
+            r = crate::packet::sshpkt_get_string(ssh, &mut pkblob, &mut blen);
             r != 0 as libc::c_int
         }
         || {
@@ -3785,11 +3782,11 @@ unsafe extern "C" fn input_userauth_info_req(
                 inst,
             );
         }
-        r = sshpkt_get_u32(ssh, &mut num_prompts);
+        r = crate::packet::sshpkt_get_u32(ssh, &mut num_prompts);
         if !(r != 0 as libc::c_int) {
             r = crate::packet::sshpkt_start(ssh, 61 as libc::c_int as u_char);
             if !(r != 0 as libc::c_int || {
-                r = sshpkt_put_u32(ssh, num_prompts);
+                r = crate::packet::sshpkt_put_u32(ssh, num_prompts);
                 r != 0 as libc::c_int
             }) {
                 crate::log::sshlog(
@@ -3813,7 +3810,7 @@ unsafe extern "C" fn input_userauth_info_req(
                     }
                     r = crate::packet::sshpkt_get_cstring(ssh, &mut prompt, 0 as *mut size_t);
                     if r != 0 as libc::c_int || {
-                        r = sshpkt_get_u8(ssh, &mut echo);
+                        r = crate::packet::sshpkt_get_u8(ssh, &mut echo);
                         r != 0 as libc::c_int
                     } {
                         current_block = 2494389617458814963;

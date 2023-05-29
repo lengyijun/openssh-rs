@@ -68,7 +68,6 @@ extern "C" {
 
     fn sshpkt_get_bignum2(ssh: *mut ssh, valp: *mut *mut BIGNUM) -> libc::c_int;
 
-    fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
     fn choose_dh(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> *mut DH;
     fn dh_gen_key(_: *mut DH, _: libc::c_int) -> libc::c_int;
     static mut use_privsep: libc::c_int;
@@ -173,14 +172,14 @@ unsafe extern "C" fn input_kex_dh_gex_request(
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    r = sshpkt_get_u32(ssh, &mut min);
+    r = crate::packet::sshpkt_get_u32(ssh, &mut min);
     if !(r != 0 as libc::c_int
         || {
-            r = sshpkt_get_u32(ssh, &mut nbits);
+            r = crate::packet::sshpkt_get_u32(ssh, &mut nbits);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_u32(ssh, &mut max);
+            r = crate::packet::sshpkt_get_u32(ssh, &mut max);
             r != 0 as libc::c_int
         }
         || {

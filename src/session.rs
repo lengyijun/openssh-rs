@@ -115,11 +115,6 @@ extern "C" {
     fn pty_setowner(_: *mut libc::passwd, _: *const libc::c_char);
     fn sshpkt_fmt_connection_id(ssh: *mut ssh, s: *mut libc::c_char, l: size_t);
 
-    fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshpkt_get_u8(ssh: *mut ssh, valp: *mut u_char) -> libc::c_int;
-
-    fn sshpkt_put_u32(ssh: *mut ssh, val: u_int32_t) -> libc::c_int;
-
     fn sshpkt_fatal(ssh: *mut ssh, r: libc::c_int, fmt: *const libc::c_char, _: ...) -> !;
 
     fn ssh_local_port(_: *mut ssh) -> libc::c_int;
@@ -3073,18 +3068,18 @@ unsafe extern "C" fn session_window_change_req(
     mut s: *mut Session,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    r = sshpkt_get_u32(ssh, &mut (*s).col);
+    r = crate::packet::sshpkt_get_u32(ssh, &mut (*s).col);
     if r != 0 as libc::c_int
         || {
-            r = sshpkt_get_u32(ssh, &mut (*s).row);
+            r = crate::packet::sshpkt_get_u32(ssh, &mut (*s).row);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_u32(ssh, &mut (*s).xpixel);
+            r = crate::packet::sshpkt_get_u32(ssh, &mut (*s).xpixel);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_u32(ssh, &mut (*s).ypixel);
+            r = crate::packet::sshpkt_get_u32(ssh, &mut (*s).ypixel);
             r != 0 as libc::c_int
         }
         || {
@@ -3130,19 +3125,19 @@ unsafe extern "C" fn session_pty_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
     r = crate::packet::sshpkt_get_cstring(ssh, &mut (*s).term, 0 as *mut size_t);
     if r != 0 as libc::c_int
         || {
-            r = sshpkt_get_u32(ssh, &mut (*s).col);
+            r = crate::packet::sshpkt_get_u32(ssh, &mut (*s).col);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_u32(ssh, &mut (*s).row);
+            r = crate::packet::sshpkt_get_u32(ssh, &mut (*s).row);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_u32(ssh, &mut (*s).xpixel);
+            r = crate::packet::sshpkt_get_u32(ssh, &mut (*s).xpixel);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_u32(ssh, &mut (*s).ypixel);
+            r = crate::packet::sshpkt_get_u32(ssh, &mut (*s).ypixel);
             r != 0 as libc::c_int
         }
     {
@@ -3367,7 +3362,7 @@ unsafe extern "C" fn session_x11_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
         );
         return 0 as libc::c_int;
     }
-    r = sshpkt_get_u8(ssh, &mut single_connection);
+    r = crate::packet::sshpkt_get_u8(ssh, &mut single_connection);
     if r != 0 as libc::c_int
         || {
             r = crate::packet::sshpkt_get_cstring(ssh, &mut (*s).auth_proto, 0 as *mut size_t);
@@ -3378,7 +3373,7 @@ unsafe extern "C" fn session_x11_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_u32(ssh, &mut (*s).screen);
+            r = crate::packet::sshpkt_get_u32(ssh, &mut (*s).screen);
             r != 0 as libc::c_int
         }
         || {
@@ -3465,7 +3460,7 @@ unsafe extern "C" fn session_exec_req(mut ssh: *mut ssh, mut s: *mut Session) ->
 }
 unsafe extern "C" fn session_break_req(mut ssh: *mut ssh, mut s: *mut Session) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    r = sshpkt_get_u32(ssh, 0 as *mut u_int32_t);
+    r = crate::packet::sshpkt_get_u32(ssh, 0 as *mut u_int32_t);
     if r != 0 as libc::c_int || {
         r = crate::packet::sshpkt_get_end(ssh);
         r != 0 as libc::c_int
@@ -4127,7 +4122,7 @@ unsafe extern "C" fn session_exit_message(
             b"libc::exit-status\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             0 as libc::c_int,
         );
-        r = sshpkt_put_u32(
+        r = crate::packet::sshpkt_put_u32(
             ssh,
             ((status & 0xff00 as libc::c_int) >> 8 as libc::c_int) as u_int32_t,
         );
