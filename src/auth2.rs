@@ -42,13 +42,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn auth_log(
-        _: *mut ssh,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-    );
     fn auth_maxtries_exceeded(_: *mut ssh) -> !;
     fn getpwnamallow(_: *mut ssh, user: *const libc::c_char) -> *mut libc::passwd;
     fn auth_root_allowed(_: *mut ssh, _: *const libc::c_char) -> libc::c_int;
@@ -949,7 +942,7 @@ pub unsafe extern "C" fn userauth_finish(
             partial = 1 as libc::c_int;
         }
     }
-    auth_log(ssh, authenticated, partial, method, submethod);
+    crate::auth::auth_log(ssh, authenticated, partial, method, submethod);
     if authenticated != 0 || partial != 0 {
         auth2_update_session_info(authctxt, method, submethod);
     }

@@ -137,13 +137,7 @@ extern "C" {
     fn auth2_record_key(_: *mut Authctxt, _: libc::c_int, _: *const crate::sshkey::sshkey);
     fn auth2_record_info(authctxt_0: *mut Authctxt, _: *const libc::c_char, _: ...);
     fn auth2_update_session_info(_: *mut Authctxt, _: *const libc::c_char, _: *const libc::c_char);
-    fn auth_log(
-        _: *mut ssh,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-    );
+
     fn auth_root_allowed(_: *mut ssh, _: *const libc::c_char) -> libc::c_int;
     fn auth2_read_banner() -> *mut libc::c_char;
     fn auth2_update_methods_lists(
@@ -1036,7 +1030,7 @@ pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor: 
             }
         }
         if (*ent).flags & (0x8 as libc::c_int | 0x20 as libc::c_int) != 0 {
-            auth_log(ssh, authenticated, partial, auth_method, auth_submethod);
+            crate::auth::auth_log(ssh, authenticated, partial, auth_method, auth_submethod);
             if partial == 0 && authenticated == 0 {
                 (*authctxt).failures += 1;
                 (*authctxt).failures;
@@ -2948,7 +2942,7 @@ pub unsafe extern "C" fn mm_answer_keyallowed(
         hostbased_cuser = cuser;
         hostbased_chost = chost;
     } else {
-        auth_log(
+        crate::auth::auth_log(
             ssh,
             0 as libc::c_int,
             0 as libc::c_int,
