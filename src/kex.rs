@@ -45,18 +45,11 @@ extern "C" {
     fn ssh_packet_get_connection_out(_: *mut ssh) -> libc::c_int;
     fn sshpkt_putb(ssh: *mut ssh, b: *const crate::sshbuf::sshbuf) -> libc::c_int;
     fn sshpkt_put_u32(ssh: *mut ssh, val: u_int32_t) -> libc::c_int;
-    fn sshpkt_put_cstring(ssh: *mut ssh, v: *const libc::c_void) -> libc::c_int;
-    fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
+
     fn sshpkt_get_string(ssh: *mut ssh, valp: *mut *mut u_char, lenp: *mut size_t) -> libc::c_int;
     fn sshpkt_get_u8(ssh: *mut ssh, valp: *mut u_char) -> libc::c_int;
     fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshpkt_get_cstring(
-        ssh: *mut ssh,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
+
     fn sshpkt_ptr(_: *mut ssh, lenp: *mut size_t) -> *const u_char;
     fn compat_banner(_: *mut ssh, _: *const libc::c_char);
     fn compat_kex_proposal(_: *mut ssh, _: *const libc::c_char) -> *mut libc::c_char;
@@ -1060,14 +1053,14 @@ pub unsafe extern "C" fn kex_protocol_error(
         type_0,
         seq,
     );
-    r = sshpkt_start(ssh, 3 as libc::c_int as u_char);
+    r = crate::packet::sshpkt_start(ssh, 3 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshpkt_put_u32(ssh, seq);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_send(ssh);
+            r = crate::packet::sshpkt_send(ssh);
             r != 0 as libc::c_int
         }
     {
@@ -1108,25 +1101,25 @@ unsafe extern "C" fn kex_send_ext_info(mut ssh: *mut ssh) -> libc::c_int {
     if algs.is_null() {
         return -(2 as libc::c_int);
     }
-    r = sshpkt_start(ssh, 7 as libc::c_int as u_char);
+    r = crate::packet::sshpkt_start(ssh, 7 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshpkt_put_u32(ssh, 2 as libc::c_int as u_int32_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_put_cstring(
+            r = crate::packet::sshpkt_put_cstring(
                 ssh,
                 b"server-sig-algs\0" as *const u8 as *const libc::c_char as *const libc::c_void,
             );
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_put_cstring(ssh, algs as *const libc::c_void);
+            r = crate::packet::sshpkt_put_cstring(ssh, algs as *const libc::c_void);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_put_cstring(
+            r = crate::packet::sshpkt_put_cstring(
                 ssh,
                 b"publickey-hostbound@openssh.com\0" as *const u8 as *const libc::c_char
                     as *const libc::c_void,
@@ -1134,14 +1127,14 @@ unsafe extern "C" fn kex_send_ext_info(mut ssh: *mut ssh) -> libc::c_int {
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_put_cstring(
+            r = crate::packet::sshpkt_put_cstring(
                 ssh,
                 b"0\0" as *const u8 as *const libc::c_char as *const libc::c_void,
             );
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_send(ssh);
+            r = crate::packet::sshpkt_send(ssh);
             r != 0 as libc::c_int
         }
     {
@@ -1164,9 +1157,9 @@ unsafe extern "C" fn kex_send_ext_info(mut ssh: *mut ssh) -> libc::c_int {
 pub unsafe extern "C" fn kex_send_newkeys(mut ssh: *mut ssh) -> libc::c_int {
     let mut r: libc::c_int = 0;
     kex_reset_dispatch(ssh);
-    r = sshpkt_start(ssh, 21 as libc::c_int as u_char);
+    r = crate::packet::sshpkt_start(ssh, 21 as libc::c_int as u_char);
     if r != 0 as libc::c_int || {
-        r = sshpkt_send(ssh);
+        r = crate::packet::sshpkt_send(ssh);
         r != 0 as libc::c_int
     } {
         return r;
@@ -1259,7 +1252,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
     }
     i = 0 as libc::c_int as u_int32_t;
     while i < ninfo {
-        r = sshpkt_get_cstring(ssh, &mut name, 0 as *mut size_t);
+        r = crate::packet::sshpkt_get_cstring(ssh, &mut name, 0 as *mut size_t);
         if r != 0 as libc::c_int {
             return r;
         }
@@ -1381,7 +1374,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
         i = i.wrapping_add(1);
         i;
     }
-    return sshpkt_get_end(ssh);
+    return crate::packet::sshpkt_get_end(ssh);
 }
 unsafe extern "C" fn kex_input_newkeys(
     mut _type_0: libc::c_int,
@@ -1416,7 +1409,7 @@ unsafe extern "C" fn kex_input_newkeys(
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    r = sshpkt_get_end(ssh);
+    r = crate::packet::sshpkt_get_end(ssh);
     if r != 0 as libc::c_int {
         return r;
     }
@@ -1483,14 +1476,14 @@ pub unsafe extern "C" fn kex_send_kexinit(mut ssh: *mut ssh) -> libc::c_int {
         return -(1 as libc::c_int);
     }
     arc4random_buf(cookie as *mut libc::c_void, 16 as libc::c_int as size_t);
-    r = sshpkt_start(ssh, 20 as libc::c_int as u_char);
+    r = crate::packet::sshpkt_start(ssh, 20 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshpkt_putb(ssh, (*kex).my);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_send(ssh);
+            r = crate::packet::sshpkt_send(ssh);
             r != 0 as libc::c_int
         }
     {
@@ -1602,7 +1595,7 @@ pub unsafe extern "C" fn kex_input_kexinit(
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_end(ssh);
+            r = crate::packet::sshpkt_get_end(ssh);
             r != 0 as libc::c_int
         }
     {

@@ -37,12 +37,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
     fn sshpkt_fmt_connection_id(ssh: *mut ssh, s: *mut libc::c_char, l: size_t);
-    fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
-    fn sshpkt_get_cstring(
-        ssh: *mut ssh,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
+
     fn sshpkt_get_string_direct(
         ssh: *mut ssh,
         valp: *mut *const u_char,
@@ -50,13 +45,12 @@ extern "C" {
     ) -> libc::c_int;
     fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
     fn sshpkt_get_u8(ssh: *mut ssh, valp: *mut u_char) -> libc::c_int;
-    fn sshpkt_put_cstring(ssh: *mut ssh, v: *const libc::c_void) -> libc::c_int;
+
     fn sshpkt_put_u32(ssh: *mut ssh, val: u_int32_t) -> libc::c_int;
-    fn sshpkt_put_u8(ssh: *mut ssh, val: u_char) -> libc::c_int;
+
     fn sshpkt_putb(ssh: *mut ssh, b: *const crate::sshbuf::sshbuf) -> libc::c_int;
     fn sshpkt_fatal(ssh: *mut ssh, r: libc::c_int, fmt: *const libc::c_char, _: ...) -> !;
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
-    fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
+
     fn ssh_packet_get_rekey_timeout(_: *mut ssh) -> time_t;
     fn ssh_remote_port(_: *mut ssh) -> libc::c_int;
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
@@ -734,10 +728,10 @@ unsafe extern "C" fn client_alive_check(mut ssh: *mut ssh) {
     }
     channel_id = channel_find_open(ssh);
     if channel_id == -(1 as libc::c_int) {
-        r = sshpkt_start(ssh, 80 as libc::c_int as u_char);
+        r = crate::packet::sshpkt_start(ssh, 80 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
-                r = sshpkt_put_cstring(
+                r = crate::packet::sshpkt_put_cstring(
                     ssh,
                     b"keepalive@openssh.com\0" as *const u8 as *const libc::c_char
                         as *const libc::c_void,
@@ -745,7 +739,7 @@ unsafe extern "C" fn client_alive_check(mut ssh: *mut ssh) {
                 r != 0 as libc::c_int
             }
             || {
-                r = sshpkt_put_u8(ssh, 1 as libc::c_int as u_char);
+                r = crate::packet::sshpkt_put_u8(ssh, 1 as libc::c_int as u_char);
                 r != 0 as libc::c_int
             }
         {
@@ -770,7 +764,7 @@ unsafe extern "C" fn client_alive_check(mut ssh: *mut ssh) {
             1 as libc::c_int,
         );
     }
-    r = sshpkt_send(ssh);
+    r = crate::packet::sshpkt_send(ssh);
     if r != 0 as libc::c_int {
         sshfatal(
             b"serverloop.c\0" as *const u8 as *const libc::c_char,
@@ -1200,14 +1194,14 @@ unsafe extern "C" fn server_request_direct_tcpip(
     let mut target_port: u_int = 0 as libc::c_int as u_int;
     let mut originator_port: u_int = 0 as libc::c_int as u_int;
     let mut r: libc::c_int = 0;
-    r = sshpkt_get_cstring(ssh, &mut target, 0 as *mut size_t);
+    r = crate::packet::sshpkt_get_cstring(ssh, &mut target, 0 as *mut size_t);
     if r != 0 as libc::c_int
         || {
             r = sshpkt_get_u32(ssh, &mut target_port);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_cstring(ssh, &mut originator, 0 as *mut size_t);
+            r = crate::packet::sshpkt_get_cstring(ssh, &mut originator, 0 as *mut size_t);
             r != 0 as libc::c_int
         }
         || {
@@ -1215,7 +1209,7 @@ unsafe extern "C" fn server_request_direct_tcpip(
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_end(ssh);
+            r = crate::packet::sshpkt_get_end(ssh);
             r != 0 as libc::c_int
         }
     {
@@ -1335,10 +1329,10 @@ unsafe extern "C" fn server_request_direct_streamlocal(mut ssh: *mut ssh) -> *mu
             b"no/invalid user\0" as *const u8 as *const libc::c_char,
         );
     }
-    r = sshpkt_get_cstring(ssh, &mut target, 0 as *mut size_t);
+    r = crate::packet::sshpkt_get_cstring(ssh, &mut target, 0 as *mut size_t);
     if r != 0 as libc::c_int
         || {
-            r = sshpkt_get_cstring(ssh, &mut originator, 0 as *mut size_t);
+            r = crate::packet::sshpkt_get_cstring(ssh, &mut originator, 0 as *mut size_t);
             r != 0 as libc::c_int
         }
         || {
@@ -1346,7 +1340,7 @@ unsafe extern "C" fn server_request_direct_streamlocal(mut ssh: *mut ssh) -> *mu
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_end(ssh);
+            r = crate::packet::sshpkt_get_end(ssh);
             r != 0 as libc::c_int
         }
     {
@@ -1599,7 +1593,7 @@ unsafe extern "C" fn server_request_session(mut ssh: *mut ssh) -> *mut Channel {
         0 as *const libc::c_char,
         b"input_session_request\0" as *const u8 as *const libc::c_char,
     );
-    r = sshpkt_get_end(ssh);
+    r = crate::packet::sshpkt_get_end(ssh);
     if r != 0 as libc::c_int {
         sshpkt_fatal(
             ssh,
@@ -1677,7 +1671,7 @@ unsafe extern "C" fn server_input_channel_open(
     let mut rchan: u_int = 0 as libc::c_int as u_int;
     let mut rmaxpack: u_int = 0 as libc::c_int as u_int;
     let mut rwindow: u_int = 0 as libc::c_int as u_int;
-    r = sshpkt_get_cstring(ssh, &mut ctype, 0 as *mut size_t);
+    r = crate::packet::sshpkt_get_cstring(ssh, &mut ctype, 0 as *mut size_t);
     if r != 0 as libc::c_int
         || {
             r = sshpkt_get_u32(ssh, &mut rchan);
@@ -1754,7 +1748,7 @@ unsafe extern "C" fn server_input_channel_open(
         (*c).remote_window = rwindow;
         (*c).remote_maxpacket = rmaxpack;
         if (*c).type_0 != 12 as libc::c_int {
-            r = sshpkt_start(ssh, 91 as libc::c_int as u_char);
+            r = crate::packet::sshpkt_start(ssh, 91 as libc::c_int as u_char);
             if r != 0 as libc::c_int
                 || {
                     r = sshpkt_put_u32(ssh, (*c).remote_id);
@@ -1773,7 +1767,7 @@ unsafe extern "C" fn server_input_channel_open(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshpkt_send(ssh);
+                    r = crate::packet::sshpkt_send(ssh);
                     r != 0 as libc::c_int
                 }
             {
@@ -1802,7 +1796,7 @@ unsafe extern "C" fn server_input_channel_open(
             b"failure %s\0" as *const u8 as *const libc::c_char,
             ctype,
         );
-        r = sshpkt_start(ssh, 92 as libc::c_int as u_char);
+        r = crate::packet::sshpkt_start(ssh, 92 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
                 r = sshpkt_put_u32(ssh, rchan);
@@ -1813,7 +1807,7 @@ unsafe extern "C" fn server_input_channel_open(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshpkt_put_cstring(
+                r = crate::packet::sshpkt_put_cstring(
                     ssh,
                     (if !errmsg.is_null() {
                         errmsg
@@ -1824,14 +1818,14 @@ unsafe extern "C" fn server_input_channel_open(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshpkt_put_cstring(
+                r = crate::packet::sshpkt_put_cstring(
                     ssh,
                     b"\0" as *const u8 as *const libc::c_char as *const libc::c_void,
                 );
                 r != 0 as libc::c_int
             }
             || {
-                r = sshpkt_send(ssh);
+                r = crate::packet::sshpkt_send(ssh);
                 r != 0 as libc::c_int
             }
         {
@@ -2104,7 +2098,7 @@ unsafe extern "C" fn server_input_global_request(
             b"no/invalid user\0" as *const u8 as *const libc::c_char,
         );
     }
-    r = sshpkt_get_cstring(ssh, &mut rtype, 0 as *mut size_t);
+    r = crate::packet::sshpkt_get_cstring(ssh, &mut rtype, 0 as *mut size_t);
     if r != 0 as libc::c_int || {
         r = sshpkt_get_u8(ssh, &mut want_reply);
         r != 0 as libc::c_int
@@ -2138,7 +2132,7 @@ unsafe extern "C" fn server_input_global_request(
         b"tcpip-forward\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
     {
-        r = sshpkt_get_cstring(ssh, &mut fwd.listen_host, 0 as *mut size_t);
+        r = crate::packet::sshpkt_get_cstring(ssh, &mut fwd.listen_host, 0 as *mut size_t);
         if r != 0 as libc::c_int || {
             r = sshpkt_get_u32(ssh, &mut port);
             r != 0 as libc::c_int
@@ -2231,7 +2225,7 @@ unsafe extern "C" fn server_input_global_request(
         b"cancel-tcpip-forward\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
     {
-        r = sshpkt_get_cstring(ssh, &mut fwd.listen_host, 0 as *mut size_t);
+        r = crate::packet::sshpkt_get_cstring(ssh, &mut fwd.listen_host, 0 as *mut size_t);
         if r != 0 as libc::c_int || {
             r = sshpkt_get_u32(ssh, &mut port);
             r != 0 as libc::c_int
@@ -2269,7 +2263,7 @@ unsafe extern "C" fn server_input_global_request(
         b"streamlocal-forward@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
     {
-        r = sshpkt_get_cstring(ssh, &mut fwd.listen_path, 0 as *mut size_t);
+        r = crate::packet::sshpkt_get_cstring(ssh, &mut fwd.listen_path, 0 as *mut size_t);
         if r != 0 as libc::c_int {
             sshpkt_fatal(
                 ssh,
@@ -2318,7 +2312,7 @@ unsafe extern "C" fn server_input_global_request(
         b"cancel-streamlocal-forward@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
     {
-        r = sshpkt_get_cstring(ssh, &mut fwd.listen_path, 0 as *mut size_t);
+        r = crate::packet::sshpkt_get_cstring(ssh, &mut fwd.listen_path, 0 as *mut size_t);
         if r != 0 as libc::c_int {
             sshpkt_fatal(
                 ssh,
@@ -2360,7 +2354,7 @@ unsafe extern "C" fn server_input_global_request(
         success = server_input_hostkeys_prove(ssh, &mut resp);
     }
     if want_reply != 0 {
-        r = sshpkt_start(
+        r = crate::packet::sshpkt_start(
             ssh,
             (if success != 0 {
                 81 as libc::c_int
@@ -2374,7 +2368,7 @@ unsafe extern "C" fn server_input_global_request(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshpkt_send(ssh);
+                r = crate::packet::sshpkt_send(ssh);
                 r != 0 as libc::c_int
             }
             || {
@@ -2413,7 +2407,7 @@ unsafe extern "C" fn server_input_channel_req(
     r = sshpkt_get_u32(ssh, &mut id);
     if r != 0 as libc::c_int
         || {
-            r = sshpkt_get_cstring(ssh, &mut rtype, 0 as *mut size_t);
+            r = crate::packet::sshpkt_get_cstring(ssh, &mut rtype, 0 as *mut size_t);
             r != 0 as libc::c_int
         }
         || {
@@ -2464,7 +2458,7 @@ unsafe extern "C" fn server_input_channel_req(
         b"eow@openssh.com\0" as *const u8 as *const libc::c_char,
     ) == 0
     {
-        r = sshpkt_get_end(ssh);
+        r = crate::packet::sshpkt_get_end(ssh);
         if r != 0 as libc::c_int {
             sshpkt_fatal(
                 ssh,
@@ -2499,7 +2493,7 @@ unsafe extern "C" fn server_input_channel_req(
                 (*c).self_0,
             );
         }
-        r = sshpkt_start(
+        r = crate::packet::sshpkt_start(
             ssh,
             (if success != 0 {
                 99 as libc::c_int
@@ -2513,7 +2507,7 @@ unsafe extern "C" fn server_input_channel_req(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshpkt_send(ssh);
+                r = crate::packet::sshpkt_send(ssh);
                 r != 0 as libc::c_int
             }
         {

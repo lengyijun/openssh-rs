@@ -4,12 +4,6 @@ use crate::packet::ssh;
 use ::libc;
 extern "C" {
 
-    fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
-    fn sshpkt_get_cstring(
-        ssh: *mut ssh,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
     fn auth2_challenge(_: *mut ssh, _: *mut libc::c_char) -> libc::c_int;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
@@ -265,14 +259,14 @@ unsafe extern "C" fn userauth_kbdint(
     let mut authenticated: libc::c_int = 0 as libc::c_int;
     let mut lang: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut devs: *mut libc::c_char = 0 as *mut libc::c_char;
-    r = sshpkt_get_cstring(ssh, &mut lang, 0 as *mut size_t);
+    r = crate::packet::sshpkt_get_cstring(ssh, &mut lang, 0 as *mut size_t);
     if r != 0 as libc::c_int
         || {
-            r = sshpkt_get_cstring(ssh, &mut devs, 0 as *mut size_t);
+            r = crate::packet::sshpkt_get_cstring(ssh, &mut devs, 0 as *mut size_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_end(ssh);
+            r = crate::packet::sshpkt_get_end(ssh);
             r != 0 as libc::c_int
         }
     {

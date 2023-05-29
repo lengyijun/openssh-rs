@@ -5,7 +5,7 @@ use ::libc;
 extern "C" {
 
     fn auth_password(_: *mut ssh, _: *const libc::c_char) -> libc::c_int;
-    fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
+
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -264,7 +264,7 @@ unsafe extern "C" fn userauth_none(
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     none_enabled = 0 as libc::c_int;
-    r = sshpkt_get_end(ssh);
+    r = crate::packet::sshpkt_get_end(ssh);
     if r != 0 as libc::c_int {
         sshfatal(
             b"auth2-none.c\0" as *const u8 as *const libc::c_char,

@@ -61,13 +61,11 @@ extern "C" {
         _: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> libc::c_int;
     fn sshpkt_put_string(ssh: *mut ssh, v: *const libc::c_void, len: size_t) -> libc::c_int;
     fn sshpkt_put_bignum2(ssh: *mut ssh, v: *const BIGNUM) -> libc::c_int;
     fn sshpkt_put_stringb(ssh: *mut ssh, v: *const crate::sshbuf::sshbuf) -> libc::c_int;
-    fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
+
     fn sshpkt_get_bignum2(ssh: *mut ssh, valp: *mut *mut BIGNUM) -> libc::c_int;
 
     fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
@@ -186,7 +184,7 @@ unsafe extern "C" fn input_kex_dh_gex_request(
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_end(ssh);
+            r = crate::packet::sshpkt_get_end(ssh);
             r != 0 as libc::c_int
         })
     {
@@ -245,7 +243,7 @@ unsafe extern "C" fn input_kex_dh_gex_request(
                     b"SSH2_MSG_KEX_DH_GEX_GROUP sent\0" as *const u8 as *const libc::c_char,
                 );
                 DH_get0_pqg((*kex).dh, &mut dh_p, 0 as *mut *const BIGNUM, &mut dh_g);
-                r = sshpkt_start(ssh, 31 as libc::c_int as u_char);
+                r = crate::packet::sshpkt_start(ssh, 31 as libc::c_int as u_char);
                 if !(r != 0 as libc::c_int
                     || {
                         r = sshpkt_put_bignum2(ssh, dh_p);
@@ -256,7 +254,7 @@ unsafe extern "C" fn input_kex_dh_gex_request(
                         r != 0 as libc::c_int
                     }
                     || {
-                        r = sshpkt_send(ssh);
+                        r = crate::packet::sshpkt_send(ssh);
                         r != 0 as libc::c_int
                     })
                 {
@@ -341,7 +339,7 @@ unsafe extern "C" fn input_kex_dh_gex_init(
     if !(r != 0 as libc::c_int) {
         r = sshpkt_get_bignum2(ssh, &mut dh_client_pub);
         if !(r != 0 as libc::c_int || {
-            r = sshpkt_get_end(ssh);
+            r = crate::packet::sshpkt_get_end(ssh);
             r != 0 as libc::c_int
         }) {
             shared_secret = crate::sshbuf::sshbuf_new();
@@ -390,7 +388,10 @@ unsafe extern "C" fn input_kex_dh_gex_init(
                                     (*kex).hostkey_alg,
                                 );
                                 if !(r < 0 as libc::c_int) {
-                                    r = sshpkt_start(ssh, 33 as libc::c_int as u_char);
+                                    r = crate::packet::sshpkt_start(
+                                        ssh,
+                                        33 as libc::c_int as u_char,
+                                    );
                                     if !(r != 0 as libc::c_int
                                         || {
                                             r = sshpkt_put_stringb(ssh, server_host_key_blob);
@@ -409,7 +410,7 @@ unsafe extern "C" fn input_kex_dh_gex_init(
                                             r != 0 as libc::c_int
                                         }
                                         || {
-                                            r = sshpkt_send(ssh);
+                                            r = crate::packet::sshpkt_send(ssh);
                                             r != 0 as libc::c_int
                                         })
                                     {

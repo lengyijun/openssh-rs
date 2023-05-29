@@ -19,18 +19,9 @@ extern "C" {
         _: *const libc::c_char,
     ) -> libc::c_int;
 
-    fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
-    fn sshpkt_put_u8(ssh: *mut ssh, val: u_char) -> libc::c_int;
     fn sshpkt_put_u32(ssh: *mut ssh, val: u_int32_t) -> libc::c_int;
-    fn sshpkt_put_cstring(ssh: *mut ssh, v: *const libc::c_void) -> libc::c_int;
+
     fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshpkt_get_cstring(
-        ssh: *mut ssh,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
@@ -439,18 +430,18 @@ unsafe extern "C" fn send_userauth_info_request(mut ssh: *mut ssh) -> libc::c_in
     {
         return 0 as libc::c_int;
     }
-    r = sshpkt_start(ssh, 60 as libc::c_int as u_char) as u_int;
+    r = crate::packet::sshpkt_start(ssh, 60 as libc::c_int as u_char) as u_int;
     if r != 0 as libc::c_int as libc::c_uint
         || {
-            r = sshpkt_put_cstring(ssh, name as *const libc::c_void) as u_int;
+            r = crate::packet::sshpkt_put_cstring(ssh, name as *const libc::c_void) as u_int;
             r != 0 as libc::c_int as libc::c_uint
         }
         || {
-            r = sshpkt_put_cstring(ssh, instr as *const libc::c_void) as u_int;
+            r = crate::packet::sshpkt_put_cstring(ssh, instr as *const libc::c_void) as u_int;
             r != 0 as libc::c_int as libc::c_uint
         }
         || {
-            r = sshpkt_put_cstring(
+            r = crate::packet::sshpkt_put_cstring(
                 ssh,
                 b"\0" as *const u8 as *const libc::c_char as *const libc::c_void,
             ) as u_int;
@@ -476,9 +467,12 @@ unsafe extern "C" fn send_userauth_info_request(mut ssh: *mut ssh) -> libc::c_in
     }
     i = 0 as libc::c_int as u_int;
     while i < (*kbdintctxt).nreq {
-        r = sshpkt_put_cstring(ssh, *prompts.offset(i as isize) as *const libc::c_void) as u_int;
+        r = crate::packet::sshpkt_put_cstring(
+            ssh,
+            *prompts.offset(i as isize) as *const libc::c_void,
+        ) as u_int;
         if r != 0 as libc::c_int as libc::c_uint || {
-            r = sshpkt_put_u8(ssh, *echo_on.offset(i as isize) as u_char) as u_int;
+            r = crate::packet::sshpkt_put_u8(ssh, *echo_on.offset(i as isize) as u_char) as u_int;
             r != 0 as libc::c_int as libc::c_uint
         } {
             sshfatal(
@@ -497,7 +491,7 @@ unsafe extern "C" fn send_userauth_info_request(mut ssh: *mut ssh) -> libc::c_in
         i = i.wrapping_add(1);
         i;
     }
-    r = sshpkt_send(ssh) as u_int;
+    r = crate::packet::sshpkt_send(ssh) as u_int;
     if r != 0 as libc::c_int as libc::c_uint || {
         r = crate::packet::ssh_packet_write_wait(ssh) as u_int;
         r != 0 as libc::c_int as libc::c_uint
@@ -635,7 +629,11 @@ unsafe extern "C" fn input_userauth_info_response(
         ) as *mut *mut libc::c_char;
         i = 0 as libc::c_int as u_int;
         while i < nresp {
-            r = sshpkt_get_cstring(ssh, &mut *response.offset(i as isize), 0 as *mut size_t);
+            r = crate::packet::sshpkt_get_cstring(
+                ssh,
+                &mut *response.offset(i as isize),
+                0 as *mut size_t,
+            );
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"auth2-chall.c\0" as *const u8 as *const libc::c_char,
@@ -654,7 +652,7 @@ unsafe extern "C" fn input_userauth_info_response(
             i;
         }
     }
-    r = sshpkt_get_end(ssh);
+    r = crate::packet::sshpkt_get_end(ssh);
     if r != 0 as libc::c_int {
         sshfatal(
             b"auth2-chall.c\0" as *const u8 as *const libc::c_char,

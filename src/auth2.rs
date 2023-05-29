@@ -28,16 +28,6 @@ extern "C" {
         __remaining: *mut libc::timespec,
     ) -> libc::c_int;
 
-    fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
-    fn sshpkt_get_cstring(
-        ssh: *mut ssh,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshpkt_put_cstring(ssh: *mut ssh, v: *const libc::c_void) -> libc::c_int;
-    fn sshpkt_put_u8(ssh: *mut ssh, val: u_char) -> libc::c_int;
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
-    fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
@@ -430,21 +420,21 @@ pub unsafe extern "C" fn auth2_read_banner() -> *mut libc::c_char {
 }
 unsafe extern "C" fn userauth_send_banner(mut ssh: *mut ssh, mut msg: *const libc::c_char) {
     let mut r: libc::c_int = 0;
-    r = sshpkt_start(ssh, 53 as libc::c_int as u_char);
+    r = crate::packet::sshpkt_start(ssh, 53 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshpkt_put_cstring(ssh, msg as *const libc::c_void);
+            r = crate::packet::sshpkt_put_cstring(ssh, msg as *const libc::c_void);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_put_cstring(
+            r = crate::packet::sshpkt_put_cstring(
                 ssh,
                 b"\0" as *const u8 as *const libc::c_char as *const libc::c_void,
             );
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_send(ssh);
+            r = crate::packet::sshpkt_send(ssh);
             r != 0 as libc::c_int
         }
     {
@@ -520,9 +510,9 @@ unsafe extern "C" fn input_service_request(
     let mut service: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
     let mut acceptit: libc::c_int = 0 as libc::c_int;
-    r = sshpkt_get_cstring(ssh, &mut service, 0 as *mut size_t);
+    r = crate::packet::sshpkt_get_cstring(ssh, &mut service, 0 as *mut size_t);
     if !(r != 0 as libc::c_int || {
-        r = sshpkt_get_end(ssh);
+        r = crate::packet::sshpkt_get_end(ssh);
         r != 0 as libc::c_int
     }) {
         if authctxt.is_null() {
@@ -561,14 +551,14 @@ unsafe extern "C" fn input_service_request(
             }
         }
         if acceptit != 0 {
-            r = sshpkt_start(ssh, 6 as libc::c_int as u_char);
+            r = crate::packet::sshpkt_start(ssh, 6 as libc::c_int as u_char);
             if !(r != 0 as libc::c_int
                 || {
-                    r = sshpkt_put_cstring(ssh, service as *const libc::c_void);
+                    r = crate::packet::sshpkt_put_cstring(ssh, service as *const libc::c_void);
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshpkt_send(ssh);
+                    r = crate::packet::sshpkt_send(ssh);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -724,14 +714,14 @@ unsafe extern "C" fn input_userauth_request(
             b"input_userauth_request: no authctxt\0" as *const u8 as *const libc::c_char,
         );
     }
-    r = sshpkt_get_cstring(ssh, &mut user, 0 as *mut size_t);
+    r = crate::packet::sshpkt_get_cstring(ssh, &mut user, 0 as *mut size_t);
     if !(r != 0 as libc::c_int
         || {
-            r = sshpkt_get_cstring(ssh, &mut service, 0 as *mut size_t);
+            r = crate::packet::sshpkt_get_cstring(ssh, &mut service, 0 as *mut size_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_cstring(ssh, &mut method, 0 as *mut size_t);
+            r = crate::packet::sshpkt_get_cstring(ssh, &mut method, 0 as *mut size_t);
             r != 0 as libc::c_int
         })
     {
@@ -975,10 +965,10 @@ pub unsafe extern "C" fn userauth_finish(
                     as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
             ),
         );
-        r = sshpkt_start(ssh, 52 as libc::c_int as u_char);
+        r = crate::packet::sshpkt_start(ssh, 52 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
-                r = sshpkt_send(ssh);
+                r = crate::packet::sshpkt_send(ssh);
                 r != 0 as libc::c_int
             }
             || {
@@ -1029,18 +1019,18 @@ pub unsafe extern "C" fn userauth_finish(
             partial,
             methods,
         );
-        r = sshpkt_start(ssh, 51 as libc::c_int as u_char);
+        r = crate::packet::sshpkt_start(ssh, 51 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
-                r = sshpkt_put_cstring(ssh, methods as *const libc::c_void);
+                r = crate::packet::sshpkt_put_cstring(ssh, methods as *const libc::c_void);
                 r != 0 as libc::c_int
             }
             || {
-                r = sshpkt_put_u8(ssh, partial as u_char);
+                r = crate::packet::sshpkt_put_u8(ssh, partial as u_char);
                 r != 0 as libc::c_int
             }
             || {
-                r = sshpkt_send(ssh);
+                r = crate::packet::sshpkt_send(ssh);
                 r != 0 as libc::c_int
             }
             || {

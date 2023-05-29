@@ -158,11 +158,9 @@ extern "C" {
     fn ssh_local_port(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_rdomain_in(_: *mut ssh) -> *const libc::c_char;
     fn ssh_packet_set_rekey_limits(_: *mut ssh, _: u_int64_t, _: u_int32_t);
-    fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
+
     fn sshpkt_fatal(ssh: *mut ssh, r: libc::c_int, fmt: *const libc::c_char, _: ...) -> !;
-    fn sshpkt_put_u8(ssh: *mut ssh, val: u_char) -> libc::c_int;
-    fn sshpkt_put_cstring(ssh: *mut ssh, v: *const libc::c_void) -> libc::c_int;
+
     fn sshpkt_put_stringb(ssh: *mut ssh, v: *const crate::sshbuf::sshbuf) -> libc::c_int;
 
     fn log_verbose_add(_: *const libc::c_char);
@@ -1860,10 +1858,10 @@ unsafe extern "C" fn notify_hostkeys(mut ssh: *mut ssh) {
             );
             libc::free(fp as *mut libc::c_void);
             if nkeys == 0 as libc::c_int as libc::c_uint {
-                r = sshpkt_start(ssh, 80 as libc::c_int as u_char);
+                r = crate::packet::sshpkt_start(ssh, 80 as libc::c_int as u_char);
                 if r != 0 as libc::c_int
                     || {
-                        r = sshpkt_put_cstring(
+                        r = crate::packet::sshpkt_put_cstring(
                             ssh,
                             b"hostkeys-00@openssh.com\0" as *const u8 as *const libc::c_char
                                 as *const libc::c_void,
@@ -1871,7 +1869,7 @@ unsafe extern "C" fn notify_hostkeys(mut ssh: *mut ssh) {
                         r != 0 as libc::c_int
                     }
                     || {
-                        r = sshpkt_put_u8(ssh, 0 as libc::c_int as u_char);
+                        r = crate::packet::sshpkt_put_u8(ssh, 0 as libc::c_int as u_char);
                         r != 0 as libc::c_int
                     }
                 {
@@ -1943,7 +1941,7 @@ unsafe extern "C" fn notify_hostkeys(mut ssh: *mut ssh) {
             b"no hostkeys\0" as *const u8 as *const libc::c_char,
         );
     }
-    r = sshpkt_send(ssh);
+    r = crate::packet::sshpkt_send(ssh);
     if r != 0 as libc::c_int {
         sshpkt_fatal(
             ssh,

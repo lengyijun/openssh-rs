@@ -4,7 +4,6 @@ use crate::packet::ssh;
 use ::libc;
 extern "C" {
 
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn ssh_packet_read_seqnr(_: *mut ssh, _: *mut u_char, seqnr_p: *mut u_int32_t) -> libc::c_int;
     fn ssh_packet_read_poll_seqnr(
         _: *mut ssh,
@@ -13,7 +12,7 @@ extern "C" {
     ) -> libc::c_int;
     fn sshpkt_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> libc::c_int;
     fn sshpkt_fatal(ssh: *mut ssh, r: libc::c_int, fmt: *const libc::c_char, _: ...) -> !;
-    fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
+
     fn sshpkt_put_u32(ssh: *mut ssh, val: u_int32_t) -> libc::c_int;
 
 }
@@ -77,14 +76,14 @@ pub unsafe extern "C" fn dispatch_protocol_error(
         type_0,
         seq,
     );
-    r = sshpkt_start(ssh, 3 as libc::c_int as u_char);
+    r = crate::packet::sshpkt_start(ssh, 3 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshpkt_put_u32(ssh, seq);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_send(ssh);
+            r = crate::packet::sshpkt_send(ssh);
             r != 0 as libc::c_int
         }
         || {

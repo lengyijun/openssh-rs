@@ -17,8 +17,7 @@ extern "C" {
 
     fn sshpkt_ptr(_: *mut ssh, lenp: *mut size_t) -> *const u_char;
     fn sshpkt_put(ssh: *mut ssh, v: *const libc::c_void, len: size_t) -> libc::c_int;
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
-    fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
+
     fn ssh_packet_get_output(_: *mut ssh) -> *mut libc::c_void;
     fn ssh_packet_get_input(_: *mut ssh) -> *mut libc::c_void;
     fn ssh_packet_read_poll2(_: *mut ssh, _: *mut u_char, seqnr_p: *mut u_int32_t) -> libc::c_int;
@@ -476,14 +475,14 @@ pub unsafe extern "C" fn ssh_packet_put(
     mut len: size_t,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    r = sshpkt_start(ssh, type_0 as u_char);
+    r = crate::packet::sshpkt_start(ssh, type_0 as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshpkt_put(ssh, data as *const libc::c_void, len);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_send(ssh);
+            r = crate::packet::sshpkt_send(ssh);
             r != 0 as libc::c_int
         }
     {

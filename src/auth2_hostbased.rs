@@ -11,11 +11,7 @@ extern "C" {
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn sshpkt_get_cstring(
-        ssh: *mut ssh,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
+
     fn sshpkt_get_string(ssh: *mut ssh, valp: *mut *mut u_char, lenp: *mut size_t) -> libc::c_int;
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
 
@@ -432,18 +428,18 @@ unsafe extern "C" fn userauth_hostbased(
     let mut r: libc::c_int = 0;
     let mut pktype: libc::c_int = 0;
     let mut authenticated: libc::c_int = 0 as libc::c_int;
-    r = sshpkt_get_cstring(ssh, &mut pkalg, &mut alen);
+    r = crate::packet::sshpkt_get_cstring(ssh, &mut pkalg, &mut alen);
     if r != 0 as libc::c_int
         || {
             r = sshpkt_get_string(ssh, &mut pkblob, &mut blen);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_cstring(ssh, &mut chost, 0 as *mut size_t);
+            r = crate::packet::sshpkt_get_cstring(ssh, &mut chost, 0 as *mut size_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_cstring(ssh, &mut cuser, 0 as *mut size_t);
+            r = crate::packet::sshpkt_get_cstring(ssh, &mut cuser, 0 as *mut size_t);
             r != 0 as libc::c_int
         }
         || {

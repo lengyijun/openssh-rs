@@ -85,10 +85,7 @@ extern "C" {
     fn ssh_packet_set_interactive(_: *mut ssh, _: libc::c_int, _: libc::c_int, _: libc::c_int);
     fn ssh_packet_set_mux(_: *mut ssh);
     fn ssh_packet_get_mux(_: *mut ssh) -> libc::c_int;
-    fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
-    fn sshpkt_put_u8(ssh: *mut ssh, val: u_char) -> libc::c_int;
-    fn sshpkt_put_cstring(ssh: *mut ssh, v: *const libc::c_void) -> libc::c_int;
+
     fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
 
     fn sshbuf_put(
@@ -5108,7 +5105,7 @@ unsafe extern "C" fn ssh_session2_setup(
                 as *mut libc::c_char,
             0 as libc::c_int,
         );
-        r = sshpkt_send(ssh);
+        r = crate::packet::sshpkt_send(ssh);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"ssh.c\0" as *const u8 as *const libc::c_char,
@@ -5337,10 +5334,10 @@ unsafe extern "C" fn ssh_session2(
             0 as *const libc::c_char,
             b"Requesting no-more-sessions@openssh.com\0" as *const u8 as *const libc::c_char,
         );
-        r = sshpkt_start(ssh, 80 as libc::c_int as u_char);
+        r = crate::packet::sshpkt_start(ssh, 80 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
-                r = sshpkt_put_cstring(
+                r = crate::packet::sshpkt_put_cstring(
                     ssh,
                     b"no-more-sessions@openssh.com\0" as *const u8 as *const libc::c_char
                         as *const libc::c_void,
@@ -5348,11 +5345,11 @@ unsafe extern "C" fn ssh_session2(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshpkt_put_u8(ssh, 0 as libc::c_int as u_char);
+                r = crate::packet::sshpkt_put_u8(ssh, 0 as libc::c_int as u_char);
                 r != 0 as libc::c_int
             }
             || {
-                r = sshpkt_send(ssh);
+                r = crate::packet::sshpkt_send(ssh);
                 r != 0 as libc::c_int
             }
         {

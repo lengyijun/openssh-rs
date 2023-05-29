@@ -7,10 +7,7 @@ extern "C" {
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
-    fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
-    fn sshpkt_put_cstring(ssh: *mut ssh, v: *const libc::c_void) -> libc::c_int;
-    fn sshpkt_put_u8(ssh: *mut ssh, val: u_char) -> libc::c_int;
+
     fn sshpkt_put_u32(ssh: *mut ssh, val: u_int32_t) -> libc::c_int;
     fn channel_close_fd(_: *mut ssh, _: *mut Channel, _: *mut libc::c_int) -> libc::c_int;
     fn channel_format_extended_usage(_: *const Channel) -> *const libc::c_char;
@@ -443,14 +440,14 @@ unsafe extern "C" fn chan_send_eof2(mut ssh: *mut ssh, mut c: *mut Channel) {
                     (*c).self_0,
                 );
             }
-            r = sshpkt_start(ssh, 96 as libc::c_int as u_char);
+            r = crate::packet::sshpkt_start(ssh, 96 as libc::c_int as u_char);
             if r != 0 as libc::c_int
                 || {
                     r = sshpkt_put_u32(ssh, (*c).remote_id);
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshpkt_send(ssh);
+                    r = crate::packet::sshpkt_send(ssh);
                     r != 0 as libc::c_int
                 }
             {
@@ -540,14 +537,14 @@ unsafe extern "C" fn chan_send_close2(mut ssh: *mut ssh, mut c: *mut Channel) {
                 (*c).self_0,
             );
         }
-        r = sshpkt_start(ssh, 97 as libc::c_int as u_char);
+        r = crate::packet::sshpkt_start(ssh, 97 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
                 r = sshpkt_put_u32(ssh, (*c).remote_id);
                 r != 0 as libc::c_int
             }
             || {
-                r = sshpkt_send(ssh);
+                r = crate::packet::sshpkt_send(ssh);
                 r != 0 as libc::c_int
             }
         {
@@ -607,25 +604,25 @@ unsafe extern "C" fn chan_send_eow2(mut ssh: *mut ssh, mut c: *mut Channel) {
             (*c).self_0,
         );
     }
-    r = sshpkt_start(ssh, 98 as libc::c_int as u_char);
+    r = crate::packet::sshpkt_start(ssh, 98 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshpkt_put_u32(ssh, (*c).remote_id);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_put_cstring(
+            r = crate::packet::sshpkt_put_cstring(
                 ssh,
                 b"eow@openssh.com\0" as *const u8 as *const libc::c_char as *const libc::c_void,
             );
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_put_u8(ssh, 0 as libc::c_int as u_char);
+            r = crate::packet::sshpkt_put_u8(ssh, 0 as libc::c_int as u_char);
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_send(ssh);
+            r = crate::packet::sshpkt_send(ssh);
             r != 0 as libc::c_int
         }
     {

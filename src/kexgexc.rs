@@ -71,15 +71,12 @@ extern "C" {
         _: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_put_u32(ssh: *mut ssh, val: u_int32_t) -> libc::c_int;
     fn sshpkt_put_bignum2(ssh: *mut ssh, v: *const BIGNUM) -> libc::c_int;
     fn sshpkt_get_string(ssh: *mut ssh, valp: *mut *mut u_char, lenp: *mut size_t) -> libc::c_int;
     fn sshpkt_getb_froms(ssh: *mut ssh, valp: *mut *mut crate::sshbuf::sshbuf) -> libc::c_int;
     fn sshpkt_get_bignum2(ssh: *mut ssh, valp: *mut *mut BIGNUM) -> libc::c_int;
 
-    fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
     fn dh_new_group(_: *mut BIGNUM, _: *mut BIGNUM) -> *mut DH;
     fn dh_gen_key(_: *mut DH, _: libc::c_int) -> libc::c_int;
     fn dh_estimate(_: libc::c_int) -> u_int;
@@ -163,7 +160,7 @@ pub unsafe extern "C" fn kexgex_client(mut ssh: *mut ssh) -> libc::c_int {
             4096 as libc::c_int as libc::c_uint
         };
     }
-    r = sshpkt_start(ssh, 34 as libc::c_int as u_char);
+    r = crate::packet::sshpkt_start(ssh, 34 as libc::c_int as u_char);
     if !(r != 0 as libc::c_int
         || {
             r = sshpkt_put_u32(ssh, (*kex).min);
@@ -178,7 +175,7 @@ pub unsafe extern "C" fn kexgex_client(mut ssh: *mut ssh) -> libc::c_int {
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_send(ssh);
+            r = crate::packet::sshpkt_send(ssh);
             r != 0 as libc::c_int
         })
     {
@@ -253,7 +250,7 @@ unsafe extern "C" fn input_kex_dh_gex_group(
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_get_end(ssh);
+            r = crate::packet::sshpkt_get_end(ssh);
             r != 0 as libc::c_int
         })
     {
@@ -273,14 +270,14 @@ unsafe extern "C" fn input_kex_dh_gex_group(
                 );
                 if !(r != 0 as libc::c_int) {
                     DH_get0_key((*kex).dh, &mut pub_key, 0 as *mut *const BIGNUM);
-                    r = sshpkt_start(ssh, 32 as libc::c_int as u_char);
+                    r = crate::packet::sshpkt_start(ssh, 32 as libc::c_int as u_char);
                     if !(r != 0 as libc::c_int
                         || {
                             r = sshpkt_put_bignum2(ssh, pub_key);
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshpkt_send(ssh);
+                            r = crate::packet::sshpkt_send(ssh);
                             r != 0 as libc::c_int
                         })
                     {
@@ -387,7 +384,7 @@ unsafe extern "C" fn input_kex_dh_gex_reply(
                         r != 0 as libc::c_int
                     }
                     || {
-                        r = sshpkt_get_end(ssh);
+                        r = crate::packet::sshpkt_get_end(ssh);
                         r != 0 as libc::c_int
                     })
                 {

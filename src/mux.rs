@@ -171,7 +171,7 @@ extern "C" {
     fn chan_read_failed(_: *mut ssh, _: *mut Channel);
     fn chan_write_failed(_: *mut ssh, _: *mut Channel);
     fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
+
     fn mm_send_fd(_: libc::c_int, _: libc::c_int) -> libc::c_int;
     fn mm_receive_fd(_: libc::c_int) -> libc::c_int;
     fn leave_raw_mode(_: libc::c_int);
@@ -3954,7 +3954,7 @@ unsafe extern "C" fn mux_session_confirm(
                     as *mut libc::c_char,
                 0 as libc::c_int,
             );
-            r = sshpkt_send(ssh);
+            r = crate::packet::sshpkt_send(ssh);
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"mux.c\0" as *const u8 as *const libc::c_char,
