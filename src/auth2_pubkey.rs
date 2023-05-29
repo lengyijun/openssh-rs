@@ -33,7 +33,6 @@ extern "C" {
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn ssh_remote_port(_: *mut ssh) -> libc::c_int;
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
-    fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
 
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
@@ -1260,7 +1259,7 @@ unsafe extern "C" fn userauth_pubkey(
                                     r != 0 as libc::c_int
                                 }
                                 || {
-                                    r = ssh_packet_write_wait(ssh);
+                                    r = crate::packet::ssh_packet_write_wait(ssh);
                                     r != 0 as libc::c_int
                                 }
                             {

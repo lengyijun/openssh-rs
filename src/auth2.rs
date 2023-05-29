@@ -45,7 +45,6 @@ extern "C" {
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
     fn ssh_packet_set_log_preamble(_: *mut ssh, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
-    fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
@@ -579,7 +578,7 @@ unsafe extern "C" fn input_service_request(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = ssh_packet_write_wait(ssh);
+                    r = crate::packet::ssh_packet_write_wait(ssh);
                     r != 0 as libc::c_int
                 })
             {
@@ -989,7 +988,7 @@ pub unsafe extern "C" fn userauth_finish(
                 r != 0 as libc::c_int
             }
             || {
-                r = ssh_packet_write_wait(ssh);
+                r = crate::packet::ssh_packet_write_wait(ssh);
                 r != 0 as libc::c_int
             }
         {
@@ -1051,7 +1050,7 @@ pub unsafe extern "C" fn userauth_finish(
                 r != 0 as libc::c_int
             }
             || {
-                r = ssh_packet_write_wait(ssh);
+                r = crate::packet::ssh_packet_write_wait(ssh);
                 r != 0 as libc::c_int
             }
         {

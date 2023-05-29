@@ -65,7 +65,7 @@ extern "C" {
     fn ssh_packet_remaining(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_not_very_much_data_to_write(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_have_data_to_write(_: *mut ssh) -> libc::c_int;
-    fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
+
     fn ssh_packet_write_poll(_: *mut ssh) -> libc::c_int;
 
     fn ssh_packet_send_debug(_: *mut ssh, fmt: *const libc::c_char, _: ...);
@@ -2381,7 +2381,7 @@ unsafe extern "C" fn server_input_global_request(
                 r != 0 as libc::c_int
             }
             || {
-                r = ssh_packet_write_wait(ssh);
+                r = crate::packet::ssh_packet_write_wait(ssh);
                 r != 0 as libc::c_int
             }
         {

@@ -97,7 +97,7 @@ extern "C" {
     fn ssh_packet_remaining(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_not_very_much_data_to_write(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_have_data_to_write(_: *mut ssh) -> libc::c_int;
-    fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
+
     fn ssh_packet_write_poll(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_get_bytes(_: *mut ssh, _: *mut u_int64_t, _: *mut u_int64_t);
     fn ssh_packet_process_read(_: *mut ssh, _: libc::c_int) -> libc::c_int;
@@ -3487,7 +3487,7 @@ pub unsafe extern "C" fn client_loop(
             r != 0 as libc::c_int
         }
         || {
-            r = ssh_packet_write_wait(ssh);
+            r = crate::packet::ssh_packet_write_wait(ssh);
             r != 0 as libc::c_int
         }
     {
@@ -6111,7 +6111,7 @@ unsafe extern "C" fn client_input_global_request(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = ssh_packet_write_wait(ssh);
+                    r = crate::packet::ssh_packet_write_wait(ssh);
                     r != 0 as libc::c_int
                 }
             {

@@ -19,7 +19,6 @@ extern "C" {
         _: *const libc::c_char,
     ) -> libc::c_int;
 
-    fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_put_u8(ssh: *mut ssh, val: u_char) -> libc::c_int;
@@ -500,7 +499,7 @@ unsafe extern "C" fn send_userauth_info_request(mut ssh: *mut ssh) -> libc::c_in
     }
     r = sshpkt_send(ssh) as u_int;
     if r != 0 as libc::c_int as libc::c_uint || {
-        r = ssh_packet_write_wait(ssh) as u_int;
+        r = crate::packet::ssh_packet_write_wait(ssh) as u_int;
         r != 0 as libc::c_int as libc::c_uint
     } {
         sshfatal(

@@ -141,7 +141,7 @@ extern "C" {
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
     fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
     fn ssh_packet_send_debug(_: *mut ssh, fmt: *const libc::c_char, _: ...);
-    fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
+
     fn ssh_packet_set_alive_timeouts(_: *mut ssh, _: libc::c_int);
     fn ssh_packet_get_maxsize(_: *mut ssh) -> u_int;
     fn log_level_get() -> LogLevel;
@@ -8812,7 +8812,7 @@ pub unsafe extern "C" fn channel_request_remote_forwarding(
                 r != 0 as libc::c_int
             }
             || {
-                r = ssh_packet_write_wait(ssh);
+                r = crate::packet::ssh_packet_write_wait(ssh);
                 r != 0 as libc::c_int
             }
         {
@@ -8859,7 +8859,7 @@ pub unsafe extern "C" fn channel_request_remote_forwarding(
                 r != 0 as libc::c_int
             }
             || {
-                r = ssh_packet_write_wait(ssh);
+                r = crate::packet::ssh_packet_write_wait(ssh);
                 r != 0 as libc::c_int
             }
         {
@@ -10770,7 +10770,7 @@ pub unsafe extern "C" fn x11_request_forwarding_with_spoofing(
             r != 0 as libc::c_int
         }
         || {
-            r = ssh_packet_write_wait(ssh);
+            r = crate::packet::ssh_packet_write_wait(ssh);
             r != 0 as libc::c_int
         }
     {
