@@ -40,7 +40,7 @@ extern "C" {
         valp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
@@ -355,7 +355,7 @@ unsafe extern "C" fn process_add() {
     }
     nkeys = pkcs11_add_provider(name, pin, &mut keys, &mut labels);
     if nkeys > 0 as libc::c_int {
-        r = sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
         if r != 0 as libc::c_int || {
             r = sshbuf_put_u32(msg, nkeys as u_int32_t);
             r != 0 as libc::c_int
@@ -412,7 +412,7 @@ unsafe extern "C" fn process_add() {
             i;
         }
     } else {
-        r = sshbuf_put_u8(msg, 5 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 5 as libc::c_int as u_char);
         if r != 0 as libc::c_int || {
             r = sshbuf_put_u32(msg, -nkeys as u_int32_t);
             r != 0 as libc::c_int
@@ -470,7 +470,7 @@ unsafe extern "C" fn process_del() {
         );
     }
     del_keys_by_name(name);
-    r = sshbuf_put_u8(
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(
         msg,
         (if pkcs11_del_provider(name) == 0 as libc::c_int {
             6 as libc::c_int
@@ -616,7 +616,7 @@ unsafe extern "C" fn process_sign() {
         );
     }
     if ok == 0 as libc::c_int {
-        r = sshbuf_put_u8(msg, 14 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 14 as libc::c_int as u_char);
         if r != 0 as libc::c_int || {
             r = sshbuf_put_string(msg, signature as *const libc::c_void, slen);
             r != 0 as libc::c_int
@@ -633,7 +633,7 @@ unsafe extern "C" fn process_sign() {
             );
         }
     } else {
-        r = sshbuf_put_u8(msg, 30 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 30 as libc::c_int as u_char);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,

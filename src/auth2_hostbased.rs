@@ -24,7 +24,7 @@ extern "C" {
 
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_put_string(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -791,7 +791,10 @@ unsafe extern "C" fn userauth_hostbased(
                     r = sshbuf_put_stringb(b, (*(*ssh).kex).session_id);
                     if r != 0 as libc::c_int
                         || {
-                            r = sshbuf_put_u8(b, 50 as libc::c_int as u_char);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_u8(
+                                b,
+                                50 as libc::c_int as u_char,
+                            );
                             r != 0 as libc::c_int
                         }
                         || {

@@ -211,7 +211,7 @@ extern "C" {
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_put_u64(buf: *mut crate::sshbuf::sshbuf, val: u_int64_t) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_get_string(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
@@ -2392,7 +2392,7 @@ pub unsafe extern "C" fn sshkey_shield_private(mut k: *mut sshkey) -> libc::c_in
                                     break;
                                 }
                                 i = i.wrapping_add(1);
-                                r = sshbuf_put_u8(
+                                r = crate::sshbuf_getput_basic::sshbuf_put_u8(
                                     prvbuf,
                                     (i & 0xff as libc::c_int as libc::c_ulong) as u_char,
                                 );
@@ -3617,7 +3617,7 @@ pub unsafe extern "C" fn sshkey_serialize_private_sk(
     r = sshbuf_put_cstring(b, (*key).sk_application);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u8(b, (*key).sk_flags);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, (*key).sk_flags);
             r != 0 as libc::c_int
         }
         || {
@@ -4154,7 +4154,7 @@ unsafe extern "C" fn sshkey_private_to_blob2(
                                                 break;
                                             }
                                             i = i.wrapping_add(1);
-                                            r = sshbuf_put_u8(
+                                            r = crate::sshbuf_getput_basic::sshbuf_put_u8(
                                                 encrypted,
                                                 (i & 0xff as libc::c_int as libc::c_ulong)
                                                     as u_char,
@@ -4306,7 +4306,7 @@ unsafe extern "C" fn private2_uudecode(
                     break;
                 }
                 if *cp as libc::c_int != '\n' as i32 && *cp as libc::c_int != '\r' as i32 {
-                    r = sshbuf_put_u8(encoded, *cp);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u8(encoded, *cp);
                     if r != 0 as libc::c_int {
                         current_block = 3973966692310782800;
                         break;
@@ -4333,7 +4333,7 @@ unsafe extern "C" fn private2_uudecode(
                 {
                     continue;
                 }
-                r = sshbuf_put_u8(encoded, 0 as libc::c_int as u_char);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u8(encoded, 0 as libc::c_int as u_char);
                 if r != 0 as libc::c_int {
                     current_block = 3973966692310782800;
                     break;

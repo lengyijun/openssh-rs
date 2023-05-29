@@ -115,7 +115,7 @@ extern "C" {
         valp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
@@ -3072,9 +3072,9 @@ unsafe extern "C" fn channel_decode_socks5(
                 (*c).self_0,
             );
         }
-        r = sshbuf_put_u8(output, 0x5 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(output, 0x5 as libc::c_int as u_char);
         if r != 0 as libc::c_int || {
-            r = sshbuf_put_u8(output, 0 as libc::c_int as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(output, 0 as libc::c_int as u_char);
             r != 0 as libc::c_int
         } {
             sshfatal(
@@ -6869,10 +6869,10 @@ pub unsafe extern "C" fn channel_proxy_upstream(
                 b"no packet\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            r = sshbuf_put_u8(b, 0 as libc::c_int as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 0 as libc::c_int as u_char);
             if r != 0 as libc::c_int
                 || {
-                    r = sshbuf_put_u8(b, type_0 as u_char);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, type_0 as u_char);
                     r != 0 as libc::c_int
                 }
                 || {

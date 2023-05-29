@@ -109,7 +109,7 @@ extern "C" {
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_get_cstring(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut libc::c_char,
@@ -1142,7 +1142,7 @@ unsafe extern "C" fn send_status(mut e: *mut SocketEntry, mut success: libc::c_i
     let mut r: libc::c_int = 0;
     r = sshbuf_put_u32((*e).output, 1 as libc::c_int as u_int32_t);
     if r != 0 as libc::c_int || {
-        r = sshbuf_put_u8(
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(
             (*e).output,
             (if success != 0 {
                 6 as libc::c_int
@@ -1248,7 +1248,7 @@ unsafe extern "C" fn process_request_identities(mut e: *mut SocketEntry) {
         nentries,
         (*idtab).nentries,
     );
-    r = sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, nentries);
@@ -1981,7 +1981,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
         b"User presence confirmed\0" as *const u8 as *const libc::c_char,
     );
     if ok == 0 as libc::c_int {
-        r = sshbuf_put_u8(msg, 14 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 14 as libc::c_int as u_char);
         if r != 0 as libc::c_int || {
             r = sshbuf_put_string(msg, signature as *const libc::c_void, slen);
             r != 0 as libc::c_int
@@ -2000,7 +2000,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
             );
         }
     } else {
-        r = sshbuf_put_u8(msg, 5 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 5 as libc::c_int as u_char);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -3350,7 +3350,7 @@ unsafe extern "C" fn no_identities(mut e: *mut SocketEntry) {
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, 0 as libc::c_int as u_int32_t);

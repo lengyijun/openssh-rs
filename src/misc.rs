@@ -156,7 +156,6 @@ extern "C" {
         v: *const libc::c_void,
         len: size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
 
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
@@ -2443,7 +2442,7 @@ unsafe extern "C" fn vdollar_percent_expand(
             match current_block {
                 6009453772311597924 => {}
                 _ => {
-                    r = sshbuf_put_u8(buf, *string as u_char);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, *string as u_char);
                     if r != 0 as libc::c_int {
                         sshfatal(
                             b"misc.c\0" as *const u8 as *const libc::c_char,
@@ -2455,7 +2454,8 @@ unsafe extern "C" fn vdollar_percent_expand(
                             1 as libc::c_int,
                             SYSLOG_LEVEL_FATAL,
                             ssh_err(r),
-                            b"sshbuf_put_u8 %%\0" as *const u8 as *const libc::c_char,
+                            b"crate::sshbuf_getput_basic::sshbuf_put_u8 %%\0" as *const u8
+                                as *const libc::c_char,
                         );
                     }
                 }
@@ -3622,11 +3622,11 @@ pub unsafe extern "C" fn argv_assemble(
             match c as libc::c_int {
                 32 | 9 => {
                     ws = 1 as libc::c_int;
-                    r = sshbuf_put_u8(arg, c as u_char);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u8(arg, c as u_char);
                     current_block_10 = 7976072742316086414;
                 }
                 92 | 39 | 34 => {
-                    r = sshbuf_put_u8(arg, '\\' as i32 as u_char);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u8(arg, '\\' as i32 as u_char);
                     if r != 0 as libc::c_int {
                         current_block_10 = 7976072742316086414;
                     } else {
@@ -3639,7 +3639,7 @@ pub unsafe extern "C" fn argv_assemble(
             }
             match current_block_10 {
                 1440669349572724640 => {
-                    r = sshbuf_put_u8(arg, c as u_char);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u8(arg, c as u_char);
                 }
                 _ => {}
             }
@@ -3652,23 +3652,24 @@ pub unsafe extern "C" fn argv_assemble(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     ssh_err(r),
-                    b"sshbuf_put_u8\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshbuf_getput_basic::sshbuf_put_u8\0" as *const u8
+                        as *const libc::c_char,
                 );
             }
             j += 1;
             j;
         }
         if i != 0 as libc::c_int && {
-            r = sshbuf_put_u8(buf, ' ' as i32 as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, ' ' as i32 as u_char);
             r != 0 as libc::c_int
         } || ws != 0 as libc::c_int && {
-            r = sshbuf_put_u8(buf, '"' as i32 as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, '"' as i32 as u_char);
             r != 0 as libc::c_int
         } || {
             r = sshbuf_putb(buf, arg);
             r != 0 as libc::c_int
         } || ws != 0 as libc::c_int && {
-            r = sshbuf_put_u8(buf, '"' as i32 as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, '"' as i32 as u_char);
             r != 0 as libc::c_int
         } {
             sshfatal(

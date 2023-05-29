@@ -80,7 +80,6 @@ extern "C" {
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
     fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
 }
 pub type __u_char = libc::c_uchar;
@@ -720,7 +719,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
                     current_block = 5020065448061302065;
                     break;
                 }
-                r = sshbuf_put_u8(banner, c);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u8(banner, c);
                 if r != 0 as libc::c_int {
                     return r;
                 }

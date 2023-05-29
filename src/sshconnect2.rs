@@ -56,7 +56,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
 
@@ -2679,7 +2678,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
                 }
             }
             skip = sshbuf_len(b);
-            r = sshbuf_put_u8(b, 50 as libc::c_int as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 50 as libc::c_int as u_char);
             if r != 0 as libc::c_int
                 || {
                     r = sshbuf_put_cstring(b, (*authctxt).server_user);
@@ -2694,7 +2693,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_u8(b, 1 as libc::c_int as u_char);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 1 as libc::c_int as u_char);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -4553,7 +4552,10 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
                         r = sshbuf_put_stringb(b, (*(*ssh).kex).session_id);
                         if r != 0 as libc::c_int
                             || {
-                                r = sshbuf_put_u8(b, 50 as libc::c_int as u_char);
+                                r = crate::sshbuf_getput_basic::sshbuf_put_u8(
+                                    b,
+                                    50 as libc::c_int as u_char,
+                                );
                                 r != 0 as libc::c_int
                             }
                             || {

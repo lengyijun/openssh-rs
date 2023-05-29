@@ -195,7 +195,7 @@ extern "C" {
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_put_u64(buf: *mut crate::sshbuf::sshbuf, val: u_int64_t) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_get_string(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
@@ -4118,7 +4118,7 @@ pub unsafe extern "C" fn sshpkt_putb(
     return sshbuf_putb((*(*ssh).state).outgoing_packet, b);
 }
 pub unsafe extern "C" fn sshpkt_put_u8(mut ssh: *mut ssh, mut val: u_char) -> libc::c_int {
-    return sshbuf_put_u8((*(*ssh).state).outgoing_packet, val);
+    return crate::sshbuf_getput_basic::sshbuf_put_u8((*(*ssh).state).outgoing_packet, val);
 }
 pub unsafe extern "C" fn sshpkt_put_u32(mut ssh: *mut ssh, mut val: u_int32_t) -> libc::c_int {
     return sshbuf_put_u32((*(*ssh).state).outgoing_packet, val);

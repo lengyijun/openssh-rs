@@ -55,7 +55,7 @@ extern "C" {
         valp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_put_u64(buf: *mut crate::sshbuf::sshbuf, val: u_int64_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
@@ -520,7 +520,7 @@ unsafe extern "C" fn send_string_request(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_u8(msg, code as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, code as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -584,7 +584,7 @@ unsafe extern "C" fn send_string_attrs_request(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_u8(msg, code as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, code as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -1251,7 +1251,7 @@ pub unsafe extern "C" fn do_init(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_u8(msg, 1 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 1 as libc::c_int as u_char);
     if r != 0 as libc::c_int || {
         r = sshbuf_put_u32(msg, 3 as libc::c_int as u_int32_t);
         r != 0 as libc::c_int
@@ -1624,7 +1624,7 @@ pub unsafe extern "C" fn do_limits(
     let fresh0 = (*conn).msg_id;
     (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
     id = fresh0;
-    r = sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -1774,7 +1774,7 @@ pub unsafe extern "C" fn do_close(
     let fresh1 = (*conn).msg_id;
     (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
     id = fresh1;
-    r = sshbuf_put_u8(msg, 4 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 4 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -1863,7 +1863,7 @@ unsafe extern "C" fn do_lsreaddir(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_u8(msg, 11 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 11 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -1925,7 +1925,7 @@ unsafe extern "C" fn do_lsreaddir(
             id,
         );
         sshbuf_reset(msg);
-        r = sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
                 r = sshbuf_put_u32(msg, id);
@@ -2609,7 +2609,7 @@ unsafe extern "C" fn do_realpath_expand(
                 as *const libc::c_char,
             path,
         );
-        r = sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
                 r = sshbuf_put_u32(msg, id);
@@ -2928,7 +2928,7 @@ pub unsafe extern "C" fn do_copy(
     let fresh17 = (*conn).msg_id;
     (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
     id = fresh17;
-    r = sshbuf_put_u8(msg, 3 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 3 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -2986,7 +2986,7 @@ pub unsafe extern "C" fn do_copy(
     let fresh18 = (*conn).msg_id;
     (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
     id = fresh18;
-    r = sshbuf_put_u8(msg, 3 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 3 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -3048,7 +3048,7 @@ pub unsafe extern "C" fn do_copy(
     let fresh19 = (*conn).msg_id;
     (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
     id = fresh19;
-    r = sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -3170,7 +3170,7 @@ pub unsafe extern "C" fn do_rename(
             oldpath,
             newpath,
         );
-        r = sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
                 r = sshbuf_put_u32(msg, id);
@@ -3207,7 +3207,7 @@ pub unsafe extern "C" fn do_rename(
             oldpath,
             newpath,
         );
-        r = sshbuf_put_u8(msg, 18 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 18 as libc::c_int as u_char);
         if r != 0 as libc::c_int || {
             r = sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
@@ -3328,7 +3328,7 @@ pub unsafe extern "C" fn do_hardlink(
     let fresh21 = (*conn).msg_id;
     (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
     id = fresh21;
-    r = sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -3443,7 +3443,7 @@ pub unsafe extern "C" fn do_symlink(
     let fresh22 = (*conn).msg_id;
     (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
     id = fresh22;
-    r = sshbuf_put_u8(msg, 20 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 20 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -3539,7 +3539,7 @@ pub unsafe extern "C" fn do_fsync(
     let fresh23 = (*conn).msg_id;
     (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
     id = fresh23;
-    r = sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -3647,7 +3647,7 @@ pub unsafe extern "C" fn do_statvfs(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -3728,7 +3728,7 @@ pub unsafe extern "C" fn do_lsetstat(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -3806,7 +3806,7 @@ unsafe extern "C" fn send_read_request(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_u8(msg, 5 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 5 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -3894,7 +3894,7 @@ unsafe extern "C" fn send_open(
     let fresh26 = (*conn).msg_id;
     (*conn).msg_id = ((*conn).msg_id).wrapping_add(1);
     id = fresh26;
-    r = sshbuf_put_u8(msg, 3 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 3 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);
@@ -5288,7 +5288,7 @@ pub unsafe extern "C" fn do_upload(
                 id = id.wrapping_add(1);
                 ack = request_enqueue(&mut acks, id, len as size_t, offset as uint64_t);
                 sshbuf_reset(msg);
-                r = sshbuf_put_u8(msg, 6 as libc::c_int as u_char);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 6 as libc::c_int as u_char);
                 if r != 0 as libc::c_int
                     || {
                         r = sshbuf_put_u32(msg, (*ack).id);
@@ -6314,7 +6314,7 @@ pub unsafe extern "C" fn do_crossload(
                     );
                 }
                 sshbuf_reset(msg);
-                r = sshbuf_put_u8(msg, 6 as libc::c_int as u_char);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 6 as libc::c_int as u_char);
                 if r != 0 as libc::c_int
                     || {
                         let fresh30 = (*to).msg_id;
@@ -6992,7 +6992,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
         i = i.wrapping_add(1);
         i;
     }
-    r = sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_u32(msg, id);

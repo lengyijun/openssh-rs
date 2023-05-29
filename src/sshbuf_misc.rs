@@ -28,7 +28,7 @@ extern "C" {
     ) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn __ctype_b_loc() -> *mut *const libc::c_ushort;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
     fn sshbuf_put(
@@ -214,7 +214,7 @@ pub unsafe extern "C" fn sshbuf_dtob64(
                     current_block = 13586036798005543211;
                     break;
                 }
-                r = sshbuf_put_u8(b64, *s.offset(i as isize) as u_char);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u8(b64, *s.offset(i as isize) as u_char);
                 if r != 0 as libc::c_int {
                     current_block = 5734119236069516492;
                     break;
@@ -222,7 +222,7 @@ pub unsafe extern "C" fn sshbuf_dtob64(
                 if i.wrapping_rem(70 as libc::c_int as libc::c_ulong)
                     == 69 as libc::c_int as libc::c_ulong
                     && {
-                        r = sshbuf_put_u8(b64, '\n' as i32 as u_char);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_u8(b64, '\n' as i32 as u_char);
                         r != 0 as libc::c_int
                     }
                 {
@@ -239,7 +239,10 @@ pub unsafe extern "C" fn sshbuf_dtob64(
                         .wrapping_rem(70 as libc::c_int as libc::c_ulong)
                         != 69 as libc::c_int as libc::c_ulong
                         && {
-                            r = sshbuf_put_u8(b64, '\n' as i32 as u_char);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_u8(
+                                b64,
+                                '\n' as i32 as u_char,
+                            );
                             r != 0 as libc::c_int
                         }
                     {

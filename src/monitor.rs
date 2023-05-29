@@ -102,7 +102,7 @@ extern "C" {
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_get_string(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
@@ -1698,7 +1698,7 @@ pub unsafe extern "C" fn mm_answer_moduli(
     sshbuf_reset(m);
     dh = choose_dh(min as libc::c_int, want as libc::c_int, max as libc::c_int);
     if dh.is_null() {
-        r = sshbuf_put_u8(m, 0 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, 0 as libc::c_int as u_char);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -1714,7 +1714,7 @@ pub unsafe extern "C" fn mm_answer_moduli(
         return 0 as libc::c_int;
     } else {
         DH_get0_pqg(dh, &mut dh_p, 0 as *mut *const BIGNUM, &mut dh_g);
-        r = sshbuf_put_u8(m, 1 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, 1 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
                 r = sshbuf_put_bignum2(m, dh_p);
@@ -2075,7 +2075,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
     );
     sshbuf_reset(m);
     if pwent.is_null() {
-        r = sshbuf_put_u8(m, 0 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, 0 as libc::c_int as u_char);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -2095,7 +2095,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
         allowed = 1 as libc::c_int;
         (*authctxt).pw = pwent;
         (*authctxt).valid = 1 as libc::c_int;
-        r = sshbuf_put_u8(m, 1 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, 1 as libc::c_int as u_char);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -3839,7 +3839,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
     encoded_ret = (ret != 0 as libc::c_int) as libc::c_int;
     r = sshbuf_put_u32(m, encoded_ret as u_int32_t);
     if r != 0 as libc::c_int || {
-        r = sshbuf_put_u8(
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(
             m,
             (sig_details != 0 as *mut libc::c_void as *mut sshkey_sig_details) as libc::c_int
                 as u_char,
@@ -3860,7 +3860,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
     if !sig_details.is_null() {
         r = sshbuf_put_u32(m, (*sig_details).sk_counter);
         if r != 0 as libc::c_int || {
-            r = sshbuf_put_u8(m, (*sig_details).sk_flags);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, (*sig_details).sk_flags);
             r != 0 as libc::c_int
         } {
             sshfatal(

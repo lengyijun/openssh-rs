@@ -125,7 +125,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -2970,7 +2970,10 @@ unsafe extern "C" fn process_escapes(
                             if pid != 0 as libc::c_int {
                                 libc::exit(0 as libc::c_int);
                             }
-                            r = sshbuf_put_u8(bin, 4 as libc::c_int as u_char);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_u8(
+                                bin,
+                                4 as libc::c_int as u_char,
+                            );
                             if r != 0 as libc::c_int {
                                 sshfatal(
                                     b"clientloop.c\0" as *const u8 as *const libc::c_char,
@@ -2982,7 +2985,8 @@ unsafe extern "C" fn process_escapes(
                                     1 as libc::c_int,
                                     SYSLOG_LEVEL_FATAL,
                                     ssh_err(r),
-                                    b"sshbuf_put_u8\0" as *const u8 as *const libc::c_char,
+                                    b"crate::sshbuf_getput_basic::sshbuf_put_u8\0" as *const u8
+                                        as *const libc::c_char,
                                 );
                             }
                             return -(1 as libc::c_int);
@@ -3071,7 +3075,10 @@ unsafe extern "C" fn process_escapes(
                 }
                 _ => {
                     if ch as libc::c_int != (*efc).escape_char {
-                        r = sshbuf_put_u8(bin, (*efc).escape_char as u_char);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_u8(
+                            bin,
+                            (*efc).escape_char as u_char,
+                        );
                         if r != 0 as libc::c_int {
                             sshfatal(
                                 b"clientloop.c\0" as *const u8 as *const libc::c_char,
@@ -3083,7 +3090,8 @@ unsafe extern "C" fn process_escapes(
                                 1 as libc::c_int,
                                 SYSLOG_LEVEL_FATAL,
                                 ssh_err(r),
-                                b"sshbuf_put_u8\0" as *const u8 as *const libc::c_char,
+                                b"crate::sshbuf_getput_basic::sshbuf_put_u8\0" as *const u8
+                                    as *const libc::c_char,
                             );
                         }
                         bytes += 1;
@@ -3145,7 +3153,7 @@ unsafe extern "C" fn process_escapes(
             13484060386966298149 => {
                 last_was_cr = (ch as libc::c_int == '\r' as i32 || ch as libc::c_int == '\n' as i32)
                     as libc::c_int;
-                r = sshbuf_put_u8(bin, ch);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u8(bin, ch);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"clientloop.c\0" as *const u8 as *const libc::c_char,
@@ -3157,7 +3165,8 @@ unsafe extern "C" fn process_escapes(
                         1 as libc::c_int,
                         SYSLOG_LEVEL_FATAL,
                         ssh_err(r),
-                        b"sshbuf_put_u8\0" as *const u8 as *const libc::c_char,
+                        b"crate::sshbuf_getput_basic::sshbuf_put_u8\0" as *const u8
+                            as *const libc::c_char,
                     );
                 }
                 bytes += 1;
@@ -3878,10 +3887,10 @@ unsafe extern "C" fn client_request_forwarded_tcpip(
                 b"alloc reply\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            r = sshbuf_put_u8(b, 0 as libc::c_int as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 0 as libc::c_int as u_char);
             if r != 0 as libc::c_int
                 || {
-                    r = sshbuf_put_u8(b, 90 as libc::c_int as u_char);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 90 as libc::c_int as u_char);
                     r != 0 as libc::c_int
                 }
                 || {

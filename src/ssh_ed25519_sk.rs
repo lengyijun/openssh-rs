@@ -28,7 +28,7 @@ extern "C" {
         valp: *mut *mut libc::c_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
@@ -425,7 +425,7 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
                     apphash.as_mut_ptr() as *const libc::c_void,
                     ::core::mem::size_of::<[u_char; 32]>() as libc::c_ulong,
                 ) != 0 as libc::c_int
-                || sshbuf_put_u8(encoded, sig_flags) != 0 as libc::c_int
+                || crate::sshbuf_getput_basic::sshbuf_put_u8(encoded, sig_flags) != 0 as libc::c_int
                 || sshbuf_put_u32(encoded, sig_counter) != 0 as libc::c_int
                 || sshbuf_put(
                     encoded,

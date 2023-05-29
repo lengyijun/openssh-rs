@@ -144,7 +144,7 @@ extern "C" {
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn match_pattern_list(
@@ -1081,7 +1081,7 @@ unsafe extern "C" fn display_loginmsg() {
     if sshbuf_len(loginmsg) == 0 as libc::c_int as libc::c_ulong {
         return;
     }
-    r = sshbuf_put_u8(loginmsg, 0 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(loginmsg, 0 as libc::c_int as u_char);
     if r != 0 as libc::c_int {
         sshfatal(
             b"session.c\0" as *const u8 as *const libc::c_char,
@@ -1091,7 +1091,7 @@ unsafe extern "C" fn display_loginmsg() {
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             ssh_err(r),
-            b"sshbuf_put_u8\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_getput_basic::sshbuf_put_u8\0" as *const u8 as *const libc::c_char,
         );
     }
     printf(

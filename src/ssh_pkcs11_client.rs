@@ -130,7 +130,7 @@ extern "C" {
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_get_string(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
@@ -499,7 +499,7 @@ unsafe extern "C" fn rsa_encrypt(
                             as *const libc::c_char,
                     );
                 }
-                r = sshbuf_put_u8(msg, 13 as libc::c_int as u_char);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 13 as libc::c_int as u_char);
                 if r != 0 as libc::c_int
                     || {
                         r = sshbuf_put_string(msg, blob as *const libc::c_void, blen);
@@ -639,7 +639,7 @@ unsafe extern "C" fn ecdsa_do_sign(
                             as *const libc::c_char,
                     );
                 }
-                r = sshbuf_put_u8(msg, 13 as libc::c_int as u_char);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 13 as libc::c_int as u_char);
                 if r != 0 as libc::c_int
                     || {
                         r = sshbuf_put_string(msg, blob as *const libc::c_void, blen);
@@ -961,7 +961,7 @@ pub unsafe extern "C" fn pkcs11_add_provider(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_u8(msg, 20 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 20 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_cstring(msg, name);
@@ -1089,7 +1089,7 @@ pub unsafe extern "C" fn pkcs11_del_provider(mut name: *mut libc::c_char) -> lib
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_u8(msg, 21 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 21 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_cstring(msg, name);

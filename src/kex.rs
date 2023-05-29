@@ -116,7 +116,7 @@ extern "C" {
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_get_cstring(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut libc::c_char,
@@ -951,7 +951,7 @@ pub unsafe extern "C" fn kex_prop2buf(
     sshbuf_reset(b);
     i = 0 as libc::c_int as u_int;
     while i < 16 as libc::c_int as libc::c_uint {
-        r = sshbuf_put_u8(b, 0 as libc::c_int as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 0 as libc::c_int as u_char);
         if r != 0 as libc::c_int {
             return r;
         }
@@ -967,7 +967,7 @@ pub unsafe extern "C" fn kex_prop2buf(
         i = i.wrapping_add(1);
         i;
     }
-    r = sshbuf_put_u8(b, 0 as libc::c_int as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 0 as libc::c_int as u_char);
     if r != 0 as libc::c_int || {
         r = sshbuf_put_u32(b, 0 as libc::c_int as u_int32_t);
         r != 0 as libc::c_int
@@ -3042,7 +3042,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                     current_block = 14036831669631104504;
                                     break 's_97;
                                 } else {
-                                    r = sshbuf_put_u8(peer_version, c);
+                                    r = crate::sshbuf_getput_basic::sshbuf_put_u8(peer_version, c);
                                     if r != 0 as libc::c_int {
                                         oerrno = *libc::__errno_location();
                                         crate::log::sshlog(

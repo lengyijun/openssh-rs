@@ -25,7 +25,7 @@ extern "C" {
         valp: *mut *mut libc::c_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_put_u64(buf: *mut crate::sshbuf::sshbuf, val: u_int64_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
@@ -1523,7 +1523,7 @@ unsafe extern "C" fn serialise_nullable_string(
     mut s: *const libc::c_char,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    r = sshbuf_put_u8(
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(
         m,
         (s == 0 as *mut libc::c_void as *const libc::c_char) as libc::c_int as u_char,
     );
@@ -1565,38 +1565,47 @@ pub unsafe extern "C" fn sshauthopt_serialise(
     mut untrusted: libc::c_int,
 ) -> libc::c_int {
     let mut r: libc::c_int = -(1 as libc::c_int);
-    r = sshbuf_put_u8(m, (*opts).permit_port_forwarding_flag as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, (*opts).permit_port_forwarding_flag as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u8(m, (*opts).permit_agent_forwarding_flag as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(
+                m,
+                (*opts).permit_agent_forwarding_flag as u_char,
+            );
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u8(m, (*opts).permit_x11_forwarding_flag as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(
+                m,
+                (*opts).permit_x11_forwarding_flag as u_char,
+            );
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u8(m, (*opts).permit_pty_flag as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, (*opts).permit_pty_flag as u_char);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u8(m, (*opts).permit_user_rc as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, (*opts).permit_user_rc as u_char);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u8(m, (*opts).restricted as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, (*opts).restricted as u_char);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u8(m, (*opts).cert_authority as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, (*opts).cert_authority as u_char);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u8(m, (*opts).no_require_user_presence as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(
+                m,
+                (*opts).no_require_user_presence as u_char,
+            );
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u8(m, (*opts).require_verify as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, (*opts).require_verify as u_char);
             r != 0 as libc::c_int
         }
     {
@@ -1606,7 +1615,7 @@ pub unsafe extern "C" fn sshauthopt_serialise(
     if r != 0 as libc::c_int {
         return r;
     }
-    r = sshbuf_put_u8(
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8(
         m,
         ((*opts).force_tun_device == -(1 as libc::c_int)) as libc::c_int as u_char,
     );

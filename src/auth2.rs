@@ -65,7 +65,6 @@ extern "C" {
 
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
     fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
     fn monotime_double() -> libc::c_double;
     fn sshkey_free(_: *mut sshkey);
@@ -1847,7 +1846,10 @@ pub unsafe extern "C" fn auth2_update_session_info(
         );
     }
     if !((*authctxt).auth_method_key).is_null() {
-        r = sshbuf_put_u8((*authctxt).session_info, ' ' as i32 as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(
+            (*authctxt).session_info,
+            ' ' as i32 as u_char,
+        );
         if r != 0 as libc::c_int || {
             r = sshkey_format_text((*authctxt).auth_method_key, (*authctxt).session_info);
             r != 0 as libc::c_int
@@ -1881,7 +1883,10 @@ pub unsafe extern "C" fn auth2_update_session_info(
                 b"auth_method_info contains \\n\0" as *const u8 as *const libc::c_char,
             );
         }
-        r = sshbuf_put_u8((*authctxt).session_info, ' ' as i32 as u_char);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u8(
+            (*authctxt).session_info,
+            ' ' as i32 as u_char,
+        );
         if r != 0 as libc::c_int || {
             r = crate::sshbuf_getput_basic::sshbuf_putf(
                 (*authctxt).session_info,
@@ -1904,7 +1909,7 @@ pub unsafe extern "C" fn auth2_update_session_info(
             );
         }
     }
-    r = sshbuf_put_u8((*authctxt).session_info, '\n' as i32 as u_char);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u8((*authctxt).session_info, '\n' as i32 as u_char);
     if r != 0 as libc::c_int {
         sshfatal(
             b"auth2.c\0" as *const u8 as *const libc::c_char,

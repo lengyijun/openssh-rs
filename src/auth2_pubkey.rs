@@ -44,7 +44,7 @@ extern "C" {
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_put_string(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -1124,7 +1124,10 @@ unsafe extern "C" fn userauth_pubkey(
                                     b"\0" as *const u8 as *const libc::c_char
                                 },
                             );
-                            r = sshbuf_put_u8(b, 50 as libc::c_int as u_char);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_u8(
+                                b,
+                                50 as libc::c_int as u_char,
+                            );
                             if r != 0 as libc::c_int
                                 || {
                                     r = sshbuf_put_cstring(b, userstyle);
@@ -1139,7 +1142,7 @@ unsafe extern "C" fn userauth_pubkey(
                                     r != 0 as libc::c_int
                                 }
                                 || {
-                                    r = sshbuf_put_u8(b, have_sig);
+                                    r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, have_sig);
                                     r != 0 as libc::c_int
                                 }
                                 || {

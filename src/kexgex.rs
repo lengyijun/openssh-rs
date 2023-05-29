@@ -12,7 +12,7 @@ extern "C" {
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -75,7 +75,7 @@ pub unsafe extern "C" fn kexgex_hash(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u8(b, 20 as libc::c_int as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 20 as libc::c_int as u_char);
             r != 0 as libc::c_int
         }
         || {
@@ -91,7 +91,7 @@ pub unsafe extern "C" fn kexgex_hash(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u8(b, 20 as libc::c_int as u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 20 as libc::c_int as u_char);
             r != 0 as libc::c_int
         }
         || {

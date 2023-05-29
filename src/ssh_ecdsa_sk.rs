@@ -40,7 +40,7 @@ extern "C" {
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_get_cstring(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut libc::c_char,
@@ -602,7 +602,7 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
                                                     );
                                                     if !(ret != 0 as libc::c_int
                                                         || {
-                                                            ret = sshbuf_put_u8(
+                                                            ret = crate::sshbuf_getput_basic::sshbuf_put_u8(
                                                                 original_signed,
                                                                 sig_flags,
                                                             );

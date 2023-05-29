@@ -94,7 +94,7 @@ extern "C" {
         valp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
 
@@ -361,7 +361,7 @@ pub unsafe extern "C" fn sshsig_armor(
                         .wrapping_sub(1 as libc::c_int as libc::c_ulong),
                 );
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u8(buf, '\n' as i32 as u_char);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, '\n' as i32 as u_char);
                     r != 0 as libc::c_int
                 } {
                     crate::log::sshlog(

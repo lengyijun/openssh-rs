@@ -49,7 +49,7 @@ extern "C" {
         valp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
@@ -391,7 +391,7 @@ unsafe extern "C" fn client_converse(
         r = sshbuf_put_u32(req, type_0);
         if r != 0 as libc::c_int
             || {
-                r = sshbuf_put_u8(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u8(
                     req,
                     (log_is_on_stderr() != 0 as libc::c_int) as libc::c_int as u_char,
                 );
@@ -762,7 +762,7 @@ pub unsafe extern "C" fn sshsk_enroll(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_u8(req, flags);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u8(req, flags);
                 r != 0 as libc::c_int
             }
             || {
