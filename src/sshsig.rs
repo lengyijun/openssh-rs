@@ -79,21 +79,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
 
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -596,7 +581,11 @@ unsafe extern "C" fn sshsig_wrap_sign(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_string(tosign, 0 as *const libc::c_void, 0 as libc::c_int as size_t);
+                r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                    tosign,
+                    0 as *const libc::c_void,
+                    0 as libc::c_int as size_t,
+                );
                 r != 0 as libc::c_int
             }
             || {
@@ -708,7 +697,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_put_string(
+                            r = crate::sshbuf_getput_basic::sshbuf_put_string(
                                 blob,
                                 0 as *const libc::c_void,
                                 0 as libc::c_int as size_t,
@@ -720,7 +709,11 @@ unsafe extern "C" fn sshsig_wrap_sign(
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_put_string(blob, sig as *const libc::c_void, slen);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                                blob,
+                                sig as *const libc::c_void,
+                                slen,
+                            );
                             r != 0 as libc::c_int
                         }
                     {
@@ -852,11 +845,19 @@ unsafe extern "C" fn sshsig_peek_hashalg(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_get_string(buf, 0 as *mut *mut u_char, 0 as *mut size_t);
+                r = crate::sshbuf_getput_basic::sshbuf_get_string(
+                    buf,
+                    0 as *mut *mut u_char,
+                    0 as *mut size_t,
+                );
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_get_cstring(buf, &mut hashalg, 0 as *mut size_t);
+                r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                    buf,
+                    &mut hashalg,
+                    0 as *mut size_t,
+                );
                 r != 0 as libc::c_int
             }
             || {
@@ -948,7 +949,7 @@ unsafe extern "C" fn sshsig_wrap_verify(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_string(
+                r = crate::sshbuf_getput_basic::sshbuf_put_string(
                     toverify,
                     0 as *const libc::c_void,
                     0 as libc::c_int as size_t,
@@ -982,15 +983,27 @@ unsafe extern "C" fn sshsig_wrap_verify(
                 r = sshkey_froms(signature, &mut key);
                 if r != 0 as libc::c_int
                     || {
-                        r = sshbuf_get_cstring(signature, &mut got_namespace, 0 as *mut size_t);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                            signature,
+                            &mut got_namespace,
+                            0 as *mut size_t,
+                        );
                         r != 0 as libc::c_int
                     }
                     || {
-                        r = sshbuf_get_string(signature, 0 as *mut *mut u_char, 0 as *mut size_t);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_string(
+                            signature,
+                            0 as *mut *mut u_char,
+                            0 as *mut size_t,
+                        );
                         r != 0 as libc::c_int
                     }
                     || {
-                        r = sshbuf_get_cstring(signature, &mut sig_hashalg, 0 as *mut size_t);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                            signature,
+                            &mut sig_hashalg,
+                            0 as *mut size_t,
+                        );
                         r != 0 as libc::c_int
                     }
                     || {

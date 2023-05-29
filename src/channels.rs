@@ -100,21 +100,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
 
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
@@ -4419,7 +4404,7 @@ unsafe extern "C" fn channel_handle_rfd(mut ssh: *mut ssh, mut c: *mut Channel) 
                     chan_read_failed(ssh, c);
                 }
             } else if (*c).datagram != 0 {
-                r = sshbuf_put_string(
+                r = crate::sshbuf_getput_basic::sshbuf_put_string(
                     (*c).input,
                     buf.as_mut_ptr() as *const libc::c_void,
                     len as size_t,
@@ -4533,7 +4518,7 @@ unsafe extern "C" fn channel_handle_wfd(mut ssh: *mut ssh, mut c: *mut Channel) 
             return -(1 as libc::c_int);
         }
     } else if (*c).datagram != 0 {
-        r = sshbuf_get_string((*c).output, &mut data, &mut dlen);
+        r = crate::sshbuf_getput_basic::sshbuf_get_string((*c).output, &mut data, &mut dlen);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -6447,7 +6432,11 @@ pub unsafe extern "C" fn channel_proxy_downstream(
                 );
                 current_block = 11241368042544214213;
             } else {
-                r = sshbuf_get_cstring(original, &mut ctype, 0 as *mut size_t);
+                r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                    original,
+                    &mut ctype,
+                    0 as *mut size_t,
+                );
                 if r != 0 as libc::c_int || {
                     r = crate::sshbuf_getput_basic::sshbuf_get_u32(original, &mut id);
                     r != 0 as libc::c_int
@@ -6622,7 +6611,11 @@ pub unsafe extern "C" fn channel_proxy_downstream(
                 );
                 current_block = 11241368042544214213;
             } else {
-                r = sshbuf_get_cstring(original, &mut ctype, 0 as *mut size_t);
+                r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                    original,
+                    &mut ctype,
+                    0 as *mut size_t,
+                );
                 if r != 0 as libc::c_int {
                     crate::log::sshlog(
                         b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -6660,7 +6653,11 @@ pub unsafe extern "C" fn channel_proxy_downstream(
                     r = crate::sshbuf_getput_basic::sshbuf_get_u8(original, 0 as *mut u_char);
                     if r != 0 as libc::c_int
                         || {
-                            r = sshbuf_get_cstring(original, &mut listen_host, 0 as *mut size_t);
+                            r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                                original,
+                                &mut listen_host,
+                                0 as *mut size_t,
+                            );
                             r != 0 as libc::c_int
                         }
                         || {
@@ -7114,7 +7111,11 @@ pub unsafe extern "C" fn channel_input_data(
     (*c).local_window =
         ((*c).local_window as libc::c_ulong).wrapping_sub(win_len) as u_int as u_int;
     if (*c).datagram != 0 {
-        r = sshbuf_put_string((*c).output, data as *const libc::c_void, data_len);
+        r = crate::sshbuf_getput_basic::sshbuf_put_string(
+            (*c).output,
+            data as *const libc::c_void,
+            data_len,
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"channels.c\0" as *const u8 as *const libc::c_char,

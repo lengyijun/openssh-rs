@@ -77,11 +77,6 @@ extern "C" {
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn tilde_expand_filename(_: *const libc::c_char, _: uid_t) -> *mut libc::c_char;
     fn percent_expand(_: *const libc::c_char, _: ...) -> *mut libc::c_char;
@@ -1474,7 +1469,7 @@ pub unsafe extern "C" fn auth_debug_send(mut ssh: *mut ssh) {
         return;
     }
     while crate::sshbuf::sshbuf_len(auth_debug) != 0 as libc::c_int as libc::c_ulong {
-        r = sshbuf_get_cstring(auth_debug, &mut msg, 0 as *mut size_t);
+        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(auth_debug, &mut msg, 0 as *mut size_t);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"auth.c\0" as *const u8 as *const libc::c_char,
@@ -1484,7 +1479,8 @@ pub unsafe extern "C" fn auth_debug_send(mut ssh: *mut ssh) {
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 ssh_err(r),
-                b"sshbuf_get_cstring\0" as *const u8 as *const libc::c_char,
+                b"crate::sshbuf_getput_basic::sshbuf_get_cstring\0" as *const u8
+                    as *const libc::c_char,
             );
         }
         ssh_packet_send_debug(ssh, b"%s\0" as *const u8 as *const libc::c_char, msg);

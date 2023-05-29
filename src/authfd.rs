@@ -39,21 +39,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
 
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -513,7 +498,7 @@ unsafe extern "C" fn deserialise_identity2(
     let mut blen: size_t = 0;
     r = sshbuf_get_string_direct(ids, &mut blob, &mut blen);
     if !(r != 0 as libc::c_int || {
-        r = sshbuf_get_cstring(ids, &mut comment, 0 as *mut size_t);
+        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(ids, &mut comment, 0 as *mut size_t);
         r != 0 as libc::c_int
     }) {
         r = sshkey_from_blob(blob, blen, keyp);
@@ -738,7 +723,11 @@ pub unsafe extern "C" fn ssh_agent_sign(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_string(msg, data as *const libc::c_void, datalen);
+            r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                msg,
+                data as *const libc::c_void,
+                datalen,
+            );
             r != 0 as libc::c_int
         }
         || {
@@ -758,7 +747,7 @@ pub unsafe extern "C" fn ssh_agent_sign(
                 } else if type_0 as libc::c_int != 14 as libc::c_int {
                     r = -(4 as libc::c_int);
                 } else {
-                    r = sshbuf_get_string(msg, &mut sig, &mut len);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_string(msg, &mut sig, &mut len);
                     if !(r != 0 as libc::c_int) {
                         r = sshkey_check_sigtype(sig, len, alg);
                         if !(r != 0 as libc::c_int) {
@@ -796,7 +785,11 @@ unsafe extern "C" fn encode_dest_constraint_hop(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_string(b, 0 as *const libc::c_void, 0 as libc::c_int as size_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                b,
+                0 as *const libc::c_void,
+                0 as libc::c_int as size_t,
+            );
             r != 0 as libc::c_int
         })
     {
@@ -851,7 +844,11 @@ unsafe extern "C" fn encode_dest_constraint(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_string(b, 0 as *const libc::c_void, 0 as libc::c_int as size_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                b,
+                0 as *const libc::c_void,
+                0 as libc::c_int as size_t,
+            );
             r != 0 as libc::c_int
         })
     {
@@ -1110,7 +1107,11 @@ pub unsafe extern "C" fn ssh_remove_identity(
         if !(r != 0 as libc::c_int) {
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 18 as libc::c_int as u_char);
             if !(r != 0 as libc::c_int || {
-                r = sshbuf_put_string(msg, blob as *const libc::c_void, blen);
+                r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                    msg,
+                    blob as *const libc::c_void,
+                    blen,
+                );
                 r != 0 as libc::c_int
             }) {
                 r = ssh_request_reply_decode(sock, msg);

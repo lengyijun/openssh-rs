@@ -43,21 +43,7 @@ extern "C" {
     fn sshbuf_put_bignum2(buf: *mut crate::sshbuf::sshbuf, v: *const BIGNUM) -> libc::c_int;
     fn sshbuf_get_bignum2(buf: *mut crate::sshbuf::sshbuf, valp: *mut *mut BIGNUM) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
+
     fn RSA_new() -> *mut RSA;
     fn RSA_size(rsa: *const RSA) -> libc::c_int;
     fn RSA_set0_key(r: *mut RSA, n: *mut BIGNUM, e: *mut BIGNUM, d: *mut BIGNUM) -> libc::c_int;
@@ -808,7 +794,11 @@ unsafe extern "C" fn ssh_rsa_sign(
                     } else {
                         ret = sshbuf_put_cstring(b, rsa_hash_alg_ident(hash_alg));
                         if !(ret != 0 as libc::c_int || {
-                            ret = sshbuf_put_string(b, sig as *const libc::c_void, slen);
+                            ret = crate::sshbuf_getput_basic::sshbuf_put_string(
+                                b,
+                                sig as *const libc::c_void,
+                                slen,
+                            );
                             ret != 0 as libc::c_int
                         }) {
                             len = crate::sshbuf::sshbuf_len(b) as u_int;
@@ -896,7 +886,9 @@ unsafe extern "C" fn ssh_rsa_verify(
     if b.is_null() {
         return -(2 as libc::c_int);
     }
-    if sshbuf_get_cstring(b, &mut sigtype, 0 as *mut size_t) != 0 as libc::c_int {
+    if crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut sigtype, 0 as *mut size_t)
+        != 0 as libc::c_int
+    {
         ret = -(4 as libc::c_int);
     } else {
         hash_alg = rsa_hash_id_from_ident(sigtype);
@@ -925,7 +917,9 @@ unsafe extern "C" fn ssh_rsa_verify(
             match current_block {
                 17539625483582710546 => {}
                 _ => {
-                    if sshbuf_get_string(b, &mut sigblob, &mut len) != 0 as libc::c_int {
+                    if crate::sshbuf_getput_basic::sshbuf_get_string(b, &mut sigblob, &mut len)
+                        != 0 as libc::c_int
+                    {
                         ret = -(4 as libc::c_int);
                     } else if crate::sshbuf::sshbuf_len(b) != 0 as libc::c_int as libc::c_ulong {
                         ret = -(23 as libc::c_int);

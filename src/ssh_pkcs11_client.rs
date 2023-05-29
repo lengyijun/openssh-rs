@@ -126,21 +126,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn log_level_get() -> LogLevel;
 
@@ -497,11 +482,19 @@ unsafe extern "C" fn rsa_encrypt(
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 13 as libc::c_int as u_char);
                 if r != 0 as libc::c_int
                     || {
-                        r = sshbuf_put_string(msg, blob as *const libc::c_void, blen);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                            msg,
+                            blob as *const libc::c_void,
+                            blen,
+                        );
                         r != 0 as libc::c_int
                     }
                     || {
-                        r = sshbuf_put_string(msg, from as *const libc::c_void, flen as size_t);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                            msg,
+                            from as *const libc::c_void,
+                            flen as size_t,
+                        );
                         r != 0 as libc::c_int
                     }
                     || {
@@ -528,7 +521,11 @@ unsafe extern "C" fn rsa_encrypt(
                 send_msg(msg);
                 crate::sshbuf::sshbuf_reset(msg);
                 if recv_msg(msg) == 14 as libc::c_int {
-                    r = sshbuf_get_string(msg, &mut signature, &mut slen);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_string(
+                        msg,
+                        &mut signature,
+                        &mut slen,
+                    );
                     if r != 0 as libc::c_int {
                         sshfatal(
                             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
@@ -640,11 +637,19 @@ unsafe extern "C" fn ecdsa_do_sign(
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 13 as libc::c_int as u_char);
                 if r != 0 as libc::c_int
                     || {
-                        r = sshbuf_put_string(msg, blob as *const libc::c_void, blen);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                            msg,
+                            blob as *const libc::c_void,
+                            blen,
+                        );
                         r != 0 as libc::c_int
                     }
                     || {
-                        r = sshbuf_put_string(msg, dgst as *const libc::c_void, dgst_len as size_t);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                            msg,
+                            dgst as *const libc::c_void,
+                            dgst_len as size_t,
+                        );
                         r != 0 as libc::c_int
                     }
                     || {
@@ -671,7 +676,11 @@ unsafe extern "C" fn ecdsa_do_sign(
                 send_msg(msg);
                 crate::sshbuf::sshbuf_reset(msg);
                 if recv_msg(msg) == 14 as libc::c_int {
-                    r = sshbuf_get_string(msg, &mut signature, &mut slen);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_string(
+                        msg,
+                        &mut signature,
+                        &mut slen,
+                    );
                     if r != 0 as libc::c_int {
                         sshfatal(
                             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
@@ -1015,9 +1024,13 @@ pub unsafe extern "C" fn pkcs11_add_provider(
         }
         i = 0 as libc::c_int as u_int;
         while i < nkeys {
-            r = sshbuf_get_string(msg, &mut blob, &mut blen);
+            r = crate::sshbuf_getput_basic::sshbuf_get_string(msg, &mut blob, &mut blen);
             if r != 0 as libc::c_int || {
-                r = sshbuf_get_cstring(msg, &mut label, 0 as *mut size_t);
+                r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                    msg,
+                    &mut label,
+                    0 as *mut size_t,
+                );
                 r != 0 as libc::c_int
             } {
                 sshfatal(

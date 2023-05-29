@@ -110,11 +110,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
 
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
@@ -1011,7 +1006,11 @@ pub unsafe extern "C" fn kex_buf2prop(
                     current_block = 11050875288958768710;
                     break;
                 }
-                r = sshbuf_get_cstring(b, &mut *proposal.offset(i as isize), 0 as *mut size_t);
+                r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                    b,
+                    &mut *proposal.offset(i as isize),
+                    0 as *mut size_t,
+                );
                 if r != 0 as libc::c_int {
                     crate::log::sshlog(
                         b"kex.c\0" as *const u8 as *const libc::c_char,

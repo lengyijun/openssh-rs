@@ -44,16 +44,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
 
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
@@ -2826,7 +2816,11 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
                     b"no signature\0" as *const u8 as *const libc::c_char,
                 );
             }
-            r = sshbuf_put_string(b, signature as *const libc::c_void, slen);
+            r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                b,
+                signature as *const libc::c_void,
+                slen,
+            );
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
@@ -4214,7 +4208,7 @@ unsafe extern "C" fn ssh_keysign(
     }
     r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, sock as u_int32_t);
     if r != 0 as libc::c_int || {
-        r = sshbuf_put_string(b, data as *const libc::c_void, datalen);
+        r = crate::sshbuf_getput_basic::sshbuf_put_string(b, data as *const libc::c_void, datalen);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -4336,7 +4330,7 @@ unsafe extern "C" fn ssh_keysign(
                             b"bad version\0" as *const u8 as *const libc::c_char,
                         );
                     } else {
-                        r = sshbuf_get_string(b, sigp, lenp);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_string(b, sigp, lenp);
                         if r != 0 as libc::c_int {
                             crate::log::sshlog(
                                 b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
@@ -4568,7 +4562,11 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
                                 r != 0 as libc::c_int
                             }
                             || {
-                                r = sshbuf_put_string(b, keyblob as *const libc::c_void, keylen);
+                                r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                                    b,
+                                    keyblob as *const libc::c_void,
+                                    keylen,
+                                );
                                 r != 0 as libc::c_int
                             }
                             || {

@@ -25,21 +25,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
 
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -333,9 +318,9 @@ unsafe extern "C" fn process_add() {
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_get_cstring(iqueue, &mut name, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(iqueue, &mut name, 0 as *mut size_t);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_cstring(iqueue, &mut pin, 0 as *mut size_t);
+        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(iqueue, &mut pin, 0 as *mut size_t);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -381,7 +366,11 @@ unsafe extern "C" fn process_add() {
                     b"encode key\0" as *const u8 as *const libc::c_char,
                 );
             } else {
-                r = sshbuf_put_string(msg, blob as *const libc::c_void, blen);
+                r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                    msg,
+                    blob as *const libc::c_void,
+                    blen,
+                );
                 if r != 0 as libc::c_int || {
                     r = sshbuf_put_cstring(msg, *labels.offset(i as isize));
                     r != 0 as libc::c_int
@@ -449,9 +438,9 @@ unsafe extern "C" fn process_del() {
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_get_cstring(iqueue, &mut name, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(iqueue, &mut name, 0 as *mut size_t);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_cstring(iqueue, &mut pin, 0 as *mut size_t);
+        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(iqueue, &mut pin, 0 as *mut size_t);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -501,10 +490,10 @@ unsafe extern "C" fn process_sign() {
     let mut key: *mut sshkey = 0 as *mut sshkey;
     let mut found: *mut sshkey = 0 as *mut sshkey;
     let mut msg: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
-    r = sshbuf_get_string(iqueue, &mut blob, &mut blen);
+    r = crate::sshbuf_getput_basic::sshbuf_get_string(iqueue, &mut blob, &mut blen);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_get_string(iqueue, &mut data, &mut dlen);
+            r = crate::sshbuf_getput_basic::sshbuf_get_string(iqueue, &mut data, &mut dlen);
             r != 0 as libc::c_int
         }
         || {
@@ -613,7 +602,11 @@ unsafe extern "C" fn process_sign() {
     if ok == 0 as libc::c_int {
         r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 14 as libc::c_int as u_char);
         if r != 0 as libc::c_int || {
-            r = sshbuf_put_string(msg, signature as *const libc::c_void, slen);
+            r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                msg,
+                signature as *const libc::c_void,
+                slen,
+            );
             r != 0 as libc::c_int
         } {
             sshfatal(

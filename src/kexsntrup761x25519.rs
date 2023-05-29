@@ -35,11 +35,7 @@ extern "C" {
         len: size_t,
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
+
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
     fn ssh_digest_buffer(
         alg: libc::c_int,
@@ -278,7 +274,7 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_enc(
                             );
                             if !(r != 0 as libc::c_int) {
                                 crate::sshbuf::sshbuf_reset(buf);
-                                r = sshbuf_put_string(
+                                r = crate::sshbuf_getput_basic::sshbuf_put_string(
                                     buf,
                                     hash.as_mut_ptr() as *const libc::c_void,
                                     ssh_digest_bytes((*kex).hash_alg),
@@ -354,7 +350,7 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_dec(
                     );
                     if !(r != 0 as libc::c_int) {
                         crate::sshbuf::sshbuf_reset(buf);
-                        r = sshbuf_put_string(
+                        r = crate::sshbuf_getput_basic::sshbuf_put_string(
                             buf,
                             hash.as_mut_ptr() as *const libc::c_void,
                             ssh_digest_bytes((*kex).hash_alg),

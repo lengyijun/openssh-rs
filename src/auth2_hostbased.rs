@@ -22,11 +22,6 @@ extern "C" {
     fn sshpkt_get_string(ssh: *mut ssh, valp: *mut *mut u_char, lenp: *mut size_t) -> libc::c_int;
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
 
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -807,11 +802,19 @@ unsafe extern "C" fn userauth_hostbased(
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_put_string(b, pkalg as *const libc::c_void, alen);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                                b,
+                                pkalg as *const libc::c_void,
+                                alen,
+                            );
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_put_string(b, pkblob as *const libc::c_void, blen);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                                b,
+                                pkblob as *const libc::c_void,
+                                blen,
+                            );
                             r != 0 as libc::c_int
                         }
                         || {

@@ -30,21 +30,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
@@ -255,7 +240,7 @@ unsafe extern "C" fn ssh_ed25519_serialize_public(
     if ((*key).ed25519_pk).is_null() {
         return -(10 as libc::c_int);
     }
-    r = sshbuf_put_string(
+    r = crate::sshbuf_getput_basic::sshbuf_put_string(
         b,
         (*key).ed25519_pk as *const libc::c_void,
         32 as libc::c_uint as size_t,
@@ -271,13 +256,13 @@ unsafe extern "C" fn ssh_ed25519_serialize_private(
     mut _opts: sshkey_serialize_rep,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    r = sshbuf_put_string(
+    r = crate::sshbuf_getput_basic::sshbuf_put_string(
         b,
         (*key).ed25519_pk as *const libc::c_void,
         32 as libc::c_uint as size_t,
     );
     if r != 0 as libc::c_int || {
-        r = sshbuf_put_string(
+        r = crate::sshbuf_getput_basic::sshbuf_put_string(
             b,
             (*key).ed25519_sk as *const libc::c_void,
             64 as libc::c_uint as size_t,
@@ -328,7 +313,7 @@ unsafe extern "C" fn ssh_ed25519_deserialize_public(
     let mut pk: *mut u_char = 0 as *mut u_char;
     let mut len: size_t = 0 as libc::c_int as size_t;
     let mut r: libc::c_int = 0;
-    r = sshbuf_get_string(b, &mut pk, &mut len);
+    r = crate::sshbuf_getput_basic::sshbuf_get_string(b, &mut pk, &mut len);
     if r != 0 as libc::c_int {
         return r;
     }
@@ -349,7 +334,7 @@ unsafe extern "C" fn ssh_ed25519_deserialize_private(
     let mut ed25519_sk: *mut u_char = 0 as *mut u_char;
     r = ssh_ed25519_deserialize_public(0 as *const libc::c_char, b, key);
     if !(r != 0 as libc::c_int) {
-        r = sshbuf_get_string(b, &mut ed25519_sk, &mut sklen);
+        r = crate::sshbuf_getput_basic::sshbuf_get_string(b, &mut ed25519_sk, &mut sklen);
         if !(r != 0 as libc::c_int) {
             if sklen != 64 as libc::c_uint as libc::c_ulong {
                 r = -(4 as libc::c_int);
@@ -419,7 +404,7 @@ unsafe extern "C" fn ssh_ed25519_sign(
         } else {
             r = sshbuf_put_cstring(b, b"ssh-ed25519\0" as *const u8 as *const libc::c_char);
             if !(r != 0 as libc::c_int || {
-                r = sshbuf_put_string(
+                r = crate::sshbuf_getput_basic::sshbuf_put_string(
                     b,
                     sig as *const libc::c_void,
                     smlen.wrapping_sub(datalen as libc::c_ulonglong) as size_t,
@@ -496,7 +481,7 @@ unsafe extern "C" fn ssh_ed25519_verify(
     if b.is_null() {
         return -(2 as libc::c_int);
     }
-    r = sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t);
     if !(r != 0 as libc::c_int || {
         r = sshbuf_get_string_direct(b, &mut sigblob, &mut len);
         r != 0 as libc::c_int

@@ -36,11 +36,6 @@ extern "C" {
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
     fn sshbuf_get_bignum2(buf: *mut crate::sshbuf::sshbuf, valp: *mut *mut BIGNUM) -> libc::c_int;
     fn sshbuf_dtourlb64(
         d: *const crate::sshbuf::sshbuf,
@@ -479,7 +474,9 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
     ) as *mut sshkey_sig_details;
     if details.is_null() {
         ret = -(2 as libc::c_int);
-    } else if sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t) != 0 as libc::c_int {
+    } else if crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t)
+        != 0 as libc::c_int
+    {
         ret = -(4 as libc::c_int);
     } else {
         if libc::strcmp(
@@ -511,8 +508,11 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
                     ret = -(4 as libc::c_int);
                 } else {
                     if is_webauthn != 0 {
-                        if sshbuf_get_cstring(b, &mut webauthn_origin, 0 as *mut size_t)
-                            != 0 as libc::c_int
+                        if crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                            b,
+                            &mut webauthn_origin,
+                            0 as *mut size_t,
+                        ) != 0 as libc::c_int
                             || sshbuf_froms(b, &mut webauthn_wrapper) != 0 as libc::c_int
                             || sshbuf_froms(b, &mut webauthn_exts) != 0 as libc::c_int
                         {

@@ -20,11 +20,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
 
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
@@ -218,7 +213,7 @@ unsafe extern "C" fn cert_option_list(
             }
             crate::sshbuf::sshbuf_free(data);
             data = 0 as *mut crate::sshbuf::sshbuf;
-            r = sshbuf_get_cstring(c, &mut name, 0 as *mut size_t);
+            r = crate::sshbuf_getput_basic::sshbuf_get_cstring(c, &mut name, 0 as *mut size_t);
             if r != 0 as libc::c_int || {
                 r = sshbuf_froms(c, &mut data);
                 r != 0 as libc::c_int
@@ -314,7 +309,11 @@ unsafe extern "C" fn cert_option_list(
                         b"force-command\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
                     {
-                        r = sshbuf_get_cstring(data, &mut command, 0 as *mut size_t);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                            data,
+                            &mut command,
+                            0 as *mut size_t,
+                        );
                         if r != 0 as libc::c_int {
                             crate::log::sshlog(
                                 b"auth-options.c\0" as *const u8 as *const libc::c_char,
@@ -358,7 +357,11 @@ unsafe extern "C" fn cert_option_list(
                         b"source-address\0" as *const u8 as *const libc::c_char,
                     ) == 0 as libc::c_int
                     {
-                        r = sshbuf_get_cstring(data, &mut allowed, 0 as *mut size_t);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                            data,
+                            &mut allowed,
+                            0 as *mut size_t,
+                        );
                         if r != 0 as libc::c_int {
                             crate::log::sshlog(
                                 b"auth-options.c\0" as *const u8 as *const libc::c_char,
@@ -1478,7 +1481,11 @@ unsafe extern "C" fn deserialise_array(
                         current_block = 13536709405535804910;
                         break;
                     }
-                    r = sshbuf_get_cstring(b, &mut *a.offset(i as isize), 0 as *mut size_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                        b,
+                        &mut *a.offset(i as isize),
+                        0 as *mut size_t,
+                    );
                     if r != 0 as libc::c_int {
                         current_block = 10872474994193263422;
                         break;
@@ -1537,7 +1544,7 @@ unsafe extern "C" fn deserialise_nullable_string(
     *sp = 0 as *mut libc::c_char;
     r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut flag);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_cstring(
+        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
             m,
             if flag as libc::c_int != 0 {
                 0 as *mut *mut libc::c_char

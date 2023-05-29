@@ -38,16 +38,7 @@ extern "C" {
         _: ...
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
+
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -661,7 +652,7 @@ pub unsafe extern "C" fn sys_tun_infilter(
     *(rbuf.as_mut_ptr() as *mut u_char).offset(3 as libc::c_int as isize) =
         (__v & 0xff as libc::c_int as libc::c_uint) as u_char;
     ptr = rbuf.as_mut_ptr();
-    r = sshbuf_put_string((*c).input, ptr as *const libc::c_void, len);
+    r = crate::sshbuf_getput_basic::sshbuf_put_string((*c).input, ptr as *const libc::c_void, len);
     if r != 0 as libc::c_int {
         sshfatal(
             b"port-net.c\0" as *const u8 as *const libc::c_char,
@@ -689,7 +680,7 @@ pub unsafe extern "C" fn sys_tun_outfilter(
     let mut buf: *mut u_char = 0 as *mut u_char;
     let mut _af: u_int32_t = 0;
     let mut r: libc::c_int = 0;
-    r = sshbuf_get_string((*c).output, data, dlen);
+    r = crate::sshbuf_getput_basic::sshbuf_get_string((*c).output, data, dlen);
     if r != 0 as libc::c_int {
         sshfatal(
             b"port-net.c\0" as *const u8 as *const libc::c_char,

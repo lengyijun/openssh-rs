@@ -43,21 +43,6 @@ extern "C" {
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_get_string_direct(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *const u_char,
@@ -384,7 +369,7 @@ unsafe extern "C" fn valid_request(
             b"sshbuf_from failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    r = sshbuf_get_string(b, 0 as *mut *mut u_char, &mut len);
+    r = crate::sshbuf_getput_basic::sshbuf_get_string(b, 0 as *mut *mut u_char, &mut len);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
@@ -435,7 +420,7 @@ unsafe extern "C" fn valid_request(
             b"parse user\0" as *const u8 as *const libc::c_char,
         );
     }
-    r = sshbuf_get_cstring(b, &mut p, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut p, 0 as *mut size_t);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
@@ -454,7 +439,7 @@ unsafe extern "C" fn valid_request(
         fail;
     }
     libc::free(p as *mut libc::c_void);
-    r = sshbuf_get_cstring(b, &mut p, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut p, 0 as *mut size_t);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
@@ -472,9 +457,9 @@ unsafe extern "C" fn valid_request(
         fail;
     }
     libc::free(p as *mut libc::c_void);
-    r = sshbuf_get_cstring(b, &mut pkalg, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut pkalg, 0 as *mut size_t);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_string(b, &mut pkblob, &mut blen);
+        r = crate::sshbuf_getput_basic::sshbuf_get_string(b, &mut pkblob, &mut blen);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -512,7 +497,7 @@ unsafe extern "C" fn valid_request(
             fail;
         }
     }
-    r = sshbuf_get_cstring(b, &mut p, &mut len);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut p, &mut len);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
@@ -551,7 +536,7 @@ unsafe extern "C" fn valid_request(
         fail;
     }
     libc::free(p as *mut libc::c_void);
-    r = sshbuf_get_cstring(b, &mut luser, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut luser, 0 as *mut size_t);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
@@ -1021,7 +1006,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             __progname,
         );
     }
-    r = sshbuf_get_string(b, &mut data, &mut dlen);
+    r = crate::sshbuf_getput_basic::sshbuf_get_string(b, &mut data, &mut dlen);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
@@ -1114,7 +1099,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
     }
     libc::free(data as *mut libc::c_void);
     crate::sshbuf::sshbuf_reset(b);
-    r = sshbuf_put_string(b, signature as *const libc::c_void, slen);
+    r = crate::sshbuf_getput_basic::sshbuf_put_string(b, signature as *const libc::c_void, slen);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,

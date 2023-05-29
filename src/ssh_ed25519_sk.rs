@@ -23,11 +23,6 @@ extern "C" {
         valp: *mut *const u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
 
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -373,7 +368,8 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
     if b.is_null() {
         return -(2 as libc::c_int);
     }
-    if sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t) != 0 as libc::c_int
+    if crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t)
+        != 0 as libc::c_int
         || sshbuf_get_string_direct(b, &mut sigblob, &mut len) != 0 as libc::c_int
         || crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut sig_flags) != 0 as libc::c_int
         || crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut sig_counter) != 0 as libc::c_int

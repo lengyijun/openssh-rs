@@ -35,11 +35,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -570,7 +565,7 @@ unsafe extern "C" fn sshsk_ecdsa_assemble(
             );
             r = -(2 as libc::c_int);
         } else {
-            r = sshbuf_put_string(
+            r = crate::sshbuf_getput_basic::sshbuf_put_string(
                 b,
                 (*resp).public_key as *const libc::c_void,
                 (*resp).public_key_len,
@@ -586,7 +581,8 @@ unsafe extern "C" fn sshsk_ecdsa_assemble(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     ssh_err(r),
-                    b"sshbuf_put_string\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshbuf_getput_basic::sshbuf_put_string\0" as *const u8
+                        as *const libc::c_char,
                 );
             } else {
                 r = sshbuf_get_ec(b, q, EC_KEY_get0_group((*key).ecdsa));
@@ -997,7 +993,7 @@ unsafe extern "C" fn fill_attestation_blob(
     );
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_string(
+            r = crate::sshbuf_getput_basic::sshbuf_put_string(
                 attest,
                 (*resp).attestation_cert as *const libc::c_void,
                 (*resp).attestation_cert_len,
@@ -1005,7 +1001,7 @@ unsafe extern "C" fn fill_attestation_blob(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_string(
+            r = crate::sshbuf_getput_basic::sshbuf_put_string(
                 attest,
                 (*resp).signature as *const libc::c_void,
                 (*resp).signature_len,
@@ -1013,7 +1009,7 @@ unsafe extern "C" fn fill_attestation_blob(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_string(
+            r = crate::sshbuf_getput_basic::sshbuf_put_string(
                 attest,
                 (*resp).authdata as *const libc::c_void,
                 (*resp).authdata_len,
@@ -1025,7 +1021,11 @@ unsafe extern "C" fn fill_attestation_blob(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_string(attest, 0 as *const libc::c_void, 0 as libc::c_int as size_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                attest,
+                0 as *const libc::c_void,
+                0 as libc::c_int as size_t,
+            );
             r != 0 as libc::c_int
         }
     {
@@ -1376,7 +1376,11 @@ unsafe extern "C" fn sshsk_ed25519_sig(
         );
         r = -(4 as libc::c_int);
     } else {
-        r = sshbuf_put_string(sig, (*resp).sig_r as *const libc::c_void, (*resp).sig_r_len);
+        r = crate::sshbuf_getput_basic::sshbuf_put_string(
+            sig,
+            (*resp).sig_r as *const libc::c_void,
+            (*resp).sig_r_len,
+        );
         if r != 0 as libc::c_int
             || {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(sig, (*resp).flags);

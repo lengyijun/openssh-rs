@@ -198,16 +198,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
     fn sshbuf_get_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *mut crate::sshbuf::sshbuf,
@@ -2442,7 +2432,7 @@ unsafe extern "C" fn recv_rexec_state(mut fd: libc::c_int, mut conf: *mut crate:
             b"rexec version mismatch\0" as *const u8 as *const libc::c_char,
         );
     }
-    r = sshbuf_get_string(m, &mut cp, &mut len);
+    r = crate::sshbuf_getput_basic::sshbuf_get_string(m, &mut cp, &mut len);
     if r != 0 as libc::c_int || {
         r = sshbuf_get_stringb(m, inc);
         r != 0 as libc::c_int
@@ -2492,10 +2482,18 @@ unsafe extern "C" fn recv_rexec_state(mut fd: libc::c_int, mut conf: *mut crate:
                     as *const libc::c_char,
             );
         }
-        r = sshbuf_get_cstring(inc, &mut (*item).selector, 0 as *mut size_t);
+        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+            inc,
+            &mut (*item).selector,
+            0 as *mut size_t,
+        );
         if r != 0 as libc::c_int
             || {
-                r = sshbuf_get_cstring(inc, &mut (*item).filename, 0 as *mut size_t);
+                r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                    inc,
+                    &mut (*item).filename,
+                    0 as *mut size_t,
+                );
                 r != 0 as libc::c_int
             }
             || {

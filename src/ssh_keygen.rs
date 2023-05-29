@@ -261,16 +261,6 @@ extern "C" {
 
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
 
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1451,11 +1441,11 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut crate::sshbuf::sshbuf) 
     r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut i1);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_get_cstring(b, &mut type_0, 0 as *mut size_t);
+            r = crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut type_0, 0 as *mut size_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_cstring(b, &mut cipher, 0 as *mut size_t);
+            r = crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut cipher, 0 as *mut size_t);
             r != 0 as libc::c_int
         }
         || {
@@ -4258,7 +4248,11 @@ unsafe extern "C" fn prepare_options_buf(
                 );
                 r = sshbuf_put_cstring(c, (*ext).key);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_string(c, 0 as *const libc::c_void, 0 as libc::c_int as size_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                        c,
+                        0 as *const libc::c_void,
+                        0 as libc::c_int as size_t,
+                    );
                     r != 0 as libc::c_int
                 } {
                     sshfatal(
@@ -5302,7 +5296,7 @@ unsafe extern "C" fn show_options(
     while crate::sshbuf::sshbuf_len(options) != 0 as libc::c_int as libc::c_ulong {
         crate::sshbuf::sshbuf_free(option);
         option = 0 as *mut crate::sshbuf::sshbuf;
-        r = sshbuf_get_cstring(options, &mut name, 0 as *mut size_t);
+        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(options, &mut name, 0 as *mut size_t);
         if r != 0 as libc::c_int || {
             r = sshbuf_froms(options, &mut option);
             r != 0 as libc::c_int
@@ -5355,7 +5349,7 @@ unsafe extern "C" fn show_options(
                     b"source-address\0" as *const u8 as *const libc::c_char,
                 ) == 0 as libc::c_int)
         {
-            r = sshbuf_get_cstring(option, &mut arg, 0 as *mut size_t);
+            r = crate::sshbuf_getput_basic::sshbuf_get_cstring(option, &mut arg, 0 as *mut size_t);
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,

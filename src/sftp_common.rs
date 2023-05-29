@@ -18,18 +18,6 @@ extern "C" {
     ) -> size_t;
     fn localtime(__timer: *const time_t) -> *mut tm;
 
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -190,9 +178,9 @@ pub unsafe extern "C" fn decode_attrib(
         }
         i = 0 as libc::c_int as u_int;
         while i < count {
-            r = sshbuf_get_cstring(b, &mut type_0, 0 as *mut size_t);
+            r = crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut type_0, 0 as *mut size_t);
             if r != 0 as libc::c_int || {
-                r = sshbuf_get_string(b, &mut data, &mut dlen);
+                r = crate::sshbuf_getput_basic::sshbuf_get_string(b, &mut data, &mut dlen);
                 r != 0 as libc::c_int
             } {
                 return r;

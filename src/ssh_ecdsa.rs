@@ -52,11 +52,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -372,7 +367,7 @@ unsafe extern "C" fn ssh_ecdsa_deserialize_public(
     if (*key).ecdsa_nid == -(1 as libc::c_int) {
         return -(10 as libc::c_int);
     }
-    r = sshbuf_get_cstring(b, &mut curve, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut curve, 0 as *mut size_t);
     if !(r != 0 as libc::c_int) {
         if (*key).ecdsa_nid != sshkey_curve_name_to_nid(curve) {
             r = -(15 as libc::c_int);
@@ -582,7 +577,8 @@ unsafe extern "C" fn ssh_ecdsa_verify(
     if b.is_null() {
         return -(2 as libc::c_int);
     }
-    if sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t) != 0 as libc::c_int
+    if crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t)
+        != 0 as libc::c_int
         || sshbuf_froms(b, &mut sigbuf) != 0 as libc::c_int
     {
         ret = -(4 as libc::c_int);

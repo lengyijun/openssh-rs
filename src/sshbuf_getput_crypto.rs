@@ -32,11 +32,7 @@ extern "C" {
         len: size_t,
         ctx: *mut BN_CTX,
     ) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
+
     fn sshbuf_get_string_direct(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *const u_char,
@@ -185,7 +181,7 @@ pub unsafe extern "C" fn sshbuf_put_bignum2(
     {
         prepend = 1 as libc::c_int;
     }
-    r = sshbuf_put_string(
+    r = crate::sshbuf_getput_basic::sshbuf_put_string(
         buf,
         d.as_mut_ptr()
             .offset(1 as libc::c_int as isize)
@@ -238,7 +234,11 @@ pub unsafe extern "C" fn sshbuf_put_ec(
     {
         return -(1 as libc::c_int);
     }
-    ret = sshbuf_put_string(buf, d.as_mut_ptr() as *const libc::c_void, len);
+    ret = crate::sshbuf_getput_basic::sshbuf_put_string(
+        buf,
+        d.as_mut_ptr() as *const libc::c_void,
+        len,
+    );
     explicit_bzero(d.as_mut_ptr() as *mut libc::c_void, len);
     return ret;
 }

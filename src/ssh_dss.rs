@@ -54,21 +54,6 @@ extern "C" {
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_bignum2(buf: *mut crate::sshbuf::sshbuf, v: *const BIGNUM) -> libc::c_int;
     fn sshbuf_get_bignum2(buf: *mut crate::sshbuf::sshbuf, valp: *mut *mut BIGNUM) -> libc::c_int;
@@ -585,7 +570,7 @@ unsafe extern "C" fn ssh_dss_sign(
                 } else {
                     ret = sshbuf_put_cstring(b, b"ssh-dss\0" as *const u8 as *const libc::c_char);
                     if !(ret != 0 as libc::c_int || {
-                        ret = sshbuf_put_string(
+                        ret = crate::sshbuf_getput_basic::sshbuf_put_string(
                             b,
                             sigblob.as_mut_ptr() as *const libc::c_void,
                             (2 as libc::c_int * 20 as libc::c_int) as size_t,
@@ -666,8 +651,10 @@ unsafe extern "C" fn ssh_dss_verify(
     if b.is_null() {
         return -(2 as libc::c_int);
     }
-    if sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t) != 0 as libc::c_int
-        || sshbuf_get_string(b, &mut sigblob, &mut len) != 0 as libc::c_int
+    if crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t)
+        != 0 as libc::c_int
+        || crate::sshbuf_getput_basic::sshbuf_get_string(b, &mut sigblob, &mut len)
+            != 0 as libc::c_int
     {
         ret = -(4 as libc::c_int);
     } else if libc::strcmp(b"ssh-dss\0" as *const u8 as *const libc::c_char, ktype)

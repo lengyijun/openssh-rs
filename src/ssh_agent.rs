@@ -104,20 +104,11 @@ extern "C" {
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
     fn sshbuf_get_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
+
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1353,15 +1344,27 @@ unsafe extern "C" fn parse_userauth_request(
             r = crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut t);
             if !(r != 0 as libc::c_int
                 || {
-                    r = sshbuf_get_cstring(b, &mut user, 0 as *mut size_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                        b,
+                        &mut user,
+                        0 as *mut size_t,
+                    );
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_get_cstring(b, &mut service, 0 as *mut size_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                        b,
+                        &mut service,
+                        0 as *mut size_t,
+                    );
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_get_cstring(b, &mut method, 0 as *mut size_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                        b,
+                        &mut method,
+                        0 as *mut size_t,
+                    );
                     r != 0 as libc::c_int
                 }
                 || {
@@ -1369,7 +1372,11 @@ unsafe extern "C" fn parse_userauth_request(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_get_cstring(b, &mut pkalg, 0 as *mut size_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                        b,
+                        &mut pkalg,
+                        0 as *mut size_t,
+                    );
                     r != 0 as libc::c_int
                 }
                 || {
@@ -1486,7 +1493,11 @@ unsafe extern "C" fn parse_sshsig_request(mut msg: *mut crate::sshbuf::sshbuf) -
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_cstring(b, 0 as *mut *mut libc::c_char, 0 as *mut size_t);
+            r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                b,
+                0 as *mut *mut libc::c_char,
+                0 as *mut size_t,
+            );
             r != 0 as libc::c_int
         }
         || {
@@ -1494,7 +1505,11 @@ unsafe extern "C" fn parse_sshsig_request(mut msg: *mut crate::sshbuf::sshbuf) -
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_cstring(b, 0 as *mut *mut libc::c_char, 0 as *mut size_t);
+            r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                b,
+                0 as *mut *mut libc::c_char,
+                0 as *mut size_t,
+            );
             r != 0 as libc::c_int
         }
         || {
@@ -1977,7 +1992,11 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
     if ok == 0 as libc::c_int {
         r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 14 as libc::c_int as u_char);
         if r != 0 as libc::c_int || {
-            r = sshbuf_put_string(msg, signature as *const libc::c_void, slen);
+            r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                msg,
+                signature as *const libc::c_void,
+                slen,
+            );
             r != 0 as libc::c_int
         } {
             sshfatal(
@@ -2209,10 +2228,14 @@ unsafe extern "C" fn parse_dest_constraint_hop(
         '\0' as i32,
         ::core::mem::size_of::<dest_constraint_hop>() as libc::c_ulong,
     );
-    r = sshbuf_get_cstring(b, &mut (*dch).user, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(b, &mut (*dch).user, 0 as *mut size_t);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_get_cstring(b, &mut (*dch).hostname, 0 as *mut size_t);
+            r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                b,
+                &mut (*dch).hostname,
+                0 as *mut size_t,
+            );
             r != 0 as libc::c_int
         }
         || {
@@ -2506,7 +2529,7 @@ unsafe extern "C" fn parse_key_constraint_extension(
     let mut ext_name: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
     let mut b: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
-    r = sshbuf_get_cstring(m, &mut ext_name, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(m, &mut ext_name, 0 as *mut size_t);
     if r != 0 as libc::c_int {
         crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -2572,7 +2595,11 @@ unsafe extern "C" fn parse_key_constraint_extension(
                 r = -(4 as libc::c_int);
                 current_block = 4252588936699793226;
             } else {
-                r = sshbuf_get_cstring(m, sk_providerp, 0 as *mut size_t);
+                r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+                    m,
+                    sk_providerp,
+                    0 as *mut size_t,
+                );
                 if r != 0 as libc::c_int {
                     crate::log::sshlog(
                         b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -2931,7 +2958,11 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
     );
     r = sshkey_private_deserialize((*e).request, &mut k);
     if r != 0 as libc::c_int || k.is_null() || {
-        r = sshbuf_get_cstring((*e).request, &mut comment, 0 as *mut size_t);
+        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+            (*e).request,
+            &mut comment,
+            0 as *mut size_t,
+        );
         r != 0 as libc::c_int
     } {
         crate::log::sshlog(
@@ -3185,7 +3216,7 @@ unsafe extern "C" fn process_lock_agent(mut e: *mut SocketEntry, mut lock: libc:
         0 as *const libc::c_char,
         b"entering\0" as *const u8 as *const libc::c_char,
     );
-    r = sshbuf_get_cstring((*e).request, &mut passwd, &mut pwlen);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring((*e).request, &mut passwd, &mut pwlen);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -3395,9 +3426,17 @@ unsafe extern "C" fn process_add_smartcard_key(mut e: *mut SocketEntry) {
         0 as *const libc::c_char,
         b"entering\0" as *const u8 as *const libc::c_char,
     );
-    r = sshbuf_get_cstring((*e).request, &mut provider, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+        (*e).request,
+        &mut provider,
+        0 as *mut size_t,
+    );
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_cstring((*e).request, &mut pin, 0 as *mut size_t);
+        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+            (*e).request,
+            &mut pin,
+            0 as *mut size_t,
+        );
         r != 0 as libc::c_int
     } {
         crate::log::sshlog(
@@ -3559,9 +3598,17 @@ unsafe extern "C" fn process_remove_smartcard_key(mut e: *mut SocketEntry) {
         0 as *const libc::c_char,
         b"entering\0" as *const u8 as *const libc::c_char,
     );
-    r = sshbuf_get_cstring((*e).request, &mut provider, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+        (*e).request,
+        &mut provider,
+        0 as *mut size_t,
+    );
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_cstring((*e).request, &mut pin, 0 as *mut size_t);
+        r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
+            (*e).request,
+            &mut pin,
+            0 as *mut size_t,
+        );
         r != 0 as libc::c_int
     } {
         crate::log::sshlog(
@@ -3919,7 +3966,7 @@ unsafe extern "C" fn process_extension(mut e: *mut SocketEntry) {
         0 as *const libc::c_char,
         b"entering\0" as *const u8 as *const libc::c_char,
     );
-    r = sshbuf_get_cstring((*e).request, &mut name, 0 as *mut size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_get_cstring((*e).request, &mut name, 0 as *mut size_t);
     if r != 0 as libc::c_int {
         crate::log::sshlog(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,

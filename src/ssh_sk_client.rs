@@ -30,24 +30,10 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_put_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
+
     fn sshbuf_get_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *mut crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-    fn sshbuf_get_cstring(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut libc::c_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_get_string(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *mut u_char,
-        lenp: *mut size_t,
     ) -> libc::c_int;
 
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
@@ -622,7 +608,11 @@ pub unsafe extern "C" fn sshsk_sign(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_string(req, data as *const libc::c_void, datalen);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_string(
+                        req,
+                        data as *const libc::c_void,
+                        datalen,
+                    );
                     r != 0 as libc::c_int
                 }
                 || {
@@ -651,7 +641,7 @@ pub unsafe extern "C" fn sshsk_sign(
             } else {
                 r = client_converse(req, &mut resp, 1 as libc::c_int as u_int);
                 if !(r != 0 as libc::c_int) {
-                    r = sshbuf_get_string(resp, sigp, lenp);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_string(resp, sigp, lenp);
                     if r != 0 as libc::c_int {
                         crate::log::sshlog(
                             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
@@ -955,7 +945,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
                     r = sshbuf_get_stringb(resp, kbuf);
                     if r != 0 as libc::c_int
                         || {
-                            r = sshbuf_get_cstring(
+                            r = crate::sshbuf_getput_basic::sshbuf_get_cstring(
                                 resp,
                                 0 as *mut *mut libc::c_char,
                                 0 as *mut size_t,
@@ -963,7 +953,11 @@ pub unsafe extern "C" fn sshsk_load_resident(
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_get_string(resp, &mut userid, &mut userid_len);
+                            r = crate::sshbuf_getput_basic::sshbuf_get_string(
+                                resp,
+                                &mut userid,
+                                &mut userid_len,
+                            );
                             r != 0 as libc::c_int
                         }
                     {
