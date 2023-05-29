@@ -37,10 +37,6 @@ extern "C" {
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -257,7 +253,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 129 as libc::c_int as u_char);
             if r != 0 as libc::c_int
                 || {
-                    r = sshbuf_put_u32(buf, obaud as u_int32_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(buf, obaud as u_int32_t);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -268,7 +264,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_u32(buf, ibaud as u_int32_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(buf, ibaud as u_int32_t);
                     r != 0 as libc::c_int
                 }
             {
@@ -287,7 +283,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 1 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[0 as libc::c_int as usize]),
                 );
@@ -309,7 +305,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 2 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[1 as libc::c_int as usize]),
                 );
@@ -331,7 +327,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 3 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[2 as libc::c_int as usize]),
                 );
@@ -353,7 +349,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 4 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[3 as libc::c_int as usize]),
                 );
@@ -375,7 +371,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 5 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[4 as libc::c_int as usize]),
                 );
@@ -397,7 +393,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 6 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[11 as libc::c_int as usize]),
                 );
@@ -419,7 +415,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 7 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[16 as libc::c_int as usize]),
                 );
@@ -441,7 +437,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 8 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[8 as libc::c_int as usize]),
                 );
@@ -463,7 +459,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 9 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[9 as libc::c_int as usize]),
                 );
@@ -485,7 +481,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 10 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[10 as libc::c_int as usize]),
                 );
@@ -507,7 +503,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 12 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[12 as libc::c_int as usize]),
                 );
@@ -529,7 +525,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 13 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[14 as libc::c_int as usize]),
                 );
@@ -551,7 +547,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 14 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[15 as libc::c_int as usize]),
                 );
@@ -573,7 +569,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             }
             r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 18 as libc::c_int as u_char);
             if r != 0 as libc::c_int || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     buf,
                     special_char_encode(tio.c_cc[13 as libc::c_int as usize]),
                 );
@@ -609,7 +605,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 30 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o4 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -648,7 +644,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 31 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o10 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -687,7 +683,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 32 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o20 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -726,7 +722,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 33 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o40 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -765,7 +761,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 34 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o100 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -804,7 +800,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 35 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o200 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -843,7 +839,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 36 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o400 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -882,7 +878,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 37 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o1000 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -921,7 +917,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 38 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o2000 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -960,7 +956,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 39 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o4000 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -999,7 +995,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 40 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o10000 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1038,7 +1034,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 41 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o20000 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1077,7 +1073,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 42 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_iflag & 0o40000 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1116,7 +1112,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 50 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o1 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1155,7 +1151,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 51 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o2 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1194,7 +1190,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 52 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o4 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1233,7 +1229,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 53 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o10 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1272,7 +1268,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 54 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o20 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1311,7 +1307,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 55 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o40 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1350,7 +1346,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 56 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o100 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1389,7 +1385,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 57 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o200 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1428,7 +1424,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 58 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o400 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1467,7 +1463,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 59 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o100000 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1506,7 +1502,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 60 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o1000 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1545,7 +1541,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 61 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o4000 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1584,7 +1580,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 62 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_lflag & 0o40000 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1623,7 +1619,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 70 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_oflag & 0o1 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1662,7 +1658,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 71 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_oflag & 0o2 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1701,7 +1697,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 72 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_oflag & 0o4 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1740,7 +1736,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 73 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_oflag & 0o10 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1779,7 +1775,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 74 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_oflag & 0o20 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1818,7 +1814,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 75 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_oflag & 0o40 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1857,7 +1853,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 90 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_cflag & 0o40 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1896,7 +1892,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 91 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_cflag & 0o60 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1935,7 +1931,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 92 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_cflag & 0o400 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -1974,7 +1970,7 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             } else {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(buf, 93 as libc::c_int as u_char);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_put_u32(
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                         buf,
                         (tio.c_cflag & 0o1000 as libc::c_int as libc::c_uint
                             != 0 as libc::c_int as libc::c_uint)
@@ -2082,7 +2078,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
         failure = -(1 as libc::c_int);
     }
     while crate::sshbuf::sshbuf_len(buf) > 0 as libc::c_int as libc::c_ulong {
-        r = sshbuf_get_u8(buf, &mut opcode);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u8(buf, &mut opcode);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"ttymodes.c\0" as *const u8 as *const libc::c_char,
@@ -2102,7 +2098,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 break;
             }
             128 => {
-                r = sshbuf_get_u32(buf, &mut baud);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut baud);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"ttymodes.c\0" as *const u8 as *const libc::c_char,
@@ -2137,7 +2133,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             129 => {
-                r = sshbuf_get_u32(buf, &mut baud);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut baud);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"ttymodes.c\0" as *const u8 as *const libc::c_char,
@@ -2172,7 +2168,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             1 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2191,7 +2187,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[0 as libc::c_int as usize] = special_char_decode(u);
             }
             2 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2210,7 +2206,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[1 as libc::c_int as usize] = special_char_decode(u);
             }
             3 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2229,7 +2225,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[2 as libc::c_int as usize] = special_char_decode(u);
             }
             4 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2248,7 +2244,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[3 as libc::c_int as usize] = special_char_decode(u);
             }
             5 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2267,7 +2263,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[4 as libc::c_int as usize] = special_char_decode(u);
             }
             6 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2286,7 +2282,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[11 as libc::c_int as usize] = special_char_decode(u);
             }
             7 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2305,7 +2301,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[16 as libc::c_int as usize] = special_char_decode(u);
             }
             8 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2324,7 +2320,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[8 as libc::c_int as usize] = special_char_decode(u);
             }
             9 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2343,7 +2339,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[9 as libc::c_int as usize] = special_char_decode(u);
             }
             10 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2362,7 +2358,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[10 as libc::c_int as usize] = special_char_decode(u);
             }
             12 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2381,7 +2377,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[12 as libc::c_int as usize] = special_char_decode(u);
             }
             13 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2400,7 +2396,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[14 as libc::c_int as usize] = special_char_decode(u);
             }
             14 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2419,7 +2415,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[15 as libc::c_int as usize] = special_char_decode(u);
             }
             18 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2438,7 +2434,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 tio.c_cc[13 as libc::c_int as usize] = special_char_decode(u);
             }
             30 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2461,7 +2457,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             31 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2484,7 +2480,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             32 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2507,7 +2503,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             33 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2530,7 +2526,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             34 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2553,7 +2549,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             35 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2576,7 +2572,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             36 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2599,7 +2595,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             37 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2622,7 +2618,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             38 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2645,7 +2641,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             39 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2668,7 +2664,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             40 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2691,7 +2687,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             41 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2714,7 +2710,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             42 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2737,7 +2733,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             50 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2760,7 +2756,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             51 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2783,7 +2779,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             52 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2806,7 +2802,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             53 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2829,7 +2825,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             54 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2852,7 +2848,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             55 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2875,7 +2871,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             56 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2898,7 +2894,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             57 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2921,7 +2917,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             58 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2944,7 +2940,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             59 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2967,7 +2963,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             60 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -2990,7 +2986,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             61 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3013,7 +3009,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             62 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3036,7 +3032,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             70 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3059,7 +3055,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             71 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3082,7 +3078,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             72 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3105,7 +3101,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             73 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3128,7 +3124,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             74 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3151,7 +3147,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             75 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3174,7 +3170,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             90 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3197,7 +3193,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             91 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3220,7 +3216,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             92 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3243,7 +3239,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 }
             }
             93 => {
-                r = sshbuf_get_u32(buf, &mut u);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut u);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"./ttymodes.h\0" as *const u8 as *const libc::c_char,
@@ -3284,7 +3280,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
                 if opcode as libc::c_int > 0 as libc::c_int
                     && (opcode as libc::c_int) < 160 as libc::c_int
                 {
-                    r = sshbuf_get_u32(buf, 0 as *mut u_int32_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, 0 as *mut u_int32_t);
                     if r != 0 as libc::c_int {
                         sshfatal(
                             b"ttymodes.c\0" as *const u8 as *const libc::c_char,

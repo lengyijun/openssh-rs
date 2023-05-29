@@ -43,8 +43,6 @@ extern "C" {
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_get_string(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
@@ -407,7 +405,7 @@ unsafe extern "C" fn valid_request(
         fail += 1;
         fail;
     }
-    r = sshbuf_get_u8(b, &mut type_0);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut type_0);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
@@ -957,7 +955,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             __progname,
         );
     }
-    r = sshbuf_get_u8(b, &mut rver);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut rver);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
@@ -984,7 +982,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             version,
         );
     }
-    r = sshbuf_get_u32(b, &mut fd as *mut libc::c_int as *mut u_int);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut fd as *mut libc::c_int as *mut u_int);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,

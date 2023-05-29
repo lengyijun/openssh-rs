@@ -122,8 +122,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -3898,15 +3896,15 @@ unsafe extern "C" fn client_request_forwarded_tcpip(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_u32(b, rchan as u_int32_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, rchan as u_int32_t);
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_u32(b, rwindow);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, rwindow);
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_u32(b, rmaxpack);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, rmaxpack);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -3914,7 +3912,7 @@ unsafe extern "C" fn client_request_forwarded_tcpip(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_u32(b, listen_port);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, listen_port);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -3922,7 +3920,7 @@ unsafe extern "C" fn client_request_forwarded_tcpip(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_u32(b, originator_port);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, originator_port);
                     r != 0 as libc::c_int
                 }
                 || {

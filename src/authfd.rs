@@ -55,9 +55,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -455,7 +452,7 @@ unsafe extern "C" fn ssh_request_reply_decode(
     r = ssh_request_reply(sock, request, reply);
     if !(r != 0 as libc::c_int
         || {
-            r = sshbuf_get_u8(reply, &mut type_0);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u8(reply, &mut type_0);
             r != 0 as libc::c_int
         }
         || {
@@ -550,7 +547,7 @@ pub unsafe extern "C" fn ssh_fetch_identitylist(
     if !(r != 0 as libc::c_int) {
         r = ssh_request_reply(sock, msg, msg);
         if !(r != 0 as libc::c_int) {
-            r = sshbuf_get_u8(msg, &mut type_0);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
             if !(r != 0 as libc::c_int) {
                 if type_0 as libc::c_int == 5 as libc::c_int
                     || type_0 as libc::c_int == 102 as libc::c_int
@@ -560,7 +557,7 @@ pub unsafe extern "C" fn ssh_fetch_identitylist(
                 } else if type_0 as libc::c_int != 12 as libc::c_int {
                     r = -(4 as libc::c_int);
                 } else {
-                    r = sshbuf_get_u32(msg, &mut num);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut num);
                     if !(r != 0 as libc::c_int) {
                         if num > 2048 as libc::c_int as libc::c_uint {
                             r = -(4 as libc::c_int);
@@ -745,13 +742,13 @@ pub unsafe extern "C" fn ssh_agent_sign(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(msg, flags);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, flags);
             r != 0 as libc::c_int
         })
     {
         r = ssh_request_reply(sock, msg, msg);
         if !(r != 0 as libc::c_int) {
-            r = sshbuf_get_u8(msg, &mut type_0);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
             if !(r != 0 as libc::c_int) {
                 if type_0 as libc::c_int == 5 as libc::c_int
                     || type_0 as libc::c_int == 102 as libc::c_int
@@ -882,7 +879,7 @@ unsafe extern "C" fn encode_constraints(
     if life != 0 as libc::c_int as libc::c_uint {
         r = crate::sshbuf_getput_basic::sshbuf_put_u8(m, 1 as libc::c_int as u_char);
         if r != 0 as libc::c_int || {
-            r = sshbuf_put_u32(m, life);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, life);
             r != 0 as libc::c_int
         } {
             current_block = 4970921734680953786;
@@ -913,7 +910,7 @@ unsafe extern "C" fn encode_constraints(
                             3 as libc::c_int as u_char,
                         );
                         if r != 0 as libc::c_int || {
-                            r = sshbuf_put_u32(m, maxsign);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, maxsign);
                             r != 0 as libc::c_int
                         } {
                             current_block = 4970921734680953786;

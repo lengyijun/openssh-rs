@@ -104,9 +104,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
 
     fn sshbuf_get_cstring(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1138,7 +1135,7 @@ unsafe extern "C" fn confirm_key(
 }
 unsafe extern "C" fn send_status(mut e: *mut SocketEntry, mut success: libc::c_int) {
     let mut r: libc::c_int = 0;
-    r = sshbuf_put_u32((*e).output, 1 as libc::c_int as u_int32_t);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u32((*e).output, 1 as libc::c_int as u_int32_t);
     if r != 0 as libc::c_int || {
         r = crate::sshbuf_getput_basic::sshbuf_put_u8(
             (*e).output,
@@ -1249,7 +1246,7 @@ unsafe extern "C" fn process_request_identities(mut e: *mut SocketEntry) {
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, nentries);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, nentries);
             r != 0 as libc::c_int
         }
         || {
@@ -1354,7 +1351,7 @@ unsafe extern "C" fn parse_userauth_request(
         if crate::sshbuf::sshbuf_len(sess_id) == 0 as libc::c_int as libc::c_ulong {
             r = -(4 as libc::c_int);
         } else {
-            r = sshbuf_get_u8(b, &mut t);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut t);
             if !(r != 0 as libc::c_int
                 || {
                     r = sshbuf_get_cstring(b, &mut user, 0 as *mut size_t);
@@ -1369,7 +1366,7 @@ unsafe extern "C" fn parse_userauth_request(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_get_u8(b, &mut sig_follows);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut sig_follows);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -1648,7 +1645,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32((*e).request, &mut flags);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32((*e).request, &mut flags);
             r != 0 as libc::c_int
         }
     {
@@ -2279,7 +2276,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
             ) as *mut libc::c_int;
             r = sshkey_froms(b, &mut k);
             if r != 0 as libc::c_int || {
-                r = sshbuf_get_u8(b, &mut key_is_ca);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut key_is_ca);
                 r != 0 as libc::c_int
             } {
                 current_block = 11742207246258642460;
@@ -2721,7 +2718,7 @@ unsafe extern "C" fn parse_key_constraints(
             current_block = 7205609094909031804;
             break;
         }
-        r = sshbuf_get_u8(m, &mut ctype);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut ctype);
         if r != 0 as libc::c_int {
             crate::log::sshlog(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -2757,7 +2754,7 @@ unsafe extern "C" fn parse_key_constraints(
                         current_block = 16812902527858607079;
                         break;
                     } else {
-                        r = sshbuf_get_u32(m, &mut seconds);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut seconds);
                         if r != 0 as libc::c_int {
                             crate::log::sshlog(
                                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -2834,7 +2831,7 @@ unsafe extern "C" fn parse_key_constraints(
                         current_block = 16812902527858607079;
                         break;
                     } else {
-                        r = sshbuf_get_u32(m, &mut maxsign);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut maxsign);
                         if r != 0 as libc::c_int {
                             crate::log::sshlog(
                                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -3351,7 +3348,7 @@ unsafe extern "C" fn no_identities(mut e: *mut SocketEntry) {
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, 0 as libc::c_int as u_int32_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, 0 as libc::c_int as u_int32_t);
             r != 0 as libc::c_int
         }
         || {
@@ -3683,7 +3680,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u8((*e).request, &mut fwd);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u8((*e).request, &mut fwd);
             r != 0 as libc::c_int
         }
     {
@@ -4013,7 +4010,7 @@ unsafe extern "C" fn process_message(mut socknum: u_int) -> libc::c_int {
     crate::sshbuf::sshbuf_reset((*e).request);
     r = sshbuf_get_stringb((*e).input, (*e).request);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_u8((*e).request, &mut type_0);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u8((*e).request, &mut type_0);
         r != 0 as libc::c_int
     } {
         if r == -(3 as libc::c_int) || r == -(6 as libc::c_int) {

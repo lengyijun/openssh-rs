@@ -55,9 +55,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
@@ -4216,7 +4213,7 @@ unsafe extern "C" fn ssh_keysign(
                 as *const libc::c_char,
         );
     }
-    r = sshbuf_put_u32(b, sock as u_int32_t);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, sock as u_int32_t);
     if r != 0 as libc::c_int || {
         r = sshbuf_put_string(b, data as *const libc::c_void, datalen);
         r != 0 as libc::c_int
@@ -4312,7 +4309,7 @@ unsafe extern "C" fn ssh_keysign(
                         (status & 0xff00 as libc::c_int) >> 8 as libc::c_int,
                     );
                 } else {
-                    r = sshbuf_get_u8(b, &mut rversion);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut rversion);
                     if r != 0 as libc::c_int {
                         crate::log::sshlog(
                             b"sshconnect2.c\0" as *const u8 as *const libc::c_char,

@@ -261,8 +261,7 @@ extern "C" {
 
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
+
     fn sshbuf_get_cstring(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut libc::c_char,
@@ -1322,7 +1321,7 @@ unsafe extern "C" fn buffer_get_bignum_bits(
     let mut bytes: u_int = 0;
     let mut bignum_bits: u_int = 0;
     let mut r: libc::c_int = 0;
-    r = sshbuf_get_u32(b, &mut bignum_bits);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut bignum_bits);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -1418,7 +1417,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut crate::sshbuf::sshbuf) 
     let mut rsa_p: *mut BIGNUM = 0 as *mut BIGNUM;
     let mut rsa_q: *mut BIGNUM = 0 as *mut BIGNUM;
     let mut rsa_iqmp: *mut BIGNUM = 0 as *mut BIGNUM;
-    r = sshbuf_get_u32(b, &mut magic);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut magic);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -1450,7 +1449,7 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut crate::sshbuf::sshbuf) 
         );
         return 0 as *mut sshkey;
     }
-    r = sshbuf_get_u32(b, &mut i1);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut i1);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_get_cstring(b, &mut type_0, 0 as *mut size_t);
@@ -1461,15 +1460,15 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut crate::sshbuf::sshbuf) 
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(b, &mut i2);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut i2);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(b, &mut i3);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut i3);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(b, &mut i4);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut i4);
             r != 0 as libc::c_int
         }
     {
@@ -1617,14 +1616,14 @@ unsafe extern "C" fn do_convert_private_ssh2(mut b: *mut crate::sshbuf::sshbuf) 
             dsa_pub_key = dsa_priv_key;
         }
         0 => {
-            r = sshbuf_get_u8(b, &mut e1);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut e1);
             if r != 0 as libc::c_int
                 || (e1 as libc::c_int) < 30 as libc::c_int && {
-                    r = sshbuf_get_u8(b, &mut e2);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut e2);
                     r != 0 as libc::c_int
                 }
                 || (e1 as libc::c_int) < 30 as libc::c_int && {
-                    r = sshbuf_get_u8(b, &mut e3);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut e3);
                     r != 0 as libc::c_int
                 }
             {

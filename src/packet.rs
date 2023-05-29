@@ -188,11 +188,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_get_u64(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int64_t) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_put_u64(buf: *mut crate::sshbuf::sshbuf, val: u_int64_t) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
 
     fn sshbuf_get_string(
         buf: *mut crate::sshbuf::sshbuf,
@@ -2261,11 +2256,14 @@ unsafe extern "C" fn ssh_packet_read_poll2_mux(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u8((*state).incoming_packet, 0 as *mut u_char);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u8(
+                (*state).incoming_packet,
+                0 as *mut u_char,
+            );
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u8((*state).incoming_packet, typep);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u8((*state).incoming_packet, typep);
             r != 0 as libc::c_int
         }
     {
@@ -2725,7 +2723,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                                             match current_block {
                                                 11636842938881510489 => {}
                                                 _ => {
-                                                    r = sshbuf_get_u8(
+                                                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(
                                                         (*state).incoming_packet,
                                                         typep,
                                                     );
@@ -3612,22 +3610,22 @@ unsafe extern "C" fn kex_to_blob(
     mut kex: *mut kex,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    r = sshbuf_put_u32(m, (*kex).we_need);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, (*kex).we_need);
     if r != 0 as libc::c_int
         || {
             r = sshbuf_put_cstring(m, (*kex).hostkey_alg);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(m, (*kex).hostkey_type as u_int32_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, (*kex).hostkey_type as u_int32_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(m, (*kex).hostkey_nid as u_int32_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, (*kex).hostkey_nid as u_int32_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(m, (*kex).kex_type);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, (*kex).kex_type);
             r != 0 as libc::c_int
         }
         || {
@@ -3651,7 +3649,7 @@ unsafe extern "C" fn kex_to_blob(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(m, (*kex).flags);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, (*kex).flags);
             r != 0 as libc::c_int
         }
     {
@@ -3695,11 +3693,11 @@ unsafe extern "C" fn newkeys_to_blob(
     r = sshbuf_put_cstring(b, (*enc).name);
     if !(r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(b, (*enc).enabled as u_int32_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*enc).enabled as u_int32_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(b, (*enc).block_size);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*enc).block_size);
             r != 0 as libc::c_int
         }
         || {
@@ -3719,7 +3717,7 @@ unsafe extern "C" fn newkeys_to_blob(
             r = sshbuf_put_cstring(b, (*mac).name);
             if r != 0 as libc::c_int
                 || {
-                    r = sshbuf_put_u32(b, (*mac).enabled as u_int32_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*mac).enabled as u_int32_t);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -3741,7 +3739,7 @@ unsafe extern "C" fn newkeys_to_blob(
         match current_block {
             14301505990650711411 => {}
             _ => {
-                r = sshbuf_put_u32(b, (*comp).type_0);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*comp).type_0);
                 if !(r != 0 as libc::c_int || {
                     r = sshbuf_put_cstring(b, (*comp).name);
                     r != 0 as libc::c_int
@@ -3771,43 +3769,43 @@ pub unsafe extern "C" fn ssh_packet_get_state(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(m, (*state).rekey_limit);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(m, (*state).rekey_limit);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(m, (*state).rekey_interval);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, (*state).rekey_interval);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(m, (*state).p_send.seqnr);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, (*state).p_send.seqnr);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(m, (*state).p_send.blocks);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(m, (*state).p_send.blocks);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(m, (*state).p_send.packets);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, (*state).p_send.packets);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(m, (*state).p_send.bytes);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(m, (*state).p_send.bytes);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(m, (*state).p_read.seqnr);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, (*state).p_read.seqnr);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(m, (*state).p_read.blocks);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(m, (*state).p_read.blocks);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(m, (*state).p_read.packets);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, (*state).p_read.packets);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(m, (*state).p_read.bytes);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(m, (*state).p_read.bytes);
             r != 0 as libc::c_int
         }
         || {
@@ -3853,11 +3851,14 @@ unsafe extern "C" fn newkeys_from_blob(
             r = sshbuf_get_cstring(b, &mut (*enc).name, 0 as *mut size_t);
             if !(r != 0 as libc::c_int
                 || {
-                    r = sshbuf_get_u32(b, &mut (*enc).enabled as *mut libc::c_int as *mut u_int);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u32(
+                        b,
+                        &mut (*enc).enabled as *mut libc::c_int as *mut u_int,
+                    );
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_get_u32(b, &mut (*enc).block_size);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut (*enc).block_size);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -3882,7 +3883,7 @@ unsafe extern "C" fn newkeys_from_blob(
                             if r != 0 as libc::c_int {
                                 current_block = 15195334471293752841;
                             } else {
-                                r = sshbuf_get_u32(
+                                r = crate::sshbuf_getput_basic::sshbuf_get_u32(
                                     b,
                                     &mut (*mac).enabled as *mut libc::c_int as *mut u_int,
                                 );
@@ -3906,7 +3907,7 @@ unsafe extern "C" fn newkeys_from_blob(
                     match current_block {
                         15195334471293752841 => {}
                         _ => {
-                            r = sshbuf_get_u32(b, &mut (*comp).type_0);
+                            r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut (*comp).type_0);
                             if !(r != 0 as libc::c_int || {
                                 r = sshbuf_get_cstring(b, &mut (*comp).name, 0 as *mut size_t);
                                 r != 0 as libc::c_int
@@ -3942,25 +3943,28 @@ unsafe extern "C" fn kex_from_blob(
     if kex.is_null() {
         return -(2 as libc::c_int);
     }
-    r = sshbuf_get_u32(m, &mut (*kex).we_need);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut (*kex).we_need);
     if !(r != 0 as libc::c_int
         || {
             r = sshbuf_get_cstring(m, &mut (*kex).hostkey_alg, 0 as *mut size_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(
                 m,
                 &mut (*kex).hostkey_type as *mut libc::c_int as *mut u_int,
             );
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(m, &mut (*kex).hostkey_nid as *mut libc::c_int as *mut u_int);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(
+                m,
+                &mut (*kex).hostkey_nid as *mut libc::c_int as *mut u_int,
+            );
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(m, &mut (*kex).kex_type);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut (*kex).kex_type);
             r != 0 as libc::c_int
         }
         || {
@@ -3984,7 +3988,7 @@ unsafe extern "C" fn kex_from_blob(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(m, &mut (*kex).flags);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut (*kex).flags);
             r != 0 as libc::c_int
         })
     {
@@ -4024,43 +4028,43 @@ pub unsafe extern "C" fn ssh_packet_set_state(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(m, &mut (*state).rekey_limit);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(m, &mut (*state).rekey_limit);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(m, &mut (*state).rekey_interval);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut (*state).rekey_interval);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(m, &mut (*state).p_send.seqnr);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut (*state).p_send.seqnr);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(m, &mut (*state).p_send.blocks);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(m, &mut (*state).p_send.blocks);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(m, &mut (*state).p_send.packets);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut (*state).p_send.packets);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(m, &mut (*state).p_send.bytes);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(m, &mut (*state).p_send.bytes);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(m, &mut (*state).p_read.seqnr);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut (*state).p_read.seqnr);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(m, &mut (*state).p_read.blocks);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(m, &mut (*state).p_read.blocks);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(m, &mut (*state).p_read.packets);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut (*state).p_read.packets);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(m, &mut (*state).p_read.bytes);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(m, &mut (*state).p_read.bytes);
             r != 0 as libc::c_int
         }
     {
@@ -4129,10 +4133,10 @@ pub unsafe extern "C" fn sshpkt_put_u8(mut ssh: *mut ssh, mut val: u_char) -> li
     return crate::sshbuf_getput_basic::sshbuf_put_u8((*(*ssh).state).outgoing_packet, val);
 }
 pub unsafe extern "C" fn sshpkt_put_u32(mut ssh: *mut ssh, mut val: u_int32_t) -> libc::c_int {
-    return sshbuf_put_u32((*(*ssh).state).outgoing_packet, val);
+    return crate::sshbuf_getput_basic::sshbuf_put_u32((*(*ssh).state).outgoing_packet, val);
 }
 pub unsafe extern "C" fn sshpkt_put_u64(mut ssh: *mut ssh, mut val: u_int64_t) -> libc::c_int {
-    return sshbuf_put_u64((*(*ssh).state).outgoing_packet, val);
+    return crate::sshbuf_getput_basic::sshbuf_put_u64((*(*ssh).state).outgoing_packet, val);
 }
 pub unsafe extern "C" fn sshpkt_put_string(
     mut ssh: *mut ssh,
@@ -4180,19 +4184,19 @@ pub unsafe extern "C" fn sshpkt_get(
     return sshbuf_get((*(*ssh).state).incoming_packet, valp, len);
 }
 pub unsafe extern "C" fn sshpkt_get_u8(mut ssh: *mut ssh, mut valp: *mut u_char) -> libc::c_int {
-    return sshbuf_get_u8((*(*ssh).state).incoming_packet, valp);
+    return crate::sshbuf_getput_basic::sshbuf_get_u8((*(*ssh).state).incoming_packet, valp);
 }
 pub unsafe extern "C" fn sshpkt_get_u32(
     mut ssh: *mut ssh,
     mut valp: *mut u_int32_t,
 ) -> libc::c_int {
-    return sshbuf_get_u32((*(*ssh).state).incoming_packet, valp);
+    return crate::sshbuf_getput_basic::sshbuf_get_u32((*(*ssh).state).incoming_packet, valp);
 }
 pub unsafe extern "C" fn sshpkt_get_u64(
     mut ssh: *mut ssh,
     mut valp: *mut u_int64_t,
 ) -> libc::c_int {
-    return sshbuf_get_u64((*(*ssh).state).incoming_packet, valp);
+    return crate::sshbuf_getput_basic::sshbuf_get_u64((*(*ssh).state).incoming_packet, valp);
 }
 pub unsafe extern "C" fn sshpkt_get_string(
     mut ssh: *mut ssh,

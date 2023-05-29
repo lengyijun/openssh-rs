@@ -116,10 +116,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
     fn sshbuf_put(
@@ -3310,7 +3306,10 @@ unsafe extern "C" fn channel_decode_socks5(
     );
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(output, __bswap_32(0 as libc::c_int as in_addr_t));
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(
+                output,
+                __bswap_32(0 as libc::c_int as in_addr_t),
+            );
             r != 0 as libc::c_int
         }
         || {
@@ -6441,7 +6440,7 @@ pub unsafe extern "C" fn channel_proxy_downstream(
             } else {
                 r = sshbuf_get_cstring(original, &mut ctype, 0 as *mut size_t);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_get_u32(original, &mut id);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u32(original, &mut id);
                     r != 0 as libc::c_int
                 } {
                     crate::log::sshlog(
@@ -6476,7 +6475,10 @@ pub unsafe extern "C" fn channel_proxy_downstream(
                     r = sshbuf_put_cstring(modified, ctype);
                     if r != 0 as libc::c_int
                         || {
-                            r = sshbuf_put_u32(modified, (*c).self_0 as u_int32_t);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_u32(
+                                modified,
+                                (*c).self_0 as u_int32_t,
+                            );
                             r != 0 as libc::c_int
                         }
                         || {
@@ -6524,9 +6526,9 @@ pub unsafe extern "C" fn channel_proxy_downstream(
                 );
                 current_block = 11241368042544214213;
             } else {
-                r = sshbuf_get_u32(original, &mut remote_id);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(original, &mut remote_id);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_get_u32(original, &mut id);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u32(original, &mut id);
                     r != 0 as libc::c_int
                 } {
                     crate::log::sshlog(
@@ -6560,10 +6562,13 @@ pub unsafe extern "C" fn channel_proxy_downstream(
                     (*c).mux_downstream_id = id as libc::c_int;
                     (*c).remote_id = remote_id;
                     (*c).have_remote_id = 1 as libc::c_int;
-                    r = sshbuf_put_u32(modified, remote_id);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(modified, remote_id);
                     if r != 0 as libc::c_int
                         || {
-                            r = sshbuf_put_u32(modified, (*c).self_0 as u_int32_t);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_u32(
+                                modified,
+                                (*c).self_0 as u_int32_t,
+                            );
                             r != 0 as libc::c_int
                         }
                         || {
@@ -6643,14 +6648,17 @@ pub unsafe extern "C" fn channel_proxy_downstream(
                     );
                     current_block = 11241368042544214213;
                 } else {
-                    r = sshbuf_get_u8(original, 0 as *mut u_char);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(original, 0 as *mut u_char);
                     if r != 0 as libc::c_int
                         || {
                             r = sshbuf_get_cstring(original, &mut listen_host, 0 as *mut size_t);
                             r != 0 as libc::c_int
                         }
                         || {
-                            r = sshbuf_get_u32(original, &mut listen_port);
+                            r = crate::sshbuf_getput_basic::sshbuf_get_u32(
+                                original,
+                                &mut listen_port,
+                            );
                             r != 0 as libc::c_int
                         }
                     {
@@ -6875,7 +6883,10 @@ pub unsafe extern "C" fn channel_proxy_upstream(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_u32(b, (*c).mux_downstream_id as u_int32_t);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(
+                        b,
+                        (*c).mux_downstream_id as u_int32_t,
+                    );
                     r != 0 as libc::c_int
                 }
                 || {

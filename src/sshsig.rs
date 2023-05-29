@@ -95,9 +95,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -697,7 +694,10 @@ unsafe extern "C" fn sshsig_wrap_sign(
                     );
                     if r != 0 as libc::c_int
                         || {
-                            r = sshbuf_put_u32(blob, 0x1 as libc::c_int as u_int32_t);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_u32(
+                                blob,
+                                0x1 as libc::c_int as u_int32_t,
+                            );
                             r != 0 as libc::c_int
                         }
                         || {
@@ -773,7 +773,7 @@ unsafe extern "C" fn sshsig_parse_preamble(mut buf: *mut crate::sshbuf::sshbuf) 
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u32(buf, &mut sversion);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, &mut sversion);
             r != 0 as libc::c_int
         }
     {

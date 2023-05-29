@@ -41,7 +41,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_ec_validate_public(_: *const EC_GROUP, _: *const EC_POINT) -> libc::c_int;
 
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -236,7 +235,7 @@ pub unsafe extern "C" fn kex_ecdh_keypair(mut kex: *mut kex) -> libc::c_int {
         } else {
             r = sshbuf_put_ec(buf, public_key, group);
             if !(r != 0 as libc::c_int || {
-                r = sshbuf_get_u32(buf, 0 as *mut u_int32_t);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, 0 as *mut u_int32_t);
                 r != 0 as libc::c_int
             }) {
                 (*kex).ec_client_key = client_key;
@@ -278,7 +277,7 @@ pub unsafe extern "C" fn kex_ecdh_enc(
         } else {
             r = sshbuf_put_ec(server_blob, pub_key, group);
             if !(r != 0 as libc::c_int || {
-                r = sshbuf_get_u32(server_blob, 0 as *mut u_int32_t);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(server_blob, 0 as *mut u_int32_t);
                 r != 0 as libc::c_int
             }) {
                 r = kex_ecdh_dec_key_group(kex, client_blob, server_key, group, shared_secretp);

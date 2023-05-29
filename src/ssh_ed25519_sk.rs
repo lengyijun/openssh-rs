@@ -29,9 +29,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -379,8 +376,8 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
     }
     if sshbuf_get_cstring(b, &mut ktype, 0 as *mut size_t) != 0 as libc::c_int
         || sshbuf_get_string_direct(b, &mut sigblob, &mut len) != 0 as libc::c_int
-        || sshbuf_get_u8(b, &mut sig_flags) != 0 as libc::c_int
-        || sshbuf_get_u32(b, &mut sig_counter) != 0 as libc::c_int
+        || crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut sig_flags) != 0 as libc::c_int
+        || crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut sig_counter) != 0 as libc::c_int
     {
         r = -(4 as libc::c_int);
     } else if libc::strcmp(sshkey_ssh_name_plain(key), ktype) != 0 as libc::c_int {
@@ -425,7 +422,8 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
                     ::core::mem::size_of::<[u_char; 32]>() as libc::c_ulong,
                 ) != 0 as libc::c_int
                 || crate::sshbuf_getput_basic::sshbuf_put_u8(encoded, sig_flags) != 0 as libc::c_int
-                || sshbuf_put_u32(encoded, sig_counter) != 0 as libc::c_int
+                || crate::sshbuf_getput_basic::sshbuf_put_u32(encoded, sig_counter)
+                    != 0 as libc::c_int
                 || sshbuf_put(
                     encoded,
                     msghash.as_mut_ptr() as *const libc::c_void,

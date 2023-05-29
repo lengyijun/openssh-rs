@@ -35,7 +35,6 @@ extern "C" {
         v: *const libc::c_void,
         len: size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
 
     fn sshbuf_put_string(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1023,7 +1022,7 @@ unsafe extern "C" fn fill_attestation_blob(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(attest, 0 as libc::c_int as u_int32_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(attest, 0 as libc::c_int as u_int32_t);
             r != 0 as libc::c_int
         }
         || {
@@ -1335,7 +1334,7 @@ unsafe extern "C" fn sshsk_ecdsa_sig(
                         r != 0 as libc::c_int
                     }
                     || {
-                        r = sshbuf_put_u32(sig, (*resp).counter);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_u32(sig, (*resp).counter);
                         r != 0 as libc::c_int
                     }
                 {
@@ -1385,7 +1384,7 @@ unsafe extern "C" fn sshsk_ed25519_sig(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_u32(sig, (*resp).counter);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(sig, (*resp).counter);
                 r != 0 as libc::c_int
             }
         {

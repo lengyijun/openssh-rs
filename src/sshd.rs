@@ -199,7 +199,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_get_string(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
@@ -2419,7 +2418,7 @@ unsafe extern "C" fn recv_rexec_state(mut fd: libc::c_int, mut conf: *mut crate:
             b"ssh_msg_recv failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    r = sshbuf_get_u8(m, &mut ver);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut ver);
     if r != 0 as libc::c_int {
         sshfatal(
             b"sshd.c\0" as *const u8 as *const libc::c_char,

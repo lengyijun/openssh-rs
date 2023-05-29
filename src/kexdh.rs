@@ -22,7 +22,6 @@ extern "C" {
     fn DH_compute_key(key: *mut libc::c_uchar, pub_key: *const BIGNUM, dh: *mut DH) -> libc::c_int;
     fn DH_get0_key(dh: *const DH, pub_key: *mut *const BIGNUM, priv_key: *mut *const BIGNUM);
 
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -277,7 +276,7 @@ pub unsafe extern "C" fn kex_dh_keypair(mut kex: *mut kex) -> libc::c_int {
     }
     r = sshbuf_put_bignum2(buf, pub_key);
     if !(r != 0 as libc::c_int || {
-        r = sshbuf_get_u32(buf, 0 as *mut u_int32_t);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(buf, 0 as *mut u_int32_t);
         r != 0 as libc::c_int
     }) {
         (*kex).client_pub = buf;
@@ -306,7 +305,7 @@ pub unsafe extern "C" fn kex_dh_enc(
         } else {
             r = sshbuf_put_bignum2(server_blob, pub_key);
             if !(r != 0 as libc::c_int || {
-                r = sshbuf_get_u32(server_blob, 0 as *mut u_int32_t);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(server_blob, 0 as *mut u_int32_t);
                 r != 0 as libc::c_int
             }) {
                 r = kex_dh_dec(kex, client_blob, shared_secretp);

@@ -111,10 +111,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-
     fn sshbuf_get_cstring(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut libc::c_char,
@@ -967,7 +963,7 @@ pub unsafe extern "C" fn kex_prop2buf(
     }
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 0 as libc::c_int as u_char);
     if r != 0 as libc::c_int || {
-        r = sshbuf_put_u32(b, 0 as libc::c_int as u_int32_t);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, 0 as libc::c_int as u_int32_t);
         r != 0 as libc::c_int
     } {
         return r;
@@ -1055,9 +1051,9 @@ pub unsafe extern "C" fn kex_buf2prop(
             match current_block {
                 14439343106787185477 => {}
                 _ => {
-                    r = sshbuf_get_u8(b, &mut v);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut v);
                     if r != 0 as libc::c_int || {
-                        r = sshbuf_get_u32(b, &mut i);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut i);
                         r != 0 as libc::c_int
                     } {
                         crate::log::sshlog(

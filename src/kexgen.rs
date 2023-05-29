@@ -104,7 +104,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
 
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -377,7 +376,7 @@ unsafe extern "C" fn kex_gen_hash(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                 b,
                 (crate::sshbuf::sshbuf_len(client_kexinit))
                     .wrapping_add(1 as libc::c_int as libc::c_ulong) as u_int32_t,
@@ -393,7 +392,7 @@ unsafe extern "C" fn kex_gen_hash(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                 b,
                 (crate::sshbuf::sshbuf_len(server_kexinit))
                     .wrapping_add(1 as libc::c_int as libc::c_ulong) as u_int32_t,

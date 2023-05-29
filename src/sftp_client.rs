@@ -56,11 +56,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u64(buf: *mut crate::sshbuf::sshbuf, val: u_int64_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u64(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int64_t) -> libc::c_int;
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
         len: size_t,
@@ -400,7 +395,7 @@ unsafe extern "C" fn get_msg_extended(
             );
         }
     }
-    r = sshbuf_get_u32(m, &mut msg_len);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut msg_len);
     if r != 0 as libc::c_int {
         sshfatal(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -410,7 +405,7 @@ unsafe extern "C" fn get_msg_extended(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             ssh_err(r),
-            b"sshbuf_get_u32\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_getput_basic::sshbuf_get_u32\0" as *const u8 as *const libc::c_char,
         );
     }
     if msg_len > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_uint {
@@ -522,7 +517,7 @@ unsafe extern "C" fn send_string_request(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, code as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -586,7 +581,7 @@ unsafe extern "C" fn send_string_attrs_request(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, code as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -649,9 +644,9 @@ unsafe extern "C" fn get_status(mut conn: *mut sftp_conn, mut expected_id: u_int
         );
     }
     get_msg(conn, msg);
-    r = sshbuf_get_u8(msg, &mut type_0);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_u32(msg, &mut id);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut id);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -690,7 +685,7 @@ unsafe extern "C" fn get_status(mut conn: *mut sftp_conn, mut expected_id: u_int
             type_0 as libc::c_int,
         );
     }
-    r = sshbuf_get_u32(msg, &mut status);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut status);
     if r != 0 as libc::c_int {
         sshfatal(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -753,9 +748,9 @@ unsafe extern "C" fn get_handle(
         );
     }
     get_msg(conn, msg);
-    r = sshbuf_get_u8(msg, &mut type_0);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_u32(msg, &mut id);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut id);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -788,7 +783,7 @@ unsafe extern "C" fn get_handle(
         );
     }
     if type_0 as libc::c_int == 101 as libc::c_int {
-        r = sshbuf_get_u32(msg, &mut status);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut status);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -885,9 +880,9 @@ unsafe extern "C" fn get_decode_stat(
         );
     }
     get_msg(conn, msg);
-    r = sshbuf_get_u8(msg, &mut type_0);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_u32(msg, &mut id);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut id);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -917,7 +912,7 @@ unsafe extern "C" fn get_decode_stat(
     }
     if type_0 as libc::c_int == 101 as libc::c_int {
         let mut status: u_int = 0;
-        r = sshbuf_get_u32(msg, &mut status);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut status);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -1029,9 +1024,9 @@ unsafe extern "C" fn get_decode_statvfs(
         );
     }
     get_msg(conn, msg);
-    r = sshbuf_get_u8(msg, &mut type_0);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_u32(msg, &mut id);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut id);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -1073,7 +1068,7 @@ unsafe extern "C" fn get_decode_statvfs(
     }
     if type_0 as libc::c_int == 101 as libc::c_int {
         let mut status: u_int = 0;
-        r = sshbuf_get_u32(msg, &mut status);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut status);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -1139,46 +1134,46 @@ unsafe extern "C" fn get_decode_statvfs(
         0 as libc::c_int,
         ::core::mem::size_of::<sftp_statvfs>() as libc::c_ulong,
     );
-    r = sshbuf_get_u64(msg, &mut (*st).f_bsize);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*st).f_bsize);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_get_u64(msg, &mut (*st).f_frsize);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*st).f_frsize);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(msg, &mut (*st).f_blocks);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*st).f_blocks);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(msg, &mut (*st).f_bfree);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*st).f_bfree);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(msg, &mut (*st).f_bavail);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*st).f_bavail);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(msg, &mut (*st).f_files);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*st).f_files);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(msg, &mut (*st).f_ffree);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*st).f_ffree);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(msg, &mut (*st).f_favail);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*st).f_favail);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(msg, &mut (*st).f_fsid);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*st).f_fsid);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(msg, &mut flag);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut flag);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(msg, &mut (*st).f_namemax);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*st).f_namemax);
             r != 0 as libc::c_int
         }
     {
@@ -1252,7 +1247,7 @@ pub unsafe extern "C" fn do_init(
     }
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 1 as libc::c_int as u_char);
     if r != 0 as libc::c_int || {
-        r = sshbuf_put_u32(msg, 3 as libc::c_int as u_int32_t);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, 3 as libc::c_int as u_int32_t);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -1267,7 +1262,7 @@ pub unsafe extern "C" fn do_init(
     }
     send_msg(ret, msg);
     get_msg_extended(ret, msg, 1 as libc::c_int);
-    r = sshbuf_get_u8(msg, &mut type_0);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
     if r != 0 as libc::c_int {
         sshfatal(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -1295,7 +1290,7 @@ pub unsafe extern "C" fn do_init(
         libc::free(ret as *mut libc::c_void);
         return 0 as *mut sftp_conn;
     }
-    r = sshbuf_get_u32(msg, &mut (*ret).version);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut (*ret).version);
     if r != 0 as libc::c_int {
         sshfatal(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -1626,7 +1621,7 @@ pub unsafe extern "C" fn do_limits(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -1659,9 +1654,9 @@ pub unsafe extern "C" fn do_limits(
         id,
     );
     get_msg(conn, msg);
-    r = sshbuf_get_u8(msg, &mut type_0);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_u32(msg, &mut msg_id);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut msg_id);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -1720,18 +1715,18 @@ pub unsafe extern "C" fn do_limits(
         0 as libc::c_int,
         ::core::mem::size_of::<sftp_limits>() as libc::c_ulong,
     );
-    r = sshbuf_get_u64(msg, &mut (*limits).packet_length);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*limits).packet_length);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_get_u64(msg, &mut (*limits).read_length);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*limits).read_length);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(msg, &mut (*limits).write_length);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*limits).write_length);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_get_u64(msg, &mut (*limits).open_handles);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u64(msg, &mut (*limits).open_handles);
             r != 0 as libc::c_int
         }
     {
@@ -1776,7 +1771,7 @@ pub unsafe extern "C" fn do_close(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 4 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -1865,7 +1860,7 @@ unsafe extern "C" fn do_lsreaddir(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 11 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -1927,7 +1922,7 @@ unsafe extern "C" fn do_lsreaddir(
         r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
-                r = sshbuf_put_u32(msg, id);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
                 r != 0 as libc::c_int
             }
             || {
@@ -1949,9 +1944,9 @@ unsafe extern "C" fn do_lsreaddir(
         send_msg(conn, msg);
         crate::sshbuf::sshbuf_reset(msg);
         get_msg(conn, msg);
-        r = sshbuf_get_u8(msg, &mut type_0);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
         if r != 0 as libc::c_int || {
-            r = sshbuf_get_u32(msg, &mut id);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut id);
             r != 0 as libc::c_int
         } {
             sshfatal(
@@ -1992,7 +1987,7 @@ unsafe extern "C" fn do_lsreaddir(
         }
         if type_0 as libc::c_int == 101 as libc::c_int {
             let mut rstatus: u_int = 0;
-            r = sshbuf_get_u32(msg, &mut rstatus);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut rstatus);
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -2049,7 +2044,7 @@ unsafe extern "C" fn do_lsreaddir(
                     type_0 as libc::c_int,
                 );
             }
-            r = sshbuf_get_u32(msg, &mut count);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut count);
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -2611,7 +2606,7 @@ unsafe extern "C" fn do_realpath_expand(
         r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
-                r = sshbuf_put_u32(msg, id);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
                 r != 0 as libc::c_int
             }
             || {
@@ -2662,9 +2657,9 @@ unsafe extern "C" fn do_realpath_expand(
         );
     }
     get_msg(conn, msg);
-    r = sshbuf_get_u8(msg, &mut type_0);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_u32(msg, &mut id);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut id);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -2695,7 +2690,7 @@ unsafe extern "C" fn do_realpath_expand(
     if type_0 as libc::c_int == 101 as libc::c_int {
         let mut status: u_int = 0;
         let mut errmsg: *mut libc::c_char = 0 as *mut libc::c_char;
-        r = sshbuf_get_u32(msg, &mut status);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut status);
         if r != 0 as libc::c_int || {
             r = sshbuf_get_cstring(msg, &mut errmsg, 0 as *mut size_t);
             r != 0 as libc::c_int
@@ -2751,7 +2746,7 @@ unsafe extern "C" fn do_realpath_expand(
             type_0 as libc::c_int,
         );
     }
-    r = sshbuf_get_u32(msg, &mut count);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut count);
     if r != 0 as libc::c_int {
         sshfatal(
             b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -2930,7 +2925,7 @@ pub unsafe extern "C" fn do_copy(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 3 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -2938,7 +2933,7 @@ pub unsafe extern "C" fn do_copy(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(msg, 0x1 as libc::c_int as u_int32_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, 0x1 as libc::c_int as u_int32_t);
             r != 0 as libc::c_int
         }
         || {
@@ -2988,7 +2983,7 @@ pub unsafe extern "C" fn do_copy(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 3 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -2996,7 +2991,7 @@ pub unsafe extern "C" fn do_copy(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                 msg,
                 (0x2 as libc::c_int | 0x8 as libc::c_int | 0x10 as libc::c_int) as u_int32_t,
             );
@@ -3050,7 +3045,7 @@ pub unsafe extern "C" fn do_copy(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -3062,11 +3057,11 @@ pub unsafe extern "C" fn do_copy(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(msg, 0 as libc::c_int as u_int64_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(msg, 0 as libc::c_int as u_int64_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(msg, 0 as libc::c_int as u_int64_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(msg, 0 as libc::c_int as u_int64_t);
             r != 0 as libc::c_int
         }
         || {
@@ -3074,7 +3069,7 @@ pub unsafe extern "C" fn do_copy(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(msg, 0 as libc::c_int as u_int64_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(msg, 0 as libc::c_int as u_int64_t);
             r != 0 as libc::c_int
         }
     {
@@ -3172,7 +3167,7 @@ pub unsafe extern "C" fn do_rename(
         r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
-                r = sshbuf_put_u32(msg, id);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
                 r != 0 as libc::c_int
             }
             || {
@@ -3208,7 +3203,7 @@ pub unsafe extern "C" fn do_rename(
         );
         r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 18 as libc::c_int as u_char);
         if r != 0 as libc::c_int || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         } {
             sshfatal(
@@ -3330,7 +3325,7 @@ pub unsafe extern "C" fn do_hardlink(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -3445,7 +3440,7 @@ pub unsafe extern "C" fn do_symlink(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 20 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -3541,7 +3536,7 @@ pub unsafe extern "C" fn do_fsync(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -3649,7 +3644,7 @@ pub unsafe extern "C" fn do_statvfs(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -3730,7 +3725,7 @@ pub unsafe extern "C" fn do_lsetstat(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -3808,7 +3803,7 @@ unsafe extern "C" fn send_read_request(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 5 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -3816,11 +3811,11 @@ unsafe extern "C" fn send_read_request(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(msg, offset);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(msg, offset);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(msg, len);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, len);
             r != 0 as libc::c_int
         }
     {
@@ -3896,7 +3891,7 @@ unsafe extern "C" fn send_open(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 3 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -3904,7 +3899,7 @@ unsafe extern "C" fn send_open(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u32(msg, openmode);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, openmode);
             r != 0 as libc::c_int
         }
         || {
@@ -4219,9 +4214,9 @@ pub unsafe extern "C" fn do_download(
                     }
                     crate::sshbuf::sshbuf_reset(msg);
                     get_msg(conn, msg);
-                    r = sshbuf_get_u8(msg, &mut type_0);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
                     if r != 0 as libc::c_int || {
-                        r = sshbuf_get_u32(msg, &mut id);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut id);
                         r != 0 as libc::c_int
                     } {
                         sshfatal(
@@ -4270,7 +4265,7 @@ pub unsafe extern "C" fn do_download(
                     }
                     match type_0 as libc::c_int {
                         101 => {
-                            r = sshbuf_get_u32(msg, &mut status);
+                            r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut status);
                             if r != 0 as libc::c_int {
                                 sshfatal(
                                     b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -5290,7 +5285,7 @@ pub unsafe extern "C" fn do_upload(
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 6 as libc::c_int as u_char);
                 if r != 0 as libc::c_int
                     || {
-                        r = sshbuf_put_u32(msg, (*ack).id);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, (*ack).id);
                         r != 0 as libc::c_int
                     }
                     || {
@@ -5298,7 +5293,7 @@ pub unsafe extern "C" fn do_upload(
                         r != 0 as libc::c_int
                     }
                     || {
-                        r = sshbuf_put_u64(msg, offset as u_int64_t);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_u64(msg, offset as u_int64_t);
                         r != 0 as libc::c_int
                     }
                     || {
@@ -5355,9 +5350,9 @@ pub unsafe extern "C" fn do_upload(
                 let mut rid: u_int = 0;
                 crate::sshbuf::sshbuf_reset(msg);
                 get_msg(conn, msg);
-                r = sshbuf_get_u8(msg, &mut type_0);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
                 if r != 0 as libc::c_int || {
-                    r = sshbuf_get_u32(msg, &mut rid);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut rid);
                     r != 0 as libc::c_int
                 } {
                     sshfatal(
@@ -5386,7 +5381,7 @@ pub unsafe extern "C" fn do_upload(
                         type_0 as libc::c_int,
                     );
                 }
-                r = sshbuf_get_u32(msg, &mut status);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut status);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -5913,9 +5908,9 @@ unsafe extern "C" fn handle_dest_replies(
         }
         crate::sshbuf::sshbuf_reset(msg);
         get_msg(to, msg);
-        r = sshbuf_get_u8(msg, &mut type_0);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
         if r != 0 as libc::c_int || {
-            r = sshbuf_get_u32(msg, &mut id);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut id);
             r != 0 as libc::c_int
         } {
             sshfatal(
@@ -5961,7 +5956,7 @@ unsafe extern "C" fn handle_dest_replies(
                 type_0 as libc::c_int,
             );
         }
-        r = sshbuf_get_u32(msg, &mut status);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut status);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -6192,9 +6187,9 @@ pub unsafe extern "C" fn do_crossload(
         );
         crate::sshbuf::sshbuf_reset(msg);
         get_msg(from, msg);
-        r = sshbuf_get_u8(msg, &mut type_0);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
         if r != 0 as libc::c_int || {
-            r = sshbuf_get_u32(msg, &mut id);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut id);
             r != 0 as libc::c_int
         } {
             sshfatal(
@@ -6236,7 +6231,7 @@ pub unsafe extern "C" fn do_crossload(
         }
         match type_0 as libc::c_int {
             101 => {
-                r = sshbuf_get_u32(msg, &mut status);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut status);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -6318,7 +6313,7 @@ pub unsafe extern "C" fn do_crossload(
                     || {
                         let fresh30 = (*to).msg_id;
                         (*to).msg_id = ((*to).msg_id).wrapping_add(1);
-                        r = sshbuf_put_u32(msg, fresh30);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, fresh30);
                         r != 0 as libc::c_int
                     }
                     || {
@@ -6326,7 +6321,7 @@ pub unsafe extern "C" fn do_crossload(
                         r != 0 as libc::c_int
                     }
                     || {
-                        r = sshbuf_put_u64(msg, (*req).offset);
+                        r = crate::sshbuf_getput_basic::sshbuf_put_u64(msg, (*req).offset);
                         r != 0 as libc::c_int
                     }
                     || {
@@ -6953,7 +6948,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
     );
     i = 0 as libc::c_int as u_int;
     while i < nuids {
-        r = sshbuf_put_u32(uidbuf, *uids.offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_u32(uidbuf, *uids.offset(i as isize));
         if r != 0 as libc::c_int {
             sshfatal(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -6973,7 +6968,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
     }
     i = 0 as libc::c_int as u_int;
     while i < ngids {
-        r = sshbuf_put_u32(gidbuf, *gids.offset(i as isize));
+        r = crate::sshbuf_getput_basic::sshbuf_put_u32(gidbuf, *gids.offset(i as isize));
         if r != 0 as libc::c_int {
             sshfatal(
                 b"sftp-client.c\0" as *const u8 as *const libc::c_char,
@@ -6994,7 +6989,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
     r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 200 as libc::c_int as u_char);
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(msg, id);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(msg, id);
             r != 0 as libc::c_int
         }
         || {
@@ -7028,9 +7023,9 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
     }
     send_msg(conn, msg);
     get_msg(conn, msg);
-    r = sshbuf_get_u8(msg, &mut type_0);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(msg, &mut type_0);
     if r != 0 as libc::c_int || {
-        r = sshbuf_get_u32(msg, &mut id);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut id);
         r != 0 as libc::c_int
     } {
         sshfatal(
@@ -7065,7 +7060,7 @@ pub unsafe extern "C" fn do_get_users_groups_by_id(
     if type_0 as libc::c_int == 101 as libc::c_int {
         let mut status: u_int = 0;
         let mut errmsg: *mut libc::c_char = 0 as *mut libc::c_char;
-        r = sshbuf_get_u32(msg, &mut status);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(msg, &mut status);
         if r != 0 as libc::c_int || {
             r = sshbuf_get_cstring(msg, &mut errmsg, 0 as *mut size_t);
             r != 0 as libc::c_int

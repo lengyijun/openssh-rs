@@ -23,10 +23,7 @@ extern "C" {
         valp: *mut *mut libc::c_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_get_u64(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int64_t) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u64(buf: *mut crate::sshbuf::sshbuf, val: u_int64_t) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
+
     fn sshbuf_get_string(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
@@ -144,35 +141,35 @@ pub unsafe extern "C" fn decode_attrib(
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     attrib_clear(a);
-    r = sshbuf_get_u32(b, &mut (*a).flags);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut (*a).flags);
     if r != 0 as libc::c_int {
         return r;
     }
     if (*a).flags & 0x1 as libc::c_int as libc::c_uint != 0 {
-        r = sshbuf_get_u64(b, &mut (*a).size);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u64(b, &mut (*a).size);
         if r != 0 as libc::c_int {
             return r;
         }
     }
     if (*a).flags & 0x2 as libc::c_int as libc::c_uint != 0 {
-        r = sshbuf_get_u32(b, &mut (*a).uid);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut (*a).uid);
         if r != 0 as libc::c_int || {
-            r = sshbuf_get_u32(b, &mut (*a).gid);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut (*a).gid);
             r != 0 as libc::c_int
         } {
             return r;
         }
     }
     if (*a).flags & 0x4 as libc::c_int as libc::c_uint != 0 {
-        r = sshbuf_get_u32(b, &mut (*a).perm);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut (*a).perm);
         if r != 0 as libc::c_int {
             return r;
         }
     }
     if (*a).flags & 0x8 as libc::c_int as libc::c_uint != 0 {
-        r = sshbuf_get_u32(b, &mut (*a).atime);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut (*a).atime);
         if r != 0 as libc::c_int || {
-            r = sshbuf_get_u32(b, &mut (*a).mtime);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut (*a).mtime);
             r != 0 as libc::c_int
         } {
             return r;
@@ -184,7 +181,7 @@ pub unsafe extern "C" fn decode_attrib(
         let mut dlen: size_t = 0;
         let mut i: u_int = 0;
         let mut count: u_int = 0;
-        r = sshbuf_get_u32(b, &mut count);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut count);
         if r != 0 as libc::c_int {
             return r;
         }
@@ -225,35 +222,35 @@ pub unsafe extern "C" fn encode_attrib(
     mut a: *const Attrib,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
-    r = sshbuf_put_u32(b, (*a).flags);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*a).flags);
     if r != 0 as libc::c_int {
         return r;
     }
     if (*a).flags & 0x1 as libc::c_int as libc::c_uint != 0 {
-        r = sshbuf_put_u64(b, (*a).size);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u64(b, (*a).size);
         if r != 0 as libc::c_int {
             return r;
         }
     }
     if (*a).flags & 0x2 as libc::c_int as libc::c_uint != 0 {
-        r = sshbuf_put_u32(b, (*a).uid);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*a).uid);
         if r != 0 as libc::c_int || {
-            r = sshbuf_put_u32(b, (*a).gid);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*a).gid);
             r != 0 as libc::c_int
         } {
             return r;
         }
     }
     if (*a).flags & 0x4 as libc::c_int as libc::c_uint != 0 {
-        r = sshbuf_put_u32(b, (*a).perm);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*a).perm);
         if r != 0 as libc::c_int {
             return r;
         }
     }
     if (*a).flags & 0x8 as libc::c_int as libc::c_uint != 0 {
-        r = sshbuf_put_u32(b, (*a).atime);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*a).atime);
         if r != 0 as libc::c_int || {
-            r = sshbuf_put_u32(b, (*a).mtime);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(b, (*a).mtime);
             r != 0 as libc::c_int
         } {
             return r;

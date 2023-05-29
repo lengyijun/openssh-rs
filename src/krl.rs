@@ -64,11 +64,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u64(buf: *mut crate::sshbuf::sshbuf, val: u_int64_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u64(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int64_t) -> libc::c_int;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -2605,7 +2600,10 @@ unsafe extern "C" fn revoked_certs_generate(
                                     break;
                                 } else {
                                     bitmap_start = (*rs).lo;
-                                    r = sshbuf_put_u64(sect, bitmap_start);
+                                    r = crate::sshbuf_getput_basic::sshbuf_put_u64(
+                                        sect,
+                                        bitmap_start,
+                                    );
                                     if r != 0 as libc::c_int {
                                         current_block = 9009306676914022655;
                                         break;
@@ -2619,7 +2617,10 @@ unsafe extern "C" fn revoked_certs_generate(
                         32 => {
                             i = 0 as libc::c_int as u_int64_t;
                             while i < contig {
-                                r = sshbuf_put_u64(sect, ((*rs).lo).wrapping_add(i));
+                                r = crate::sshbuf_getput_basic::sshbuf_put_u64(
+                                    sect,
+                                    ((*rs).lo).wrapping_add(i),
+                                );
                                 if r != 0 as libc::c_int {
                                     current_block = 9009306676914022655;
                                     break 's_49;
@@ -2629,9 +2630,9 @@ unsafe extern "C" fn revoked_certs_generate(
                             }
                         }
                         33 => {
-                            r = sshbuf_put_u64(sect, (*rs).lo);
+                            r = crate::sshbuf_getput_basic::sshbuf_put_u64(sect, (*rs).lo);
                             if r != 0 as libc::c_int || {
-                                r = sshbuf_put_u64(sect, (*rs).hi);
+                                r = crate::sshbuf_getput_basic::sshbuf_put_u64(sect, (*rs).hi);
                                 r != 0 as libc::c_int
                             } {
                                 current_block = 9009306676914022655;
@@ -2809,19 +2810,19 @@ pub unsafe extern "C" fn ssh_krl_to_blob(
     );
     if !(r != 0 as libc::c_int
         || {
-            r = sshbuf_put_u32(buf, 1 as libc::c_int as u_int32_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(buf, 1 as libc::c_int as u_int32_t);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(buf, (*krl).krl_version);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(buf, (*krl).krl_version);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(buf, (*krl).generated_date);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(buf, (*krl).generated_date);
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put_u64(buf, (*krl).flags);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u64(buf, (*krl).flags);
             r != 0 as libc::c_int
         }
         || {
@@ -3127,7 +3128,7 @@ unsafe extern "C" fn parse_revoked_certs(
                 }
                 crate::sshbuf::sshbuf_free(subsect);
                 subsect = 0 as *mut crate::sshbuf::sshbuf;
-                r = sshbuf_get_u8(buf, &mut type_0);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u8(buf, &mut type_0);
                 if r != 0 as libc::c_int || {
                     r = sshbuf_froms(buf, &mut subsect);
                     r != 0 as libc::c_int
@@ -3139,7 +3140,7 @@ unsafe extern "C" fn parse_revoked_certs(
                     32 => {
                         while crate::sshbuf::sshbuf_len(subsect) > 0 as libc::c_int as libc::c_ulong
                         {
-                            r = sshbuf_get_u64(subsect, &mut serial);
+                            r = crate::sshbuf_getput_basic::sshbuf_get_u64(subsect, &mut serial);
                             if r != 0 as libc::c_int {
                                 current_block = 5485510540846724406;
                                 break 's_36;
@@ -3152,9 +3153,9 @@ unsafe extern "C" fn parse_revoked_certs(
                         }
                     }
                     33 => {
-                        r = sshbuf_get_u64(subsect, &mut serial_lo);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_u64(subsect, &mut serial_lo);
                         if r != 0 as libc::c_int || {
-                            r = sshbuf_get_u64(subsect, &mut serial_hi);
+                            r = crate::sshbuf_getput_basic::sshbuf_get_u64(subsect, &mut serial_hi);
                             r != 0 as libc::c_int
                         } {
                             current_block = 5485510540846724406;
@@ -3173,7 +3174,7 @@ unsafe extern "C" fn parse_revoked_certs(
                             current_block = 5485510540846724406;
                             break;
                         } else {
-                            r = sshbuf_get_u64(subsect, &mut serial_lo);
+                            r = crate::sshbuf_getput_basic::sshbuf_get_u64(subsect, &mut serial_lo);
                             if r != 0 as libc::c_int || {
                                 r = sshbuf_get_bignum2_bytes_direct(subsect, &mut blob, &mut blen);
                                 r != 0 as libc::c_int
@@ -3417,19 +3418,28 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                     b"alloc failed\0" as *const u8 as *const libc::c_char,
                 );
             } else {
-                r = sshbuf_get_u32(copy, &mut format_version);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u32(copy, &mut format_version);
                 if !(r != 0 as libc::c_int) {
                     if format_version != 1 as libc::c_int as libc::c_uint {
                         r = -(4 as libc::c_int);
                     } else {
-                        r = sshbuf_get_u64(copy, &mut (*krl).krl_version);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_u64(
+                            copy,
+                            &mut (*krl).krl_version,
+                        );
                         if !(r != 0 as libc::c_int
                             || {
-                                r = sshbuf_get_u64(copy, &mut (*krl).generated_date);
+                                r = crate::sshbuf_getput_basic::sshbuf_get_u64(
+                                    copy,
+                                    &mut (*krl).generated_date,
+                                );
                                 r != 0 as libc::c_int
                             }
                             || {
-                                r = sshbuf_get_u64(copy, &mut (*krl).flags);
+                                r = crate::sshbuf_getput_basic::sshbuf_get_u64(
+                                    copy,
+                                    &mut (*krl).flags,
+                                );
                                 r != 0 as libc::c_int
                             }
                             || {
@@ -3484,7 +3494,10 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                         current_block = 6717214610478484138;
                                         break;
                                     }
-                                    r = sshbuf_get_u8(copy, &mut type_0);
+                                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(
+                                        copy,
+                                        &mut type_0,
+                                    );
                                     if r != 0 as libc::c_int || {
                                         r = sshbuf_get_string_direct(copy, &mut blob, &mut blen);
                                         r != 0 as libc::c_int
@@ -3634,7 +3647,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                                         }
                                                         crate::sshbuf::sshbuf_free(sect);
                                                         sect = 0 as *mut crate::sshbuf::sshbuf;
-                                                        r = sshbuf_get_u8(copy, &mut type_0);
+                                                        r = crate::sshbuf_getput_basic::sshbuf_get_u8(copy, &mut type_0);
                                                         if r != 0 as libc::c_int || {
                                                             r = sshbuf_froms(copy, &mut sect);
                                                             r != 0 as libc::c_int

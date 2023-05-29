@@ -26,12 +26,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u64(buf: *mut crate::sshbuf::sshbuf, val: u_int64_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u64(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int64_t) -> libc::c_int;
-
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
@@ -1435,7 +1429,7 @@ unsafe extern "C" fn serialise_array(
     }
     match current_block {
         10886091980245723256 => {
-            r = sshbuf_put_u32(m, n as u_int32_t);
+            r = crate::sshbuf_getput_basic::sshbuf_put_u32(m, n as u_int32_t);
             if !(r != 0 as libc::c_int || {
                 r = sshbuf_put_stringb(m, b);
                 r != 0 as libc::c_int
@@ -1460,7 +1454,7 @@ unsafe extern "C" fn deserialise_array(
     let mut b: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut tmp: u_int = 0;
     let mut r: libc::c_int = -(1 as libc::c_int);
-    r = sshbuf_get_u32(m, &mut tmp);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u32(m, &mut tmp);
     if !(r != 0 as libc::c_int || {
         r = sshbuf_froms(m, &mut b);
         r != 0 as libc::c_int
@@ -1541,7 +1535,7 @@ unsafe extern "C" fn deserialise_nullable_string(
     let mut r: libc::c_int = 0;
     let mut flag: u_char = 0;
     *sp = 0 as *mut libc::c_char;
-    r = sshbuf_get_u8(m, &mut flag);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut flag);
     if r != 0 as libc::c_int || {
         r = sshbuf_get_cstring(
             m,
@@ -1610,7 +1604,7 @@ pub unsafe extern "C" fn sshauthopt_serialise(
     {
         return r;
     }
-    r = sshbuf_put_u64(m, (*opts).valid_before);
+    r = crate::sshbuf_getput_basic::sshbuf_put_u64(m, (*opts).valid_before);
     if r != 0 as libc::c_int {
         return r;
     }
@@ -1619,7 +1613,7 @@ pub unsafe extern "C" fn sshauthopt_serialise(
         ((*opts).force_tun_device == -(1 as libc::c_int)) as libc::c_int as u_char,
     );
     if r != 0 as libc::c_int || {
-        r = sshbuf_put_u32(
+        r = crate::sshbuf_getput_basic::sshbuf_put_u32(
             m,
             if (*opts).force_tun_device < 0 as libc::c_int {
                 0 as libc::c_int as libc::c_uint
@@ -1730,38 +1724,45 @@ pub unsafe extern "C" fn sshauthopt_deserialise(
     if opts.is_null() {
         return -(2 as libc::c_int);
     }
-    r = sshbuf_get_u8(m, &mut f);
+    r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut f);
     if !(r != 0 as libc::c_int) {
         (*opts).permit_port_forwarding_flag = f as libc::c_int;
-        r = sshbuf_get_u8(m, &mut f);
+        r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut f);
         if !(r != 0 as libc::c_int) {
             (*opts).permit_agent_forwarding_flag = f as libc::c_int;
-            r = sshbuf_get_u8(m, &mut f);
+            r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut f);
             if !(r != 0 as libc::c_int) {
                 (*opts).permit_x11_forwarding_flag = f as libc::c_int;
-                r = sshbuf_get_u8(m, &mut f);
+                r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut f);
                 if !(r != 0 as libc::c_int) {
                     (*opts).permit_pty_flag = f as libc::c_int;
-                    r = sshbuf_get_u8(m, &mut f);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut f);
                     if !(r != 0 as libc::c_int) {
                         (*opts).permit_user_rc = f as libc::c_int;
-                        r = sshbuf_get_u8(m, &mut f);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut f);
                         if !(r != 0 as libc::c_int) {
                             (*opts).restricted = f as libc::c_int;
-                            r = sshbuf_get_u8(m, &mut f);
+                            r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut f);
                             if !(r != 0 as libc::c_int) {
                                 (*opts).cert_authority = f as libc::c_int;
-                                r = sshbuf_get_u8(m, &mut f);
+                                r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut f);
                                 if !(r != 0 as libc::c_int) {
                                     (*opts).no_require_user_presence = f as libc::c_int;
-                                    r = sshbuf_get_u8(m, &mut f);
+                                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut f);
                                     if !(r != 0 as libc::c_int) {
                                         (*opts).require_verify = f as libc::c_int;
-                                        r = sshbuf_get_u64(m, &mut (*opts).valid_before);
+                                        r = crate::sshbuf_getput_basic::sshbuf_get_u64(
+                                            m,
+                                            &mut (*opts).valid_before,
+                                        );
                                         if !(r != 0 as libc::c_int) {
-                                            r = sshbuf_get_u8(m, &mut f);
+                                            r = crate::sshbuf_getput_basic::sshbuf_get_u8(
+                                                m, &mut f,
+                                            );
                                             if !(r != 0 as libc::c_int || {
-                                                r = sshbuf_get_u32(m, &mut tmp);
+                                                r = crate::sshbuf_getput_basic::sshbuf_get_u32(
+                                                    m, &mut tmp,
+                                                );
                                                 r != 0 as libc::c_int
                                             }) {
                                                 (*opts).force_tun_device = if f as libc::c_int != 0

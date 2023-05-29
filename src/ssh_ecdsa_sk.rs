@@ -36,9 +36,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
 
     fn sshbuf_get_cstring(
         buf: *mut crate::sshbuf::sshbuf,
@@ -507,8 +504,10 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
             3245404841433849185 => {}
             _ => {
                 if sshbuf_froms(b, &mut sigbuf) != 0 as libc::c_int
-                    || sshbuf_get_u8(b, &mut sig_flags) != 0 as libc::c_int
-                    || sshbuf_get_u32(b, &mut sig_counter) != 0 as libc::c_int
+                    || crate::sshbuf_getput_basic::sshbuf_get_u8(b, &mut sig_flags)
+                        != 0 as libc::c_int
+                    || crate::sshbuf_getput_basic::sshbuf_get_u32(b, &mut sig_counter)
+                        != 0 as libc::c_int
                 {
                     ret = -(4 as libc::c_int);
                 } else {
@@ -611,7 +610,7 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
                                                             ret != 0 as libc::c_int
                                                         }
                                                         || {
-                                                            ret = sshbuf_put_u32(
+                                                            ret = crate::sshbuf_getput_basic::sshbuf_put_u32(
                                                                 original_signed,
                                                                 sig_counter,
                                                             );

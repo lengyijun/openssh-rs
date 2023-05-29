@@ -50,9 +50,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
@@ -386,7 +383,7 @@ unsafe extern "C" fn client_converse(
         r = -(2 as libc::c_int);
     } else {
         ll = log_level_get() as libc::c_int;
-        r = sshbuf_put_u32(req, type_0);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u32(req, type_0);
         if r != 0 as libc::c_int
             || {
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(
@@ -396,7 +393,7 @@ unsafe extern "C" fn client_converse(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_u32(
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(
                     req,
                     (if ll < 0 as libc::c_int {
                         0 as libc::c_int
@@ -452,7 +449,7 @@ unsafe extern "C" fn client_converse(
                         b"receive\0" as *const u8 as *const libc::c_char,
                     );
                 } else {
-                    r = sshbuf_get_u8(resp, &mut version);
+                    r = crate::sshbuf_getput_basic::sshbuf_get_u8(resp, &mut version);
                     if r != 0 as libc::c_int {
                         crate::log::sshlog(
                             b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
@@ -484,7 +481,7 @@ unsafe extern "C" fn client_converse(
                         );
                         r = -(4 as libc::c_int);
                     } else {
-                        r = sshbuf_get_u32(resp, &mut rtype);
+                        r = crate::sshbuf_getput_basic::sshbuf_get_u32(resp, &mut rtype);
                         if r != 0 as libc::c_int {
                             crate::log::sshlog(
                                 b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
@@ -499,7 +496,7 @@ unsafe extern "C" fn client_converse(
                                 b"parse message type\0" as *const u8 as *const libc::c_char,
                             );
                         } else if rtype == 0 as libc::c_int as libc::c_uint {
-                            r = sshbuf_get_u32(resp, &mut rerr);
+                            r = crate::sshbuf_getput_basic::sshbuf_get_u32(resp, &mut rerr);
                             if r != 0 as libc::c_int {
                                 crate::log::sshlog(
                                     b"ssh-sk-client.c\0" as *const u8 as *const libc::c_char,
@@ -633,7 +630,7 @@ pub unsafe extern "C" fn sshsk_sign(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put_u32(req, compat);
+                    r = crate::sshbuf_getput_basic::sshbuf_put_u32(req, compat);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -741,7 +738,7 @@ pub unsafe extern "C" fn sshsk_enroll(
     {
         r = -(2 as libc::c_int);
     } else {
-        r = sshbuf_put_u32(req, type_0 as u_int);
+        r = crate::sshbuf_getput_basic::sshbuf_put_u32(req, type_0 as u_int);
         if r != 0 as libc::c_int
             || {
                 r = sshbuf_put_cstring(req, provider_path);
@@ -931,7 +928,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put_u32(req, flags);
+                r = crate::sshbuf_getput_basic::sshbuf_put_u32(req, flags);
                 r != 0 as libc::c_int
             }
         {
