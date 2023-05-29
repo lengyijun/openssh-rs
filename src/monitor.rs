@@ -138,7 +138,6 @@ extern "C" {
     fn auth2_record_info(authctxt_0: *mut Authctxt, _: *const libc::c_char, _: ...);
     fn auth2_update_session_info(_: *mut Authctxt, _: *const libc::c_char, _: *const libc::c_char);
 
-    fn auth_root_allowed(_: *mut ssh, _: *const libc::c_char) -> libc::c_int;
     fn auth2_read_banner() -> *mut libc::c_char;
     fn auth2_update_methods_lists(
         _: *mut Authctxt,
@@ -1024,7 +1023,7 @@ pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor: 
                 );
             }
             if (*(*authctxt).pw).pw_uid == 0 as libc::c_int as libc::c_uint
-                && auth_root_allowed(ssh, auth_method) == 0
+                && crate::auth::auth_root_allowed(ssh, auth_method) == 0
             {
                 authenticated = 0 as libc::c_int;
             }

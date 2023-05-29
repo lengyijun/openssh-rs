@@ -42,8 +42,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn auth_root_allowed(_: *mut ssh, _: *const libc::c_char) -> libc::c_int;
-    fn auth2_challenge_stop(_: *mut ssh);
     fn fakepw() -> *mut libc::passwd;
     static mut use_privsep: libc::c_int;
     fn mm_inform_authserv(_: *mut libc::c_char, _: *mut libc::c_char);
@@ -833,7 +831,7 @@ unsafe extern "C" fn input_userauth_request(
                 service,
             );
         }
-        auth2_challenge_stop(ssh);
+        crate::auth2_chall::auth2_challenge_stop(ssh);
         auth2_authctxt_reset_info(authctxt);
         (*authctxt).postponed = 0 as libc::c_int;
         (*authctxt).server_caused_failure = 0 as libc::c_int;
@@ -923,7 +921,7 @@ pub unsafe extern "C" fn userauth_finish(
     }
     if authenticated != 0
         && (*(*authctxt).pw).pw_uid == 0 as libc::c_int as libc::c_uint
-        && auth_root_allowed(ssh, method) == 0
+        && crate::auth::auth_root_allowed(ssh, method) == 0
     {
         authenticated = 0 as libc::c_int;
     }
