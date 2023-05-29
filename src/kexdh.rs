@@ -1,7 +1,6 @@
-use crate::mac::sshmac;
-use crate::sshkey::EC_GROUP;
+use crate::kex::newkeys;
 
-use crate::kex::sshenc;
+use crate::sshkey::EC_GROUP;
 
 use ::libc;
 extern "C" {
@@ -65,20 +64,6 @@ pub const KEX_DH_GRP14_SHA256: kex_exchange = 2;
 pub const KEX_DH_GRP14_SHA1: kex_exchange = 1;
 pub const KEX_DH_GRP1_SHA1: kex_exchange = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshcomp {
-    pub type_0: u_int,
-    pub enabled: libc::c_int,
-    pub name: *mut libc::c_char,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct newkeys {
-    pub enc: sshenc,
-    pub mac: sshmac,
-    pub comp: sshcomp,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct kex {

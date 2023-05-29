@@ -1,9 +1,10 @@
+use crate::kex::newkeys;
+
 use crate::atomicio::atomicio;
 use crate::channels::ssh_channels;
-use crate::mac::sshmac;
+
 use crate::sshkey::EC_GROUP;
 
-use crate::kex::sshenc;
 use crate::packet::session_state;
 
 use ::libc;
@@ -232,20 +233,6 @@ pub struct kex {
 }
 
 pub type DH = dh_st;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct newkeys {
-    pub enc: sshenc,
-    pub mac: sshmac,
-    pub comp: sshcomp,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshcomp {
-    pub type_0: u_int,
-    pub enabled: libc::c_int,
-    pub name: *mut libc::c_char,
-}
 
 pub type BIGNUM = bignum_st;
 #[derive(Copy, Clone)]

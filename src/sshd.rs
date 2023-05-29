@@ -1,10 +1,11 @@
+use crate::kex::newkeys;
+
 use crate::atomicio::atomicio;
 use crate::channels::ssh_channels;
 use crate::digest_openssl::ssh_digest_ctx;
-use crate::mac::sshmac;
+
 use crate::sshkey::EC_GROUP;
 
-use crate::kex::sshenc;
 use crate::packet::session_state;
 
 use crate::log::log_init;
@@ -707,20 +708,6 @@ pub struct kex {
 }
 
 pub type DH = dh_st;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct newkeys {
-    pub enc: sshenc,
-    pub mac: sshmac,
-    pub comp: sshcomp,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshcomp {
-    pub type_0: u_int,
-    pub enabled: libc::c_int,
-    pub name: *mut libc::c_char,
-}
 
 pub type C2RustUnnamed_4 = libc::c_uint;
 pub const DISPATCH_NONBLOCK: C2RustUnnamed_4 = 1;

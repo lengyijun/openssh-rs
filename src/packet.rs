@@ -1,5 +1,7 @@
 use crate::channels::ssh_channels;
 use crate::cipher::sshcipher;
+use crate::kex::newkeys;
+use crate::kex::sshcomp;
 use crate::mac::sshmac;
 use crate::sshkey::EC_GROUP;
 
@@ -431,20 +433,6 @@ pub struct kex {
 }
 
 pub type DH = dh_st;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct newkeys {
-    pub enc: sshenc,
-    pub mac: sshmac,
-    pub comp: sshcomp,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshcomp {
-    pub type_0: u_int,
-    pub enabled: libc::c_int,
-    pub name: *mut libc::c_char,
-}
 
 #[derive(Copy, Clone)]
 #[repr(C)]
