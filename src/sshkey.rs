@@ -189,8 +189,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
@@ -2764,7 +2762,7 @@ unsafe extern "C" fn cert_parse(
                             }) {
                                 continue;
                             }
-                            sshbuf_reset((*(*key).cert).critical);
+                            crate::sshbuf::sshbuf_reset((*(*key).cert).critical);
                             ret = -(4 as libc::c_int);
                             current_block = 15747115717569190648;
                             break;
@@ -2795,7 +2793,7 @@ unsafe extern "C" fn cert_parse(
                                     }) {
                                         continue;
                                     }
-                                    sshbuf_reset((*(*key).cert).extensions);
+                                    crate::sshbuf::sshbuf_reset((*(*key).cert).extensions);
                                     ret = -(4 as libc::c_int);
                                     current_block = 15747115717569190648;
                                     break;
@@ -3234,7 +3232,7 @@ pub unsafe extern "C" fn sshkey_certify_custom(
         return -(19 as libc::c_int);
     }
     cert = (*(*k).cert).certblob;
-    sshbuf_reset(cert);
+    crate::sshbuf::sshbuf_reset(cert);
     ret = sshbuf_put_cstring(cert, sshkey_ssh_name(k));
     if !(ret != 0 as libc::c_int) {
         arc4random_buf(
@@ -3367,7 +3365,7 @@ pub unsafe extern "C" fn sshkey_certify_custom(
         }
     }
     if ret != 0 as libc::c_int {
-        sshbuf_reset(cert);
+        crate::sshbuf::sshbuf_reset(cert);
     }
     libc::free(sig_blob as *mut libc::c_void);
     libc::free(ca_blob as *mut libc::c_void);
@@ -4198,7 +4196,7 @@ unsafe extern "C" fn sshkey_private_to_blob2(
                                                             authlen as u_int,
                                                         );
                                                         if !(r != 0 as libc::c_int) {
-                                                            sshbuf_reset(blob);
+                                                            crate::sshbuf::sshbuf_reset(blob);
                                                             r = sshbuf_put(
                                                                 blob,
                                                                 b"-----BEGIN OPENSSH PRIVATE KEY-----\n\0" as *const u8

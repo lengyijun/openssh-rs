@@ -139,7 +139,6 @@ extern "C" {
     fn sshbuf_avail(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
     fn sshbuf_set_max_size(buf: *mut crate::sshbuf::sshbuf, max_size: size_t) -> libc::c_int;
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
@@ -2561,13 +2560,13 @@ pub unsafe extern "C" fn channel_force_close(
         chan_read_failed(ssh, c);
     }
     if (*c).istate == 1 as libc::c_int as libc::c_uint {
-        sshbuf_reset((*c).input);
+        crate::sshbuf::sshbuf_reset((*c).input);
         chan_ibuf_empty(ssh, c);
     }
     if (*c).ostate == 0 as libc::c_int as libc::c_uint
         || (*c).ostate == 1 as libc::c_int as libc::c_uint
     {
-        sshbuf_reset((*c).output);
+        crate::sshbuf::sshbuf_reset((*c).output);
         chan_write_failed(ssh, c);
     }
     if ((*c).detach_user).is_some() {
@@ -2633,7 +2632,7 @@ unsafe extern "C" fn channel_pre_mux_client(mut ssh: *mut ssh, mut c: *mut Chann
         (*c).io_want |= 0x1 as libc::c_int as libc::c_uint;
     }
     if (*c).istate == 1 as libc::c_int as libc::c_uint {
-        sshbuf_reset((*c).input);
+        crate::sshbuf::sshbuf_reset((*c).input);
         chan_ibuf_empty(ssh, c);
         chan_rcvd_oclose(ssh, c);
     }

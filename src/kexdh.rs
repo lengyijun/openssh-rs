@@ -22,7 +22,6 @@ extern "C" {
     fn DH_compute_key(key: *mut libc::c_uchar, pub_key: *const BIGNUM, dh: *mut DH) -> libc::c_int;
     fn DH_get0_key(dh: *const DH, pub_key: *mut *const BIGNUM, priv_key: *mut *const BIGNUM);
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -341,7 +340,7 @@ pub unsafe extern "C" fn kex_dh_dec(
             r = sshbuf_get_bignum2(buf, &mut dh_pub);
             r != 0 as libc::c_int
         }) {
-            sshbuf_reset(buf);
+            crate::sshbuf::sshbuf_reset(buf);
             r = kex_dh_compute_key(kex, dh_pub, buf);
             if !(r != 0 as libc::c_int) {
                 *shared_secretp = buf;

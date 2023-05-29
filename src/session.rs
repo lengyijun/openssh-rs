@@ -140,7 +140,6 @@ extern "C" {
     fn ssh_packet_clear_keys(_: *mut ssh);
     fn ssh_packet_get_connection_out(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
 
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
@@ -1098,7 +1097,7 @@ unsafe extern "C" fn display_loginmsg() {
         b"%s\0" as *const u8 as *const libc::c_char,
         sshbuf_ptr(loginmsg) as *mut libc::c_char,
     );
-    sshbuf_reset(loginmsg);
+    crate::sshbuf::sshbuf_reset(loginmsg);
 }
 unsafe extern "C" fn prepare_auth_info_file(
     mut pw: *mut libc::passwd,
@@ -1476,7 +1475,7 @@ pub unsafe extern "C" fn do_exec_no_pty(
         options.ip_qos_interactive,
         options.ip_qos_bulk,
     );
-    sshbuf_reset(loginmsg);
+    crate::sshbuf::sshbuf_reset(loginmsg);
     close(pin[0 as libc::c_int as usize]);
     close(pout[1 as libc::c_int as usize]);
     close(perr[1 as libc::c_int as usize]);
@@ -1760,7 +1759,7 @@ pub unsafe extern "C" fn do_exec(
         ret = do_exec_no_pty(ssh, s, command);
     }
     original_command = 0 as *const libc::c_char;
-    sshbuf_reset(loginmsg);
+    crate::sshbuf::sshbuf_reset(loginmsg);
     return ret;
 }
 pub unsafe extern "C" fn do_login(

@@ -259,8 +259,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
@@ -4239,7 +4237,7 @@ unsafe extern "C" fn prepare_options_buf(
                 as *const libc::c_char,
         );
     }
-    sshbuf_reset(c);
+    crate::sshbuf::sshbuf_reset(c);
     i = 0 as libc::c_int as size_t;
     while i < ncert_ext {
         ext = &mut *cert_ext.offset(i as isize) as *mut cert_ext;
@@ -4293,7 +4291,7 @@ unsafe extern "C" fn prepare_options_buf(
                     (*ext).key,
                     (*ext).val,
                 );
-                sshbuf_reset(b);
+                crate::sshbuf::sshbuf_reset(b);
                 r = sshbuf_put_cstring(c, (*ext).key);
                 if r != 0 as libc::c_int
                     || {
@@ -5388,7 +5386,7 @@ unsafe extern "C" fn show_options(
                 hex,
                 crate::sshbuf::sshbuf_len(option),
             );
-            sshbuf_reset(option);
+            crate::sshbuf::sshbuf_reset(option);
             libc::free(hex as *mut libc::c_void);
         } else {
             printf(b" UNKNOWN FLAG OPTION\n\0" as *const u8 as *const libc::c_char);

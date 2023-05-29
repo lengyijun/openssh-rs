@@ -56,8 +56,6 @@ extern "C" {
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
     fn sshkey_private_serialize(key: *mut sshkey, buf: *mut crate::sshbuf::sshbuf) -> libc::c_int;
@@ -725,7 +723,7 @@ pub unsafe extern "C" fn sshsk_enroll(
     let mut key: *mut sshkey = 0 as *mut sshkey;
     *keyp = 0 as *mut sshkey;
     if !attest.is_null() {
-        sshbuf_reset(attest);
+        crate::sshbuf::sshbuf_reset(attest);
     }
     if type_0 < 0 as libc::c_int {
         return -(10 as libc::c_int);

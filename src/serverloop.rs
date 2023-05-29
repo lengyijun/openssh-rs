@@ -84,8 +84,6 @@ extern "C" {
     fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_put_string(
@@ -2138,7 +2136,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
                     current_block = 8873184364881414274;
                     break;
                 } else {
-                    sshbuf_reset(sigbuf);
+                    crate::sshbuf::sshbuf_reset(sigbuf);
                     libc::free(sig as *mut libc::c_void);
                     sig = 0 as *mut u_char;
                     sigalg = 0 as *const libc::c_char;

@@ -192,8 +192,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1704,7 +1702,7 @@ unsafe extern "C" fn privsep_postauth(mut ssh: *mut ssh, mut authctxt: *mut Auth
                 b"User child is on pid %ld\0" as *const u8 as *const libc::c_char,
                 (*pmonitor).m_pid as libc::c_long,
             );
-            sshbuf_reset(loginmsg);
+            crate::sshbuf::sshbuf_reset(loginmsg);
             monitor_clear_keystate(ssh, pmonitor);
             monitor_child_postauth(ssh, pmonitor);
             libc::exit(0 as libc::c_int);
@@ -2059,7 +2057,7 @@ unsafe extern "C" fn notify_hostkeys(mut ssh: *mut ssh) {
                     );
                 }
             }
-            sshbuf_reset(buf);
+            crate::sshbuf::sshbuf_reset(buf);
             r = sshkey_putb(key, buf);
             if r != 0 as libc::c_int {
                 sshfatal(
@@ -3630,7 +3628,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
             b"ssh_digest_update\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_reset(buf);
+    crate::sshbuf::sshbuf_reset(buf);
     crate::sshbuf::sshbuf_free(buf);
 }
 unsafe extern "C" fn prepare_proctitle(

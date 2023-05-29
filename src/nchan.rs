@@ -7,7 +7,6 @@ extern "C" {
 
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
@@ -878,7 +877,7 @@ pub unsafe extern "C" fn chan_is_dead(
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn chan_shutdown_write(mut ssh: *mut ssh, mut c: *mut Channel) {
-    sshbuf_reset((*c).output);
+    crate::sshbuf::sshbuf_reset((*c).output);
     if (*c).type_0 == 10 as libc::c_int {
         return;
     }

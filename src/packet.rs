@@ -167,8 +167,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_reserve(
@@ -1717,12 +1715,12 @@ pub unsafe extern "C" fn ssh_packet_send2_wrapped(mut ssh: *mut ssh) -> libc::c_
         if r != 0 as libc::c_int {
             current_block = 17000309712211423364;
         } else {
-            sshbuf_reset((*state).compression_buffer);
+            crate::sshbuf::sshbuf_reset((*state).compression_buffer);
             r = compress_buffer(ssh, (*state).outgoing_packet, (*state).compression_buffer);
             if r != 0 as libc::c_int {
                 current_block = 17000309712211423364;
             } else {
-                sshbuf_reset((*state).outgoing_packet);
+                crate::sshbuf::sshbuf_reset((*state).outgoing_packet);
                 r = sshbuf_put(
                     (*state).outgoing_packet,
                     b"\0\0\0\0\0\0" as *const u8 as *const libc::c_char as *const libc::c_void,
@@ -1919,7 +1917,7 @@ pub unsafe extern "C" fn ssh_packet_send2_wrapped(mut ssh: *mut ssh) -> libc::c_
                                                 .wrapping_add(len as libc::c_ulong)
                                                 as u_int64_t
                                                 as u_int64_t;
-                                            sshbuf_reset((*state).outgoing_packet);
+                                            crate::sshbuf::sshbuf_reset((*state).outgoing_packet);
                                             if type_0 as libc::c_int == 21 as libc::c_int {
                                                 r = ssh_set_newkeys(ssh, MODE_OUT as libc::c_int);
                                             } else if type_0 as libc::c_int == 52 as libc::c_int
@@ -2251,7 +2249,7 @@ unsafe extern "C" fn ssh_packet_read_poll2_mux(
     if crate::sshbuf::sshbuf_len((*state).input) < need {
         return 0 as libc::c_int;
     }
-    sshbuf_reset((*state).incoming_packet);
+    crate::sshbuf::sshbuf_reset((*state).incoming_packet);
     r = sshbuf_put(
         (*state).incoming_packet,
         cp.offset(4 as libc::c_int as isize) as *const libc::c_void,
@@ -2382,13 +2380,13 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
             }
             return -(54 as libc::c_int);
         }
-        sshbuf_reset((*state).incoming_packet);
+        crate::sshbuf::sshbuf_reset((*state).incoming_packet);
         current_block = 17281240262373992796;
     } else if (*state).packlen == 0 as libc::c_int as libc::c_uint {
         if crate::sshbuf::sshbuf_len((*state).input) < block_size as libc::c_ulong {
             return 0 as libc::c_int;
         }
-        sshbuf_reset((*state).incoming_packet);
+        crate::sshbuf::sshbuf_reset((*state).incoming_packet);
         r = sshbuf_reserve((*state).incoming_packet, block_size as size_t, &mut cp);
         if r != 0 as libc::c_int {
             current_block = 11636842938881510489;
@@ -2697,7 +2695,9 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                                             r != 0 as libc::c_int
                                         }) {
                                             if !comp.is_null() && (*comp).enabled != 0 {
-                                                sshbuf_reset((*state).compression_buffer);
+                                                crate::sshbuf::sshbuf_reset(
+                                                    (*state).compression_buffer,
+                                                );
                                                 r = uncompress_buffer(
                                                     ssh,
                                                     (*state).incoming_packet,
@@ -2706,7 +2706,9 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                                                 if r != 0 as libc::c_int {
                                                     current_block = 11636842938881510489;
                                                 } else {
-                                                    sshbuf_reset((*state).incoming_packet);
+                                                    crate::sshbuf::sshbuf_reset(
+                                                        (*state).incoming_packet,
+                                                    );
                                                     r = sshbuf_putb(
                                                         (*state).incoming_packet,
                                                         (*state).compression_buffer,
@@ -4076,8 +4078,8 @@ pub unsafe extern "C" fn ssh_packet_set_state(
     if r != 0 as libc::c_int {
         return r;
     }
-    sshbuf_reset((*state).input);
-    sshbuf_reset((*state).output);
+    crate::sshbuf::sshbuf_reset((*state).input);
+    crate::sshbuf::sshbuf_reset((*state).output);
     r = sshbuf_get_string_direct(m, &mut input, &mut ilen);
     if r != 0 as libc::c_int
         || {
@@ -4256,7 +4258,7 @@ pub unsafe extern "C" fn sshpkt_start(mut ssh: *mut ssh, mut type_0: u_char) -> 
     );
     buf[(::core::mem::size_of::<[u_char; 6]>() as libc::c_ulong)
         .wrapping_sub(1 as libc::c_int as libc::c_ulong) as usize] = type_0;
-    sshbuf_reset((*(*ssh).state).outgoing_packet);
+    crate::sshbuf::sshbuf_reset((*(*ssh).state).outgoing_packet);
     return sshbuf_put(
         (*(*ssh).state).outgoing_packet,
         buf.as_mut_ptr() as *const libc::c_void,
@@ -4306,7 +4308,7 @@ unsafe extern "C" fn ssh_packet_send_mux(mut ssh: *mut ssh) -> libc::c_int {
             return r;
         }
     }
-    sshbuf_reset((*state).outgoing_packet);
+    crate::sshbuf::sshbuf_reset((*state).outgoing_packet);
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn sshpkt_msg_ignore(mut ssh: *mut ssh, mut nbytes: u_int) -> libc::c_int {

@@ -14,7 +14,7 @@ extern "C" {
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
 
     fn sshbuf_max_size(buf: *const crate::sshbuf::sshbuf) -> size_t;
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn get_u32(_: *const libc::c_void) -> u_int32_t;
@@ -164,7 +164,7 @@ pub unsafe extern "C" fn ssh_msg_recv(
         );
         return -(1 as libc::c_int);
     }
-    sshbuf_reset(m);
+    crate::sshbuf::sshbuf_reset(m);
     r = sshbuf_reserve(m, msg_len as size_t, &mut p);
     if r != 0 as libc::c_int {
         crate::log::sshlog(

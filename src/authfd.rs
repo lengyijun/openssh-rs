@@ -65,8 +65,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_equal_public(_: *const sshkey, _: *const sshkey) -> libc::c_int;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
@@ -420,7 +418,7 @@ unsafe extern "C" fn ssh_request_reply(
     if len > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_ulong {
         return -(4 as libc::c_int);
     }
-    sshbuf_reset(reply);
+    crate::sshbuf::sshbuf_reset(reply);
     while len > 0 as libc::c_int as libc::c_ulong {
         l = len;
         if l > ::core::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong {

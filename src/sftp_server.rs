@@ -124,8 +124,6 @@ extern "C" {
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
@@ -1150,7 +1148,7 @@ unsafe extern "C" fn send_msg(mut m: *mut crate::sshbuf::sshbuf) {
             b"enqueue\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_reset(m);
+    crate::sshbuf::sshbuf_reset(m);
 }
 unsafe extern "C" fn status_to_message(mut status: u_int32_t) -> *const libc::c_char {
     static mut status_messages: [*const libc::c_char; 10] = [

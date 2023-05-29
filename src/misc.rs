@@ -159,7 +159,7 @@ extern "C" {
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
+
 }
 pub type __builtin_va_list = [__va_list_tag; 1];
 #[derive(Copy, Clone)]
@@ -3612,7 +3612,7 @@ pub unsafe extern "C" fn argv_assemble(
     i = 0 as libc::c_int;
     while i < argc {
         ws = 0 as libc::c_int;
-        sshbuf_reset(arg);
+        crate::sshbuf::sshbuf_reset(arg);
         j = 0 as libc::c_int;
         while *(*argv.offset(i as isize)).offset(j as isize) as libc::c_int != '\0' as i32 {
             r = 0 as libc::c_int;

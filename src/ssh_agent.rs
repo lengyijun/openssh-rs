@@ -94,8 +94,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
@@ -2971,7 +2969,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
             0 as *const libc::c_char,
             b"failed to parse constraints\0" as *const u8 as *const libc::c_char,
         );
-        sshbuf_reset((*e).request);
+        crate::sshbuf::sshbuf_reset((*e).request);
     } else {
         if !sk_provider.is_null() {
             if sshkey_is_sk(k) == 0 {
@@ -4012,7 +4010,7 @@ unsafe extern "C" fn process_message(mut socknum: u_int) -> libc::c_int {
     {
         return 0 as libc::c_int;
     }
-    sshbuf_reset((*e).request);
+    crate::sshbuf::sshbuf_reset((*e).request);
     r = sshbuf_get_stringb((*e).input, (*e).request);
     if r != 0 as libc::c_int || {
         r = sshbuf_get_u8((*e).request, &mut type_0);
@@ -4055,7 +4053,7 @@ unsafe extern "C" fn process_message(mut socknum: u_int) -> libc::c_int {
         type_0 as libc::c_int,
     );
     if locked != 0 && type_0 as libc::c_int != 23 as libc::c_int {
-        sshbuf_reset((*e).request);
+        crate::sshbuf::sshbuf_reset((*e).request);
         match type_0 as libc::c_int {
             11 => {
                 no_identities(e);
@@ -4112,7 +4110,7 @@ unsafe extern "C" fn process_message(mut socknum: u_int) -> libc::c_int {
                 b"Unknown message %d\0" as *const u8 as *const libc::c_char,
                 type_0 as libc::c_int,
             );
-            sshbuf_reset((*e).request);
+            crate::sshbuf::sshbuf_reset((*e).request);
             send_status(e, 0 as libc::c_int);
         }
     }

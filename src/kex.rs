@@ -101,8 +101,6 @@ extern "C" {
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
@@ -948,7 +946,7 @@ pub unsafe extern "C" fn kex_prop2buf(
 ) -> libc::c_int {
     let mut i: u_int = 0;
     let mut r: libc::c_int = 0;
-    sshbuf_reset(b);
+    crate::sshbuf::sshbuf_reset(b);
     i = 0 as libc::c_int as u_int;
     while i < 16 as libc::c_int as libc::c_uint {
         r = crate::sshbuf_getput_basic::sshbuf_put_u8(b, 0 as libc::c_int as u_char);
@@ -1514,7 +1512,7 @@ unsafe extern "C" fn kex_input_newkeys(
     }
     (*kex).done = 1 as libc::c_int;
     (*kex).flags &= !(0x2 as libc::c_int) as libc::c_uint;
-    sshbuf_reset((*kex).peer);
+    crate::sshbuf::sshbuf_reset((*kex).peer);
     (*kex).flags &= !(0x1 as libc::c_int) as libc::c_uint;
     libc::free((*kex).name as *mut libc::c_void);
     (*kex).name = 0 as *mut libc::c_char;
@@ -2782,7 +2780,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
     let mut peer_version_string: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut remote_version: *mut libc::c_char = 0 as *mut libc::c_char;
-    sshbuf_reset(our_version);
+    crate::sshbuf::sshbuf_reset(our_version);
     if !version_addendum.is_null() && *version_addendum as libc::c_int == '\0' as i32 {
         version_addendum = 0 as *const libc::c_char;
     }
@@ -2918,7 +2916,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                         current_block = 4276536258050058664;
                         break;
                     } else {
-                        sshbuf_reset(peer_version);
+                        crate::sshbuf::sshbuf_reset(peer_version);
                         expect_nl = 0 as libc::c_int;
                         loop {
                             if timeout_ms > 0 as libc::c_int {

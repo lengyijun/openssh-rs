@@ -43,8 +43,6 @@ extern "C" {
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_get_string(
@@ -1117,7 +1115,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
         );
     }
     libc::free(data as *mut libc::c_void);
-    sshbuf_reset(b);
+    crate::sshbuf::sshbuf_reset(b);
     r = sshbuf_put_string(b, signature as *const libc::c_void, slen);
     if r != 0 as libc::c_int {
         sshfatal(

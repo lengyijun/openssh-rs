@@ -77,8 +77,6 @@ extern "C" {
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
@@ -2593,11 +2591,11 @@ unsafe extern "C" fn revoked_certs_generate(
                             current_block = 9009306676914022655;
                             break;
                         }
-                        sshbuf_reset(sect);
+                        crate::sshbuf::sshbuf_reset(sect);
                     }
                     if next_state != state || force_new_sect != 0 {
                         state = next_state;
-                        sshbuf_reset(sect);
+                        crate::sshbuf::sshbuf_reset(sect);
                         match state {
                             34 => {
                                 bitmap = bitmap_new();
@@ -2724,7 +2722,7 @@ unsafe extern "C" fn revoked_certs_generate(
                         match current_block {
                             9009306676914022655 => {}
                             _ => {
-                                sshbuf_reset(sect);
+                                crate::sshbuf::sshbuf_reset(sect);
                                 rki = revoked_key_id_tree_RB_MINMAX(
                                     &mut (*rc).revoked_key_ids,
                                     -(1 as libc::c_int),
@@ -2841,7 +2839,7 @@ pub unsafe extern "C" fn ssh_krl_to_blob(
                 current_block = 7746791466490516765;
                 break;
             }
-            sshbuf_reset(sect);
+            crate::sshbuf::sshbuf_reset(sect);
             r = revoked_certs_generate(rc, sect);
             if r != 0 as libc::c_int {
                 current_block = 14509089820662752219;
@@ -2860,7 +2858,7 @@ pub unsafe extern "C" fn ssh_krl_to_blob(
         match current_block {
             14509089820662752219 => {}
             _ => {
-                sshbuf_reset(sect);
+                crate::sshbuf::sshbuf_reset(sect);
                 rb = revoked_blob_tree_RB_MINMAX(&mut (*krl).revoked_keys, -(1 as libc::c_int));
                 loop {
                     if rb.is_null() {
@@ -2896,7 +2894,7 @@ pub unsafe extern "C" fn ssh_krl_to_blob(
                         match current_block {
                             14509089820662752219 => {}
                             _ => {
-                                sshbuf_reset(sect);
+                                crate::sshbuf::sshbuf_reset(sect);
                                 rb = revoked_blob_tree_RB_MINMAX(
                                     &mut (*krl).revoked_sha1s,
                                     -(1 as libc::c_int),
@@ -2941,7 +2939,7 @@ pub unsafe extern "C" fn ssh_krl_to_blob(
                                         match current_block {
                                             14509089820662752219 => {}
                                             _ => {
-                                                sshbuf_reset(sect);
+                                                crate::sshbuf::sshbuf_reset(sect);
                                                 rb = revoked_blob_tree_RB_MINMAX(
                                                     &mut (*krl).revoked_sha256s,
                                                     -(1 as libc::c_int),

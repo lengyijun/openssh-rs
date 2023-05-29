@@ -68,8 +68,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
@@ -338,7 +336,7 @@ unsafe extern "C" fn send_msg(mut conn: *mut sftp_conn, mut m: *mut crate::sshbu
             libc::strerror(*libc::__errno_location()),
         );
     }
-    sshbuf_reset(m);
+    crate::sshbuf::sshbuf_reset(m);
 }
 unsafe extern "C" fn get_msg_extended(
     mut conn: *mut sftp_conn,
@@ -348,7 +346,7 @@ unsafe extern "C" fn get_msg_extended(
     let mut msg_len: u_int = 0;
     let mut p: *mut u_char = 0 as *mut u_char;
     let mut r: libc::c_int = 0;
-    sshbuf_reset(m);
+    crate::sshbuf::sshbuf_reset(m);
     r = sshbuf_reserve(m, 4 as libc::c_int as size_t, &mut p);
     if r != 0 as libc::c_int {
         sshfatal(
@@ -1925,7 +1923,7 @@ unsafe extern "C" fn do_lsreaddir(
             b"Sending SSH2_FXP_READDIR I:%u\0" as *const u8 as *const libc::c_char,
             id,
         );
-        sshbuf_reset(msg);
+        crate::sshbuf::sshbuf_reset(msg);
         r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 12 as libc::c_int as u_char);
         if r != 0 as libc::c_int
             || {
@@ -1949,7 +1947,7 @@ unsafe extern "C" fn do_lsreaddir(
             );
         }
         send_msg(conn, msg);
-        sshbuf_reset(msg);
+        crate::sshbuf::sshbuf_reset(msg);
         get_msg(conn, msg);
         r = sshbuf_get_u8(msg, &mut type_0);
         if r != 0 as libc::c_int || {
@@ -2972,7 +2970,7 @@ pub unsafe extern "C" fn do_copy(
         id,
         oldpath,
     );
-    sshbuf_reset(msg);
+    crate::sshbuf::sshbuf_reset(msg);
     old_handle = get_handle(
         conn,
         id,
@@ -3033,7 +3031,7 @@ pub unsafe extern "C" fn do_copy(
         id,
         newpath,
     );
-    sshbuf_reset(msg);
+    crate::sshbuf::sshbuf_reset(msg);
     new_handle = get_handle(
         conn,
         id,
@@ -4219,7 +4217,7 @@ pub unsafe extern "C" fn do_download(
                             handle_len as u_int,
                         );
                     }
-                    sshbuf_reset(msg);
+                    crate::sshbuf::sshbuf_reset(msg);
                     get_msg(conn, msg);
                     r = sshbuf_get_u8(msg, &mut type_0);
                     if r != 0 as libc::c_int || {
@@ -5288,7 +5286,7 @@ pub unsafe extern "C" fn do_upload(
             if len != 0 as libc::c_int {
                 id = id.wrapping_add(1);
                 ack = request_enqueue(&mut acks, id, len as size_t, offset as uint64_t);
-                sshbuf_reset(msg);
+                crate::sshbuf::sshbuf_reset(msg);
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 6 as libc::c_int as u_char);
                 if r != 0 as libc::c_int
                     || {
@@ -5355,7 +5353,7 @@ pub unsafe extern "C" fn do_upload(
                 || id.wrapping_sub(ackid) >= (*conn).num_requests
             {
                 let mut rid: u_int = 0;
-                sshbuf_reset(msg);
+                crate::sshbuf::sshbuf_reset(msg);
                 get_msg(conn, msg);
                 r = sshbuf_get_u8(msg, &mut type_0);
                 if r != 0 as libc::c_int || {
@@ -5913,7 +5911,7 @@ unsafe extern "C" fn handle_dest_replies(
                 break;
             }
         }
-        sshbuf_reset(msg);
+        crate::sshbuf::sshbuf_reset(msg);
         get_msg(to, msg);
         r = sshbuf_get_u8(msg, &mut type_0);
         if r != 0 as libc::c_int || {
@@ -6192,7 +6190,7 @@ pub unsafe extern "C" fn do_crossload(
             &mut num_upload_req,
             &mut write_error as *mut libc::c_int as *mut u_int,
         );
-        sshbuf_reset(msg);
+        crate::sshbuf::sshbuf_reset(msg);
         get_msg(from, msg);
         r = sshbuf_get_u8(msg, &mut type_0);
         if r != 0 as libc::c_int || {
@@ -6314,7 +6312,7 @@ pub unsafe extern "C" fn do_crossload(
                         (*req).len,
                     );
                 }
-                sshbuf_reset(msg);
+                crate::sshbuf::sshbuf_reset(msg);
                 r = crate::sshbuf_getput_basic::sshbuf_put_u8(msg, 6 as libc::c_int as u_char);
                 if r != 0 as libc::c_int
                     || {

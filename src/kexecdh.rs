@@ -41,7 +41,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_ec_validate_public(_: *const EC_GROUP, _: *const EC_POINT) -> libc::c_int;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -320,7 +319,7 @@ unsafe extern "C" fn kex_ecdh_dec_key_group(
             } else {
                 r = sshbuf_get_ec(buf, dh_pub, group);
                 if !(r != 0 as libc::c_int) {
-                    sshbuf_reset(buf);
+                    crate::sshbuf::sshbuf_reset(buf);
                     if sshkey_ec_validate_public(group, dh_pub) != 0 as libc::c_int {
                         r = -(3 as libc::c_int);
                     } else {

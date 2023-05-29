@@ -58,8 +58,6 @@ extern "C" {
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
@@ -4244,7 +4242,7 @@ unsafe extern "C" fn ssh_keysign(
             b"couldn't send request\0" as *const u8 as *const libc::c_char,
         );
     }
-    sshbuf_reset(b);
+    crate::sshbuf::sshbuf_reset(b);
     r = ssh_msg_recv(from[0 as libc::c_int as usize], b);
     close(from[0 as libc::c_int as usize]);
     close(to[1 as libc::c_int as usize]);

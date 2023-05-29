@@ -66,8 +66,6 @@ extern "C" {
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn compat_banner(_: *mut ssh, _: *const libc::c_char);
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
@@ -699,7 +697,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
     n = 0 as libc::c_int as size_t;
     j = n;
     loop {
-        sshbuf_reset(banner);
+        crate::sshbuf::sshbuf_reset(banner);
         expect_nl = 0 as libc::c_int;
         loop {
             if j >= crate::sshbuf::sshbuf_len(input) {

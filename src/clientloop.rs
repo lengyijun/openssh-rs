@@ -113,8 +113,6 @@ extern "C" {
     fn ssh_packet_is_rekeying(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_check_rekey(_: *mut ssh) -> libc::c_int;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
@@ -1748,9 +1746,9 @@ unsafe extern "C" fn client_suspend_self(
         );
     }
     leave_raw_mode((options.request_tty == 3 as libc::c_int) as libc::c_int);
-    sshbuf_reset(bin);
-    sshbuf_reset(bout);
-    sshbuf_reset(berr);
+    crate::sshbuf::sshbuf_reset(bin);
+    crate::sshbuf::sshbuf_reset(bout);
+    crate::sshbuf::sshbuf_reset(berr);
     kill(libc::getpid(), 20 as libc::c_int);
     ::core::ptr::write_volatile(
         &mut received_window_change_signal as *mut sig_atomic_t,
@@ -5384,7 +5382,7 @@ unsafe extern "C" fn client_global_hostkeys_prove_confirm(
         }
         if !(*((*ctx).keys_match).offset(i as isize) != 0) {
             plaintype = sshkey_type_plain((**((*ctx).keys).offset(i as isize)).type_0);
-            sshbuf_reset(signdata);
+            crate::sshbuf::sshbuf_reset(signdata);
             r = sshbuf_put_cstring(
                 signdata,
                 b"hostkeys-prove-00@openssh.com\0" as *const u8 as *const libc::c_char,
@@ -6133,7 +6131,7 @@ unsafe extern "C" fn client_input_hostkeys(mut ssh: *mut ssh) -> libc::c_int {
                                         i = 0 as libc::c_int as size_t;
                                         while i < (*ctx).nkeys {
                                             if !(*((*ctx).keys_match).offset(i as isize) != 0) {
-                                                sshbuf_reset(buf);
+                                                crate::sshbuf::sshbuf_reset(buf);
                                                 r = sshkey_putb(
                                                     *((*ctx).keys).offset(i as isize),
                                                     buf,

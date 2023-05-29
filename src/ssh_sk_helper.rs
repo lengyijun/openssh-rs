@@ -54,8 +54,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
     fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
     fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
@@ -775,7 +773,7 @@ unsafe extern "C" fn process_load_resident(
                 (*(**srks.offset(i as isize)).key).sk_application,
                 (**srks.offset(i as isize)).user_id_len,
             );
-            sshbuf_reset(kbuf);
+            crate::sshbuf::sshbuf_reset(kbuf);
             r = sshkey_private_serialize((**srks.offset(i as isize)).key, kbuf);
             if r != 0 as libc::c_int {
                 sshfatal(

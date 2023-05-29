@@ -118,8 +118,6 @@ extern "C" {
         >,
     ) -> libc::c_int;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_put(
@@ -378,7 +376,7 @@ unsafe extern "C" fn recv_msg(mut m: *mut crate::sshbuf::sshbuf) -> libc::c_int 
             len,
         );
     }
-    sshbuf_reset(m);
+    crate::sshbuf::sshbuf_reset(m);
     while len > 0 as libc::c_int as libc::c_uint {
         l = len;
         if l as libc::c_ulong > ::core::mem::size_of::<[u_char; 1024]>() as libc::c_ulong {
@@ -528,7 +526,7 @@ unsafe extern "C" fn rsa_encrypt(
                     );
                 }
                 send_msg(msg);
-                sshbuf_reset(msg);
+                crate::sshbuf::sshbuf_reset(msg);
                 if recv_msg(msg) == 14 as libc::c_int {
                     r = sshbuf_get_string(msg, &mut signature, &mut slen);
                     if r != 0 as libc::c_int {
@@ -668,7 +666,7 @@ unsafe extern "C" fn ecdsa_do_sign(
                     );
                 }
                 send_msg(msg);
-                sshbuf_reset(msg);
+                crate::sshbuf::sshbuf_reset(msg);
                 if recv_msg(msg) == 14 as libc::c_int {
                     r = sshbuf_get_string(msg, &mut signature, &mut slen);
                     if r != 0 as libc::c_int {
@@ -984,7 +982,7 @@ pub unsafe extern "C" fn pkcs11_add_provider(
         );
     }
     send_msg(msg);
-    sshbuf_reset(msg);
+    crate::sshbuf::sshbuf_reset(msg);
     type_0 = recv_msg(msg);
     if type_0 == 12 as libc::c_int {
         r = sshbuf_get_u32(msg, &mut nkeys);
@@ -1112,7 +1110,7 @@ pub unsafe extern "C" fn pkcs11_del_provider(mut name: *mut libc::c_char) -> lib
         );
     }
     send_msg(msg);
-    sshbuf_reset(msg);
+    crate::sshbuf::sshbuf_reset(msg);
     if recv_msg(msg) == 6 as libc::c_int {
         ret = 0 as libc::c_int;
     }

@@ -29,8 +29,6 @@ extern "C" {
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
@@ -1097,7 +1095,7 @@ pub unsafe extern "C" fn sshsk_enroll(
     );
     *keyp = 0 as *mut sshkey;
     if !attest.is_null() {
-        sshbuf_reset(attest);
+        crate::sshbuf::sshbuf_reset(attest);
     }
     r = make_options(device, userid, &mut opts);
     if !(r != 0 as libc::c_int) {

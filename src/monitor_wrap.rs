@@ -26,8 +26,6 @@ extern "C" {
 
     fn dh_new_group(_: *mut BIGNUM, _: *mut BIGNUM) -> *mut DH;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
@@ -933,7 +931,7 @@ pub unsafe extern "C" fn mm_request_receive(
             msg_len,
         );
     }
-    sshbuf_reset(m);
+    crate::sshbuf::sshbuf_reset(m);
     r = sshbuf_reserve(m, msg_len as size_t, &mut p);
     if r != 0 as libc::c_int {
         sshfatal(
@@ -2078,7 +2076,7 @@ pub unsafe extern "C" fn mm_auth2_read_banner() -> *mut libc::c_char {
         );
     }
     mm_request_send((*pmonitor).m_recvfd, MONITOR_REQ_AUTH2_READ_BANNER, m);
-    sshbuf_reset(m);
+    crate::sshbuf::sshbuf_reset(m);
     mm_request_receive_expect((*pmonitor).m_recvfd, MONITOR_ANS_AUTH2_READ_BANNER, m);
     r = sshbuf_get_cstring(m, &mut banner, 0 as *mut size_t);
     if r != 0 as libc::c_int {

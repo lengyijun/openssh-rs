@@ -77,8 +77,6 @@ extern "C" {
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
-    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
-
     fn sshbuf_get_cstring(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut libc::c_char,
@@ -1495,7 +1493,7 @@ pub unsafe extern "C" fn auth_debug_send(mut ssh: *mut ssh) {
 }
 pub unsafe extern "C" fn auth_debug_reset() {
     if !auth_debug.is_null() {
-        sshbuf_reset(auth_debug);
+        crate::sshbuf::sshbuf_reset(auth_debug);
     } else {
         auth_debug = crate::sshbuf::sshbuf_new();
         if auth_debug.is_null() {
