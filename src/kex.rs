@@ -36,7 +36,7 @@ extern "C" {
     fn DH_free(dh: *mut DH);
 
     fn EC_KEY_free(key: *mut crate::sshkey::EC_KEY);
-    fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
+
     fn ssh_dispatch_range(_: *mut ssh, _: u_int, _: u_int, _: Option<dispatch_fn>);
     fn ssh_set_newkeys(_: *mut ssh, mode: libc::c_int) -> libc::c_int;
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
@@ -1180,7 +1180,7 @@ pub unsafe extern "C" fn kex_send_newkeys(mut ssh: *mut ssh) -> libc::c_int {
         0 as *const libc::c_char,
         b"SSH2_MSG_NEWKEYS sent\0" as *const u8 as *const libc::c_char,
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         21 as libc::c_int,
         Some(
@@ -1230,7 +1230,7 @@ pub unsafe extern "C" fn kex_input_ext_info(
         0 as *const libc::c_char,
         b"SSH2_MSG_EXT_INFO received\0" as *const u8 as *const libc::c_char,
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         7 as libc::c_int,
         Some(
@@ -1400,7 +1400,7 @@ unsafe extern "C" fn kex_input_newkeys(
         0 as *const libc::c_char,
         b"SSH2_MSG_NEWKEYS received\0" as *const u8 as *const libc::c_char,
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         21 as libc::c_int,
         Some(
@@ -1408,7 +1408,7 @@ unsafe extern "C" fn kex_input_newkeys(
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         20 as libc::c_int,
         Some(
@@ -1551,7 +1551,7 @@ pub unsafe extern "C" fn kex_input_kexinit(
         );
         return -(1 as libc::c_int);
     }
-    ssh_dispatch_set(ssh, 20 as libc::c_int, None);
+    crate::dispatch::ssh_dispatch_set(ssh, 20 as libc::c_int, None);
     ptr = sshpkt_ptr(ssh, &mut dlen);
     r = sshbuf_put((*kex).peer, ptr as *const libc::c_void, dlen);
     if r != 0 as libc::c_int {
@@ -1756,7 +1756,7 @@ pub unsafe extern "C" fn kex_ready(
     }
     (*(*ssh).kex).flags = 0x2 as libc::c_int as u_int;
     kex_reset_dispatch(ssh);
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         20 as libc::c_int,
         Some(

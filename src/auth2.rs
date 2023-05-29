@@ -41,7 +41,6 @@ extern "C" {
     fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
     fn dispatch_protocol_ignore(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
 
-    fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
     fn ssh_packet_set_log_preamble(_: *mut ssh, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
@@ -502,7 +501,7 @@ pub unsafe extern "C" fn do_authentication2(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         5 as libc::c_int,
         Some(
@@ -552,7 +551,7 @@ unsafe extern "C" fn input_service_request(
         {
             if (*authctxt).success == 0 {
                 acceptit = 1 as libc::c_int;
-                ssh_dispatch_set(
+                crate::dispatch::ssh_dispatch_set(
                     ssh,
                     50 as libc::c_int,
                     Some(
@@ -973,7 +972,7 @@ pub unsafe extern "C" fn userauth_finish(
         return;
     }
     if authenticated == 1 as libc::c_int {
-        ssh_dispatch_set(
+        crate::dispatch::ssh_dispatch_set(
             ssh,
             50 as libc::c_int,
             Some(

@@ -69,7 +69,6 @@ extern "C" {
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn ssh_packet_set_rekey_limits(_: *mut ssh, _: u_int64_t, _: u_int32_t);
 
-    fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_range(_: *mut ssh, _: u_int, _: u_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
     fn compat_kex_proposal(_: *mut ssh, _: *const libc::c_char) -> *mut libc::c_char;
@@ -1124,7 +1123,7 @@ pub unsafe extern "C" fn ssh_userauth2(
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         7 as libc::c_int,
         Some(
@@ -1132,7 +1131,7 @@ pub unsafe extern "C" fn ssh_userauth2(
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         6 as libc::c_int,
         Some(
@@ -1256,7 +1255,7 @@ unsafe extern "C" fn input_userauth_service_accept(
                     b"SSH2_MSG_SERVICE_ACCEPT received\0" as *const u8 as *const libc::c_char,
                 );
                 userauth_none(ssh);
-                ssh_dispatch_set(
+                crate::dispatch::ssh_dispatch_set(
                     ssh,
                     7 as libc::c_int,
                     Some(
@@ -1268,7 +1267,7 @@ unsafe extern "C" fn input_userauth_service_accept(
                             ) -> libc::c_int,
                     ),
                 );
-                ssh_dispatch_set(
+                crate::dispatch::ssh_dispatch_set(
                     ssh,
                     52 as libc::c_int,
                     Some(
@@ -1280,7 +1279,7 @@ unsafe extern "C" fn input_userauth_service_accept(
                             ) -> libc::c_int,
                     ),
                 );
-                ssh_dispatch_set(
+                crate::dispatch::ssh_dispatch_set(
                     ssh,
                     51 as libc::c_int,
                     Some(
@@ -1292,7 +1291,7 @@ unsafe extern "C" fn input_userauth_service_accept(
                             ) -> libc::c_int,
                     ),
                 );
-                ssh_dispatch_set(
+                crate::dispatch::ssh_dispatch_set(
                     ssh,
                     53 as libc::c_int,
                     Some(
@@ -1841,7 +1840,7 @@ unsafe extern "C" fn userauth_passwd(mut ssh: *mut ssh) -> libc::c_int {
     if !password.is_null() {
         freezero(password as *mut libc::c_void, strlen(password));
     }
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         60 as libc::c_int,
         Some(
@@ -2010,7 +2009,7 @@ unsafe extern "C" fn input_userauth_passwd_changereq(
                                 r != 0 as libc::c_int
                             })
                         {
-                            ssh_dispatch_set(
+                            crate::dispatch::ssh_dispatch_set(
                                 ssh,
                                 60 as libc::c_int,
                                 Some(
@@ -2768,7 +2767,7 @@ unsafe extern "C" fn send_pubkey_test(mut ssh: *mut ssh, mut id: *mut Identity) 
                 b"cannot handle key\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            ssh_dispatch_set(
+            crate::dispatch::ssh_dispatch_set(
                 ssh,
                 60 as libc::c_int,
                 Some(
@@ -3601,7 +3600,7 @@ unsafe extern "C" fn userauth_kbdint(mut ssh: *mut ssh) -> libc::c_int {
             0 as *const libc::c_char,
             b"userauth_kbdint: disable: no info_req_seen\0" as *const u8 as *const libc::c_char,
         );
-        ssh_dispatch_set(ssh, 60 as libc::c_int, None);
+        crate::dispatch::ssh_dispatch_set(ssh, 60 as libc::c_int, None);
         return 0 as libc::c_int;
     }
     crate::log::sshlog(
@@ -3661,7 +3660,7 @@ unsafe extern "C" fn userauth_kbdint(mut ssh: *mut ssh) -> libc::c_int {
             b"send packet\0" as *const u8 as *const libc::c_char,
         );
     }
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         60 as libc::c_int,
         Some(

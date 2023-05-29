@@ -78,7 +78,7 @@ extern "C" {
     fn sshpkt_get_string(ssh: *mut ssh, valp: *mut *mut u_char, lenp: *mut size_t) -> libc::c_int;
     fn sshpkt_getb_froms(ssh: *mut ssh, valp: *mut *mut crate::sshbuf::sshbuf) -> libc::c_int;
     fn sshpkt_get_bignum2(ssh: *mut ssh, valp: *mut *mut BIGNUM) -> libc::c_int;
-    fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
+
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
     fn dh_new_group(_: *mut BIGNUM, _: *mut BIGNUM) -> *mut DH;
     fn dh_gen_key(_: *mut DH, _: libc::c_int) -> libc::c_int;
@@ -205,7 +205,7 @@ pub unsafe extern "C" fn kexgex_client(mut ssh: *mut ssh) -> libc::c_int {
             0 as *const libc::c_char,
             b"expecting SSH2_MSG_KEX_DH_GEX_GROUP\0" as *const u8 as *const libc::c_char,
         );
-        ssh_dispatch_set(
+        crate::dispatch::ssh_dispatch_set(
             ssh,
             31 as libc::c_int,
             Some(
@@ -238,7 +238,7 @@ unsafe extern "C" fn input_kex_dh_gex_group(
         0 as *const libc::c_char,
         b"SSH2_MSG_KEX_DH_GEX_GROUP received\0" as *const u8 as *const libc::c_char,
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         31 as libc::c_int,
         Some(
@@ -309,7 +309,7 @@ unsafe extern "C" fn input_kex_dh_gex_group(
                             b"expecting SSH2_MSG_KEX_DH_GEX_REPLY\0" as *const u8
                                 as *const libc::c_char,
                         );
-                        ssh_dispatch_set(
+                        crate::dispatch::ssh_dispatch_set(
                             ssh,
                             33 as libc::c_int,
                             Some(
@@ -361,7 +361,7 @@ unsafe extern "C" fn input_kex_dh_gex_reply(
         0 as *const libc::c_char,
         b"SSH2_MSG_KEX_DH_GEX_REPLY received\0" as *const u8 as *const libc::c_char,
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         33 as libc::c_int,
         Some(

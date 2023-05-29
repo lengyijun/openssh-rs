@@ -31,7 +31,7 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
     fn sshpkt_get_end(ssh: *mut ssh) -> libc::c_int;
-    fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn sshfatal(
@@ -357,7 +357,7 @@ pub unsafe extern "C" fn auth2_challenge(
 }
 pub unsafe extern "C" fn auth2_challenge_stop(mut ssh: *mut ssh) {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
-    ssh_dispatch_set(ssh, 61 as libc::c_int, None);
+    crate::dispatch::ssh_dispatch_set(ssh, 61 as libc::c_int, None);
     if !((*authctxt).kbdintctxt).is_null() {
         kbdint_free((*authctxt).kbdintctxt as *mut KbdintAuthctxt);
         (*authctxt).kbdintctxt = 0 as *mut libc::c_void;
@@ -407,7 +407,7 @@ unsafe extern "C" fn auth2_challenge_start(mut ssh: *mut ssh) -> libc::c_int {
         auth2_challenge_stop(ssh);
         return 0 as libc::c_int;
     }
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         61 as libc::c_int,
         Some(

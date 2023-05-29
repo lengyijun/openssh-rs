@@ -77,7 +77,6 @@ extern "C" {
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
     fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
 
-    fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
 
     fn sshbuf_put_stringb(
@@ -2552,7 +2551,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         97 as libc::c_int,
         Some(
@@ -2560,7 +2559,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         94 as libc::c_int,
         Some(
@@ -2568,7 +2567,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         96 as libc::c_int,
         Some(
@@ -2576,7 +2575,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         95 as libc::c_int,
         Some(
@@ -2584,7 +2583,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         90 as libc::c_int,
         Some(
@@ -2592,7 +2591,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         91 as libc::c_int,
         Some(
@@ -2600,7 +2599,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         92 as libc::c_int,
         Some(
@@ -2608,7 +2607,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         98 as libc::c_int,
         Some(
@@ -2616,7 +2615,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         93 as libc::c_int,
         Some(
@@ -2624,7 +2623,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         80 as libc::c_int,
         Some(
@@ -2632,7 +2631,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         99 as libc::c_int,
         Some(
@@ -2640,7 +2639,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         100 as libc::c_int,
         Some(
@@ -2648,7 +2647,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         81 as libc::c_int,
         Some(
@@ -2656,7 +2655,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         82 as libc::c_int,
         Some(
@@ -2664,7 +2663,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
-    ssh_dispatch_set(
+    crate::dispatch::ssh_dispatch_set(
         ssh,
         20 as libc::c_int,
         Some(
