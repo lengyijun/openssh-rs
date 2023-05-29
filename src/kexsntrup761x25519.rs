@@ -1,3 +1,4 @@
+use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
 use crate::umac::umac_ctx;
 
@@ -8,8 +9,6 @@ extern "C" {
     pub type dh_st;
 
     pub type ec_group_st;
-
-    pub type ssh_hmac_ctx;
 
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
     fn crypto_kem_sntrup761_enc(

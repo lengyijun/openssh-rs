@@ -1,3 +1,4 @@
+use crate::hmac::ssh_hmac_ctx;
 use ::libc;
 use libc::close;
 
@@ -5,8 +6,6 @@ extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-
-    pub type ssh_hmac_ctx;
 
     fn link(__from: *const libc::c_char, __to: *const libc::c_char) -> libc::c_int;
     fn unlink(__name: *const libc::c_char) -> libc::c_int;

@@ -1,3 +1,4 @@
+use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
 use crate::umac::umac_ctx;
 
@@ -15,8 +16,6 @@ extern "C" {
 
     pub type ec_group_st;
     pub type dh_st;
-
-    pub type ssh_hmac_ctx;
 
     pub type session_state;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;

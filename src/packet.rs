@@ -1,4 +1,5 @@
 use crate::cipher::sshcipher;
+use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
 use crate::umac::umac_ctx;
 use ::libc;
@@ -18,8 +19,6 @@ extern "C" {
 
     pub type ec_group_st;
     pub type dh_st;
-
-    pub type ssh_hmac_ctx;
 
     pub type internal_state;
     pub type sshcipher_ctx;

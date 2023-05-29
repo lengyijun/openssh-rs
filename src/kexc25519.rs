@@ -1,3 +1,4 @@
+use crate::hmac::ssh_hmac_ctx;
 use crate::kex::sshenc;
 use crate::umac::umac_ctx;
 
@@ -8,8 +9,6 @@ extern "C" {
     pub type dh_st;
 
     pub type ec_group_st;
-
-    pub type ssh_hmac_ctx;
 
     fn timingsafe_bcmp(_: *const libc::c_void, _: *const libc::c_void, _: size_t) -> libc::c_int;
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);

@@ -1,7 +1,7 @@
+use crate::hmac::ssh_hmac_ctx;
 use crate::umac::umac_ctx;
 use ::libc;
 extern "C" {
-    pub type ssh_hmac_ctx;
 
     fn timingsafe_bcmp(_: *const libc::c_void, _: *const libc::c_void, _: size_t) -> libc::c_int;
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
