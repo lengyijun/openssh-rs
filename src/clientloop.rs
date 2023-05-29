@@ -103,7 +103,7 @@ extern "C" {
     fn ssh_packet_process_read(_: *mut ssh, _: libc::c_int) -> libc::c_int;
     fn ssh_packet_set_interactive(_: *mut ssh, _: libc::c_int, _: libc::c_int, _: libc::c_int);
     fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
-    fn ssh_dispatch_init(_: *mut ssh, _: Option<dispatch_fn>);
+
     fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
@@ -6504,7 +6504,7 @@ pub unsafe extern "C" fn client_session2_setup(
     client_repledge();
 }
 unsafe extern "C" fn client_init_dispatch(mut ssh: *mut ssh) {
-    ssh_dispatch_init(
+    crate::dispatch::ssh_dispatch_init(
         ssh,
         Some(
             dispatch_protocol_error

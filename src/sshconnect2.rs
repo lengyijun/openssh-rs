@@ -68,7 +68,7 @@ extern "C" {
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn ssh_packet_set_rekey_limits(_: *mut ssh, _: u_int64_t, _: u_int32_t);
-    fn ssh_dispatch_init(_: *mut ssh, _: Option<dispatch_fn>);
+
     fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_range(_: *mut ssh, _: u_int, _: u_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
@@ -1117,7 +1117,7 @@ pub unsafe extern "C" fn ssh_userauth2(
         );
     }
     (*ssh).authctxt = &mut authctxt as *mut Authctxt as *mut libc::c_void;
-    ssh_dispatch_init(
+    crate::dispatch::ssh_dispatch_init(
         ssh,
         Some(
             input_userauth_error

@@ -40,7 +40,7 @@ extern "C" {
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
     fn dispatch_protocol_ignore(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
-    fn ssh_dispatch_init(_: *mut ssh, _: Option<dispatch_fn>);
+
     fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
     fn ssh_packet_set_log_preamble(_: *mut ssh, _: *const libc::c_char, _: ...) -> libc::c_int;
@@ -495,7 +495,7 @@ unsafe extern "C" fn userauth_banner(mut ssh: *mut ssh) {
 }
 pub unsafe extern "C" fn do_authentication2(mut ssh: *mut ssh) {
     let mut authctxt: *mut Authctxt = (*ssh).authctxt as *mut Authctxt;
-    ssh_dispatch_init(
+    crate::dispatch::ssh_dispatch_init(
         ssh,
         Some(
             dispatch_protocol_error

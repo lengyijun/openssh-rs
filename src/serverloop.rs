@@ -76,7 +76,7 @@ extern "C" {
     fn ssh_packet_get_connection_out(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
     fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
-    fn ssh_dispatch_init(_: *mut ssh, _: Option<dispatch_fn>);
+
     fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
 
@@ -2545,7 +2545,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
         0 as *const libc::c_char,
         b"server_init_dispatch\0" as *const u8 as *const libc::c_char,
     );
-    ssh_dispatch_init(
+    crate::dispatch::ssh_dispatch_init(
         ssh,
         Some(
             dispatch_protocol_error
