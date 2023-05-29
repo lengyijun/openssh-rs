@@ -179,7 +179,7 @@ extern "C" {
     fn choose_dh(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> *mut DH;
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
     fn ssh_clear_newkeys(_: *mut ssh, _: libc::c_int);
-    fn ssh_packet_set_log_preamble(_: *mut ssh, _: *const libc::c_char, _: ...) -> libc::c_int;
+
     fn ssh_packet_connection_is_on_socket(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_set_state(_: *mut ssh, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
@@ -1086,7 +1086,7 @@ pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor: 
         (*authctxt).user,
     );
     (*ssh).authctxt = 0 as *mut libc::c_void;
-    ssh_packet_set_log_preamble(
+    crate::packet::ssh_packet_set_log_preamble(
         ssh,
         b"user %s\0" as *const u8 as *const libc::c_char,
         (*authctxt).user,
@@ -2014,7 +2014,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
             );
         }
     }
-    ssh_packet_set_log_preamble(
+    crate::packet::ssh_packet_set_log_preamble(
         ssh,
         b"%suser %s\0" as *const u8 as *const libc::c_char,
         if (*authctxt).valid != 0 {

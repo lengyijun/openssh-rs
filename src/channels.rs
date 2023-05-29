@@ -139,7 +139,7 @@ extern "C" {
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn ssh_remote_port(_: *mut ssh) -> libc::c_int;
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
-    fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
+
     fn ssh_packet_send_debug(_: *mut ssh, fmt: *const libc::c_char, _: ...);
 
     fn ssh_packet_set_alive_timeouts(_: *mut ssh, _: libc::c_int);
@@ -6897,7 +6897,7 @@ unsafe extern "C" fn channel_parse_id(
             b"%s: parse id\0" as *const u8 as *const libc::c_char,
             where_0,
         );
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Invalid %s message\0" as *const u8 as *const libc::c_char,
             what,
@@ -6916,7 +6916,7 @@ unsafe extern "C" fn channel_parse_id(
             where_0,
             id,
         );
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Invalid %s channel id\0" as *const u8 as *const libc::c_char,
             what,
@@ -6933,7 +6933,7 @@ unsafe extern "C" fn channel_from_packet_id(
     let mut c: *mut Channel = 0 as *mut Channel;
     c = channel_lookup(ssh, id);
     if c.is_null() {
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"%s packet referred to nonexistent channel %d\0" as *const u8 as *const libc::c_char,
             what,
@@ -7123,7 +7123,7 @@ pub unsafe extern "C" fn channel_input_extended_data(
                 (*c).self_0,
             );
         } else {
-            ssh_packet_disconnect(
+            crate::packet::ssh_packet_disconnect(
                 ssh,
                 b"Received extended_data after EOF on channel %d.\0" as *const u8
                     as *const libc::c_char,
@@ -7145,7 +7145,7 @@ pub unsafe extern "C" fn channel_input_extended_data(
             ssh_err(r),
             b"parse tcode\0" as *const u8 as *const libc::c_char,
         );
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Invalid extended_data message\0" as *const u8 as *const libc::c_char,
         );
@@ -7186,7 +7186,7 @@ pub unsafe extern "C" fn channel_input_extended_data(
             ssh_err(r),
             b"parse data\0" as *const u8 as *const libc::c_char,
         );
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Invalid extended_data message\0" as *const u8 as *const libc::c_char,
         );
@@ -7267,7 +7267,7 @@ pub unsafe extern "C" fn channel_input_ieof(
             ssh_err(r),
             b"parse data\0" as *const u8 as *const libc::c_char,
         );
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Invalid ieof message\0" as *const u8 as *const libc::c_char,
         );
@@ -7322,7 +7322,7 @@ pub unsafe extern "C" fn channel_input_oclose(
             ssh_err(r),
             b"parse data\0" as *const u8 as *const libc::c_char,
         );
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Invalid oclose message\0" as *const u8 as *const libc::c_char,
         );
@@ -7350,7 +7350,7 @@ pub unsafe extern "C" fn channel_input_open_confirmation(
         return 0 as libc::c_int;
     }
     if (*c).type_0 != 3 as libc::c_int {
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Received open confirmation for non-opening channel %d.\0" as *const u8
                 as *const libc::c_char,
@@ -7384,7 +7384,7 @@ pub unsafe extern "C" fn channel_input_open_confirmation(
             ssh_err(r),
             b"window/maxpacket\0" as *const u8 as *const libc::c_char,
         );
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Invalid open confirmation message\0" as *const u8 as *const libc::c_char,
         );
@@ -7485,7 +7485,7 @@ pub unsafe extern "C" fn channel_input_open_failure(
         return 0 as libc::c_int;
     }
     if (*c).type_0 != 3 as libc::c_int {
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Received open failure for non-opening channel %d.\0" as *const u8
                 as *const libc::c_char,
@@ -7506,7 +7506,7 @@ pub unsafe extern "C" fn channel_input_open_failure(
             ssh_err(r),
             b"parse reason\0" as *const u8 as *const libc::c_char,
         );
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Invalid open failure message\0" as *const u8 as *const libc::c_char,
         );
@@ -7534,7 +7534,7 @@ pub unsafe extern "C" fn channel_input_open_failure(
             ssh_err(r),
             b"parse msg/lang\0" as *const u8 as *const libc::c_char,
         );
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Invalid open failure message\0" as *const u8 as *const libc::c_char,
         );
@@ -7656,7 +7656,7 @@ pub unsafe extern "C" fn channel_input_window_adjust(
             ssh_err(r),
             b"parse adjust\0" as *const u8 as *const libc::c_char,
         );
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Invalid window adjust message\0" as *const u8 as *const libc::c_char,
         );
@@ -7748,7 +7748,7 @@ pub unsafe extern "C" fn channel_input_status_confirm(
         return 0 as libc::c_int;
     }
     if sshpkt_get_end(ssh) != 0 as libc::c_int {
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Invalid status confirm message\0" as *const u8 as *const libc::c_char,
         );
@@ -7952,7 +7952,7 @@ unsafe extern "C" fn channel_setup_fwd_listener_tcpip(
     r = getaddrinfo(addr, strport.as_mut_ptr(), &mut hints, &mut aitop);
     if r != 0 as libc::c_int {
         if addr.is_null() {
-            ssh_packet_disconnect(
+            crate::packet::ssh_packet_disconnect(
                 ssh,
                 b"getaddrinfo: fatal error: %s\0" as *const u8 as *const libc::c_char,
                 ssh_gai_strerror(r),

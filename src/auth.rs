@@ -114,7 +114,7 @@ extern "C" {
     fn temporarily_use_uid(_: *mut libc::passwd);
     fn restore_uid();
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
-    fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
+
     fn ssh_packet_send_debug(_: *mut ssh, fmt: *const libc::c_char, _: ...);
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
     fn ssh_remote_port(_: *mut ssh) -> libc::c_int;
@@ -1014,7 +1014,7 @@ pub unsafe extern "C" fn auth_maxtries_exceeded(mut ssh: *mut ssh) -> ! {
         ssh_remote_ipaddr(ssh),
         ssh_remote_port(ssh),
     );
-    ssh_packet_disconnect(
+    crate::packet::ssh_packet_disconnect(
         ssh,
         b"Too many authentication failures\0" as *const u8 as *const libc::c_char,
     );

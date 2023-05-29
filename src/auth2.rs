@@ -41,9 +41,6 @@ extern "C" {
     fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
     fn dispatch_protocol_ignore(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
 
-    fn ssh_packet_set_log_preamble(_: *mut ssh, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
-
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
@@ -596,7 +593,7 @@ unsafe extern "C" fn input_service_request(
                 b"bad service request %s\0" as *const u8 as *const libc::c_char,
                 service,
             );
-            ssh_packet_disconnect(
+            crate::packet::ssh_packet_disconnect(
                 ssh,
                 b"bad service request %s\0" as *const u8 as *const libc::c_char,
                 service,
@@ -811,7 +808,7 @@ unsafe extern "C" fn input_userauth_request(
                 (*authctxt).valid = 0 as libc::c_int;
                 (*authctxt).pw = fakepw();
             }
-            ssh_packet_set_log_preamble(
+            crate::packet::ssh_packet_set_log_preamble(
                 ssh,
                 b"%suser %s\0" as *const u8 as *const libc::c_char,
                 if (*authctxt).valid != 0 {
@@ -845,7 +842,7 @@ unsafe extern "C" fn input_userauth_request(
             }
             userauth_banner(ssh);
             if auth2_setup_methods_lists(authctxt) != 0 as libc::c_int {
-                ssh_packet_disconnect(
+                crate::packet::ssh_packet_disconnect(
                     ssh,
                     b"no authentication methods enabled\0" as *const u8 as *const libc::c_char,
                 );
@@ -853,7 +850,7 @@ unsafe extern "C" fn input_userauth_request(
         } else if libc::strcmp(user, (*authctxt).user) != 0 as libc::c_int
             || libc::strcmp(service, (*authctxt).service) != 0 as libc::c_int
         {
-            ssh_packet_disconnect(
+            crate::packet::ssh_packet_disconnect(
                 ssh,
                 b"Change of username or service not allowed: (%s,%s) -> (%s,%s)\0" as *const u8
                     as *const libc::c_char,
@@ -1002,7 +999,7 @@ pub unsafe extern "C" fn userauth_finish(
             );
         }
         (*authctxt).success = 1 as libc::c_int;
-        ssh_packet_set_log_preamble(
+        crate::packet::ssh_packet_set_log_preamble(
             ssh,
             b"user %s\0" as *const u8 as *const libc::c_char,
             (*authctxt).user,

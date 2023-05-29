@@ -133,7 +133,7 @@ extern "C" {
     fn ssh_tty_parse_modes(_: *mut ssh, _: libc::c_int);
     fn ssh_packet_connection_is_on_socket(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_send_debug(_: *mut ssh, fmt: *const libc::c_char, _: ...);
-    fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
+
     fn ssh_packet_set_interactive(_: *mut ssh, _: libc::c_int, _: libc::c_int, _: libc::c_int);
     fn ssh_packet_clear_keys(_: *mut ssh);
     fn ssh_packet_get_connection_out(_: *mut ssh) -> libc::c_int;
@@ -3129,7 +3129,7 @@ unsafe extern "C" fn session_pty_req(mut ssh: *mut ssh, mut s: *mut Session) -> 
         return 0 as libc::c_int;
     }
     if (*s).ttyfd != -(1 as libc::c_int) {
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Protocol error: you already have a pty.\0" as *const u8 as *const libc::c_char,
         );
@@ -4208,7 +4208,7 @@ unsafe extern "C" fn session_exit_message(
             );
         }
     } else {
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"wait returned status %04x.\0" as *const u8 as *const libc::c_char,
             status,

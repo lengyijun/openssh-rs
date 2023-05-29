@@ -69,7 +69,7 @@ extern "C" {
     fn ssh_packet_write_poll(_: *mut ssh) -> libc::c_int;
 
     fn ssh_packet_send_debug(_: *mut ssh, fmt: *const libc::c_char, _: ...);
-    fn ssh_packet_disconnect(_: *mut ssh, fmt: *const libc::c_char, _: ...) -> !;
+
     fn ssh_packet_process_read(_: *mut ssh, _: libc::c_int) -> libc::c_int;
     fn ssh_packet_check_rekey(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_is_rekeying(_: *mut ssh) -> libc::c_int;
@@ -1612,7 +1612,7 @@ unsafe extern "C" fn server_request_session(mut ssh: *mut ssh) -> *mut Channel {
         );
     }
     if no_more_sessions != 0 {
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"Possible attack: attempt to open a session after additional sessions disabled\0"
                 as *const u8 as *const libc::c_char,
@@ -2449,7 +2449,7 @@ unsafe extern "C" fn server_input_channel_req(
         c = channel_lookup(ssh, id as libc::c_int);
         c.is_null()
     } {
-        ssh_packet_disconnect(
+        crate::packet::ssh_packet_disconnect(
             ssh,
             b"%s: unknown channel %d\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 25], &[libc::c_char; 25]>(
