@@ -1,9 +1,8 @@
-use crate::channels::ssh_channels;
-use crate::packet::session_state;
+use crate::packet::key_entry;
+
+use crate::packet::ssh;
 use ::libc;
 extern "C" {
-
-    pub type kex;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -24,38 +23,14 @@ extern "C" {
 }
 pub type __uint32_t = libc::c_uint;
 pub type u_int32_t = __uint32_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ssh {
-    pub state: *mut session_state,
-    pub kex: *mut kex,
-    pub remote_ipaddr: *mut libc::c_char,
-    pub remote_port: libc::c_int,
-    pub local_ipaddr: *mut libc::c_char,
-    pub local_port: libc::c_int,
-    pub rdomain_in: *mut libc::c_char,
-    pub log_preamble: *mut libc::c_char,
-    pub dispatch: [Option<dispatch_fn>; 255],
-    pub dispatch_skip_packets: libc::c_int,
-    pub compat: libc::c_int,
-    pub private_keys: C2RustUnnamed_1,
-    pub public_keys: C2RustUnnamed,
-    pub authctxt: *mut libc::c_void,
-    pub chanctxt: *mut ssh_channels,
-    pub app_data: *mut libc::c_void,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed {
     pub tqh_first: *mut key_entry,
     pub tqh_last: *mut *mut key_entry,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct key_entry {
-    pub next: C2RustUnnamed_0,
-    pub key: *mut crate::sshkey::sshkey,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_0 {

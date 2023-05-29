@@ -1,11 +1,11 @@
 use crate::atomicio::atomicio;
-use crate::channels::ssh_channels;
+use crate::packet::key_entry;
+
 use crate::cipher::sshcipher;
 use crate::digest_openssl::ssh_digest_ctx;
 use crate::mac::sshmac;
+use crate::packet::ssh;
 use crate::sshkey::EC_GROUP;
-
-use crate::packet::session_state;
 
 use ::libc;
 
@@ -139,37 +139,12 @@ pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
 pub type uint8_t = __uint8_t;
 pub type sig_atomic_t = __sig_atomic_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ssh {
-    pub state: *mut session_state,
-    pub kex: *mut kex,
-    pub remote_ipaddr: *mut libc::c_char,
-    pub remote_port: libc::c_int,
-    pub local_ipaddr: *mut libc::c_char,
-    pub local_port: libc::c_int,
-    pub rdomain_in: *mut libc::c_char,
-    pub log_preamble: *mut libc::c_char,
-    pub dispatch: [Option<dispatch_fn>; 255],
-    pub dispatch_skip_packets: libc::c_int,
-    pub compat: libc::c_int,
-    pub private_keys: C2RustUnnamed_1,
-    pub public_keys: C2RustUnnamed,
-    pub authctxt: *mut libc::c_void,
-    pub chanctxt: *mut ssh_channels,
-    pub app_data: *mut libc::c_void,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed {
     pub tqh_first: *mut key_entry,
     pub tqh_last: *mut *mut key_entry,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct key_entry {
-    pub next: C2RustUnnamed_0,
-    pub key: *mut crate::sshkey::sshkey,
 }
 
 #[derive(Copy, Clone)]

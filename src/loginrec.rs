@@ -1,6 +1,7 @@
 use crate::atomicio::atomicio;
-use crate::channels::ssh_channels;
-use crate::packet::session_state;
+use crate::packet::key_entry;
+
+use crate::packet::ssh;
 use ::libc;
 use libc::close;
 
@@ -15,8 +16,6 @@ extern "C" {
     pub type sockaddr_dl;
     pub type sockaddr_ax25;
     pub type sockaddr_at;
-
-    pub type kex;
 
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
         -> libc::c_int;
@@ -207,35 +206,9 @@ pub struct C2RustUnnamed_0 {
 
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct ssh {
-    pub state: *mut session_state,
-    pub kex: *mut kex,
-    pub remote_ipaddr: *mut libc::c_char,
-    pub remote_port: libc::c_int,
-    pub local_ipaddr: *mut libc::c_char,
-    pub local_port: libc::c_int,
-    pub rdomain_in: *mut libc::c_char,
-    pub log_preamble: *mut libc::c_char,
-    pub dispatch: [Option<dispatch_fn>; 255],
-    pub dispatch_skip_packets: libc::c_int,
-    pub compat: libc::c_int,
-    pub private_keys: C2RustUnnamed_3,
-    pub public_keys: C2RustUnnamed_1,
-    pub authctxt: *mut libc::c_void,
-    pub chanctxt: *mut ssh_channels,
-    pub app_data: *mut libc::c_void,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
 pub struct C2RustUnnamed_1 {
     pub tqh_first: *mut key_entry,
     pub tqh_last: *mut *mut key_entry,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct key_entry {
-    pub next: C2RustUnnamed_2,
-    pub key: *mut crate::sshkey::sshkey,
 }
 
 #[derive(Copy, Clone)]

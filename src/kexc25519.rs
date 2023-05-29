@@ -1,12 +1,9 @@
-use crate::kex::newkeys;
+use crate::kex::dh_st;
 
-use crate::sshkey::EC_GROUP;
+use crate::kex::kex;
 
 use ::libc;
 extern "C" {
-    pub type ssh;
-
-    pub type dh_st;
 
     pub type ec_group_st;
 
@@ -48,67 +45,6 @@ pub type uint8_t = __uint8_t;
 pub type sig_atomic_t = __sig_atomic_t;
 pub type DH = dh_st;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct kex {
-    pub newkeys: [*mut newkeys; 2],
-    pub we_need: u_int,
-    pub dh_need: u_int,
-    pub server: libc::c_int,
-    pub name: *mut libc::c_char,
-    pub hostkey_alg: *mut libc::c_char,
-    pub hostkey_type: libc::c_int,
-    pub hostkey_nid: libc::c_int,
-    pub kex_type: u_int,
-    pub server_sig_algs: *mut libc::c_char,
-    pub ext_info_c: libc::c_int,
-    pub my: *mut crate::sshbuf::sshbuf,
-    pub peer: *mut crate::sshbuf::sshbuf,
-    pub client_version: *mut crate::sshbuf::sshbuf,
-    pub server_version: *mut crate::sshbuf::sshbuf,
-    pub session_id: *mut crate::sshbuf::sshbuf,
-    pub initial_sig: *mut crate::sshbuf::sshbuf,
-    pub initial_hostkey: *mut crate::sshkey::sshkey,
-    pub done: sig_atomic_t,
-    pub flags: u_int,
-    pub hash_alg: libc::c_int,
-    pub ec_nid: libc::c_int,
-    pub failed_choice: *mut libc::c_char,
-    pub verify_host_key:
-        Option<unsafe extern "C" fn(*mut crate::sshkey::sshkey, *mut ssh) -> libc::c_int>,
-    pub load_host_public_key: Option<
-        unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut crate::sshkey::sshkey,
-    >,
-    pub load_host_private_key: Option<
-        unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut crate::sshkey::sshkey,
-    >,
-    pub host_key_index: Option<
-        unsafe extern "C" fn(*mut crate::sshkey::sshkey, libc::c_int, *mut ssh) -> libc::c_int,
-    >,
-    pub sign: Option<
-        unsafe extern "C" fn(
-            *mut ssh,
-            *mut crate::sshkey::sshkey,
-            *mut crate::sshkey::sshkey,
-            *mut *mut u_char,
-            *mut size_t,
-            *const u_char,
-            size_t,
-            *const libc::c_char,
-        ) -> libc::c_int,
-    >,
-    pub kex: [Option<unsafe extern "C" fn(*mut ssh) -> libc::c_int>; 10],
-    pub dh: *mut DH,
-    pub min: u_int,
-    pub max: u_int,
-    pub nbits: u_int,
-    pub ec_client_key: *mut crate::sshkey::EC_KEY,
-    pub ec_group: *const EC_GROUP,
-    pub c25519_client_key: [u_char; 32],
-    pub c25519_client_pubkey: [u_char; 32],
-    pub sntrup761_client_key: [u_char; 1763],
-    pub client_pub: *mut crate::sshbuf::sshbuf,
-}
 pub unsafe extern "C" fn kexc25519_keygen(mut key: *mut u_char, mut pub_0: *mut u_char) {
     static mut basepoint: [u_char; 32] = [
         9 as libc::c_int as u_char,

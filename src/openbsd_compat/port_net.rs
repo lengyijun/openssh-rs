@@ -1,8 +1,8 @@
+use crate::packet::ssh;
 use ::c2rust_bitfields;
 use ::libc;
 use libc::close;
 extern "C" {
-    pub type ssh;
 
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
     fn getsockopt(

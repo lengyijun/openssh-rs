@@ -1,10 +1,10 @@
+use crate::kex::dh_st;
 use ::libc;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
     pub type bignum_st;
-    pub type dh_st;
 
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;
