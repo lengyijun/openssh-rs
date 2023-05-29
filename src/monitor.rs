@@ -53,12 +53,6 @@ extern "C" {
     );
     fn DH_free(dh: *mut DH);
 
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_from_blob(
@@ -3045,7 +3039,7 @@ pub unsafe extern "C" fn mm_answer_keyallowed(
         if key.is_null() || (*authctxt).valid == 0 {
             b"invalid\0" as *const u8 as *const libc::c_char
         } else {
-            sshkey_type(key)
+            crate::sshkey::sshkey_type(key)
         },
         if allowed != 0 {
             b"allowed\0" as *const u8 as *const libc::c_char
@@ -3714,7 +3708,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
             },
         );
     }
-    fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+    fp = crate::sshkey::sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
     if fp.is_null() {
         sshfatal(
             b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -3724,7 +3718,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+            b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
         );
     }
     ret = sshkey_verify(
@@ -3747,7 +3741,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
         0 as *const libc::c_char,
         b"%s %s signature using %s %s%s%s\0" as *const u8 as *const libc::c_char,
         auth_method,
-        sshkey_type(key),
+        crate::sshkey::sshkey_type(key),
         if sigalg.is_null() {
             b"default\0" as *const u8 as *const libc::c_char
         } else {
@@ -3791,7 +3785,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
                 0 as *const libc::c_char,
                 b"public key %s %s signature for %s%s from %.128s port %d rejected: user presence (authenticator touch) requirement not met \0"
                     as *const u8 as *const libc::c_char,
-                sshkey_type(key),
+                crate::sshkey::sshkey_type(key),
                 fp,
                 if (*authctxt).valid != 0 {
                     b"\0" as *const u8 as *const libc::c_char
@@ -3822,7 +3816,7 @@ pub unsafe extern "C" fn mm_answer_keyverify(
                 0 as *const libc::c_char,
                 b"public key %s %s signature for %s%s from %.128s port %d rejected: user verification requirement not met \0"
                     as *const u8 as *const libc::c_char,
-                sshkey_type(key),
+                crate::sshkey::sshkey_type(key),
                 fp,
                 if (*authctxt).valid != 0 {
                     b"\0" as *const u8 as *const libc::c_char

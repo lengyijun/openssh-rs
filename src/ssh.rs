@@ -160,7 +160,6 @@ extern "C" {
         _: libc::c_int,
     );
 
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_alg_list(
@@ -5709,7 +5708,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
                             b"key %s type %s is not a certificate\0" as *const u8
                                 as *const libc::c_char,
                             cp,
-                            sshkey_type(public),
+                            crate::sshkey::sshkey_type(public),
                         );
                         crate::sshkey::sshkey_free(public);
                         libc::free(cp as *mut libc::c_void);
@@ -5787,7 +5786,7 @@ unsafe extern "C" fn load_public_identity_files(mut cinfo: *const ssh_conn_info)
                 0 as *const libc::c_char,
                 b"key %s type %s is not a certificate\0" as *const u8 as *const libc::c_char,
                 filename,
-                sshkey_type(public),
+                crate::sshkey::sshkey_type(public),
             );
             crate::sshkey::sshkey_free(public);
             libc::free(filename as *mut libc::c_void);

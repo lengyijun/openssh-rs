@@ -122,12 +122,6 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
 
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
@@ -2414,7 +2408,8 @@ pub unsafe extern "C" fn load_hostkeys_command(
         invocation,
     );
     if !host_key.is_null() {
-        key_fp = sshkey_fingerprint(host_key, options.fingerprint_hash, SSH_FP_DEFAULT);
+        key_fp =
+            crate::sshkey::sshkey_fingerprint(host_key, options.fingerprint_hash, SSH_FP_DEFAULT);
         if key_fp.is_null() {
             sshfatal(
                 b"sshconnect.c\0" as *const u8 as *const libc::c_char,
@@ -2426,7 +2421,7 @@ pub unsafe extern "C" fn load_hostkeys_command(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
             );
         }
         r = sshkey_to_base64(host_key, &mut keytext);
@@ -2763,7 +2758,7 @@ unsafe extern "C" fn check_host_key(
     }
     loop {
         want_cert = sshkey_is_cert(host_key);
-        type_0 = sshkey_type(host_key);
+        type_0 = crate::sshkey::sshkey_type(host_key);
         host_status = check_key_in_hostkeys(host_hostkeys, host_key, &mut host_found);
         if readonly == 0
             && (num_user_hostfiles == 0 as libc::c_int as libc::c_uint
@@ -2987,12 +2982,12 @@ unsafe extern "C" fn check_host_key(
                                 );
                             }
                         } else if options.visual_host_key != 0 {
-                            fp = sshkey_fingerprint(
+                            fp = crate::sshkey::sshkey_fingerprint(
                                 host_key,
                                 options.fingerprint_hash,
                                 SSH_FP_DEFAULT,
                             );
-                            ra = sshkey_fingerprint(
+                            ra = crate::sshkey::sshkey_fingerprint(
                                 host_key,
                                 options.fingerprint_hash,
                                 SSH_FP_RANDOMART,
@@ -3008,7 +3003,7 @@ unsafe extern "C" fn check_host_key(
                                     1 as libc::c_int,
                                     SYSLOG_LEVEL_FATAL,
                                     0 as *const libc::c_char,
-                                    b"sshkey_fingerprint failed\0" as *const u8
+                                    b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8
                                         as *const libc::c_char,
                                 );
                             }
@@ -3136,12 +3131,12 @@ unsafe extern "C" fn check_host_key(
                                         b".\0" as *const u8 as *const libc::c_char,
                                     );
                                 }
-                                fp = sshkey_fingerprint(
+                                fp = crate::sshkey::sshkey_fingerprint(
                                     host_key,
                                     options.fingerprint_hash,
                                     SSH_FP_DEFAULT,
                                 );
-                                ra = sshkey_fingerprint(
+                                ra = crate::sshkey::sshkey_fingerprint(
                                     host_key,
                                     options.fingerprint_hash,
                                     SSH_FP_RANDOMART,
@@ -3157,7 +3152,7 @@ unsafe extern "C" fn check_host_key(
                                         1 as libc::c_int,
                                         SYSLOG_LEVEL_FATAL,
                                         0 as *const libc::c_char,
-                                        b"sshkey_fingerprint failed\0" as *const u8
+                                        b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8
                                             as *const libc::c_char,
                                     );
                                 }
@@ -3613,7 +3608,7 @@ unsafe extern "C" fn check_host_key(
                         SYSLOG_LEVEL_ERROR,
                         0 as *const libc::c_char,
                         b"Offending %s key in %s:%lu\0" as *const u8 as *const libc::c_char,
-                        sshkey_type((*host_found).key),
+                        crate::sshkey::sshkey_type((*host_found).key),
                         (*host_found).file,
                         (*host_found).line,
                     );
@@ -3981,7 +3976,7 @@ pub unsafe extern "C" fn verify_host_key(
     let mut fp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut cafp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut plain: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
-    fp = sshkey_fingerprint(host_key, options.fingerprint_hash, SSH_FP_DEFAULT);
+    fp = crate::sshkey::sshkey_fingerprint(host_key, options.fingerprint_hash, SSH_FP_DEFAULT);
     if fp.is_null() {
         crate::log::sshlog(
             b"sshconnect.c\0" as *const u8 as *const libc::c_char,
@@ -3996,7 +3991,7 @@ pub unsafe extern "C" fn verify_host_key(
         r = -(1 as libc::c_int);
     } else {
         if sshkey_is_cert(host_key) != 0 {
-            cafp = sshkey_fingerprint(
+            cafp = crate::sshkey::sshkey_fingerprint(
                 (*(*host_key).cert).signature_key,
                 options.fingerprint_hash,
                 SSH_FP_DEFAULT,
@@ -4094,7 +4089,7 @@ pub unsafe extern "C" fn verify_host_key(
                         0 as *const libc::c_char,
                         b"server host key %s %s matches cached key\0" as *const u8
                             as *const libc::c_char,
-                        sshkey_type(host_key),
+                        crate::sshkey::sshkey_type(host_key),
                         fp,
                     );
                     r = 0 as libc::c_int;
@@ -4122,7 +4117,7 @@ pub unsafe extern "C" fn verify_host_key(
                                             ssh_err(r),
                                             b"Error checking host key %s %s in revoked keys file %s\0"
                                                 as *const u8 as *const libc::c_char,
-                                            sshkey_type(host_key),
+                                            crate::sshkey::sshkey_type(host_key),
                                             fp,
                                             options.revoked_host_keys,
                                         );
@@ -4144,7 +4139,7 @@ pub unsafe extern "C" fn verify_host_key(
                                             0 as *const libc::c_char,
                                             b"Host key %s %s revoked by file %s\0" as *const u8
                                                 as *const libc::c_char,
-                                            sshkey_type(host_key),
+                                            crate::sshkey::sshkey_type(host_key),
                                             fp,
                                             options.revoked_host_keys,
                                         );
@@ -4170,7 +4165,7 @@ pub unsafe extern "C" fn verify_host_key(
                                             ssh_err(r),
                                             b"Error checking host key %s %s in revoked keys file %s\0"
                                                 as *const u8 as *const libc::c_char,
-                                            sshkey_type(host_key),
+                                            crate::sshkey::sshkey_type(host_key),
                                             fp,
                                             options.revoked_host_keys,
                                         );
@@ -4192,7 +4187,7 @@ pub unsafe extern "C" fn verify_host_key(
                                             0 as *const libc::c_char,
                                             b"Host key %s %s revoked by file %s\0" as *const u8
                                                 as *const libc::c_char,
-                                            sshkey_type(host_key),
+                                            crate::sshkey::sshkey_type(host_key),
                                             fp,
                                             options.revoked_host_keys,
                                         );
@@ -4367,8 +4362,16 @@ unsafe extern "C" fn show_other_keys(
                 &mut found,
             ) == 0)
             {
-                fp = sshkey_fingerprint((*found).key, options.fingerprint_hash, SSH_FP_DEFAULT);
-                ra = sshkey_fingerprint((*found).key, options.fingerprint_hash, SSH_FP_RANDOMART);
+                fp = crate::sshkey::sshkey_fingerprint(
+                    (*found).key,
+                    options.fingerprint_hash,
+                    SSH_FP_DEFAULT,
+                );
+                ra = crate::sshkey::sshkey_fingerprint(
+                    (*found).key,
+                    options.fingerprint_hash,
+                    SSH_FP_RANDOMART,
+                );
                 if fp.is_null() || ra.is_null() {
                     sshfatal(
                         b"sshconnect.c\0" as *const u8 as *const libc::c_char,
@@ -4380,7 +4383,8 @@ unsafe extern "C" fn show_other_keys(
                         1 as libc::c_int,
                         SYSLOG_LEVEL_FATAL,
                         0 as *const libc::c_char,
-                        b"sshkey_fingerprint fail\0" as *const u8 as *const libc::c_char,
+                        b"crate::sshkey::sshkey_fingerprint fail\0" as *const u8
+                            as *const libc::c_char,
                     );
                 }
                 crate::log::sshlog(
@@ -4395,11 +4399,11 @@ unsafe extern "C" fn show_other_keys(
                     0 as *const libc::c_char,
                     b"WARNING: %s key found for host %s\nin %s:%lu\n%s key fingerprint %s.\0"
                         as *const u8 as *const libc::c_char,
-                    sshkey_type((*found).key),
+                    crate::sshkey::sshkey_type((*found).key),
                     (*found).host,
                     (*found).file,
                     (*found).line,
-                    sshkey_type((*found).key),
+                    crate::sshkey::sshkey_type((*found).key),
                     fp,
                 );
                 if options.visual_host_key != 0 {
@@ -4429,7 +4433,7 @@ unsafe extern "C" fn show_other_keys(
 }
 unsafe extern "C" fn warn_changed_key(mut host_key: *mut crate::sshkey::sshkey) {
     let mut fp: *mut libc::c_char = 0 as *mut libc::c_char;
-    fp = sshkey_fingerprint(host_key, options.fingerprint_hash, SSH_FP_DEFAULT);
+    fp = crate::sshkey::sshkey_fingerprint(host_key, options.fingerprint_hash, SSH_FP_DEFAULT);
     if fp.is_null() {
         sshfatal(
             b"sshconnect.c\0" as *const u8 as *const libc::c_char,
@@ -4439,7 +4443,7 @@ unsafe extern "C" fn warn_changed_key(mut host_key: *mut crate::sshkey::sshkey) 
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshkey_fingerprint fail\0" as *const u8 as *const libc::c_char,
+            b"crate::sshkey::sshkey_fingerprint fail\0" as *const u8 as *const libc::c_char,
         );
     }
     crate::log::sshlog(
@@ -4511,7 +4515,7 @@ unsafe extern "C" fn warn_changed_key(mut host_key: *mut crate::sshkey::sshkey) 
         0 as *const libc::c_char,
         b"The fingerprint for the %s key sent by the remote host is\n%s.\0" as *const u8
             as *const libc::c_char,
-        sshkey_type(host_key),
+        crate::sshkey::sshkey_type(host_key),
         fp,
     );
     crate::log::sshlog(

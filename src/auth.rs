@@ -87,12 +87,7 @@ extern "C" {
         includes_0: *mut include_list,
         _: *mut connection_info,
     );
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
+
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn init_hostkeys() -> *mut hostkeys;
     fn load_hostkeys(_: *mut hostkeys, _: *const libc::c_char, _: *const libc::c_char, _: u_int);
@@ -859,8 +854,8 @@ unsafe extern "C" fn format_method_key(mut authctxt: *mut Authctxt) -> *mut libc
         return 0 as *mut libc::c_char;
     }
     if sshkey_is_cert(key) != 0 {
-        fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
-        cafp = sshkey_fingerprint(
+        fp = crate::sshkey::sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+        cafp = crate::sshkey::sshkey_fingerprint(
             (*(*key).cert).signature_key,
             options.fingerprint_hash,
             SSH_FP_DEFAULT,
@@ -868,7 +863,7 @@ unsafe extern "C" fn format_method_key(mut authctxt: *mut Authctxt) -> *mut libc
         crate::xmalloc::xasprintf(
             &mut ret as *mut *mut libc::c_char,
             b"%s %s ID %s (serial %llu) CA %s %s%s%s\0" as *const u8 as *const libc::c_char,
-            sshkey_type(key),
+            crate::sshkey::sshkey_type(key),
             if fp.is_null() {
                 b"(null)\0" as *const u8 as *const libc::c_char
             } else {
@@ -876,7 +871,7 @@ unsafe extern "C" fn format_method_key(mut authctxt: *mut Authctxt) -> *mut libc
             },
             (*(*key).cert).key_id,
             (*(*key).cert).serial as libc::c_ulonglong,
-            sshkey_type((*(*key).cert).signature_key),
+            crate::sshkey::sshkey_type((*(*key).cert).signature_key),
             if cafp.is_null() {
                 b"(null)\0" as *const u8 as *const libc::c_char
             } else {
@@ -896,11 +891,11 @@ unsafe extern "C" fn format_method_key(mut authctxt: *mut Authctxt) -> *mut libc
         libc::free(fp as *mut libc::c_void);
         libc::free(cafp as *mut libc::c_void);
     } else {
-        fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+        fp = crate::sshkey::sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
         crate::xmalloc::xasprintf(
             &mut ret as *mut *mut libc::c_char,
             b"%s %s%s%s\0" as *const u8 as *const libc::c_char,
-            sshkey_type(key),
+            crate::sshkey::sshkey_type(key),
             if fp.is_null() {
                 b"(null)\0" as *const u8 as *const libc::c_char
             } else {
@@ -1317,7 +1312,7 @@ pub unsafe extern "C" fn auth_key_is_revoked(mut key: *mut crate::sshkey::sshkey
     if (options.revoked_keys_file).is_null() {
         return 0 as libc::c_int;
     }
-    fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+    fp = crate::sshkey::sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
     if fp.is_null() {
         r = -(2 as libc::c_int);
         crate::log::sshlog(
@@ -1349,7 +1344,7 @@ pub unsafe extern "C" fn auth_key_is_revoked(mut key: *mut crate::sshkey::sshkey
                     0 as *const libc::c_char,
                     b"Authentication key %s %s revoked by file %s\0" as *const u8
                         as *const libc::c_char,
-                    sshkey_type(key),
+                    crate::sshkey::sshkey_type(key),
                     fp,
                     options.revoked_keys_file,
                 );
@@ -1367,7 +1362,7 @@ pub unsafe extern "C" fn auth_key_is_revoked(mut key: *mut crate::sshkey::sshkey
                     ssh_err(r),
                     b"Error checking authentication key %s %s in revoked keys file %s\0"
                         as *const u8 as *const libc::c_char,
-                    sshkey_type(key),
+                    crate::sshkey::sshkey_type(key),
                     fp,
                     options.revoked_keys_file,
                 );

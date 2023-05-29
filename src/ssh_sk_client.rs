@@ -34,7 +34,6 @@ extern "C" {
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_private_serialize(
         key: *mut crate::sshkey::sshkey,
         buf: *mut crate::sshbuf::sshbuf,
@@ -1014,7 +1013,7 @@ pub unsafe extern "C" fn sshsk_load_resident(
                                         b"srks[%zu]: %s %s uidlen %zu\0" as *const u8
                                             as *const libc::c_char,
                                         nsrks,
-                                        sshkey_type((*srk).key),
+                                        crate::sshkey::sshkey_type((*srk).key),
                                         (*(*srk).key).sk_application,
                                         (*srk).user_id_len,
                                     );

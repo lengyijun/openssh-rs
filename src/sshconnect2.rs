@@ -75,17 +75,11 @@ extern "C" {
     fn compat_kex_proposal(_: *mut ssh, _: *const libc::c_char) -> *mut libc::c_char;
     fn compression_alg_list(_: libc::c_int) -> *const libc::c_char;
 
-
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
+
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
@@ -1658,7 +1652,7 @@ unsafe extern "C" fn format_identity(mut id: *mut Identity) -> *mut libc::c_char
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut note: *const libc::c_char = b"\0" as *const u8 as *const libc::c_char;
     if !((*id).key).is_null() {
-        fp = sshkey_fingerprint((*id).key, options.fingerprint_hash, SSH_FP_DEFAULT);
+        fp = crate::sshkey::sshkey_fingerprint((*id).key, options.fingerprint_hash, SSH_FP_DEFAULT);
     }
     if !((*id).key).is_null() {
         if (*(*id).key).flags & 0x1 as libc::c_int != 0 as libc::c_int {
@@ -1672,7 +1666,7 @@ unsafe extern "C" fn format_identity(mut id: *mut Identity) -> *mut libc::c_char
         b"%s %s%s%s%s%s%s\0" as *const u8 as *const libc::c_char,
         (*id).filename,
         if !((*id).key).is_null() {
-            sshkey_type((*id).key)
+            crate::sshkey::sshkey_type((*id).key)
         } else {
             b"\0" as *const u8 as *const libc::c_char
         },
@@ -1801,7 +1795,11 @@ unsafe extern "C" fn input_userauth_pk_ok(
                     }
                 }
                 if found == 0 || id.is_null() {
-                    fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+                    fp = crate::sshkey::sshkey_fingerprint(
+                        key,
+                        options.fingerprint_hash,
+                        SSH_FP_DEFAULT,
+                    );
                     crate::log::sshlog(
                         b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
                         (*::core::mem::transmute::<&[u8; 21], &[libc::c_char; 21]>(
@@ -1814,7 +1812,7 @@ unsafe extern "C" fn input_userauth_pk_ok(
                         0 as *const libc::c_char,
                         b"server replied with unknown key: %s %s\0" as *const u8
                             as *const libc::c_char,
-                        sshkey_type(key),
+                        crate::sshkey::sshkey_type(key),
                         if fp.is_null() {
                             b"<ERROR>\0" as *const u8 as *const libc::c_char
                         } else {
@@ -2285,7 +2283,11 @@ unsafe extern "C" fn identity_sign(
                     && sshkey_is_sk(sign_key) != 0
                     && (*sign_key).sk_flags as libc::c_int & 0x1 as libc::c_int != 0
                 {
-                    fp = sshkey_fingerprint(sign_key, options.fingerprint_hash, SSH_FP_DEFAULT);
+                    fp = crate::sshkey::sshkey_fingerprint(
+                        sign_key,
+                        options.fingerprint_hash,
+                        SSH_FP_DEFAULT,
+                    );
                     if fp.is_null() {
                         sshfatal(
                             b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
@@ -2304,7 +2306,7 @@ unsafe extern "C" fn identity_sign(
                         options.batch_mode,
                         b"Confirm user presence for key %s %s\0" as *const u8
                             as *const libc::c_char,
-                        sshkey_type(sign_key),
+                        crate::sshkey::sshkey_type(sign_key),
                         fp,
                     );
                     libc::free(fp as *mut libc::c_void);
@@ -2347,7 +2349,7 @@ unsafe extern "C" fn identity_sign(
                     crate::xmalloc::xasprintf(
                         &mut prompt as *mut *mut libc::c_char,
                         b"Enter PIN for %s key %s: \0" as *const u8 as *const libc::c_char,
-                        sshkey_type(sign_key),
+                        crate::sshkey::sshkey_type(sign_key),
                         (*id).filename,
                     );
                     pin = read_passphrase(prompt, 0 as libc::c_int);
@@ -2452,7 +2454,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
         hostbound = 1 as libc::c_int;
         method = b"publickey-hostbound-v00@openssh.com\0" as *const u8 as *const libc::c_char;
     }
-    fp = sshkey_fingerprint((*id).key, options.fingerprint_hash, SSH_FP_DEFAULT);
+    fp = crate::sshkey::sshkey_fingerprint((*id).key, options.fingerprint_hash, SSH_FP_DEFAULT);
     if fp.is_null() {
         return 0 as libc::c_int;
     }
@@ -2466,7 +2468,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
         0 as *const libc::c_char,
         b"using %s with %s %s\0" as *const u8 as *const libc::c_char,
         method,
-        sshkey_type((*id).key),
+        crate::sshkey::sshkey_type((*id).key),
         fp,
     );
     if sshkey_is_cert((*id).key) != 0 {
@@ -2742,7 +2744,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
                     b"%skey %s %s returned incorrect signature type\0" as *const u8
                         as *const libc::c_char,
                     loc,
-                    sshkey_type((*id).key),
+                    crate::sshkey::sshkey_type((*id).key),
                     fp,
                 );
                 fallback_sigtype += 1;
@@ -2759,7 +2761,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
                     SYSLOG_LEVEL_ERROR,
                     ssh_err(r),
                     b"signing failed for %s \"%s\"%s\0" as *const u8 as *const libc::c_char,
-                    sshkey_type((*sign_id).key),
+                    crate::sshkey::sshkey_type((*sign_id).key),
                     (*sign_id).filename,
                     if (*id).agent_fd != -(1 as libc::c_int) {
                         b" from agent\0" as *const u8 as *const libc::c_char
@@ -4416,7 +4418,7 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
                 as *const libc::c_char,
         );
     } else {
-        fp = sshkey_fingerprint(private, options.fingerprint_hash, SSH_FP_DEFAULT);
+        fp = crate::sshkey::sshkey_fingerprint(private, options.fingerprint_hash, SSH_FP_DEFAULT);
         if fp.is_null() {
             crate::log::sshlog(
                 b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
@@ -4428,7 +4430,7 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
             );
         } else {
             crate::log::sshlog(

@@ -285,17 +285,10 @@ extern "C" {
     fn ssh_digest_final(ctx: *mut ssh_digest_ctx, d: *mut u_char, dlen: size_t) -> libc::c_int;
     fn ssh_digest_free(ctx: *mut ssh_digest_ctx);
 
-
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
 
     fn sshkey_shield_private(_: *mut crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
@@ -1369,7 +1362,10 @@ pub unsafe extern "C" fn demote_sensitive_data() {
     i = 0 as libc::c_int as u_int;
     while i < options.num_host_key_files {
         if !(*(sensitive_data.host_keys).offset(i as isize)).is_null() {
-            r = crate::sshkey::sshkey_from_private(*(sensitive_data.host_keys).offset(i as isize), &mut tmp);
+            r = crate::sshkey::sshkey_from_private(
+                *(sensitive_data.host_keys).offset(i as isize),
+                &mut tmp,
+            );
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"sshd.c\0" as *const u8 as *const libc::c_char,
@@ -1382,7 +1378,7 @@ pub unsafe extern "C" fn demote_sensitive_data() {
                     SYSLOG_LEVEL_FATAL,
                     ssh_err(r),
                     b"could not demote host %s key\0" as *const u8 as *const libc::c_char,
-                    sshkey_type(*(sensitive_data.host_keys).offset(i as isize)),
+                    crate::sshkey::sshkey_type(*(sensitive_data.host_keys).offset(i as isize)),
                 );
             }
             crate::sshkey::sshkey_free(*(sensitive_data.host_keys).offset(i as isize));
@@ -1970,7 +1966,7 @@ unsafe extern "C" fn notify_hostkeys(mut ssh: *mut ssh) {
             || (*key).type_0 == KEY_UNSPEC as libc::c_int
             || sshkey_is_cert(key) != 0)
         {
-            fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+            fp = crate::sshkey::sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
             crate::log::sshlog(
                 b"sshd.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"notify_hostkeys\0"))
@@ -4340,7 +4336,11 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                             }
                             _ => {}
                         }
-                        fp = sshkey_fingerprint(pubkey, options.fingerprint_hash, SSH_FP_DEFAULT);
+                        fp = crate::sshkey::sshkey_fingerprint(
+                            pubkey,
+                            options.fingerprint_hash,
+                            SSH_FP_DEFAULT,
+                        );
                         if fp.is_null() {
                             sshfatal(
                                 b"sshd.c\0" as *const u8 as *const libc::c_char,
@@ -4352,7 +4352,8 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                                 0 as libc::c_int,
                                 SYSLOG_LEVEL_FATAL,
                                 0 as *const libc::c_char,
-                                b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                                b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8
+                                    as *const libc::c_char,
                             );
                         }
                         crate::log::sshlog(
@@ -4440,8 +4441,10 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             } else {
                 j = 0 as libc::c_int as u_int;
                 while j < options.num_host_key_files {
-                    if crate::sshkey::sshkey_equal_public(key, *(sensitive_data.host_pubkeys).offset(j as isize))
-                        != 0
+                    if crate::sshkey::sshkey_equal_public(
+                        key,
+                        *(sensitive_data.host_pubkeys).offset(j as isize),
+                    ) != 0
                     {
                         let ref mut fresh12 =
                             *(sensitive_data.host_certificates).offset(j as isize);
@@ -4480,7 +4483,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         b"host certificate: #%u type %d %s\0" as *const u8 as *const libc::c_char,
                         j,
                         (*key).type_0,
-                        sshkey_type(key),
+                        crate::sshkey::sshkey_type(key),
                     );
                 }
             }

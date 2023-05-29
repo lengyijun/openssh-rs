@@ -231,12 +231,7 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
+
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
@@ -5060,7 +5055,7 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
     i = 0 as libc::c_int as size_t;
     while i < (*ctx).nkeys {
         if !(*((*ctx).keys_verified).offset(i as isize) == 0) {
-            fp = sshkey_fingerprint(
+            fp = crate::sshkey::sshkey_fingerprint(
                 *((*ctx).keys).offset(i as isize),
                 options.fingerprint_hash,
                 SSH_FP_DEFAULT,
@@ -5076,7 +5071,8 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     0 as *const libc::c_char,
-                    b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8
+                        as *const libc::c_char,
                 );
             }
             if first != 0 && asking != 0 {
@@ -5093,7 +5089,7 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
                 loglevel,
                 0 as *const libc::c_char,
                 b"Learned new hostkey: %s %s\0" as *const u8 as *const libc::c_char,
-                sshkey_type(*((*ctx).keys).offset(i as isize)),
+                crate::sshkey::sshkey_type(*((*ctx).keys).offset(i as isize)),
                 fp,
             );
             first = 0 as libc::c_int;
@@ -5104,7 +5100,7 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
     }
     i = 0 as libc::c_int as size_t;
     while i < (*ctx).nold {
-        fp = sshkey_fingerprint(
+        fp = crate::sshkey::sshkey_fingerprint(
             *((*ctx).old_keys).offset(i as isize),
             options.fingerprint_hash,
             SSH_FP_DEFAULT,
@@ -5120,7 +5116,7 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
             );
         }
         if first != 0 && asking != 0 {
@@ -5135,7 +5131,7 @@ unsafe extern "C" fn update_known_hosts(mut ctx: *mut hostkeys_update_ctx) {
             loglevel,
             0 as *const libc::c_char,
             b"Deprecating obsolete hostkey: %s %s\0" as *const u8 as *const libc::c_char,
-            sshkey_type(*((*ctx).old_keys).offset(i as isize)),
+            crate::sshkey::sshkey_type(*((*ctx).old_keys).offset(i as isize)),
             fp,
         );
         first = 0 as libc::c_int;
@@ -5405,7 +5401,7 @@ unsafe extern "C" fn client_global_hostkeys_prove_confirm(
                         ssh_err(r),
                         b"server gave unintelligible signature for %s key %zu\0" as *const u8
                             as *const libc::c_char,
-                        sshkey_type(*((*ctx).keys).offset(i as isize)),
+                        crate::sshkey::sshkey_type(*((*ctx).keys).offset(i as isize)),
                         i,
                     );
                     current_block = 15146261001000136824;
@@ -5452,7 +5448,7 @@ unsafe extern "C" fn client_global_hostkeys_prove_confirm(
                         SYSLOG_LEVEL_DEBUG3,
                         0 as *const libc::c_char,
                         b"verify %s key %zu using sigalg %s\0" as *const u8 as *const libc::c_char,
-                        sshkey_type(*((*ctx).keys).offset(i as isize)),
+                        crate::sshkey::sshkey_type(*((*ctx).keys).offset(i as isize)),
                         i,
                         alg,
                     );
@@ -5484,7 +5480,7 @@ unsafe extern "C" fn client_global_hostkeys_prove_confirm(
                             ssh_err(r),
                             b"server gave bad signature for %s key %zu\0" as *const u8
                                 as *const libc::c_char,
-                            sshkey_type(*((*ctx).keys).offset(i as isize)),
+                            crate::sshkey::sshkey_type(*((*ctx).keys).offset(i as isize)),
                             i,
                         );
                         current_block = 15146261001000136824;
@@ -5647,7 +5643,11 @@ unsafe extern "C" fn client_input_hostkeys(mut ssh: *mut ssh) -> libc::c_int {
                     b"convert key\0" as *const u8 as *const libc::c_char,
                 );
             } else {
-                fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+                fp = crate::sshkey::sshkey_fingerprint(
+                    key,
+                    options.fingerprint_hash,
+                    SSH_FP_DEFAULT,
+                );
                 crate::log::sshlog(
                     b"clientloop.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 22], &[libc::c_char; 22]>(
@@ -5659,7 +5659,7 @@ unsafe extern "C" fn client_input_hostkeys(mut ssh: *mut ssh) -> libc::c_int {
                     SYSLOG_LEVEL_DEBUG3,
                     0 as *const libc::c_char,
                     b"received %s key %s\0" as *const u8 as *const libc::c_char,
-                    sshkey_type(key),
+                    crate::sshkey::sshkey_type(key),
                     fp,
                 );
                 libc::free(fp as *mut libc::c_void);

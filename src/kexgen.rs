@@ -26,7 +26,6 @@ extern "C" {
         _: *mut *mut crate::sshkey::sshkey,
     ) -> libc::c_int;
 
-
     fn kex_verify_host_key(_: *mut ssh, _: *mut crate::sshkey::sshkey) -> libc::c_int;
     fn kex_load_hostkey(
         _: *mut ssh,

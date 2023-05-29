@@ -36,12 +36,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_cert_check_authority_now(
@@ -715,7 +709,7 @@ unsafe extern "C" fn userauth_hostbased(
                         SYSLOG_LEVEL_INFO,
                         ssh_err(r),
                         b"refusing %s key\0" as *const u8 as *const libc::c_char,
-                        sshkey_type(key),
+                        crate::sshkey::sshkey_type(key),
                     );
                 } else if (*authctxt).valid == 0 || ((*authctxt).user).is_null() {
                     crate::log::sshlog(
@@ -1042,7 +1036,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
     }
     if host_status as libc::c_uint == HOST_OK as libc::c_int as libc::c_uint {
         if sshkey_is_cert(key) != 0 {
-            fp = sshkey_fingerprint(
+            fp = crate::sshkey::sshkey_fingerprint(
                 (*(*key).cert).signature_key,
                 options.fingerprint_hash,
                 SSH_FP_DEFAULT,
@@ -1058,7 +1052,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     0 as *const libc::c_char,
-                    b"sshkey_fingerprint fail\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshkey::sshkey_fingerprint fail\0" as *const u8 as *const libc::c_char,
                 );
             }
             crate::log::sshlog(
@@ -1074,13 +1068,13 @@ pub unsafe extern "C" fn hostbased_key_allowed(
                 b"Accepted certificate ID \"%s\" signed by %s CA %s from %s@%s\0" as *const u8
                     as *const libc::c_char,
                 (*(*key).cert).key_id,
-                sshkey_type((*(*key).cert).signature_key),
+                crate::sshkey::sshkey_type((*(*key).cert).signature_key),
                 fp,
                 cuser,
                 lookup,
             );
         } else {
-            fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+            fp = crate::sshkey::sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
             if fp.is_null() {
                 sshfatal(
                     b"auth2-hostbased.c\0" as *const u8 as *const libc::c_char,
@@ -1092,7 +1086,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     0 as *const libc::c_char,
-                    b"sshkey_fingerprint fail\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshkey::sshkey_fingerprint fail\0" as *const u8 as *const libc::c_char,
                 );
             }
             crate::log::sshlog(
@@ -1106,7 +1100,7 @@ pub unsafe extern "C" fn hostbased_key_allowed(
                 SYSLOG_LEVEL_VERBOSE,
                 0 as *const libc::c_char,
                 b"Accepted %s public key %s from %s@%s\0" as *const u8 as *const libc::c_char,
-                sshkey_type(key),
+                crate::sshkey::sshkey_type(key),
                 fp,
                 cuser,
                 lookup,

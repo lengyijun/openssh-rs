@@ -60,15 +60,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-
-
-
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
     fn auth_log(
         _: *mut ssh,
         _: libc::c_int,
@@ -1713,8 +1704,9 @@ pub unsafe extern "C" fn auth2_key_already_used(
     let mut fp: *mut libc::c_char = 0 as *mut libc::c_char;
     i = 0 as libc::c_int as u_int;
     while i < (*authctxt).nprev_keys {
-        if crate::sshkey::sshkey_equal_public(key, *((*authctxt).prev_keys).offset(i as isize)) != 0 {
-            fp = sshkey_fingerprint(
+        if crate::sshkey::sshkey_equal_public(key, *((*authctxt).prev_keys).offset(i as isize)) != 0
+        {
+            fp = crate::sshkey::sshkey_fingerprint(
                 *((*authctxt).prev_keys).offset(i as isize),
                 options.fingerprint_hash,
                 SSH_FP_DEFAULT,
@@ -1730,7 +1722,7 @@ pub unsafe extern "C" fn auth2_key_already_used(
                 SYSLOG_LEVEL_DEBUG3,
                 0 as *const libc::c_char,
                 b"key already used: %s %s\0" as *const u8 as *const libc::c_char,
-                sshkey_type(*((*authctxt).prev_keys).offset(i as isize)),
+                crate::sshkey::sshkey_type(*((*authctxt).prev_keys).offset(i as isize)),
                 if fp.is_null() {
                     b"UNKNOWN\0" as *const u8 as *const libc::c_char
                 } else {
@@ -1803,7 +1795,10 @@ pub unsafe extern "C" fn auth2_update_session_info(
             ' ' as i32 as u_char,
         );
         if r != 0 as libc::c_int || {
-            r = crate::sshkey::sshkey_format_text((*authctxt).auth_method_key, (*authctxt).session_info);
+            r = crate::sshkey::sshkey_format_text(
+                (*authctxt).auth_method_key,
+                (*authctxt).session_info,
+            );
             r != 0 as libc::c_int
         } {
             sshfatal(

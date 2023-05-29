@@ -50,12 +50,7 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_read(_: *mut crate::sshkey::sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
+
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -701,8 +696,11 @@ pub unsafe extern "C" fn auth_check_authkey_line(
                             match current_block {
                                 15639534262997179764 => {}
                                 _ => {
-                                    fp =
-                                        sshkey_fingerprint(found, 2 as libc::c_int, SSH_FP_DEFAULT);
+                                    fp = crate::sshkey::sshkey_fingerprint(
+                                        found,
+                                        2 as libc::c_int,
+                                        SSH_FP_DEFAULT,
+                                    );
                                     if fp.is_null() {
                                         sshfatal(
                                             b"auth2-pubkeyfile.c\0" as *const u8
@@ -740,7 +738,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
                                         } else {
                                             b"key\0" as *const u8 as *const libc::c_char
                                         },
-                                        sshkey_type(found),
+                                        crate::sshkey::sshkey_type(found),
                                         fp,
                                     );
                                     if auth_authorise_keyopts(
@@ -773,7 +771,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
                                                 0 as *const libc::c_char,
                                                 b"Accepted key %s %s found at %s\0" as *const u8
                                                     as *const libc::c_char,
-                                                sshkey_type(found),
+                                                crate::sshkey::sshkey_type(found),
                                                 fp,
                                                 loc,
                                             );
@@ -847,7 +845,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
                                                             as *const u8 as *const libc::c_char,
                                                         (*(*key).cert).key_id,
                                                         (*(*key).cert).serial as libc::c_ulonglong,
-                                                        sshkey_type(found),
+                                                        crate::sshkey::sshkey_type(found),
                                                         fp,
                                                         loc,
                                                     );

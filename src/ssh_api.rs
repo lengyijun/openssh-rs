@@ -53,9 +53,6 @@ extern "C" {
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
 
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-
-
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
@@ -920,7 +917,7 @@ pub unsafe extern "C" fn _ssh_host_public_key(
             SYSLOG_LEVEL_DEBUG3,
             0 as *const libc::c_char,
             b"check %s\0" as *const u8 as *const libc::c_char,
-            sshkey_type((*k).key),
+            crate::sshkey::sshkey_type((*k).key),
         );
         if (*(*k).key).type_0 == type_0
             && (type_0 != KEY_ECDSA as libc::c_int || (*(*k).key).ecdsa_nid == nid)
@@ -959,7 +956,7 @@ pub unsafe extern "C" fn _ssh_host_private_key(
             SYSLOG_LEVEL_DEBUG3,
             0 as *const libc::c_char,
             b"check %s\0" as *const u8 as *const libc::c_char,
-            sshkey_type((*k).key),
+            crate::sshkey::sshkey_type((*k).key),
         );
         if (*(*k).key).type_0 == type_0
             && (type_0 != KEY_ECDSA as libc::c_int || (*(*k).key).ecdsa_nid == nid)
@@ -984,7 +981,7 @@ pub unsafe extern "C" fn _ssh_verify_host_key(
         SYSLOG_LEVEL_DEBUG3,
         0 as *const libc::c_char,
         b"need %s\0" as *const u8 as *const libc::c_char,
-        sshkey_type(hostkey),
+        crate::sshkey::sshkey_type(hostkey),
     );
     k = (*ssh).public_keys.tqh_first;
     while !k.is_null() {
@@ -997,7 +994,7 @@ pub unsafe extern "C" fn _ssh_verify_host_key(
             SYSLOG_LEVEL_DEBUG3,
             0 as *const libc::c_char,
             b"check %s\0" as *const u8 as *const libc::c_char,
-            sshkey_type((*k).key),
+            crate::sshkey::sshkey_type((*k).key),
         );
         if crate::sshkey::sshkey_equal_public(hostkey, (*k).key) != 0 {
             return 0 as libc::c_int;

@@ -180,7 +180,6 @@ extern "C" {
     fn channel_cancel_rport_listener(_: *mut ssh, _: *mut Forward) -> libc::c_int;
     fn chan_rcvd_eow(_: *mut ssh, _: *mut Channel);
 
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
     fn sshkey_from_blob(
@@ -2063,7 +2062,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
                     b"unknown host %s key\0" as *const u8 as *const libc::c_char,
-                    sshkey_type(key),
+                    crate::sshkey::sshkey_type(key),
                 );
                 current_block = 8873184364881414274;
                 break;
@@ -2114,7 +2113,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
                         0 as *const libc::c_char,
                         b"sign %s key (index %d) using sigalg %s\0" as *const u8
                             as *const libc::c_char,
-                        sshkey_type(key),
+                        crate::sshkey::sshkey_type(key),
                         ndx,
                         if sigalg.is_null() {
                             b"default\0" as *const u8 as *const libc::c_char

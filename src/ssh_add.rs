@@ -56,13 +56,6 @@ extern "C" {
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
 
-
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_write(_: *const crate::sshkey::sshkey, _: *mut libc::FILE) -> libc::c_int;
     fn sshkey_read(_: *mut crate::sshkey::sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
     fn sshkey_size(_: *const crate::sshkey::sshkey) -> u_int;
@@ -350,7 +343,7 @@ unsafe extern "C" fn delete_one(
             stderr,
             b"Identity removed: %s %s (%s)\n\0" as *const u8 as *const libc::c_char,
             path,
-            sshkey_type(key),
+            crate::sshkey::sshkey_type(key),
             if !comment.is_null() {
                 comment
             } else {
@@ -858,7 +851,10 @@ unsafe extern "C" fn add_file(
                                                             certpath,
                                                         );
                                                     }
-                                                } else if crate::sshkey::sshkey_equal_public(cert, private) == 0 {
+                                                } else if crate::sshkey::sshkey_equal_public(
+                                                    cert, private,
+                                                ) == 0
+                                                {
                                                     crate::log::sshlog(
                                                         b"ssh-add.c\0" as *const u8 as *const libc::c_char,
                                                         (*::core::mem::transmute::<
@@ -1167,7 +1163,7 @@ unsafe extern "C" fn list_identities(
     i = 0 as libc::c_int as size_t;
     while i < (*idlist).nkeys {
         if do_fp != 0 {
-            fp = sshkey_fingerprint(
+            fp = crate::sshkey::sshkey_fingerprint(
                 *((*idlist).keys).offset(i as isize),
                 fingerprint_hash,
                 SSH_FP_DEFAULT,
@@ -1181,7 +1177,7 @@ unsafe extern "C" fn list_identities(
                     fp as *const libc::c_char
                 },
                 *((*idlist).comments).offset(i as isize),
-                sshkey_type(*((*idlist).keys).offset(i as isize)),
+                crate::sshkey::sshkey_type(*((*idlist).keys).offset(i as isize)),
             );
             libc::free(fp as *mut libc::c_void);
         } else {
@@ -1315,7 +1311,7 @@ unsafe extern "C" fn load_resident_keys(
     i = 0 as libc::c_int as size_t;
     while i < nsrks {
         key = (**srks.offset(i as isize)).key;
-        fp = sshkey_fingerprint(key, fingerprint_hash, SSH_FP_DEFAULT);
+        fp = crate::sshkey::sshkey_fingerprint(key, fingerprint_hash, SSH_FP_DEFAULT);
         if fp.is_null() {
             sshfatal(
                 b"ssh-add.c\0" as *const u8 as *const libc::c_char,
@@ -1327,7 +1323,7 @@ unsafe extern "C" fn load_resident_keys(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
             );
         }
         r = ssh_add_identity_constrained(
@@ -1353,7 +1349,7 @@ unsafe extern "C" fn load_resident_keys(
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
                 b"Unable to add key %s %s\0" as *const u8 as *const libc::c_char,
-                sshkey_type(key),
+                crate::sshkey::sshkey_type(key),
                 fp,
             );
             libc::free(fp as *mut libc::c_void);
@@ -1366,7 +1362,7 @@ unsafe extern "C" fn load_resident_keys(
                 libc::fprintf(
                     stderr,
                     b"Resident identity added: %s %s\n\0" as *const u8 as *const libc::c_char,
-                    sshkey_type(key),
+                    crate::sshkey::sshkey_type(key),
                     fp,
                 );
                 if lifetime != 0 as libc::c_int {
@@ -1578,7 +1574,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
                     b"@\0" as *const u8 as *const libc::c_char
                 },
                 host,
-                sshkey_type((*hke).key),
+                crate::sshkey::sshkey_type((*hke).key),
                 if want_ca != 0 {
                     b"CA \0" as *const u8 as *const libc::c_char
                 } else {

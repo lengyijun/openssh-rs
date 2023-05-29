@@ -89,12 +89,7 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
+
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_cert_check_authority_now(
@@ -677,11 +672,11 @@ pub struct Authmethod {
 unsafe extern "C" fn format_key(mut key: *const crate::sshkey::sshkey) -> *mut libc::c_char {
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut fp: *mut libc::c_char =
-        sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+        crate::sshkey::sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
     crate::xmalloc::xasprintf(
         &mut ret as *mut *mut libc::c_char,
         b"%s %s\0" as *const u8 as *const libc::c_char,
-        sshkey_type(key),
+        crate::sshkey::sshkey_type(key),
         fp,
     );
     libc::free(fp as *mut libc::c_void);
@@ -905,7 +900,7 @@ unsafe extern "C" fn userauth_pubkey(
                 SYSLOG_LEVEL_INFO,
                 0 as *const libc::c_char,
                 b"refusing previously-used %s key\0" as *const u8 as *const libc::c_char,
-                sshkey_type(key),
+                crate::sshkey::sshkey_type(key),
             );
         } else if match_pattern_list(pkalg, options.pubkey_accepted_algos, 0 as libc::c_int)
             != 1 as libc::c_int
@@ -956,7 +951,7 @@ unsafe extern "C" fn userauth_pubkey(
                         SYSLOG_LEVEL_INFO,
                         ssh_err(r),
                         b"refusing %s key\0" as *const u8 as *const libc::c_char,
-                        sshkey_type(key),
+                        crate::sshkey::sshkey_type(key),
                     );
                 } else {
                     key_s = format_key(key);
@@ -1593,7 +1588,7 @@ unsafe extern "C" fn match_principals_command(
             options.authorized_principals_command,
         );
     } else {
-        ca_fp = sshkey_fingerprint(
+        ca_fp = crate::sshkey::sshkey_fingerprint(
             (*cert).signature_key,
             options.fingerprint_hash,
             SSH_FP_DEFAULT,
@@ -1609,10 +1604,11 @@ unsafe extern "C" fn match_principals_command(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            key_fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+            key_fp =
+                crate::sshkey::sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
             if key_fp.is_null() {
                 crate::log::sshlog(
                     b"auth2-pubkey.c\0" as *const u8 as *const libc::c_char,
@@ -1624,7 +1620,8 @@ unsafe extern "C" fn match_principals_command(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8
+                        as *const libc::c_char,
                 );
             } else {
                 r = sshkey_to_base64((*cert).signature_key, &mut catext);
@@ -1807,7 +1804,7 @@ unsafe extern "C" fn user_cert_trusted_ca(
     if sshkey_is_cert(key) == 0 || (options.trusted_user_ca_keys).is_null() {
         return 0 as libc::c_int;
     }
-    ca_fp = sshkey_fingerprint(
+    ca_fp = crate::sshkey::sshkey_fingerprint(
         (*(*key).cert).signature_key,
         options.fingerprint_hash,
         SSH_FP_DEFAULT,
@@ -1831,7 +1828,7 @@ unsafe extern "C" fn user_cert_trusted_ca(
             SYSLOG_LEVEL_DEBUG2,
             ssh_err(r),
             b"CA %s %s is not listed in %s\0" as *const u8 as *const libc::c_char,
-            sshkey_type((*(*key).cert).signature_key),
+            crate::sshkey::sshkey_type((*(*key).cert).signature_key),
             ca_fp,
             options.trusted_user_ca_keys,
         );
@@ -1942,7 +1939,7 @@ unsafe extern "C" fn user_cert_trusted_ca(
                                     as *const u8 as *const libc::c_char,
                                 (*(*key).cert).key_id,
                                 (*(*key).cert).serial as libc::c_ulonglong,
-                                sshkey_type((*(*key).cert).signature_key),
+                                crate::sshkey::sshkey_type((*(*key).cert).signature_key),
                                 ca_fp,
                                 options.trusted_user_ca_keys,
                             );
@@ -2087,7 +2084,7 @@ unsafe extern "C" fn user_key_command_allowed2(
             libc::strerror(*libc::__errno_location()),
         );
     } else {
-        key_fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+        key_fp = crate::sshkey::sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
         if key_fp.is_null() {
             crate::log::sshlog(
                 b"auth2-pubkey.c\0" as *const u8 as *const libc::c_char,
@@ -2099,7 +2096,7 @@ unsafe extern "C" fn user_key_command_allowed2(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 0 as *const libc::c_char,
-                b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
             );
         } else {
             r = sshkey_to_base64(key, &mut keytext);

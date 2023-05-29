@@ -43,7 +43,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
 
-
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
     fn sshkey_from_blob(
         _: *const u_char,

@@ -51,7 +51,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
 
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
     fn sshkey_ec_validate_public(_: *const EC_GROUP, _: *const EC_POINT) -> libc::c_int;
     fn sshkey_ssh_name_plain(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
@@ -1391,7 +1390,7 @@ pub unsafe extern "C" fn sshsk_sign(
         0 as *const libc::c_char,
         b"provider \"%s\", key %s, flags 0x%02x%s\0" as *const u8 as *const libc::c_char,
         provider_path,
-        sshkey_type(key),
+        crate::sshkey::sshkey_type(key),
         (*key).sk_flags as libc::c_int,
         if !pin.is_null() && *pin as libc::c_int != '\0' as i32 {
             b" with-pin\0" as *const u8 as *const libc::c_char

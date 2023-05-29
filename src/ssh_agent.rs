@@ -126,12 +126,7 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
+
     fn sshkey_shield_private(_: *mut crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
@@ -588,7 +583,7 @@ unsafe extern "C" fn match_key_hop(
     if key.is_null() {
         return -(1 as libc::c_int);
     }
-    fp = sshkey_fingerprint(key, 2 as libc::c_int, SSH_FP_DEFAULT);
+    fp = crate::sshkey::sshkey_fingerprint(key, 2 as libc::c_int, SSH_FP_DEFAULT);
     if fp.is_null() {
         sshfatal(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -612,7 +607,7 @@ unsafe extern "C" fn match_key_hop(
             as *const libc::c_char,
         tag,
         hostname,
-        sshkey_type(key),
+        crate::sshkey::sshkey_type(key),
         fp,
         (*dch).nkeys,
     );
@@ -622,7 +617,7 @@ unsafe extern "C" fn match_key_hop(
         if (*((*dch).keys).offset(i as isize)).is_null() {
             return -(1 as libc::c_int);
         }
-        fp = sshkey_fingerprint(
+        fp = crate::sshkey::sshkey_fingerprint(
             *((*dch).keys).offset(i as isize),
             2 as libc::c_int,
             SSH_FP_DEFAULT,
@@ -655,7 +650,7 @@ unsafe extern "C" fn match_key_hop(
             } else {
                 b"\0" as *const u8 as *const libc::c_char
             },
-            sshkey_type(*((*dch).keys).offset(i as isize)),
+            crate::sshkey::sshkey_type(*((*dch).keys).offset(i as isize)),
             fp,
         );
         libc::free(fp as *mut libc::c_void);
@@ -844,7 +839,7 @@ unsafe extern "C" fn permitted_by_dest_constraints(
         0 as *const libc::c_char,
         b"%s identity \"%s\" not permitted for this destination\0" as *const u8
             as *const libc::c_char,
-        sshkey_type((*id).key),
+        crate::sshkey::sshkey_type((*id).key),
         (*id).comment,
     );
     return -(1 as libc::c_int);
@@ -873,7 +868,7 @@ unsafe extern "C" fn identity_permitted(
         0 as *const libc::c_char,
         b"entering: key %s comment \"%s\", %zu socket bindings, %zu constraints\0" as *const u8
             as *const libc::c_char,
-        sshkey_type((*id).key),
+        crate::sshkey::sshkey_type((*id).key),
         (*id).comment,
         (*e).nsession_ids,
         (*id).ndest_constraints,
@@ -904,7 +899,7 @@ unsafe extern "C" fn identity_permitted(
         fp2 = 0 as *mut libc::c_char;
         fp1 = fp2;
         if !fromkey.is_null() && {
-            fp1 = sshkey_fingerprint(fromkey, 2 as libc::c_int, SSH_FP_DEFAULT);
+            fp1 = crate::sshkey::sshkey_fingerprint(fromkey, 2 as libc::c_int, SSH_FP_DEFAULT);
             fp1.is_null()
         } {
             sshfatal(
@@ -920,7 +915,7 @@ unsafe extern "C" fn identity_permitted(
                 b"fingerprint failed\0" as *const u8 as *const libc::c_char,
             );
         }
-        fp2 = sshkey_fingerprint((*hks).key, 2 as libc::c_int, SSH_FP_DEFAULT);
+        fp2 = crate::sshkey::sshkey_fingerprint((*hks).key, 2 as libc::c_int, SSH_FP_DEFAULT);
         if fp2.is_null() {
             sshfatal(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -953,7 +948,7 @@ unsafe extern "C" fn identity_permitted(
                 b"AUTH\0" as *const u8 as *const libc::c_char
             },
             if !fromkey.is_null() {
-                sshkey_type(fromkey)
+                crate::sshkey::sshkey_type(fromkey)
             } else {
                 b"(ORIGIN)\0" as *const u8 as *const libc::c_char
             },
@@ -967,7 +962,7 @@ unsafe extern "C" fn identity_permitted(
             } else {
                 b"(ANY)\0" as *const u8 as *const libc::c_char
             },
-            sshkey_type((*hks).key),
+            crate::sshkey::sshkey_type((*hks).key),
             fp2,
         );
         libc::free(fp1 as *mut libc::c_void);
@@ -1063,7 +1058,7 @@ unsafe extern "C" fn confirm_key(
 ) -> libc::c_int {
     let mut p: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut ret: libc::c_int = -(1 as libc::c_int);
-    p = sshkey_fingerprint((*id).key, fingerprint_hash, SSH_FP_DEFAULT);
+    p = crate::sshkey::sshkey_fingerprint((*id).key, fingerprint_hash, SSH_FP_DEFAULT);
     if !p.is_null()
         && ask_permission(
             b"Allow use of key %s?\nKey fingerprint %s.%s%s\0" as *const u8 as *const libc::c_char,
@@ -1653,10 +1648,10 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                 SYSLOG_LEVEL_VERBOSE,
                 0 as *const libc::c_char,
                 b"%s key not found\0" as *const u8 as *const libc::c_char,
-                sshkey_type(key),
+                crate::sshkey::sshkey_type(key),
             );
         } else {
-            fp = sshkey_fingerprint(key, 2 as libc::c_int, SSH_FP_DEFAULT);
+            fp = crate::sshkey::sshkey_fingerprint(key, 2 as libc::c_int, SSH_FP_DEFAULT);
             if fp.is_null() {
                 sshfatal(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -1748,7 +1743,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                                 as *const u8 as *const libc::c_char,
                             (*e).nsession_ids,
                             user,
-                            sshkey_type((*id).key),
+                            crate::sshkey::sshkey_type((*id).key),
                             fp,
                         );
                         current_block = 13457127675253637570;
@@ -1841,7 +1836,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                                         0 as libc::c_int,
                                         b"Confirm user presence for key %s %s%s%s\0" as *const u8
                                             as *const libc::c_char,
-                                        sshkey_type((*id).key),
+                                        crate::sshkey::sshkey_type((*id).key),
                                         fp,
                                         if sig_dest.is_null() {
                                             b"\0" as *const u8 as *const libc::c_char
@@ -1907,7 +1902,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                                             } else {
                                                 b" \0" as *const u8 as *const libc::c_char
                                             },
-                                            sshkey_type((*id).key),
+                                            crate::sshkey::sshkey_type((*id).key),
                                             fp,
                                         );
                                         pin = read_passphrase(prompt, 0x8 as libc::c_int);
@@ -2270,7 +2265,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
                 current_block = 11742207246258642460;
                 break;
             }
-            fp = sshkey_fingerprint(k, 2 as libc::c_int, SSH_FP_DEFAULT);
+            fp = crate::sshkey::sshkey_fingerprint(k, 2 as libc::c_int, SSH_FP_DEFAULT);
             if fp.is_null() {
                 sshfatal(
                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -2312,7 +2307,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
                 } else {
                     b"\0" as *const u8 as *const libc::c_char
                 },
-                sshkey_type(k),
+                crate::sshkey::sshkey_type(k),
                 fp,
             );
             libc::free(fp as *mut libc::c_void);
@@ -2978,7 +2973,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                     0 as *const libc::c_char,
                     b"Cannot add provider: %s is not an authenticator-hosted key\0" as *const u8
                         as *const libc::c_char,
-                    sshkey_type(k),
+                    crate::sshkey::sshkey_type(k),
                 );
                 current_block = 12326576695480106577;
             } else if strcasecmp(
@@ -3104,7 +3099,11 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                             (*id).sk_provider = sk_provider;
                             (*id).dest_constraints = dest_constraints;
                             (*id).ndest_constraints = ndest_constraints;
-                            fp = sshkey_fingerprint(k, 2 as libc::c_int, SSH_FP_DEFAULT);
+                            fp = crate::sshkey::sshkey_fingerprint(
+                                k,
+                                2 as libc::c_int,
+                                SSH_FP_DEFAULT,
+                            );
                             if fp.is_null() {
                                 sshfatal(
                                     b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -3116,7 +3115,7 @@ unsafe extern "C" fn process_add_identity(mut e: *mut SocketEntry) {
                                     1 as libc::c_int,
                                     SYSLOG_LEVEL_FATAL,
                                     0 as *const libc::c_char,
-                                    b"sshkey_fingerprint failed\0" as *const u8
+                                    b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8
                                         as *const libc::c_char,
                                 );
                             }
@@ -3709,7 +3708,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
             b"parse\0" as *const u8 as *const libc::c_char,
         );
     } else {
-        fp = sshkey_fingerprint(key, 2 as libc::c_int, SSH_FP_DEFAULT);
+        fp = crate::sshkey::sshkey_fingerprint(key, 2 as libc::c_int, SSH_FP_DEFAULT);
         if fp.is_null() {
             sshfatal(
                 b"ssh-agent.c\0" as *const u8 as *const libc::c_char,
@@ -3746,7 +3745,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
                 SYSLOG_LEVEL_ERROR,
                 ssh_err(r),
                 b"sshkey_verify for %s %s\0" as *const u8 as *const libc::c_char,
-                sshkey_type(key),
+                crate::sshkey::sshkey_type(key),
                 fp,
             );
         } else {
@@ -3791,7 +3790,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
                             0 as *const libc::c_char,
                             b"session ID already recorded for %s %s\0" as *const u8
                                 as *const libc::c_char,
-                            sshkey_type(key),
+                            crate::sshkey::sshkey_type(key),
                             fp,
                         );
                         r = 0 as libc::c_int;
@@ -3810,7 +3809,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
                             0 as *const libc::c_char,
                             b"session ID recorded against different key for %s %s\0" as *const u8
                                 as *const libc::c_char,
-                            sshkey_type(key),
+                            crate::sshkey::sshkey_type(key),
                             fp,
                         );
                         r = -(1 as libc::c_int);
@@ -3860,7 +3859,7 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
                             0 as *const libc::c_char,
                             b"recorded %s %s (slot %zu of %d)\0" as *const u8
                                 as *const libc::c_char,
-                            sshkey_type(key),
+                            crate::sshkey::sshkey_type(key),
                             fp,
                             i,
                             16 as libc::c_int,

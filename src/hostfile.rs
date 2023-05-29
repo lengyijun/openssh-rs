@@ -57,17 +57,11 @@ extern "C" {
     fn sshkey_size(_: *const crate::sshkey::sshkey) -> u_int;
     fn sshkey_read(_: *mut crate::sshkey::sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
     fn sshkey_write(_: *const crate::sshkey::sshkey, _: *mut libc::FILE) -> libc::c_int;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
+
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-
 
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
 
@@ -547,7 +541,7 @@ unsafe extern "C" fn record_hostkey(
         } else {
             b"revoked \0" as *const u8 as *const libc::c_char
         },
-        sshkey_type((*l).key),
+        crate::sshkey::sshkey_type((*l).key),
         (*l).path,
         (*l).linenum,
     );
@@ -699,7 +693,11 @@ unsafe extern "C" fn check_key_not_revoked(
         if !((*((*hostkeys).entries).offset(i as isize)).marker as libc::c_uint
             != MRK_REVOKE as libc::c_int as libc::c_uint)
         {
-            if crate::sshkey::sshkey_equal_public(k, (*((*hostkeys).entries).offset(i as isize)).key) != 0 {
+            if crate::sshkey::sshkey_equal_public(
+                k,
+                (*((*hostkeys).entries).offset(i as isize)).key,
+            ) != 0
+            {
                 return -(1 as libc::c_int);
             }
             if is_cert != 0
@@ -1059,7 +1057,7 @@ unsafe extern "C" fn host_delete(
                     SYSLOG_LEVEL_DEBUG3,
                     0 as *const libc::c_char,
                     b"%s key already at %s:%ld\0" as *const u8 as *const libc::c_char,
-                    sshkey_type((*l).key),
+                    crate::sshkey::sshkey_type((*l).key),
                     (*l).path,
                     (*l).linenum,
                 );
@@ -1087,7 +1085,7 @@ unsafe extern "C" fn host_delete(
             },
             (*l).path,
             (*l).linenum,
-            sshkey_type((*l).key),
+            crate::sshkey::sshkey_type((*l).key),
             (*ctx).host,
         );
         (*ctx).modified = 1 as libc::c_int;
@@ -1273,7 +1271,7 @@ pub unsafe extern "C" fn hostfile_replace_entries(
                         if !((*keys.offset(i as isize)).is_null()
                             || want & *(ctx.match_keys).offset(i as isize) == want)
                         {
-                            fp = sshkey_fingerprint(
+                            fp = crate::sshkey::sshkey_fingerprint(
                                 *keys.offset(i as isize),
                                 hash_alg,
                                 SSH_FP_DEFAULT,

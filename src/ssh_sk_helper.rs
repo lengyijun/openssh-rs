@@ -45,7 +45,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
 
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
@@ -331,7 +330,7 @@ unsafe extern "C" fn process_sign(
         0 as *const libc::c_char,
         b"ready to sign with key %s, provider %s: msg len %zu, compat 0x%lx\0" as *const u8
             as *const libc::c_char,
-        sshkey_type(key),
+        crate::sshkey::sshkey_type(key),
         provider,
         msglen,
         compat as u_long,
@@ -730,7 +729,7 @@ unsafe extern "C" fn process_load_resident(
                 0 as *const libc::c_char,
                 b"key %zu %s %s uidlen %zu\0" as *const u8 as *const libc::c_char,
                 i,
-                sshkey_type((**srks.offset(i as isize)).key),
+                crate::sshkey::sshkey_type((**srks.offset(i as isize)).key),
                 (*(**srks.offset(i as isize)).key).sk_application,
                 (**srks.offset(i as isize)).user_id_len,
             );

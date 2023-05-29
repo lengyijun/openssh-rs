@@ -75,7 +75,7 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
+
     fn pkcs11_init(_: libc::c_int) -> libc::c_int;
     fn pkcs11_add_provider(
         _: *mut libc::c_char,
@@ -231,7 +231,7 @@ unsafe extern "C" fn lookup_key(mut k: *mut crate::sshkey::sshkey) -> *mut crate
             SYSLOG_LEVEL_DEBUG1,
             0 as *const libc::c_char,
             b"check %s %s %s\0" as *const u8 as *const libc::c_char,
-            sshkey_type((*ki).key),
+            crate::sshkey::sshkey_type((*ki).key),
             (*ki).providername,
             (*ki).label,
         );

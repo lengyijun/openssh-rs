@@ -64,18 +64,13 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
+
     fn sshkey_fingerprint_raw(
         k: *const crate::sshkey::sshkey,
         _: libc::c_int,
         retp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
 
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_drop_cert(_: *mut crate::sshkey::sshkey) -> libc::c_int;
@@ -2216,7 +2211,7 @@ pub unsafe extern "C" fn ssh_krl_revoke_key_explicit(
         SYSLOG_LEVEL_DEBUG3,
         0 as *const libc::c_char,
         b"revoke type %s\0" as *const u8 as *const libc::c_char,
-        sshkey_type(key),
+        crate::sshkey::sshkey_type(key),
     );
     r = plain_key_blob(key, &mut blob, &mut len);
     if r != 0 as libc::c_int {
@@ -4160,7 +4155,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
                 b"parse KRL key\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            fp = sshkey_fingerprint(key, 2 as libc::c_int, SSH_FP_DEFAULT);
+            fp = crate::sshkey::sshkey_fingerprint(key, 2 as libc::c_int, SSH_FP_DEFAULT);
             if fp.is_null() {
                 ret = -(4 as libc::c_int);
                 crate::log::sshlog(
@@ -4171,7 +4166,8 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
                     0 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8
+                        as *const libc::c_char,
                 );
             } else {
                 libc::fprintf(
@@ -4216,7 +4212,7 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
             libc::fprintf(f, b"# Wildcard CA\n\0" as *const u8 as *const libc::c_char);
             current_block_52 = 8180496224585318153;
         } else {
-            fp = sshkey_fingerprint((*rc).ca_key, 2 as libc::c_int, SSH_FP_DEFAULT);
+            fp = crate::sshkey::sshkey_fingerprint((*rc).ca_key, 2 as libc::c_int, SSH_FP_DEFAULT);
             if fp.is_null() {
                 ret = -(4 as libc::c_int);
                 crate::log::sshlog(
@@ -4227,7 +4223,8 @@ pub unsafe extern "C" fn krl_dump(mut krl: *mut ssh_krl, mut f: *mut libc::FILE)
                     0 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8
+                        as *const libc::c_char,
                 );
                 current_block_52 = 4761528863920922185;
             } else {

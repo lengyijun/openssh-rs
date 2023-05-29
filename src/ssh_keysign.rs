@@ -20,13 +20,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_from_blob(
         _: *const u_char,
@@ -994,7 +987,9 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
     found = 0 as libc::c_int;
     i = 0 as libc::c_int;
     while i < 5 as libc::c_int {
-        if !(keys[i as usize]).is_null() && crate::sshkey::sshkey_equal_public(key, keys[i as usize]) != 0 {
+        if !(keys[i as usize]).is_null()
+            && crate::sshkey::sshkey_equal_public(key, keys[i as usize]) != 0
+        {
             found = 1 as libc::c_int;
             break;
         } else {
@@ -1003,7 +998,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
         }
     }
     if found == 0 {
-        fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
+        fp = crate::sshkey::sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_DEFAULT);
         if fp.is_null() {
             sshfatal(
                 b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
@@ -1012,7 +1007,8 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
                 0 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"%s: sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+                b"%s: crate::sshkey::sshkey_fingerprint failed\0" as *const u8
+                    as *const libc::c_char,
                 __progname,
             );
         }
@@ -1025,7 +1021,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
             0 as *const libc::c_char,
             b"%s: no matching hostkey found for key %s %s\0" as *const u8 as *const libc::c_char,
             __progname,
-            sshkey_type(key),
+            crate::sshkey::sshkey_type(key),
             if !fp.is_null() {
                 fp as *const libc::c_char
             } else {

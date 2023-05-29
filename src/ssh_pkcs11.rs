@@ -219,12 +219,7 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_fingerprint(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: sshkey_fp_rep,
-    ) -> *mut libc::c_char;
-    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
+
     fn sshkey_ecdsa_key_to_nid(_: *mut crate::sshkey::EC_KEY) -> libc::c_int;
 
 }
@@ -2877,7 +2872,7 @@ unsafe extern "C" fn note_key(
     mut key: *mut crate::sshkey::sshkey,
 ) {
     let mut fp: *mut libc::c_char = 0 as *mut libc::c_char;
-    fp = sshkey_fingerprint(key, 2 as libc::c_int, SSH_FP_DEFAULT);
+    fp = crate::sshkey::sshkey_fingerprint(key, 2 as libc::c_int, SSH_FP_DEFAULT);
     if fp.is_null() {
         crate::log::sshlog(
             b"ssh-pkcs11.c\0" as *const u8 as *const libc::c_char,
@@ -2886,7 +2881,7 @@ unsafe extern "C" fn note_key(
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
+            b"crate::sshkey::sshkey_fingerprint failed\0" as *const u8 as *const libc::c_char,
         );
         return;
     }
@@ -2901,7 +2896,7 @@ unsafe extern "C" fn note_key(
         context,
         (*p).name,
         slotidx,
-        sshkey_type(key),
+        crate::sshkey::sshkey_type(key),
         fp,
     );
     libc::free(fp as *mut libc::c_void);
