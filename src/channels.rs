@@ -81,12 +81,7 @@ extern "C" {
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshbuf_read(
-        _: libc::c_int,
-        _: *mut crate::sshbuf::sshbuf,
-        _: size_t,
-        _: *mut size_t,
-    ) -> libc::c_int;
+
 
     fn sshbuf_get_string_direct(
         buf: *mut crate::sshbuf::sshbuf,
@@ -4253,7 +4248,7 @@ unsafe extern "C" fn channel_handle_rfd(mut ssh: *mut ssh, mut c: *mut Channel) 
         if maxlen > avail {
             maxlen = avail;
         }
-        r = sshbuf_read((*c).rfd, (*c).input, maxlen, &mut nr);
+        r = crate::sshbuf_misc::sshbuf_read((*c).rfd, (*c).input, maxlen, &mut nr);
         if r != 0 as libc::c_int {
             if *libc::__errno_location() == 4 as libc::c_int
                 || force == 0

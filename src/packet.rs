@@ -219,12 +219,7 @@ extern "C" {
         v: *const EC_POINT,
         g: *const EC_GROUP,
     ) -> libc::c_int;
-    fn sshbuf_read(
-        _: libc::c_int,
-        _: *mut crate::sshbuf::sshbuf,
-        _: size_t,
-        _: *mut size_t,
-    ) -> libc::c_int;
+
 }
 pub type __builtin_va_list = [__va_list_tag; 1];
 #[derive(Copy, Clone)]
@@ -2890,7 +2885,7 @@ pub unsafe extern "C" fn ssh_packet_process_read(
     let mut state: *mut session_state = (*ssh).state;
     let mut r: libc::c_int = 0;
     let mut rlen: size_t = 0;
-    r = sshbuf_read(
+    r = crate::sshbuf_misc::sshbuf_read(
         fd,
         (*state).input,
         (256 as libc::c_int * 1024 as libc::c_int) as size_t,
