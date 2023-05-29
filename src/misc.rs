@@ -156,7 +156,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
@@ -3702,7 +3701,7 @@ pub unsafe extern "C" fn argv_assemble(
     }
     memcpy(
         ret as *mut libc::c_void,
-        sshbuf_ptr(buf) as *const libc::c_void,
+        crate::sshbuf::sshbuf_ptr(buf) as *const libc::c_void,
         crate::sshbuf::sshbuf_len(buf),
     );
     *ret.offset(crate::sshbuf::sshbuf_len(buf) as isize) = '\0' as i32 as libc::c_char;

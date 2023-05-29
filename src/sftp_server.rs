@@ -117,7 +117,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
@@ -4380,7 +4379,7 @@ unsafe extern "C" fn process() {
     if buf_len < 5 as libc::c_int as libc::c_uint {
         return;
     }
-    cp = sshbuf_ptr(iqueue);
+    cp = crate::sshbuf::sshbuf_ptr(iqueue);
     msg_len = get_u32(cp as *const libc::c_void);
     if msg_len > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_uint {
         crate::log::sshlog(

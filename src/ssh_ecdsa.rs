@@ -52,7 +52,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_get_cstring(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut libc::c_char,
@@ -513,7 +512,7 @@ unsafe extern "C" fn ssh_ecdsa_sign(
                             } else {
                                 memcpy(
                                     *sigp as *mut libc::c_void,
-                                    sshbuf_ptr(b) as *const libc::c_void,
+                                    crate::sshbuf::sshbuf_ptr(b) as *const libc::c_void,
                                     len,
                                 );
                                 current_block = 12147880666119273379;

@@ -28,7 +28,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -412,7 +411,7 @@ unsafe extern "C" fn webauthn_check_prepare_hash(
             r = sshbuf_cmp(
                 wrapper,
                 0 as libc::c_int as size_t,
-                sshbuf_ptr(m) as *const libc::c_void,
+                crate::sshbuf::sshbuf_ptr(m) as *const libc::c_void,
                 crate::sshbuf::sshbuf_len(m),
             );
             if !(r != 0 as libc::c_int) {

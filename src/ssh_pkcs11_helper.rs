@@ -48,7 +48,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 
     fn ECDSA_size(eckey: *const EC_KEY) -> libc::c_int;
     fn ECDSA_sign(
@@ -660,7 +659,7 @@ unsafe extern "C" fn process() {
     if buf_len < 5 as libc::c_int as libc::c_uint {
         return;
     }
-    cp = sshbuf_ptr(iqueue);
+    cp = crate::sshbuf::sshbuf_ptr(iqueue);
     msg_len = get_u32(cp as *const libc::c_void);
     if msg_len > 10240 as libc::c_int as libc::c_uint {
         crate::log::sshlog(
@@ -984,7 +983,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             {
                 len = write(
                     out,
-                    sshbuf_ptr(oqueue) as *const libc::c_void,
+                    crate::sshbuf::sshbuf_ptr(oqueue) as *const libc::c_void,
                     crate::sshbuf::sshbuf_len(oqueue),
                 );
                 if len < 0 as libc::c_int as libc::c_long {

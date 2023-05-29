@@ -38,7 +38,6 @@ extern "C" {
     fn EVP_sha384() -> *const EVP_MD;
     fn EVP_sha512() -> *const EVP_MD;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -220,7 +219,7 @@ pub unsafe extern "C" fn ssh_digest_update_buffer(
 ) -> libc::c_int {
     return ssh_digest_update(
         ctx,
-        sshbuf_ptr(b) as *const libc::c_void,
+        crate::sshbuf::sshbuf_ptr(b) as *const libc::c_void,
         crate::sshbuf::sshbuf_len(b),
     );
 }
@@ -304,7 +303,7 @@ pub unsafe extern "C" fn ssh_digest_buffer(
 ) -> libc::c_int {
     return ssh_digest_memory(
         alg,
-        sshbuf_ptr(b) as *const libc::c_void,
+        crate::sshbuf::sshbuf_ptr(b) as *const libc::c_void,
         crate::sshbuf::sshbuf_len(b),
         d,
         dlen,

@@ -40,7 +40,6 @@ extern "C" {
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put_bignum2(buf: *mut crate::sshbuf::sshbuf, v: *const BIGNUM) -> libc::c_int;
     fn sshbuf_get_bignum2(buf: *mut crate::sshbuf::sshbuf, valp: *mut *mut BIGNUM) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
@@ -821,7 +820,7 @@ unsafe extern "C" fn ssh_rsa_sign(
                                 } else {
                                     memcpy(
                                         *sigp as *mut libc::c_void,
-                                        sshbuf_ptr(b) as *const libc::c_void,
+                                        crate::sshbuf::sshbuf_ptr(b) as *const libc::c_void,
                                         len as libc::c_ulong,
                                     );
                                     current_block = 17500079516916021833;

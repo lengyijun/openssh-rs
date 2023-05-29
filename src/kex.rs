@@ -101,7 +101,6 @@ extern "C" {
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_consume_end(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
@@ -3088,7 +3087,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                         if crate::sshbuf::sshbuf_len(peer_version)
                             > 4 as libc::c_int as libc::c_ulong
                             && memcmp(
-                                sshbuf_ptr(peer_version) as *const libc::c_void,
+                                crate::sshbuf::sshbuf_ptr(peer_version) as *const libc::c_void,
                                 b"SSH-\0" as *const u8 as *const libc::c_char
                                     as *const libc::c_void,
                                 4 as libc::c_int as libc::c_ulong,

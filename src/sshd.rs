@@ -192,7 +192,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -3523,7 +3522,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
     if key.is_null() {
         if ssh_digest_update(
             ctx,
-            sshbuf_ptr(server_cfg) as *const libc::c_void,
+            crate::sshbuf::sshbuf_ptr(server_cfg) as *const libc::c_void,
             crate::sshbuf::sshbuf_len(server_cfg),
         ) != 0 as libc::c_int
         {
@@ -3610,7 +3609,7 @@ unsafe extern "C" fn accumulate_host_timing_secret(
     }
     if ssh_digest_update(
         ctx,
-        sshbuf_ptr(buf) as *const libc::c_void,
+        crate::sshbuf::sshbuf_ptr(buf) as *const libc::c_void,
         crate::sshbuf::sshbuf_len(buf),
     ) != 0 as libc::c_int
     {

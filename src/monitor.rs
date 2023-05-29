@@ -90,7 +90,6 @@ extern "C" {
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
         len: size_t,
@@ -1880,7 +1879,7 @@ pub unsafe extern "C" fn mm_answer_sign(
         if datlen != crate::sshbuf::sshbuf_len(sigbuf)
             || memcmp(
                 p as *const libc::c_void,
-                sshbuf_ptr(sigbuf) as *const libc::c_void,
+                crate::sshbuf::sshbuf_ptr(sigbuf) as *const libc::c_void,
                 crate::sshbuf::sshbuf_len(sigbuf),
             ) != 0 as libc::c_int
         {
@@ -3142,7 +3141,7 @@ unsafe extern "C" fn monitor_valid_userblob(
         );
     }
     if (*ssh).compat & 0x10 as libc::c_int != 0 {
-        p = sshbuf_ptr(b);
+        p = crate::sshbuf::sshbuf_ptr(b);
         len = crate::sshbuf::sshbuf_len(b);
         if session_id2.is_null()
             || len < session_id2_len as libc::c_ulong
@@ -4226,7 +4225,7 @@ pub unsafe extern "C" fn monitor_apply_keystate(mut ssh: *mut ssh, mut _pmonitor
         );
     }
     if memcmp(
-        sshbuf_ptr((*(*ssh).kex).session_id) as *const libc::c_void,
+        crate::sshbuf::sshbuf_ptr((*(*ssh).kex).session_id) as *const libc::c_void,
         session_id2 as *const libc::c_void,
         session_id2_len as libc::c_ulong,
     ) != 0 as libc::c_int

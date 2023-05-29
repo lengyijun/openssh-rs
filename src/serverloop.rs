@@ -84,8 +84,6 @@ extern "C" {
     fn ssh_dispatch_set(_: *mut ssh, _: libc::c_int, _: Option<dispatch_fn>);
     fn ssh_dispatch_run_fatal(_: *mut ssh, _: libc::c_int, _: *mut sig_atomic_t);
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
-
     fn sshbuf_put_string(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -2189,7 +2187,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
                                 key_pub,
                                 &mut sig,
                                 &mut slen,
-                                sshbuf_ptr(sigbuf),
+                                crate::sshbuf::sshbuf_ptr(sigbuf),
                                 crate::sshbuf::sshbuf_len(sigbuf),
                                 sigalg,
                             );

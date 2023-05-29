@@ -54,7 +54,6 @@ extern "C" {
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_get_string(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
@@ -602,7 +601,7 @@ unsafe extern "C" fn ssh_dss_sign(
                             } else {
                                 memcpy(
                                     *sigp as *mut libc::c_void,
-                                    sshbuf_ptr(b) as *const libc::c_void,
+                                    crate::sshbuf::sshbuf_ptr(b) as *const libc::c_void,
                                     len,
                                 );
                                 current_block = 13472856163611868459;

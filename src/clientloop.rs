@@ -113,7 +113,6 @@ extern "C" {
     fn ssh_packet_is_rekeying(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_check_rekey(_: *mut ssh) -> libc::c_int;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_put(
@@ -3699,7 +3698,7 @@ pub unsafe extern "C" fn client_loop(
                 write as unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t,
             )),
             fileno(stderr),
-            sshbuf_ptr(stderr_buffer) as *mut u_char as *mut libc::c_void,
+            crate::sshbuf::sshbuf_ptr(stderr_buffer) as *mut u_char as *mut libc::c_void,
             crate::sshbuf::sshbuf_len(stderr_buffer),
         ) as libc::c_int;
         if len < 0 as libc::c_int
@@ -5495,7 +5494,7 @@ unsafe extern "C" fn client_global_hostkeys_prove_confirm(
                         *((*ctx).keys).offset(i as isize),
                         sig,
                         siglen,
-                        sshbuf_ptr(signdata),
+                        crate::sshbuf::sshbuf_ptr(signdata),
                         crate::sshbuf::sshbuf_len(signdata),
                         if plaintype == KEY_RSA as libc::c_int {
                             rsa_kexalg
@@ -6566,7 +6565,7 @@ pub unsafe extern "C" fn client_session2_setup(
                 0 as *const libc::c_char,
                 b"Sending subsystem: %.*s\0" as *const u8 as *const libc::c_char,
                 len as libc::c_int,
-                sshbuf_ptr(cmd),
+                crate::sshbuf::sshbuf_ptr(cmd),
             );
             channel_request_start(
                 ssh,
@@ -6593,7 +6592,7 @@ pub unsafe extern "C" fn client_session2_setup(
                 0 as *const libc::c_char,
                 b"Sending command: %.*s\0" as *const u8 as *const libc::c_char,
                 len as libc::c_int,
-                sshbuf_ptr(cmd),
+                crate::sshbuf::sshbuf_ptr(cmd),
             );
             channel_request_start(
                 ssh,

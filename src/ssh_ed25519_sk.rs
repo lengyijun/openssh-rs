@@ -34,7 +34,6 @@ extern "C" {
         v: *const libc::c_void,
         len: size_t,
     ) -> libc::c_int;
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 
     fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
 
@@ -432,7 +431,7 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
             {
                 r = -(2 as libc::c_int);
             } else {
-                sm = sshbuf_ptr(encoded);
+                sm = crate::sshbuf::sshbuf_ptr(encoded);
                 smlen = crate::sshbuf::sshbuf_len(encoded) as libc::c_ulonglong;
                 mlen = smlen;
                 m = libc::malloc(smlen as usize) as *mut u_char;

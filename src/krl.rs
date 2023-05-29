@@ -70,7 +70,6 @@ extern "C" {
         len: size_t,
     ) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
@@ -3017,7 +3016,9 @@ pub unsafe extern "C" fn ssh_krl_to_blob(
                                                                             .offset(i as isize),
                                                                         &mut sblob,
                                                                         &mut slen,
-                                                                        sshbuf_ptr(buf),
+                                                                        crate::sshbuf::sshbuf_ptr(
+                                                                            buf,
+                                                                        ),
                                                                         crate::sshbuf::sshbuf_len(
                                                                             buf,
                                                                         ),
@@ -3375,7 +3376,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
         < (::core::mem::size_of::<[libc::c_char; 9]>() as libc::c_ulong)
             .wrapping_sub(1 as libc::c_int as libc::c_ulong)
         || memcmp(
-            sshbuf_ptr(buf) as *const libc::c_void,
+            crate::sshbuf::sshbuf_ptr(buf) as *const libc::c_void,
             b"SSHKRL\n\0\0" as *const u8 as *const libc::c_char as *const libc::c_void,
             (::core::mem::size_of::<[libc::c_char; 9]>() as libc::c_ulong)
                 .wrapping_sub(1 as libc::c_int as libc::c_ulong),
@@ -3557,7 +3558,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                                     key,
                                                     blob,
                                                     blen,
-                                                    sshbuf_ptr(buf),
+                                                    crate::sshbuf::sshbuf_ptr(buf),
                                                     sig_off,
                                                     0 as *const libc::c_char,
                                                     0 as libc::c_int as u_int,

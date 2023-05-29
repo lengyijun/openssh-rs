@@ -29,7 +29,6 @@ extern "C" {
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -1192,7 +1191,7 @@ pub unsafe extern "C" fn sshsk_enroll(
                         r = -(10 as libc::c_int);
                         current_block = 7177629584601204510;
                     } else {
-                        challenge = sshbuf_ptr(challenge_buf);
+                        challenge = crate::sshbuf::sshbuf_ptr(challenge_buf);
                         challenge_len = crate::sshbuf::sshbuf_len(challenge_buf);
                         crate::log::sshlog(
                             b"ssh-sk.c\0" as *const u8 as *const libc::c_char,
@@ -1472,7 +1471,7 @@ pub unsafe extern "C" fn sshsk_sign(
                 data,
                 datalen,
                 (*key).sk_application,
-                sshbuf_ptr((*key).sk_key_handle),
+                crate::sshbuf::sshbuf_ptr((*key).sk_key_handle),
                 crate::sshbuf::sshbuf_len((*key).sk_key_handle),
                 (*key).sk_flags,
                 pin,
@@ -1545,7 +1544,7 @@ pub unsafe extern "C" fn sshsk_sign(
                                     } else {
                                         memcpy(
                                             *sigp as *mut libc::c_void,
-                                            sshbuf_ptr(sig) as *const libc::c_void,
+                                            crate::sshbuf::sshbuf_ptr(sig) as *const libc::c_void,
                                             crate::sshbuf::sshbuf_len(sig),
                                         );
                                         current_block = 8693738493027456495;

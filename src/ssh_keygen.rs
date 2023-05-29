@@ -259,7 +259,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
 
     fn sshbuf_get_cstring(
@@ -1355,7 +1354,7 @@ unsafe extern "C" fn buffer_get_bignum_bits(
             crate::sshbuf::sshbuf_len(b),
         );
     }
-    if (BN_bin2bn(sshbuf_ptr(b), bytes as libc::c_int, value)).is_null() {
+    if (BN_bin2bn(crate::sshbuf::sshbuf_ptr(b), bytes as libc::c_int, value)).is_null() {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 23], &[libc::c_char; 23]>(
@@ -5741,7 +5740,7 @@ unsafe extern "C" fn hash_to_blob(
     *blobp = crate::xmalloc::xmalloc(*lenp) as *mut u_char;
     memcpy(
         *blobp as *mut libc::c_void,
-        sshbuf_ptr(b) as *const libc::c_void,
+        crate::sshbuf::sshbuf_ptr(b) as *const libc::c_void,
         *lenp,
     );
     crate::sshbuf::sshbuf_free(b);

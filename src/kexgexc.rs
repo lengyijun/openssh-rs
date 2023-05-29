@@ -85,7 +85,6 @@ extern "C" {
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -582,7 +581,7 @@ unsafe extern "C" fn input_kex_dh_gex_reply(
                                 dh_g,
                                 pub_key,
                                 dh_server_pub,
-                                sshbuf_ptr(shared_secret),
+                                crate::sshbuf::sshbuf_ptr(shared_secret),
                                 crate::sshbuf::sshbuf_len(shared_secret),
                                 hash.as_mut_ptr(),
                                 &mut hashlen,

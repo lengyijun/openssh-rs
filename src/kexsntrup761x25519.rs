@@ -30,7 +30,6 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_int;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
         len: size_t,
@@ -246,7 +245,7 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_enc(
     if crate::sshbuf::sshbuf_len(client_blob) != need {
         r = -(21 as libc::c_int);
     } else {
-        client_pub = sshbuf_ptr(client_blob);
+        client_pub = crate::sshbuf::sshbuf_ptr(client_blob);
         buf = crate::sshbuf::sshbuf_new();
         if buf.is_null() {
             r = -(2 as libc::c_int);
@@ -327,7 +326,7 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_dec(
     if crate::sshbuf::sshbuf_len(server_blob) != need {
         r = -(21 as libc::c_int);
     } else {
-        ciphertext = sshbuf_ptr(server_blob);
+        ciphertext = crate::sshbuf::sshbuf_ptr(server_blob);
         server_pub = ciphertext.offset(1039 as libc::c_int as isize);
         buf = crate::sshbuf::sshbuf_new();
         if buf.is_null() {

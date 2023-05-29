@@ -61,7 +61,6 @@ extern "C" {
         len: size_t,
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
@@ -304,7 +303,8 @@ unsafe extern "C" fn send_msg(mut conn: *mut sftp_conn, mut m: *mut crate::sshbu
     );
     iov[0 as libc::c_int as usize].iov_base = mlen.as_mut_ptr() as *mut libc::c_void;
     iov[0 as libc::c_int as usize].iov_len = ::core::mem::size_of::<[u_char; 4]>() as libc::c_ulong;
-    iov[1 as libc::c_int as usize].iov_base = sshbuf_ptr(m) as *mut u_char as *mut libc::c_void;
+    iov[1 as libc::c_int as usize].iov_base =
+        crate::sshbuf::sshbuf_ptr(m) as *mut u_char as *mut libc::c_void;
     iov[1 as libc::c_int as usize].iov_len = crate::sshbuf::sshbuf_len(m);
     if atomiciov6(
         Some(writev as unsafe extern "C" fn(libc::c_int, *const iovec, libc::c_int) -> ssize_t),

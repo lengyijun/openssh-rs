@@ -66,7 +66,6 @@ extern "C" {
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
     fn compat_banner(_: *mut ssh, _: *const libc::c_char);
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_consume_end(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
@@ -653,7 +652,7 @@ pub unsafe extern "C" fn ssh_output_ptr(mut ssh: *mut ssh, mut len: *mut size_t)
     let mut output: *mut crate::sshbuf::sshbuf =
         ssh_packet_get_output(ssh) as *mut crate::sshbuf::sshbuf;
     *len = crate::sshbuf::sshbuf_len(output);
-    return sshbuf_ptr(output);
+    return crate::sshbuf::sshbuf_ptr(output);
 }
 pub unsafe extern "C" fn ssh_output_consume(mut ssh: *mut ssh, mut len: size_t) -> libc::c_int {
     return sshbuf_consume(
@@ -684,7 +683,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
         ssh_packet_get_input(ssh) as *mut crate::sshbuf::sshbuf;
     let mut mismatch: *const libc::c_char =
         b"Protocol mismatch.\r\n\0" as *const u8 as *const libc::c_char;
-    let mut s: *const u_char = sshbuf_ptr(input);
+    let mut s: *const u_char = crate::sshbuf::sshbuf_ptr(input);
     let mut c: u_char = 0;
     let mut cp: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut remote_version: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -731,7 +730,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
             1054647088692577877 => {
                 if crate::sshbuf::sshbuf_len(banner) >= 4 as libc::c_int as libc::c_ulong
                     && memcmp(
-                        sshbuf_ptr(banner) as *const libc::c_void,
+                        crate::sshbuf::sshbuf_ptr(banner) as *const libc::c_void,
                         b"SSH-\0" as *const u8 as *const libc::c_char as *const libc::c_void,
                         4 as libc::c_int as libc::c_ulong,
                     ) == 0 as libc::c_int
@@ -750,7 +749,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
                     0 as *const libc::c_char,
                     b"%.*s\0" as *const u8 as *const libc::c_char,
                     crate::sshbuf::sshbuf_len(banner) as libc::c_int,
-                    sshbuf_ptr(banner),
+                    crate::sshbuf::sshbuf_ptr(banner),
                 );
                 if !((*(*ssh).kex).server != 0 || {
                     n = n.wrapping_add(1);

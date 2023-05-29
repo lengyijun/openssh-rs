@@ -131,7 +131,7 @@ extern "C" {
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
+
     fn sshbuf_avail(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
     fn sshbuf_set_max_size(buf: *mut crate::sshbuf::sshbuf, max_size: size_t) -> libc::c_int;
@@ -2684,7 +2684,7 @@ unsafe extern "C" fn channel_decode_socks4(
     if have < len {
         return 0 as libc::c_int;
     }
-    p = sshbuf_ptr(input);
+    p = crate::sshbuf::sshbuf_ptr(input);
     need = 1 as libc::c_int as u_int;
     if *p.offset(4 as libc::c_int as isize) as libc::c_int == 0 as libc::c_int
         && *p.offset(5 as libc::c_int as isize) as libc::c_int == 0 as libc::c_int
@@ -2781,7 +2781,7 @@ unsafe extern "C" fn channel_decode_socks4(
         return -(1 as libc::c_int);
     }
     have = crate::sshbuf::sshbuf_len(input) as u_int;
-    p = sshbuf_ptr(input);
+    p = crate::sshbuf::sshbuf_ptr(input);
     if (memchr(p as *const libc::c_void, '\0' as i32, have as libc::c_ulong)).is_null() {
         crate::log::sshlog(
             b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -2838,7 +2838,7 @@ unsafe extern "C" fn channel_decode_socks4(
         (*c).path = crate::xmalloc::xstrdup(host);
     } else {
         have = crate::sshbuf::sshbuf_len(input) as u_int;
-        p = sshbuf_ptr(input);
+        p = crate::sshbuf::sshbuf_ptr(input);
         if (memchr(p as *const libc::c_void, '\0' as i32, have as libc::c_ulong)).is_null() {
             crate::log::sshlog(
                 b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -3007,7 +3007,7 @@ unsafe extern "C" fn channel_decode_socks5(
         b"channel %d: decode socks5\0" as *const u8 as *const libc::c_char,
         (*c).self_0,
     );
-    p = sshbuf_ptr(input);
+    p = crate::sshbuf::sshbuf_ptr(input);
     if *p.offset(0 as libc::c_int as isize) as libc::c_int != 0x5 as libc::c_int {
         return -(1 as libc::c_int);
     }
@@ -3412,7 +3412,7 @@ unsafe extern "C" fn channel_pre_dynamic(mut ssh: *mut ssh, mut c: *mut Channel)
         (*c).io_want |= 0x1 as libc::c_int as libc::c_uint;
         return;
     }
-    p = sshbuf_ptr((*c).input);
+    p = crate::sshbuf::sshbuf_ptr((*c).input);
     match *p.offset(0 as libc::c_int as isize) as libc::c_int {
         4 => {
             ret = channel_decode_socks4(c, (*c).input, (*c).output);
@@ -3499,7 +3499,7 @@ unsafe extern "C" fn channel_before_prepare_io_rdynamic(mut ssh: *mut ssh, mut c
     if have < 3 as libc::c_int as libc::c_uint {
         return;
     }
-    p = sshbuf_ptr((*c).output);
+    p = crate::sshbuf::sshbuf_ptr((*c).output);
     match *p.offset(0 as libc::c_int as isize) as libc::c_int {
         4 => {
             ret = channel_decode_socks4(c, (*c).output, (*c).input);
@@ -4676,7 +4676,7 @@ unsafe extern "C" fn channel_handle_efd_write(
     }
     len = write(
         (*c).efd,
-        sshbuf_ptr((*c).extended) as *const libc::c_void,
+        crate::sshbuf::sshbuf_ptr((*c).extended) as *const libc::c_void,
         crate::sshbuf::sshbuf_len((*c).extended),
     );
     crate::log::sshlog(
@@ -5002,13 +5002,14 @@ unsafe extern "C" fn channel_post_mux_client_read(mut ssh: *mut ssh, mut c: *mut
     if read_mux(ssh, c, 4 as libc::c_int as u_int) < 4 as libc::c_int as libc::c_uint {
         return;
     }
-    need = (*(sshbuf_ptr((*c).input)).offset(0 as libc::c_int as isize) as u_int32_t)
+    need = (*(crate::sshbuf::sshbuf_ptr((*c).input)).offset(0 as libc::c_int as isize)
+        as u_int32_t)
         << 24 as libc::c_int
-        | (*(sshbuf_ptr((*c).input)).offset(1 as libc::c_int as isize) as u_int32_t)
+        | (*(crate::sshbuf::sshbuf_ptr((*c).input)).offset(1 as libc::c_int as isize) as u_int32_t)
             << 16 as libc::c_int
-        | (*(sshbuf_ptr((*c).input)).offset(2 as libc::c_int as isize) as u_int32_t)
+        | (*(crate::sshbuf::sshbuf_ptr((*c).input)).offset(2 as libc::c_int as isize) as u_int32_t)
             << 8 as libc::c_int
-        | *(sshbuf_ptr((*c).input)).offset(3 as libc::c_int as isize) as u_int32_t;
+        | *(crate::sshbuf::sshbuf_ptr((*c).input)).offset(3 as libc::c_int as isize) as u_int32_t;
     if need > (256 as libc::c_int * 1024 as libc::c_int) as libc::c_uint {
         crate::log::sshlog(
             b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -5062,7 +5063,7 @@ unsafe extern "C" fn channel_post_mux_client_write(mut ssh: *mut ssh, mut c: *mu
     }
     len = write(
         (*c).wfd,
-        sshbuf_ptr((*c).output) as *const libc::c_void,
+        crate::sshbuf::sshbuf_ptr((*c).output) as *const libc::c_void,
         crate::sshbuf::sshbuf_len((*c).output),
     );
     if len == -(1 as libc::c_int) as libc::c_long
@@ -6154,7 +6155,11 @@ unsafe extern "C" fn channel_output_poll_input_open(mut ssh: *mut ssh, mut c: *m
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_put_string(ssh, sshbuf_ptr((*c).input) as *const libc::c_void, len);
+            r = sshpkt_put_string(
+                ssh,
+                crate::sshbuf::sshbuf_ptr((*c).input) as *const libc::c_void,
+                len,
+            );
             r != 0 as libc::c_int
         }
         || {
@@ -6252,7 +6257,11 @@ unsafe extern "C" fn channel_output_poll_extended_read(mut ssh: *mut ssh, mut c:
             r != 0 as libc::c_int
         }
         || {
-            r = sshpkt_put_string(ssh, sshbuf_ptr((*c).extended) as *const libc::c_void, len);
+            r = sshpkt_put_string(
+                ssh,
+                crate::sshbuf::sshbuf_ptr((*c).extended) as *const libc::c_void,
+                len,
+            );
             r != 0 as libc::c_int
         }
         || {

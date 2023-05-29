@@ -55,7 +55,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
@@ -2749,7 +2748,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
                 sign_id,
                 &mut signature,
                 &mut slen,
-                sshbuf_ptr(b),
+                crate::sshbuf::sshbuf_ptr(b),
                 crate::sshbuf::sshbuf_len(b),
                 (*ssh).compat as u_int,
                 alg,
@@ -4599,7 +4598,7 @@ unsafe extern "C" fn userauth_hostbased(mut ssh: *mut ssh) -> libc::c_int {
                                 private,
                                 &mut sig,
                                 &mut siglen,
-                                sshbuf_ptr(b),
+                                crate::sshbuf::sshbuf_ptr(b),
                                 crate::sshbuf::sshbuf_len(b),
                             );
                             if r != 0 as libc::c_int {

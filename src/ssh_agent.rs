@@ -94,7 +94,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_put(
@@ -1572,15 +1571,15 @@ unsafe extern "C" fn buf_equal(
     mut a: *const crate::sshbuf::sshbuf,
     mut b: *const crate::sshbuf::sshbuf,
 ) -> libc::c_int {
-    if (sshbuf_ptr(a)).is_null() || (sshbuf_ptr(b)).is_null() {
+    if (crate::sshbuf::sshbuf_ptr(a)).is_null() || (crate::sshbuf::sshbuf_ptr(b)).is_null() {
         return -(10 as libc::c_int);
     }
     if crate::sshbuf::sshbuf_len(a) != crate::sshbuf::sshbuf_len(b) {
         return -(4 as libc::c_int);
     }
     if timingsafe_bcmp(
-        sshbuf_ptr(a) as *const libc::c_void,
-        sshbuf_ptr(b) as *const libc::c_void,
+        crate::sshbuf::sshbuf_ptr(a) as *const libc::c_void,
+        crate::sshbuf::sshbuf_ptr(b) as *const libc::c_void,
         crate::sshbuf::sshbuf_len(a),
     ) != 0 as libc::c_int
     {
@@ -1887,7 +1886,7 @@ unsafe extern "C" fn process_sign_request2(mut e: *mut SocketEntry) {
                                     (*id).key,
                                     &mut signature,
                                     &mut slen,
-                                    sshbuf_ptr(data),
+                                    crate::sshbuf::sshbuf_ptr(data),
                                     crate::sshbuf::sshbuf_len(data),
                                     agent_decode_alg(key, flags),
                                     (*id).sk_provider,
@@ -3714,9 +3713,9 @@ unsafe extern "C" fn process_ext_session_bind(mut e: *mut SocketEntry) -> libc::
         }
         r = sshkey_verify(
             key,
-            sshbuf_ptr(sig),
+            crate::sshbuf::sshbuf_ptr(sig),
             crate::sshbuf::sshbuf_len(sig),
-            sshbuf_ptr(sid),
+            crate::sshbuf::sshbuf_ptr(sid),
             crate::sshbuf::sshbuf_len(sid),
             0 as *const libc::c_char,
             0 as libc::c_int as u_int,
@@ -3980,7 +3979,7 @@ unsafe extern "C" fn process_message(mut socknum: u_int) -> libc::c_int {
     if crate::sshbuf::sshbuf_len((*e).input) < 5 as libc::c_int as libc::c_ulong {
         return 0 as libc::c_int;
     }
-    cp = sshbuf_ptr((*e).input);
+    cp = crate::sshbuf::sshbuf_ptr((*e).input);
     msg_len = (*cp.offset(0 as libc::c_int as isize) as u_int32_t) << 24 as libc::c_int
         | (*cp.offset(1 as libc::c_int as isize) as u_int32_t) << 16 as libc::c_int
         | (*cp.offset(2 as libc::c_int as isize) as u_int32_t) << 8 as libc::c_int
@@ -4357,7 +4356,8 @@ unsafe extern "C" fn handle_conn_write(mut socknum: u_int) -> libc::c_int {
     }
     len = write(
         (*sockets.offset(socknum as isize)).fd,
-        sshbuf_ptr((*sockets.offset(socknum as isize)).output) as *const libc::c_void,
+        crate::sshbuf::sshbuf_ptr((*sockets.offset(socknum as isize)).output)
+            as *const libc::c_void,
         crate::sshbuf::sshbuf_len((*sockets.offset(socknum as isize)).output),
     );
     if len <= 0 as libc::c_int as libc::c_long {

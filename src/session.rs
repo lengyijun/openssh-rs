@@ -141,7 +141,6 @@ extern "C" {
     fn ssh_packet_get_connection_out(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
 
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
@@ -1095,7 +1094,7 @@ unsafe extern "C" fn display_loginmsg() {
     }
     printf(
         b"%s\0" as *const u8 as *const libc::c_char,
-        sshbuf_ptr(loginmsg) as *mut libc::c_char,
+        crate::sshbuf::sshbuf_ptr(loginmsg) as *mut libc::c_char,
     );
     crate::sshbuf::sshbuf_reset(loginmsg);
 }

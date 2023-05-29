@@ -102,7 +102,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_consume_end(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
@@ -628,7 +627,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
                     key,
                     &mut sig,
                     &mut slen,
-                    sshbuf_ptr(tosign),
+                    crate::sshbuf::sshbuf_ptr(tosign),
                     crate::sshbuf::sshbuf_len(tosign),
                     sign_alg,
                     sk_provider,
@@ -658,7 +657,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
                     key,
                     &mut sig,
                     &mut slen,
-                    sshbuf_ptr(tosign),
+                    crate::sshbuf::sshbuf_ptr(tosign),
                     crate::sshbuf::sshbuf_len(tosign),
                     sign_alg,
                     sk_provider,
@@ -1141,7 +1140,7 @@ unsafe extern "C" fn sshsig_wrap_verify(
                                 key,
                                 sig,
                                 siglen,
-                                sshbuf_ptr(toverify),
+                                crate::sshbuf::sshbuf_ptr(toverify),
                                 crate::sshbuf::sshbuf_len(toverify),
                                 0 as *const libc::c_char,
                                 0 as libc::c_int as u_int,

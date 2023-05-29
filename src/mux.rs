@@ -105,7 +105,6 @@ extern "C" {
         len: size_t,
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
-    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
 
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
@@ -4239,7 +4238,7 @@ unsafe extern "C" fn mux_client_write_packet(
         );
     }
     need = crate::sshbuf::sshbuf_len(queue) as u_int;
-    ptr = sshbuf_ptr(queue);
+    ptr = crate::sshbuf::sshbuf_ptr(queue);
     have = 0 as libc::c_int as u_int;
     while have < need {
         if muxclient_terminate != 0 {
@@ -4323,12 +4322,14 @@ unsafe extern "C" fn mux_client_read_packet(
         *libc::__errno_location() = oerrno;
         return -(1 as libc::c_int);
     }
-    need = ((*(sshbuf_ptr(queue)).offset(0 as libc::c_int as isize) as u_int32_t)
+    need = ((*(crate::sshbuf::sshbuf_ptr(queue)).offset(0 as libc::c_int as isize) as u_int32_t)
         << 24 as libc::c_int
-        | (*(sshbuf_ptr(queue)).offset(1 as libc::c_int as isize) as u_int32_t)
+        | (*(crate::sshbuf::sshbuf_ptr(queue)).offset(1 as libc::c_int as isize) as u_int32_t)
             << 16 as libc::c_int
-        | (*(sshbuf_ptr(queue)).offset(2 as libc::c_int as isize) as u_int32_t) << 8 as libc::c_int
-        | *(sshbuf_ptr(queue)).offset(3 as libc::c_int as isize) as u_int32_t) as size_t;
+        | (*(crate::sshbuf::sshbuf_ptr(queue)).offset(2 as libc::c_int as isize) as u_int32_t)
+            << 8 as libc::c_int
+        | *(crate::sshbuf::sshbuf_ptr(queue)).offset(3 as libc::c_int as isize) as u_int32_t)
+        as size_t;
     if mux_client_read(fd, queue, need) != 0 as libc::c_int {
         oerrno = *libc::__errno_location();
         crate::log::sshlog(
