@@ -1,5 +1,6 @@
 use crate::atomicio::atomicio;
-use crate::cipher::sshcipher;
+use crate::kex::sshenc;
+
 use crate::log::log_init;
 use ::libc;
 use libc::close;
@@ -732,18 +733,7 @@ pub struct sshmac {
     pub hmac_ctx: *mut ssh_hmac_ctx,
     pub umac_ctx: *mut umac_ctx,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshenc {
-    pub name: *mut libc::c_char,
-    pub cipher: *const sshcipher,
-    pub enabled: libc::c_int,
-    pub key_len: u_int,
-    pub iv_len: u_int,
-    pub block_size: u_int,
-    pub key: *mut u_char,
-    pub iv: *mut u_char,
-}
+
 pub type C2RustUnnamed_4 = libc::c_uint;
 pub const DISPATCH_NONBLOCK: C2RustUnnamed_4 = 1;
 pub const DISPATCH_BLOCK: C2RustUnnamed_4 = 0;

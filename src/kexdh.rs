@@ -1,4 +1,5 @@
-use crate::cipher::sshcipher;
+use crate::kex::sshenc;
+
 use ::libc;
 extern "C" {
     pub type ssh;
@@ -77,18 +78,7 @@ pub const KEX_DH_GRP16_SHA512: kex_exchange = 3;
 pub const KEX_DH_GRP14_SHA256: kex_exchange = 2;
 pub const KEX_DH_GRP14_SHA1: kex_exchange = 1;
 pub const KEX_DH_GRP1_SHA1: kex_exchange = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshenc {
-    pub name: *mut libc::c_char,
-    pub cipher: *const sshcipher,
-    pub enabled: libc::c_int,
-    pub key_len: u_int,
-    pub iv_len: u_int,
-    pub block_size: u_int,
-    pub key: *mut u_char,
-    pub iv: *mut u_char,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshcomp {
