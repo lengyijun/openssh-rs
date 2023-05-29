@@ -43,10 +43,7 @@ extern "C" {
     ) -> libc::c_int;
     fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
 
-    fn sshkey_equal_public(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
     fn sshkey_from_blob(
         _: *const u_char,
@@ -617,7 +614,7 @@ pub unsafe extern "C" fn ssh_agent_has_key(
     }
     i = 0 as libc::c_int as size_t;
     while i < (*idlist).nkeys {
-        if sshkey_equal_public(*((*idlist).keys).offset(i as isize), key) != 0 {
+        if crate::sshkey::sshkey_equal_public(*((*idlist).keys).offset(i as isize), key) != 0 {
             ret = 0 as libc::c_int;
             break;
         } else {

@@ -52,15 +52,9 @@ extern "C" {
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
-    fn sshkey_from_private(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_equal_public(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
 
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
@@ -500,7 +494,7 @@ pub unsafe extern "C" fn ssh_add_hostkey(
     let mut k_prv: *mut key_entry = 0 as *mut key_entry;
     let mut r: libc::c_int = 0;
     if (*(*ssh).kex).server != 0 {
-        r = sshkey_from_private(key, &mut pubkey);
+        r = crate::sshkey::sshkey_from_private(key, &mut pubkey);
         if r != 0 as libc::c_int {
             return r;
         }
@@ -1005,7 +999,7 @@ pub unsafe extern "C" fn _ssh_verify_host_key(
             b"check %s\0" as *const u8 as *const libc::c_char,
             sshkey_type((*k).key),
         );
-        if sshkey_equal_public(hostkey, (*k).key) != 0 {
+        if crate::sshkey::sshkey_equal_public(hostkey, (*k).key) != 0 {
             return 0 as libc::c_int;
         }
         k = (*k).next.tqe_next;

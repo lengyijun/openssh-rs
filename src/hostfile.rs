@@ -67,10 +67,7 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_equal_public(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
 
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
 
@@ -702,12 +699,12 @@ unsafe extern "C" fn check_key_not_revoked(
         if !((*((*hostkeys).entries).offset(i as isize)).marker as libc::c_uint
             != MRK_REVOKE as libc::c_int as libc::c_uint)
         {
-            if sshkey_equal_public(k, (*((*hostkeys).entries).offset(i as isize)).key) != 0 {
+            if crate::sshkey::sshkey_equal_public(k, (*((*hostkeys).entries).offset(i as isize)).key) != 0 {
                 return -(1 as libc::c_int);
             }
             if is_cert != 0
                 && !k.is_null()
-                && sshkey_equal_public(
+                && crate::sshkey::sshkey_equal_public(
                     (*(*k).cert).signature_key,
                     (*((*hostkeys).entries).offset(i as isize)).key,
                 ) != 0
@@ -758,7 +755,7 @@ unsafe extern "C" fn check_hostkeys_by_key_or_type(
                     }
                 }
             } else if want_cert != 0 {
-                if sshkey_equal_public(
+                if crate::sshkey::sshkey_equal_public(
                     (*(*k).cert).signature_key,
                     (*((*hostkeys).entries).offset(i as isize)).key,
                 ) != 0

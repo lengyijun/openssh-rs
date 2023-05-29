@@ -75,10 +75,7 @@ extern "C" {
     fn compat_kex_proposal(_: *mut ssh, _: *const libc::c_char) -> *mut libc::c_char;
     fn compression_alg_list(_: libc::c_int) -> *const libc::c_char;
 
-    fn sshkey_equal_public(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -2257,7 +2254,7 @@ unsafe extern "C" fn identity_sign(
         if prv.is_null() {
             return -(46 as libc::c_int);
         }
-        if !((*id).key).is_null() && sshkey_equal_public(prv, (*id).key) == 0 {
+        if !((*id).key).is_null() && crate::sshkey::sshkey_equal_public(prv, (*id).key) == 0 {
             crate::log::sshlog(
                 b"sshconnect2.c\0" as *const u8 as *const libc::c_char,
                 (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"identity_sign\0"))
@@ -2475,7 +2472,7 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
     if sshkey_is_cert((*id).key) != 0 {
         private_id = (*authctxt).keys.tqh_first;
         while !private_id.is_null() {
-            if sshkey_equal_public((*id).key, (*private_id).key) != 0
+            if crate::sshkey::sshkey_equal_public((*id).key, (*private_id).key) != 0
                 && (*(*id).key).type_0 != (*(*private_id).key).type_0
             {
                 sign_id = private_id;

@@ -162,10 +162,7 @@ extern "C" {
 
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
 
-    fn sshkey_equal_public(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -191,10 +188,7 @@ extern "C" {
         bits: u_int,
         keyp: *mut *mut crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_from_private(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
@@ -2988,7 +2982,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut libc::passwd) {
                         );
                         current_block = 10340423718687530949;
                     } else {
-                        r = sshkey_from_private(private, &mut public);
+                        r = crate::sshkey::sshkey_from_private(private, &mut public);
                         if r != 0 as libc::c_int {
                             sshfatal(
                                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -3000,7 +2994,7 @@ unsafe extern "C" fn do_gen_all_hostkeys(mut pw: *mut libc::passwd) {
                                 1 as libc::c_int,
                                 SYSLOG_LEVEL_FATAL,
                                 ssh_err(r),
-                                b"sshkey_from_private\0" as *const u8 as *const libc::c_char,
+                                b"crate::sshkey::sshkey_from_private\0" as *const u8 as *const libc::c_char,
                             );
                         }
                         libc::snprintf(
@@ -4112,7 +4106,7 @@ unsafe extern "C" fn do_change_comment(
         libc::exit(1 as libc::c_int);
     }
     freezero(passphrase as *mut libc::c_void, strlen(passphrase));
-    r = sshkey_from_private(private, &mut public);
+    r = crate::sshkey::sshkey_from_private(private, &mut public);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -4122,7 +4116,7 @@ unsafe extern "C" fn do_change_comment(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             ssh_err(r),
-            b"sshkey_from_private\0" as *const u8 as *const libc::c_char,
+            b"crate::sshkey::sshkey_from_private\0" as *const u8 as *const libc::c_char,
         );
     }
     crate::sshkey::sshkey_free(private);
@@ -4468,7 +4462,7 @@ unsafe extern "C" fn load_pkcs11_key(mut path: *mut libc::c_char) -> *mut crate:
     }
     i = 0 as libc::c_int;
     while i < nkeys {
-        if sshkey_equal_public(public, *keys.offset(i as isize)) != 0 {
+        if crate::sshkey::sshkey_equal_public(public, *keys.offset(i as isize)) != 0 {
             private = *keys.offset(i as isize);
         } else {
             crate::sshkey::sshkey_free(*keys.offset(i as isize));
@@ -4751,7 +4745,7 @@ unsafe extern "C" fn do_ca_sign(
         (*(*public).cert).valid_before = cert_valid_to;
         prepare_options_buf((*(*public).cert).critical, 1 as libc::c_int);
         prepare_options_buf((*(*public).cert).extensions, 2 as libc::c_int);
-        r = sshkey_from_private(ca, &mut (*(*public).cert).signature_key);
+        r = crate::sshkey::sshkey_from_private(ca, &mut (*(*public).cert).signature_key);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -4761,7 +4755,7 @@ unsafe extern "C" fn do_ca_sign(
                 0 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 ssh_err(r),
-                b"sshkey_from_private (ca key)\0" as *const u8 as *const libc::c_char,
+                b"crate::sshkey::sshkey_from_private (ca key)\0" as *const u8 as *const libc::c_char,
             );
         }
         if agent_fd != -(1 as libc::c_int) && (*ca).flags & 0x1 as libc::c_int != 0 as libc::c_int {
@@ -6510,7 +6504,7 @@ unsafe extern "C" fn load_sign_key(
     } else if privkey.is_null() {
         privkey = load_identity(privpath, 0 as *mut *mut libc::c_char);
     }
-    if sshkey_equal_public(pubkey, privkey) == 0 {
+    if crate::sshkey::sshkey_equal_public(pubkey, privkey) == 0 {
         crate::log::sshlog(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 14], &[libc::c_char; 14]>(b"load_sign_key\0"))
@@ -9530,7 +9524,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             }
         }
     }
-    r = sshkey_from_private(private, &mut public);
+    r = crate::sshkey::sshkey_from_private(private, &mut public);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,
@@ -9539,7 +9533,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             0 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             ssh_err(r),
-            b"sshkey_from_private\0" as *const u8 as *const libc::c_char,
+            b"crate::sshkey::sshkey_from_private\0" as *const u8 as *const libc::c_char,
         );
     }
     if have_identity == 0 {

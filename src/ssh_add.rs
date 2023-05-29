@@ -56,10 +56,7 @@ extern "C" {
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
 
-    fn sshkey_equal_public(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_fingerprint(
         _: *const crate::sshkey::sshkey,
         _: libc::c_int,
@@ -69,10 +66,7 @@ extern "C" {
     fn sshkey_write(_: *const crate::sshkey::sshkey, _: *mut libc::FILE) -> libc::c_int;
     fn sshkey_read(_: *mut crate::sshkey::sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
     fn sshkey_size(_: *const crate::sshkey::sshkey) -> u_int;
-    fn sshkey_from_private(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
     fn sshkey_to_certified(_: *mut crate::sshkey::sshkey) -> libc::c_int;
@@ -480,7 +474,7 @@ unsafe extern "C" fn delete_file(
                 );
             }
         } else {
-            if sshkey_equal_public(cert, public) == 0 {
+            if crate::sshkey::sshkey_equal_public(cert, public) == 0 {
                 sshfatal(
                     b"ssh-add.c\0" as *const u8 as *const libc::c_char,
                     (*::core::mem::transmute::<&[u8; 12], &[libc::c_char; 12]>(b"delete_file\0"))
@@ -697,7 +691,7 @@ unsafe extern "C" fn add_file(
                                         current_block = 10095721787123848864;
                                         break;
                                     }
-                                    if sshkey_equal_public(
+                                    if crate::sshkey::sshkey_equal_public(
                                         *((*idlist).keys).offset(i as isize),
                                         private,
                                     ) == 0
@@ -864,7 +858,7 @@ unsafe extern "C" fn add_file(
                                                             certpath,
                                                         );
                                                     }
-                                                } else if sshkey_equal_public(cert, private) == 0 {
+                                                } else if crate::sshkey::sshkey_equal_public(cert, private) == 0 {
                                                     crate::log::sshlog(
                                                         b"ssh-add.c\0" as *const u8 as *const libc::c_char,
                                                         (*::core::mem::transmute::<
@@ -1606,7 +1600,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
                 ((*dch).nkeys).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,
                 ::core::mem::size_of::<libc::c_int>() as libc::c_ulong,
             ) as *mut libc::c_int;
-            r = sshkey_from_private(
+            r = crate::sshkey::sshkey_from_private(
                 (*hke).key,
                 &mut *((*dch).keys).offset((*dch).nkeys as isize),
             );
@@ -1621,7 +1615,7 @@ unsafe extern "C" fn parse_dest_constraint_hop(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     ssh_err(r),
-                    b"sshkey_from_private\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshkey::sshkey_from_private\0" as *const u8 as *const libc::c_char,
                 );
             }
             *((*dch).key_is_ca).offset((*dch).nkeys as isize) = want_ca;

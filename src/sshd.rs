@@ -285,10 +285,7 @@ extern "C" {
     fn ssh_digest_final(ctx: *mut ssh_digest_ctx, d: *mut u_char, dlen: size_t) -> libc::c_int;
     fn ssh_digest_free(ctx: *mut ssh_digest_ctx);
 
-    fn sshkey_equal_public(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
@@ -299,10 +296,7 @@ extern "C" {
         _: sshkey_fp_rep,
     ) -> *mut libc::c_char;
     fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_from_private(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_shield_private(_: *mut crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
@@ -1375,7 +1369,7 @@ pub unsafe extern "C" fn demote_sensitive_data() {
     i = 0 as libc::c_int as u_int;
     while i < options.num_host_key_files {
         if !(*(sensitive_data.host_keys).offset(i as isize)).is_null() {
-            r = sshkey_from_private(*(sensitive_data.host_keys).offset(i as isize), &mut tmp);
+            r = crate::sshkey::sshkey_from_private(*(sensitive_data.host_keys).offset(i as isize), &mut tmp);
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"sshd.c\0" as *const u8 as *const libc::c_char,
@@ -4263,7 +4257,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                 }
             }
             if pubkey.is_null() && !key.is_null() {
-                r = sshkey_from_private(key, &mut pubkey);
+                r = crate::sshkey::sshkey_from_private(key, &mut pubkey);
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"sshd.c\0" as *const u8 as *const libc::c_char,
@@ -4446,7 +4440,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             } else {
                 j = 0 as libc::c_int as u_int;
                 while j < options.num_host_key_files {
-                    if sshkey_equal_public(key, *(sensitive_data.host_pubkeys).offset(j as isize))
+                    if crate::sshkey::sshkey_equal_public(key, *(sensitive_data.host_pubkeys).offset(j as isize))
                         != 0
                     {
                         let ref mut fresh12 =

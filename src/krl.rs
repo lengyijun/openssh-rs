@@ -76,10 +76,7 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
     fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_from_private(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_drop_cert(_: *mut crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
@@ -2001,7 +1998,7 @@ unsafe extern "C" fn revoked_certs_for_ca_key(
     if ca_key.is_null() {
         (*rc).ca_key = 0 as *mut crate::sshkey::sshkey;
     } else {
-        r = sshkey_from_private(ca_key, &mut (*rc).ca_key);
+        r = crate::sshkey::sshkey_from_private(ca_key, &mut (*rc).ca_key);
         if r != 0 as libc::c_int {
             libc::free(rc as *mut libc::c_void);
             return r;
@@ -2163,7 +2160,7 @@ unsafe extern "C" fn plain_key_blob(
 ) -> libc::c_int {
     let mut kcopy: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
     let mut r: libc::c_int = 0;
-    r = sshkey_from_private(key, &mut kcopy);
+    r = crate::sshkey::sshkey_from_private(key, &mut kcopy);
     if r != 0 as libc::c_int {
         return r;
     }

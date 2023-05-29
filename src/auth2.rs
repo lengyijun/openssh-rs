@@ -60,18 +60,9 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshkey_equal_public(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn sshkey_from_private(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn sshkey_format_text(
-        _: *const crate::sshkey::sshkey,
-        _: *mut crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
+
+
+
     fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_fingerprint(
         _: *const crate::sshkey::sshkey,
@@ -1657,7 +1648,7 @@ pub unsafe extern "C" fn auth2_record_key(
     let mut tmp: *mut *mut crate::sshkey::sshkey = 0 as *mut *mut crate::sshkey::sshkey;
     let mut dup: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
     let mut r: libc::c_int = 0;
-    r = sshkey_from_private(key, &mut dup);
+    r = crate::sshkey::sshkey_from_private(key, &mut dup);
     if r != 0 as libc::c_int {
         sshfatal(
             b"auth2.c\0" as *const u8 as *const libc::c_char,
@@ -1675,7 +1666,7 @@ pub unsafe extern "C" fn auth2_record_key(
     if authenticated == 0 {
         return;
     }
-    r = sshkey_from_private(key, &mut dup);
+    r = crate::sshkey::sshkey_from_private(key, &mut dup);
     if r != 0 as libc::c_int {
         sshfatal(
             b"auth2.c\0" as *const u8 as *const libc::c_char,
@@ -1722,7 +1713,7 @@ pub unsafe extern "C" fn auth2_key_already_used(
     let mut fp: *mut libc::c_char = 0 as *mut libc::c_char;
     i = 0 as libc::c_int as u_int;
     while i < (*authctxt).nprev_keys {
-        if sshkey_equal_public(key, *((*authctxt).prev_keys).offset(i as isize)) != 0 {
+        if crate::sshkey::sshkey_equal_public(key, *((*authctxt).prev_keys).offset(i as isize)) != 0 {
             fp = sshkey_fingerprint(
                 *((*authctxt).prev_keys).offset(i as isize),
                 options.fingerprint_hash,
@@ -1812,7 +1803,7 @@ pub unsafe extern "C" fn auth2_update_session_info(
             ' ' as i32 as u_char,
         );
         if r != 0 as libc::c_int || {
-            r = sshkey_format_text((*authctxt).auth_method_key, (*authctxt).session_info);
+            r = crate::sshkey::sshkey_format_text((*authctxt).auth_method_key, (*authctxt).session_info);
             r != 0 as libc::c_int
         } {
             sshfatal(

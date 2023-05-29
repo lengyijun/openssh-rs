@@ -20,10 +20,7 @@ extern "C" {
     );
     fn DH_free(dh: *mut DH);
     fn BN_clear_free(a: *mut BIGNUM);
-    fn sshkey_from_private(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_putb(_: *const crate::sshkey::sshkey, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
     fn kex_load_hostkey(
         _: *mut ssh,
@@ -550,7 +547,7 @@ unsafe extern "C" fn input_kex_dh_gex_init(
                                             r != 0 as libc::c_int
                                         }) {
                                             ((*kex).initial_hostkey).is_null() && {
-                                                r = sshkey_from_private(
+                                                r = crate::sshkey::sshkey_from_private(
                                                     server_host_public,
                                                     &mut (*kex).initial_hostkey,
                                                 );

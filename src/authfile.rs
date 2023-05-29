@@ -41,10 +41,7 @@ extern "C" {
         _: *const crate::sshkey::sshkey,
         _: *const crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_equal_public(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_to_certified(_: *mut crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_cert_copy(
         _: *const crate::sshkey::sshkey,
@@ -530,7 +527,7 @@ pub unsafe extern "C" fn sshkey_load_private_cert(
         r = sshkey_load_cert(filename, &mut cert);
         r != 0 as libc::c_int
     }) {
-        if sshkey_equal_public(key, cert) == 0 as libc::c_int {
+        if crate::sshkey::sshkey_equal_public(key, cert) == 0 as libc::c_int {
             r = -(45 as libc::c_int);
         } else {
             r = sshkey_to_certified(key);
@@ -578,7 +575,7 @@ pub unsafe extern "C" fn sshkey_in_file(
         )
     } else {
         Some(
-            sshkey_equal_public
+            crate::sshkey::sshkey_equal_public
                 as unsafe extern "C" fn(
                     *const crate::sshkey::sshkey,
                     *const crate::sshkey::sshkey,

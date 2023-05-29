@@ -25,10 +25,7 @@ extern "C" {
         _: *mut crate::sshbuf::sshbuf,
         _: *mut *mut crate::sshkey::sshkey,
     ) -> libc::c_int;
-    fn sshkey_from_private(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
 
     fn kex_verify_host_key(_: *mut ssh, _: *mut crate::sshkey::sshkey) -> libc::c_int;
     fn kex_load_hostkey(
@@ -777,7 +774,7 @@ unsafe extern "C" fn input_kex_gen_init(
                                         r != 0 as libc::c_int
                                     }) {
                                         ((*kex).initial_hostkey).is_null() && {
-                                            r = sshkey_from_private(
+                                            r = crate::sshkey::sshkey_from_private(
                                                 server_host_public,
                                                 &mut (*kex).initial_hostkey,
                                             );

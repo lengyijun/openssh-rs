@@ -20,10 +20,7 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshkey_equal_public(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_fingerprint(
         _: *const crate::sshkey::sshkey,
         _: libc::c_int,
@@ -997,7 +994,7 @@ unsafe fn main_0(mut _argc: libc::c_int, mut _argv: *mut *mut libc::c_char) -> l
     found = 0 as libc::c_int;
     i = 0 as libc::c_int;
     while i < 5 as libc::c_int {
-        if !(keys[i as usize]).is_null() && sshkey_equal_public(key, keys[i as usize]) != 0 {
+        if !(keys[i as usize]).is_null() && crate::sshkey::sshkey_equal_public(key, keys[i as usize]) != 0 {
             found = 1 as libc::c_int;
             break;
         } else {

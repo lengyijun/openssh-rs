@@ -124,10 +124,7 @@ extern "C" {
         _: *const libc::c_char,
         _: *mut *const libc::c_char,
     ) -> libc::c_int;
-    fn sshkey_equal_public(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_equal(
         _: *const crate::sshkey::sshkey,
@@ -2258,7 +2255,7 @@ unsafe extern "C" fn check_allowed_keys_line(
             current_block = 4956146061682418353;
         } else if (*sigopts).ca != 0
             && sshkey_is_cert(sign_key) != 0
-            && sshkey_equal_public((*(*sign_key).cert).signature_key, found_key) != 0
+            && crate::sshkey::sshkey_equal_public((*(*sign_key).cert).signature_key, found_key) != 0
         {
             if !principal.is_null() {
                 r = sshkey_cert_check_authority(

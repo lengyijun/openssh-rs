@@ -128,10 +128,7 @@ extern "C" {
         _: sshkey_fp_rep,
     ) -> *mut libc::c_char;
     fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_from_private(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
+
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
     fn sshkey_drop_cert(_: *mut crate::sshkey::sshkey) -> libc::c_int;
@@ -3902,7 +3899,7 @@ unsafe extern "C" fn check_host_key(
                 0 as *const libc::c_char,
                 b"No matching CA found. Retry with plain key\0" as *const u8 as *const libc::c_char,
             );
-            r = sshkey_from_private(host_key, &mut raw_key);
+            r = crate::sshkey::sshkey_from_private(host_key, &mut raw_key);
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"sshconnect.c\0" as *const u8 as *const libc::c_char,
@@ -4212,7 +4209,7 @@ pub unsafe extern "C" fn verify_host_key(
                         18082163382412822748 => {}
                         _ => {
                             if options.verify_host_key_dns != 0 {
-                                r = sshkey_from_private(host_key, &mut plain);
+                                r = crate::sshkey::sshkey_from_private(host_key, &mut plain);
                                 if r != 0 as libc::c_int {
                                     current_block = 18082163382412822748;
                                 } else {
@@ -4291,7 +4288,7 @@ pub unsafe extern "C" fn verify_host_key(
     libc::free(cafp as *mut libc::c_void);
     if r == 0 as libc::c_int && !host_key.is_null() {
         crate::sshkey::sshkey_free(previous_host_key);
-        r = sshkey_from_private(host_key, &mut previous_host_key);
+        r = crate::sshkey::sshkey_from_private(host_key, &mut previous_host_key);
     }
     return r;
 }
