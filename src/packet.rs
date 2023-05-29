@@ -1,5 +1,6 @@
 use crate::channels::ssh_channels;
 use crate::cipher::sshcipher;
+use crate::cipher::sshcipher_ctx;
 use crate::kex::dh_st;
 use crate::kex::kex;
 use crate::kex::newkeys;
@@ -26,7 +27,7 @@ extern "C" {
     pub type ec_group_st;
 
     pub type internal_state;
-    pub type sshcipher_ctx;
+
     pub type bignum_st;
     pub type ec_point_st;
     fn getpeername(__fd: libc::c_int, __addr: __SOCKADDR_ARG, __len: *mut socklen_t)
