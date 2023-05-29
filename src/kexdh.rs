@@ -1,6 +1,6 @@
-use crate::hmac::ssh_hmac_ctx;
+use crate::mac::sshmac;
+
 use crate::kex::sshenc;
-use crate::umac::umac_ctx;
 
 use ::libc;
 extern "C" {
@@ -53,19 +53,6 @@ pub type DH = dh_st;
 
 pub type EC_GROUP = ec_group_st;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshmac {
-    pub name: *mut libc::c_char,
-    pub enabled: libc::c_int,
-    pub mac_len: u_int,
-    pub key: *mut u_char,
-    pub key_len: u_int,
-    pub type_0: libc::c_int,
-    pub etm: libc::c_int,
-    pub hmac_ctx: *mut ssh_hmac_ctx,
-    pub umac_ctx: *mut umac_ctx,
-}
 pub type kex_exchange = libc::c_uint;
 pub const KEX_MAX: kex_exchange = 10;
 pub const KEX_KEM_SNTRUP761X25519_SHA512: kex_exchange = 9;

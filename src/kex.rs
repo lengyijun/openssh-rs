@@ -2,9 +2,10 @@ use crate::atomicio::atomicio;
 use crate::channels::ssh_channels;
 use crate::cipher::sshcipher;
 use crate::digest_openssl::ssh_digest_ctx;
-use crate::hmac::ssh_hmac_ctx;
+use crate::mac::sshmac;
+
 use crate::packet::session_state;
-use crate::umac::umac_ctx;
+
 use ::libc;
 
 extern "C" {
@@ -260,19 +261,7 @@ pub struct sshcomp {
     pub enabled: libc::c_int,
     pub name: *mut libc::c_char,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshmac {
-    pub name: *mut libc::c_char,
-    pub enabled: libc::c_int,
-    pub mac_len: u_int,
-    pub key: *mut u_char,
-    pub key_len: u_int,
-    pub type_0: libc::c_int,
-    pub etm: libc::c_int,
-    pub hmac_ctx: *mut ssh_hmac_ctx,
-    pub umac_ctx: *mut umac_ctx,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshenc {
