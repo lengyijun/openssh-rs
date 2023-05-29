@@ -44,7 +44,6 @@ extern "C" {
 
     fn fakepw() -> *mut libc::passwd;
     static mut use_privsep: libc::c_int;
-    fn mm_inform_authserv(_: *mut libc::c_char, _: *mut libc::c_char);
 
     static mut options: ServerOptions;
     static mut method_none: Authmethod;
@@ -807,7 +806,7 @@ unsafe extern "C" fn input_userauth_request(
                 0 as *mut libc::c_char
             };
             if use_privsep != 0 {
-                mm_inform_authserv(service, style);
+                crate::monitor_wrap::mm_inform_authserv(service, style);
             }
             userauth_banner(ssh);
             if auth2_setup_methods_lists(authctxt) != 0 as libc::c_int {
