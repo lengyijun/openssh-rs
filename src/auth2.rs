@@ -28,8 +28,6 @@ extern "C" {
         __remaining: *mut libc::timespec,
     ) -> libc::c_int;
 
-    fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
-
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
@@ -460,7 +458,7 @@ pub unsafe extern "C" fn do_authentication2(mut ssh: *mut ssh) {
     crate::dispatch::ssh_dispatch_init(
         ssh,
         Some(
-            dispatch_protocol_error
+            crate::dispatch::dispatch_protocol_error
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );

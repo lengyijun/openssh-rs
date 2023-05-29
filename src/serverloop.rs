@@ -69,7 +69,6 @@ extern "C" {
     fn ssh_packet_is_rekeying(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_get_connection_out(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
-    fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
 
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -2539,7 +2538,7 @@ unsafe extern "C" fn server_init_dispatch(mut ssh: *mut ssh) {
     crate::dispatch::ssh_dispatch_init(
         ssh,
         Some(
-            dispatch_protocol_error
+            crate::dispatch::dispatch_protocol_error
                 as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
         ),
     );
