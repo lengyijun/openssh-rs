@@ -120,8 +120,6 @@ extern "C" {
 
     fn sshbuf_set_max_size(buf: *mut crate::sshbuf::sshbuf, max_size: size_t) -> libc::c_int;
 
-    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-
     fn ssh_packet_is_rekeying(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_log_type(_: u_char) -> libc::c_int;
     fn sshpkt_msg_ignore(_: *mut ssh, _: u_int) -> libc::c_int;
@@ -6412,7 +6410,7 @@ pub unsafe extern "C" fn channel_proxy_downstream(
     }
     match type_0 as libc::c_int {
         90 => {
-            original = sshbuf_from(cp as *const libc::c_void, have);
+            original = crate::sshbuf::sshbuf_from(cp as *const libc::c_void, have);
             if original.is_null() || {
                 modified = crate::sshbuf::sshbuf_new();
                 modified.is_null()
@@ -6504,7 +6502,7 @@ pub unsafe extern "C" fn channel_proxy_downstream(
             }
         }
         91 => {
-            original = sshbuf_from(cp as *const libc::c_void, have);
+            original = crate::sshbuf::sshbuf_from(cp as *const libc::c_void, have);
             if original.is_null() || {
                 modified = crate::sshbuf::sshbuf_new();
                 modified.is_null()
@@ -6594,7 +6592,7 @@ pub unsafe extern "C" fn channel_proxy_downstream(
             }
         }
         80 => {
-            original = sshbuf_from(cp as *const libc::c_void, have);
+            original = crate::sshbuf::sshbuf_from(cp as *const libc::c_void, have);
             if original.is_null() {
                 crate::log::sshlog(
                     b"channels.c\0" as *const u8 as *const libc::c_char,

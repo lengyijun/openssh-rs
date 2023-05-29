@@ -30,8 +30,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
 }
 pub type __u_char = libc::c_uchar;
@@ -479,7 +477,7 @@ unsafe extern "C" fn ssh_ed25519_verify(
     {
         return -(10 as libc::c_int);
     }
-    b = sshbuf_from(sig as *const libc::c_void, siglen);
+    b = crate::sshbuf::sshbuf_from(sig as *const libc::c_void, siglen);
     if b.is_null() {
         return -(2 as libc::c_int);
     }

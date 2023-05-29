@@ -22,7 +22,6 @@ extern "C" {
     fn ECDSA_SIG_free(sig: *mut ECDSA_SIG);
     fn ECDSA_SIG_new() -> *mut ECDSA_SIG;
 
-    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
@@ -355,7 +354,7 @@ unsafe extern "C" fn webauthn_check_prepare_hash(
     let mut m: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     m = crate::sshbuf::sshbuf_new();
     if m.is_null() || {
-        chall = sshbuf_from(data as *const libc::c_void, datalen);
+        chall = crate::sshbuf::sshbuf_from(data as *const libc::c_void, datalen);
         chall.is_null()
     } {
         r = -(2 as libc::c_int);
@@ -464,7 +463,7 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
     if (*key).ecdsa_nid != 415 as libc::c_int {
         return -(1 as libc::c_int);
     }
-    b = sshbuf_from(sig as *const libc::c_void, siglen);
+    b = crate::sshbuf::sshbuf_from(sig as *const libc::c_void, siglen);
     if b.is_null() {
         return -(2 as libc::c_int);
     }

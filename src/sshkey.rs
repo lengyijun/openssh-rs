@@ -182,7 +182,6 @@ extern "C" {
     ) -> libc::c_int;
     fn format_absolute_time(_: uint64_t, _: *mut libc::c_char, _: size_t);
 
-    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
@@ -2942,7 +2941,7 @@ pub unsafe extern "C" fn sshkey_from_blob(
 ) -> libc::c_int {
     let mut b: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut r: libc::c_int = 0;
-    b = sshbuf_from(blob as *const libc::c_void, blen);
+    b = crate::sshbuf::sshbuf_from(blob as *const libc::c_void, blen);
     if b.is_null() {
         return -(2 as libc::c_int);
     }
@@ -2981,7 +2980,7 @@ pub unsafe extern "C" fn sshkey_get_sigtype(
     if !sigtypep.is_null() {
         *sigtypep = 0 as *mut libc::c_char;
     }
-    b = sshbuf_from(sig as *const libc::c_void, siglen);
+    b = crate::sshbuf::sshbuf_from(sig as *const libc::c_void, siglen);
     if b.is_null() {
         return -(2 as libc::c_int);
     }

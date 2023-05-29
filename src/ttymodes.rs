@@ -35,8 +35,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -2049,7 +2047,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
     if len == 0 as libc::c_int as libc::c_ulong {
         return;
     }
-    buf = sshbuf_from(data as *const libc::c_void, len);
+    buf = crate::sshbuf::sshbuf_from(data as *const libc::c_void, len);
     if buf.is_null() {
         crate::log::sshlog(
             b"ttymodes.c\0" as *const u8 as *const libc::c_char,
@@ -2059,7 +2057,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
             1 as libc::c_int,
             SYSLOG_LEVEL_ERROR,
             0 as *const libc::c_char,
-            b"sshbuf_from failed\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf::sshbuf_from failed\0" as *const u8 as *const libc::c_char,
         );
         return;
     }

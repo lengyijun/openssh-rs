@@ -41,8 +41,6 @@ extern "C" {
     ) -> libc::c_int;
     fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
 
-    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-
     fn sshbuf_get_string_direct(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *const u_char,
@@ -356,7 +354,7 @@ unsafe extern "C" fn valid_request(
         *pkalgp = 0 as *mut libc::c_char;
     }
     fail = 0 as libc::c_int;
-    b = sshbuf_from(data as *const libc::c_void, datalen);
+    b = crate::sshbuf::sshbuf_from(data as *const libc::c_void, datalen);
     if b.is_null() {
         sshfatal(
             b"ssh-keysign.c\0" as *const u8 as *const libc::c_char,
@@ -366,7 +364,7 @@ unsafe extern "C" fn valid_request(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_from failed\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf::sshbuf_from failed\0" as *const u8 as *const libc::c_char,
         );
     }
     r = crate::sshbuf_getput_basic::sshbuf_get_string(b, 0 as *mut *mut u_char, &mut len);

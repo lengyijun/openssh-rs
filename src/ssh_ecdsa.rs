@@ -46,7 +46,6 @@ extern "C" {
     ) -> libc::c_int;
     fn EC_GROUP_cmp(a: *const EC_GROUP, b: *const EC_GROUP, ctx: *mut BN_CTX) -> libc::c_int;
 
-    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
@@ -578,7 +577,7 @@ unsafe extern "C" fn ssh_ecdsa_verify(
     } {
         return -(1 as libc::c_int);
     }
-    b = sshbuf_from(sig as *const libc::c_void, siglen);
+    b = crate::sshbuf::sshbuf_from(sig as *const libc::c_void, siglen);
     if b.is_null() {
         return -(2 as libc::c_int);
     }

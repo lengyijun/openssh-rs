@@ -52,8 +52,6 @@ extern "C" {
 
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
-    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-
     fn sshbuf_put_bignum2(buf: *mut crate::sshbuf::sshbuf, v: *const BIGNUM) -> libc::c_int;
     fn sshbuf_get_bignum2(buf: *mut crate::sshbuf::sshbuf, valp: *mut *mut BIGNUM) -> libc::c_int;
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
@@ -649,7 +647,7 @@ unsafe extern "C" fn ssh_dss_verify(
     if hlen == 0 as libc::c_int as libc::c_ulong {
         return -(1 as libc::c_int);
     }
-    b = sshbuf_from(sig as *const libc::c_void, siglen);
+    b = crate::sshbuf::sshbuf_from(sig as *const libc::c_void, siglen);
     if b.is_null() {
         return -(2 as libc::c_int);
     }

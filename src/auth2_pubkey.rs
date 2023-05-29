@@ -38,8 +38,6 @@ extern "C" {
     fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
     fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
 
-    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
@@ -820,7 +818,7 @@ unsafe extern "C" fn userauth_pubkey(
     if log_level_get() as libc::c_int >= SYSLOG_LEVEL_DEBUG2 as libc::c_int {
         let mut keystring: *mut libc::c_char = 0 as *mut libc::c_char;
         let mut pkbuf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
-        pkbuf = sshbuf_from(pkblob as *const libc::c_void, blen);
+        pkbuf = crate::sshbuf::sshbuf_from(pkblob as *const libc::c_void, blen);
         if pkbuf.is_null() {
             sshfatal(
                 b"auth2-pubkey.c\0" as *const u8 as *const libc::c_char,
@@ -830,7 +828,7 @@ unsafe extern "C" fn userauth_pubkey(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"sshbuf_from failed\0" as *const u8 as *const libc::c_char,
+                b"crate::sshbuf::sshbuf_from failed\0" as *const u8 as *const libc::c_char,
             );
         }
         keystring = sshbuf_dtob64_string(pkbuf, 0 as libc::c_int);

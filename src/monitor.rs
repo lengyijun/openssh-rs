@@ -88,8 +88,6 @@ extern "C" {
     ) -> libc::c_int;
     fn sshkey_sig_details_free(_: *mut sshkey_sig_details);
 
-    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
-
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
         len: size_t,
@@ -3159,7 +3157,7 @@ unsafe extern "C" fn monitor_valid_userblob(
     let mut hostbound: libc::c_int = 0 as libc::c_int;
     let mut r: libc::c_int = 0;
     let mut fail: libc::c_int = 0 as libc::c_int;
-    b = sshbuf_from(data as *const libc::c_void, datalen as size_t);
+    b = crate::sshbuf::sshbuf_from(data as *const libc::c_void, datalen as size_t);
     if b.is_null() {
         sshfatal(
             b"monitor.c\0" as *const u8 as *const libc::c_char,
@@ -3171,7 +3169,7 @@ unsafe extern "C" fn monitor_valid_userblob(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_from\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf::sshbuf_from\0" as *const u8 as *const libc::c_char,
         );
     }
     if (*ssh).compat & 0x10 as libc::c_int != 0 {
@@ -3413,7 +3411,7 @@ unsafe extern "C" fn monitor_valid_hostbasedblob(
     let mut r: libc::c_int = 0;
     let mut fail: libc::c_int = 0 as libc::c_int;
     let mut type_0: u_char = 0;
-    b = sshbuf_from(data as *const libc::c_void, datalen as size_t);
+    b = crate::sshbuf::sshbuf_from(data as *const libc::c_void, datalen as size_t);
     if b.is_null() {
         sshfatal(
             b"monitor.c\0" as *const u8 as *const libc::c_char,
