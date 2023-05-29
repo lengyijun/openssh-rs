@@ -7,9 +7,6 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
 
-    pub type dsa_st;
-    pub type rsa_st;
-    pub type ec_key_st;
     pub type ssh_digest_ctx;
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
 
@@ -79,7 +76,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn sshkey_free(_: *mut sshkey);
+    fn sshkey_free(_: *mut crate::sshkey::sshkey);
     fn sshkey_names_valid2(_: *const libc::c_char, _: libc::c_int) -> libc::c_int;
     fn sshkey_alg_list(
         _: libc::c_int,
@@ -232,9 +229,6 @@ pub const _ISalpha: C2RustUnnamed = 1024;
 pub const _ISlower: C2RustUnnamed = 512;
 pub const _ISupper: C2RustUnnamed = 256;
 
-pub type DSA = dsa_st;
-pub type RSA = rsa_st;
-pub type EC_KEY = ec_key_st;
 pub type SyslogFacility = libc::c_int;
 pub const SYSLOG_FACILITY_NOT_SET: SyslogFacility = -1;
 pub const SYSLOG_FACILITY_LOCAL7: SyslogFacility = 10;
@@ -258,48 +252,7 @@ pub const SYSLOG_LEVEL_INFO: LogLevel = 3;
 pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_cert {
-    pub certblob: *mut crate::sshbuf::sshbuf,
-    pub type_0: u_int,
-    pub serial: u_int64_t,
-    pub key_id: *mut libc::c_char,
-    pub nprincipals: u_int,
-    pub principals: *mut *mut libc::c_char,
-    pub valid_after: u_int64_t,
-    pub valid_before: u_int64_t,
-    pub critical: *mut crate::sshbuf::sshbuf,
-    pub extensions: *mut crate::sshbuf::sshbuf,
-    pub signature_key: *mut sshkey,
-    pub signature_type: *mut libc::c_char,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey {
-    pub type_0: libc::c_int,
-    pub flags: libc::c_int,
-    pub rsa: *mut RSA,
-    pub dsa: *mut DSA,
-    pub ecdsa_nid: libc::c_int,
-    pub ecdsa: *mut EC_KEY,
-    pub ed25519_sk: *mut u_char,
-    pub ed25519_pk: *mut u_char,
-    pub xmss_name: *mut libc::c_char,
-    pub xmss_filename: *mut libc::c_char,
-    pub xmss_state: *mut libc::c_void,
-    pub xmss_sk: *mut u_char,
-    pub xmss_pk: *mut u_char,
-    pub sk_application: *mut libc::c_char,
-    pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
-    pub sk_reserved: *mut crate::sshbuf::sshbuf,
-    pub cert: *mut sshkey_cert,
-    pub shielded_private: *mut u_char,
-    pub shielded_len: size_t,
-    pub shield_prekey: *mut u_char,
-    pub shield_prekey_len: size_t,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct Forward {
@@ -384,11 +337,11 @@ pub struct Options {
     pub num_identity_files: libc::c_int,
     pub identity_files: [*mut libc::c_char; 100],
     pub identity_file_userprovided: [libc::c_int; 100],
-    pub identity_keys: [*mut sshkey; 100],
+    pub identity_keys: [*mut crate::sshkey::sshkey; 100],
     pub num_certificate_files: libc::c_int,
     pub certificate_files: [*mut libc::c_char; 100],
     pub certificate_file_userprovided: [libc::c_int; 100],
-    pub certificates: [*mut sshkey; 100],
+    pub certificates: [*mut crate::sshkey::sshkey; 100],
     pub add_keys_to_agent: libc::c_int,
     pub add_keys_to_agent_lifespan: libc::c_int,
     pub identity_agent: *mut libc::c_char,
@@ -6146,13 +6099,13 @@ pub unsafe extern "C" fn initialize_options(mut options: *mut Options) {
     memset(
         ((*options).identity_keys).as_mut_ptr() as *mut libc::c_void,
         0 as libc::c_int,
-        ::core::mem::size_of::<[*mut sshkey; 100]>() as libc::c_ulong,
+        ::core::mem::size_of::<[*mut crate::sshkey::sshkey; 100]>() as libc::c_ulong,
     );
     (*options).num_certificate_files = 0 as libc::c_int;
     memset(
         ((*options).certificates).as_mut_ptr() as *mut libc::c_void,
         0 as libc::c_int,
-        ::core::mem::size_of::<[*mut sshkey; 100]>() as libc::c_ulong,
+        ::core::mem::size_of::<[*mut crate::sshkey::sshkey; 100]>() as libc::c_ulong,
     );
     (*options).hostname = 0 as *mut libc::c_char;
     (*options).host_key_alias = 0 as *mut libc::c_char;

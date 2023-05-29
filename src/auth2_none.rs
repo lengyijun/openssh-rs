@@ -2,9 +2,6 @@ use ::libc;
 extern "C" {
     pub type ssh_channels;
 
-    pub type ec_key_st;
-    pub type dsa_st;
-    pub type rsa_st;
     pub type kex;
     pub type session_state;
     fn auth_password(_: *mut ssh, _: *const libc::c_char) -> libc::c_int;
@@ -90,53 +87,9 @@ pub struct C2RustUnnamed {
 #[repr(C)]
 pub struct key_entry {
     pub next: C2RustUnnamed_0,
-    pub key: *mut sshkey,
+    pub key: *mut crate::sshkey::sshkey,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey {
-    pub type_0: libc::c_int,
-    pub flags: libc::c_int,
-    pub rsa: *mut RSA,
-    pub dsa: *mut DSA,
-    pub ecdsa_nid: libc::c_int,
-    pub ecdsa: *mut EC_KEY,
-    pub ed25519_sk: *mut u_char,
-    pub ed25519_pk: *mut u_char,
-    pub xmss_name: *mut libc::c_char,
-    pub xmss_filename: *mut libc::c_char,
-    pub xmss_state: *mut libc::c_void,
-    pub xmss_sk: *mut u_char,
-    pub xmss_pk: *mut u_char,
-    pub sk_application: *mut libc::c_char,
-    pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
-    pub sk_reserved: *mut crate::sshbuf::sshbuf,
-    pub cert: *mut sshkey_cert,
-    pub shielded_private: *mut u_char,
-    pub shielded_len: size_t,
-    pub shield_prekey: *mut u_char,
-    pub shield_prekey_len: size_t,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_cert {
-    pub certblob: *mut crate::sshbuf::sshbuf,
-    pub type_0: u_int,
-    pub serial: u_int64_t,
-    pub key_id: *mut libc::c_char,
-    pub nprincipals: u_int,
-    pub principals: *mut *mut libc::c_char,
-    pub valid_after: u_int64_t,
-    pub valid_before: u_int64_t,
-    pub critical: *mut crate::sshbuf::sshbuf,
-    pub extensions: *mut crate::sshbuf::sshbuf,
-    pub signature_key: *mut sshkey,
-    pub signature_type: *mut libc::c_char,
-}
-pub type EC_KEY = ec_key_st;
-pub type DSA = dsa_st;
-pub type RSA = rsa_st;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_0 {

@@ -2,9 +2,6 @@ use ::libc;
 extern "C" {
     pub type ssh_channels;
 
-    pub type ec_key_st;
-    pub type dsa_st;
-    pub type rsa_st;
     pub type ec_group_st;
     pub type dh_st;
     pub type umac_ctx;
@@ -182,15 +179,19 @@ extern "C" {
     ) -> libc::c_int;
     fn channel_cancel_rport_listener(_: *mut ssh, _: *mut Forward) -> libc::c_int;
     fn chan_rcvd_eow(_: *mut ssh, _: *mut Channel);
-    fn sshkey_free(_: *mut sshkey);
-    fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
+    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
-    fn sshkey_from_blob(_: *const u_char, _: size_t, _: *mut *mut sshkey) -> libc::c_int;
-    fn sshkey_puts(_: *const sshkey, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
+    fn sshkey_from_blob(
+        _: *const u_char,
+        _: size_t,
+        _: *mut *mut crate::sshkey::sshkey,
+    ) -> libc::c_int;
+    fn sshkey_puts(_: *const crate::sshkey::sshkey, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
     fn kex_input_kexinit(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
-    fn get_hostkey_by_index(_: libc::c_int) -> *mut sshkey;
-    fn get_hostkey_public_by_index(_: libc::c_int, _: *mut ssh) -> *mut sshkey;
+    fn get_hostkey_by_index(_: libc::c_int) -> *mut crate::sshkey::sshkey;
+    fn get_hostkey_public_by_index(_: libc::c_int, _: *mut ssh) -> *mut crate::sshkey::sshkey;
     fn session_open(_: *mut Authctxt, _: libc::c_int) -> libc::c_int;
     fn session_input_channel_req(
         _: *mut ssh,
@@ -363,53 +364,9 @@ pub struct C2RustUnnamed {
 #[repr(C)]
 pub struct key_entry {
     pub next: C2RustUnnamed_0,
-    pub key: *mut sshkey,
+    pub key: *mut crate::sshkey::sshkey,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey {
-    pub type_0: libc::c_int,
-    pub flags: libc::c_int,
-    pub rsa: *mut RSA,
-    pub dsa: *mut DSA,
-    pub ecdsa_nid: libc::c_int,
-    pub ecdsa: *mut EC_KEY,
-    pub ed25519_sk: *mut u_char,
-    pub ed25519_pk: *mut u_char,
-    pub xmss_name: *mut libc::c_char,
-    pub xmss_filename: *mut libc::c_char,
-    pub xmss_state: *mut libc::c_void,
-    pub xmss_sk: *mut u_char,
-    pub xmss_pk: *mut u_char,
-    pub sk_application: *mut libc::c_char,
-    pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
-    pub sk_reserved: *mut crate::sshbuf::sshbuf,
-    pub cert: *mut sshkey_cert,
-    pub shielded_private: *mut u_char,
-    pub shielded_len: size_t,
-    pub shield_prekey: *mut u_char,
-    pub shield_prekey_len: size_t,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_cert {
-    pub certblob: *mut crate::sshbuf::sshbuf,
-    pub type_0: u_int,
-    pub serial: u_int64_t,
-    pub key_id: *mut libc::c_char,
-    pub nprincipals: u_int,
-    pub principals: *mut *mut libc::c_char,
-    pub valid_after: u_int64_t,
-    pub valid_before: u_int64_t,
-    pub critical: *mut crate::sshbuf::sshbuf,
-    pub extensions: *mut crate::sshbuf::sshbuf,
-    pub signature_key: *mut sshkey,
-    pub signature_type: *mut libc::c_char,
-}
-pub type EC_KEY = ec_key_st;
-pub type DSA = dsa_st;
-pub type RSA = rsa_st;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_0 {
@@ -443,24 +400,28 @@ pub struct kex {
     pub server_version: *mut crate::sshbuf::sshbuf,
     pub session_id: *mut crate::sshbuf::sshbuf,
     pub initial_sig: *mut crate::sshbuf::sshbuf,
-    pub initial_hostkey: *mut sshkey,
+    pub initial_hostkey: *mut crate::sshkey::sshkey,
     pub done: sig_atomic_t,
     pub flags: u_int,
     pub hash_alg: libc::c_int,
     pub ec_nid: libc::c_int,
     pub failed_choice: *mut libc::c_char,
-    pub verify_host_key: Option<unsafe extern "C" fn(*mut sshkey, *mut ssh) -> libc::c_int>,
-    pub load_host_public_key:
-        Option<unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut sshkey>,
-    pub load_host_private_key:
-        Option<unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut sshkey>,
-    pub host_key_index:
-        Option<unsafe extern "C" fn(*mut sshkey, libc::c_int, *mut ssh) -> libc::c_int>,
+    pub verify_host_key:
+        Option<unsafe extern "C" fn(*mut crate::sshkey::sshkey, *mut ssh) -> libc::c_int>,
+    pub load_host_public_key: Option<
+        unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut crate::sshkey::sshkey,
+    >,
+    pub load_host_private_key: Option<
+        unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut crate::sshkey::sshkey,
+    >,
+    pub host_key_index: Option<
+        unsafe extern "C" fn(*mut crate::sshkey::sshkey, libc::c_int, *mut ssh) -> libc::c_int,
+    >,
     pub sign: Option<
         unsafe extern "C" fn(
             *mut ssh,
-            *mut sshkey,
-            *mut sshkey,
+            *mut crate::sshkey::sshkey,
+            *mut crate::sshkey::sshkey,
             *mut *mut u_char,
             *mut size_t,
             *const u_char,
@@ -473,7 +434,7 @@ pub struct kex {
     pub min: u_int,
     pub max: u_int,
     pub nbits: u_int,
-    pub ec_client_key: *mut EC_KEY,
+    pub ec_client_key: *mut crate::sshkey::EC_KEY,
     pub ec_group: *const EC_GROUP,
     pub c25519_client_key: [u_char; 32],
     pub c25519_client_pubkey: [u_char; 32],
@@ -811,9 +772,9 @@ pub struct Authctxt {
     pub methoddata: *mut libc::c_void,
     pub kbdintctxt: *mut libc::c_void,
     pub loginmsg: *mut crate::sshbuf::sshbuf,
-    pub prev_keys: *mut *mut sshkey,
+    pub prev_keys: *mut *mut crate::sshkey::sshkey,
     pub nprev_keys: u_int,
-    pub auth_method_key: *mut sshkey,
+    pub auth_method_key: *mut crate::sshkey::sshkey,
     pub auth_method_info: *mut libc::c_char,
     pub session_info: *mut crate::sshbuf::sshbuf,
 }
@@ -2024,9 +1985,9 @@ unsafe extern "C" fn server_input_hostkeys_prove(
     let mut current_block: u64;
     let mut resp: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut sigbuf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
-    let mut key: *mut sshkey = 0 as *mut sshkey;
-    let mut key_pub: *mut sshkey = 0 as *mut sshkey;
-    let mut key_prv: *mut sshkey = 0 as *mut sshkey;
+    let mut key: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
+    let mut key_pub: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
+    let mut key_prv: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
     let mut r: libc::c_int = 0;
     let mut ndx: libc::c_int = 0;
     let mut success: libc::c_int = 0 as libc::c_int;
@@ -2064,7 +2025,7 @@ unsafe extern "C" fn server_input_hostkeys_prove(
             break;
         }
         sshkey_free(key);
-        key = 0 as *mut sshkey;
+        key = 0 as *mut crate::sshkey::sshkey;
         r = sshpkt_get_string_direct(ssh, &mut blob, &mut blen);
         if r != 0 as libc::c_int || {
             r = sshkey_from_blob(blob, blen, &mut key);

@@ -20,9 +20,6 @@ extern "C" {
     pub type _IO_marker;
     pub type ssh_channels;
 
-    pub type ec_key_st;
-    pub type dsa_st;
-    pub type rsa_st;
     pub type ec_group_st;
     pub type dh_st;
     pub type umac_ctx;
@@ -287,19 +284,32 @@ extern "C" {
     ) -> libc::c_int;
     fn ssh_digest_final(ctx: *mut ssh_digest_ctx, d: *mut u_char, dlen: size_t) -> libc::c_int;
     fn ssh_digest_free(ctx: *mut ssh_digest_ctx);
-    fn sshkey_free(_: *mut sshkey);
-    fn sshkey_equal_public(_: *const sshkey, _: *const sshkey) -> libc::c_int;
-    fn sshkey_equal(_: *const sshkey, _: *const sshkey) -> libc::c_int;
-    fn sshkey_fingerprint(_: *const sshkey, _: libc::c_int, _: sshkey_fp_rep) -> *mut libc::c_char;
-    fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
-    fn sshkey_from_private(_: *const sshkey, _: *mut *mut sshkey) -> libc::c_int;
-    fn sshkey_shield_private(_: *mut sshkey) -> libc::c_int;
-    fn sshkey_is_cert(_: *const sshkey) -> libc::c_int;
-    fn sshkey_is_sk(_: *const sshkey) -> libc::c_int;
-    fn sshkey_ssh_name(_: *const sshkey) -> *const libc::c_char;
-    fn sshkey_putb(_: *const sshkey, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
+    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+    fn sshkey_equal_public(
+        _: *const crate::sshkey::sshkey,
+        _: *const crate::sshkey::sshkey,
+    ) -> libc::c_int;
+    fn sshkey_equal(
+        _: *const crate::sshkey::sshkey,
+        _: *const crate::sshkey::sshkey,
+    ) -> libc::c_int;
+    fn sshkey_fingerprint(
+        _: *const crate::sshkey::sshkey,
+        _: libc::c_int,
+        _: sshkey_fp_rep,
+    ) -> *mut libc::c_char;
+    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
+    fn sshkey_from_private(
+        _: *const crate::sshkey::sshkey,
+        _: *mut *mut crate::sshkey::sshkey,
+    ) -> libc::c_int;
+    fn sshkey_shield_private(_: *mut crate::sshkey::sshkey) -> libc::c_int;
+    fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
+    fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
+    fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
+    fn sshkey_putb(_: *const crate::sshkey::sshkey, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
     fn sshkey_sign(
-        _: *mut sshkey,
+        _: *mut crate::sshkey::sshkey,
         _: *mut *mut u_char,
         _: *mut size_t,
         _: *const u_char,
@@ -309,8 +319,11 @@ extern "C" {
         _: *const libc::c_char,
         _: u_int,
     ) -> libc::c_int;
-    fn sshkey_private_serialize(key: *mut sshkey, buf: *mut crate::sshbuf::sshbuf) -> libc::c_int;
-    fn sshkey_check_rsa_length(_: *const sshkey, _: libc::c_int) -> libc::c_int;
+    fn sshkey_private_serialize(
+        key: *mut crate::sshkey::sshkey,
+        buf: *mut crate::sshbuf::sshbuf,
+    ) -> libc::c_int;
+    fn sshkey_check_rsa_length(_: *const crate::sshkey::sshkey, _: libc::c_int) -> libc::c_int;
     fn kex_proposal_populate_entries(
         _: *mut ssh,
         prop: *mut *mut libc::c_char,
@@ -331,13 +344,13 @@ extern "C" {
     fn kex_gen_server(_: *mut ssh) -> libc::c_int;
     fn sshkey_load_public(
         _: *const libc::c_char,
-        _: *mut *mut sshkey,
+        _: *mut *mut crate::sshkey::sshkey,
         _: *mut *mut libc::c_char,
     ) -> libc::c_int;
     fn sshkey_load_private(
         _: *const libc::c_char,
         _: *const libc::c_char,
-        _: *mut *mut sshkey,
+        _: *mut *mut crate::sshkey::sshkey,
         _: *mut *mut libc::c_char,
     ) -> libc::c_int;
 
@@ -352,7 +365,7 @@ extern "C" {
     fn ssh_get_authentication_socket(fdp: *mut libc::c_int) -> libc::c_int;
     fn ssh_agent_sign(
         sock: libc::c_int,
-        key: *const sshkey,
+        key: *const crate::sshkey::sshkey,
         sigp: *mut *mut u_char,
         lenp: *mut size_t,
         data: *const u_char,
@@ -376,7 +389,7 @@ extern "C" {
     fn mm_log_handler(_: LogLevel, _: libc::c_int, _: *const libc::c_char, _: *mut libc::c_void);
     fn mm_sshkey_sign(
         _: *mut ssh,
-        _: *mut sshkey,
+        _: *mut crate::sshkey::sshkey,
         _: *mut *mut u_char,
         _: *mut size_t,
         _: *const u_char,
@@ -625,53 +638,9 @@ pub struct C2RustUnnamed_1 {
 #[repr(C)]
 pub struct key_entry {
     pub next: C2RustUnnamed_2,
-    pub key: *mut sshkey,
+    pub key: *mut crate::sshkey::sshkey,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey {
-    pub type_0: libc::c_int,
-    pub flags: libc::c_int,
-    pub rsa: *mut RSA,
-    pub dsa: *mut DSA,
-    pub ecdsa_nid: libc::c_int,
-    pub ecdsa: *mut EC_KEY,
-    pub ed25519_sk: *mut u_char,
-    pub ed25519_pk: *mut u_char,
-    pub xmss_name: *mut libc::c_char,
-    pub xmss_filename: *mut libc::c_char,
-    pub xmss_state: *mut libc::c_void,
-    pub xmss_sk: *mut u_char,
-    pub xmss_pk: *mut u_char,
-    pub sk_application: *mut libc::c_char,
-    pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
-    pub sk_reserved: *mut crate::sshbuf::sshbuf,
-    pub cert: *mut sshkey_cert,
-    pub shielded_private: *mut u_char,
-    pub shielded_len: size_t,
-    pub shield_prekey: *mut u_char,
-    pub shield_prekey_len: size_t,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_cert {
-    pub certblob: *mut crate::sshbuf::sshbuf,
-    pub type_0: u_int,
-    pub serial: u_int64_t,
-    pub key_id: *mut libc::c_char,
-    pub nprincipals: u_int,
-    pub principals: *mut *mut libc::c_char,
-    pub valid_after: u_int64_t,
-    pub valid_before: u_int64_t,
-    pub critical: *mut crate::sshbuf::sshbuf,
-    pub extensions: *mut crate::sshbuf::sshbuf,
-    pub signature_key: *mut sshkey,
-    pub signature_type: *mut libc::c_char,
-}
-pub type EC_KEY = ec_key_st;
-pub type DSA = dsa_st;
-pub type RSA = rsa_st;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_2 {
@@ -705,24 +674,28 @@ pub struct kex {
     pub server_version: *mut crate::sshbuf::sshbuf,
     pub session_id: *mut crate::sshbuf::sshbuf,
     pub initial_sig: *mut crate::sshbuf::sshbuf,
-    pub initial_hostkey: *mut sshkey,
+    pub initial_hostkey: *mut crate::sshkey::sshkey,
     pub done: sig_atomic_t,
     pub flags: u_int,
     pub hash_alg: libc::c_int,
     pub ec_nid: libc::c_int,
     pub failed_choice: *mut libc::c_char,
-    pub verify_host_key: Option<unsafe extern "C" fn(*mut sshkey, *mut ssh) -> libc::c_int>,
-    pub load_host_public_key:
-        Option<unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut sshkey>,
-    pub load_host_private_key:
-        Option<unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut sshkey>,
-    pub host_key_index:
-        Option<unsafe extern "C" fn(*mut sshkey, libc::c_int, *mut ssh) -> libc::c_int>,
+    pub verify_host_key:
+        Option<unsafe extern "C" fn(*mut crate::sshkey::sshkey, *mut ssh) -> libc::c_int>,
+    pub load_host_public_key: Option<
+        unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut crate::sshkey::sshkey,
+    >,
+    pub load_host_private_key: Option<
+        unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut crate::sshkey::sshkey,
+    >,
+    pub host_key_index: Option<
+        unsafe extern "C" fn(*mut crate::sshkey::sshkey, libc::c_int, *mut ssh) -> libc::c_int,
+    >,
     pub sign: Option<
         unsafe extern "C" fn(
             *mut ssh,
-            *mut sshkey,
-            *mut sshkey,
+            *mut crate::sshkey::sshkey,
+            *mut crate::sshkey::sshkey,
             *mut *mut u_char,
             *mut size_t,
             *const u_char,
@@ -735,7 +708,7 @@ pub struct kex {
     pub min: u_int,
     pub max: u_int,
     pub nbits: u_int,
-    pub ec_client_key: *mut EC_KEY,
+    pub ec_client_key: *mut crate::sshkey::EC_KEY,
     pub ec_group: *const EC_GROUP,
     pub c25519_client_key: [u_char; 32],
     pub c25519_client_pubkey: [u_char; 32],
@@ -841,9 +814,9 @@ pub struct Authctxt {
     pub methoddata: *mut libc::c_void,
     pub kbdintctxt: *mut libc::c_void,
     pub loginmsg: *mut crate::sshbuf::sshbuf,
-    pub prev_keys: *mut *mut sshkey,
+    pub prev_keys: *mut *mut crate::sshkey::sshkey,
     pub nprev_keys: u_int,
-    pub auth_method_key: *mut sshkey,
+    pub auth_method_key: *mut crate::sshkey::sshkey,
     pub auth_method_info: *mut libc::c_char,
     pub session_info: *mut crate::sshbuf::sshbuf,
 }
@@ -1089,9 +1062,9 @@ pub struct sshauthopt {
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_6 {
-    pub host_keys: *mut *mut sshkey,
-    pub host_pubkeys: *mut *mut sshkey,
-    pub host_certificates: *mut *mut sshkey,
+    pub host_keys: *mut *mut crate::sshkey::sshkey,
+    pub host_pubkeys: *mut *mut crate::sshkey::sshkey,
+    pub host_certificates: *mut *mut crate::sshkey::sshkey,
     pub have_ssh2_key: libc::c_int,
 }
 pub static mut options: ServerOptions = ServerOptions {
@@ -1244,9 +1217,9 @@ static mut num_listen_socks: libc::c_int = 0 as libc::c_int;
 pub static mut auth_sock: libc::c_int = -(1 as libc::c_int);
 static mut have_agent: libc::c_int = 0 as libc::c_int;
 pub static mut sensitive_data: C2RustUnnamed_6 = C2RustUnnamed_6 {
-    host_keys: 0 as *const *mut sshkey as *mut *mut sshkey,
-    host_pubkeys: 0 as *const *mut sshkey as *mut *mut sshkey,
-    host_certificates: 0 as *const *mut sshkey as *mut *mut sshkey,
+    host_keys: 0 as *const *mut crate::sshkey::sshkey as *mut *mut crate::sshkey::sshkey,
+    host_pubkeys: 0 as *const *mut crate::sshkey::sshkey as *mut *mut crate::sshkey::sshkey,
+    host_certificates: 0 as *const *mut crate::sshkey::sshkey as *mut *mut crate::sshkey::sshkey,
     have_ssh2_key: 0,
 };
 static mut received_sighup: sig_atomic_t = 0 as libc::c_int;
@@ -1384,19 +1357,19 @@ pub unsafe extern "C" fn destroy_sensitive_data() {
         if !(*(sensitive_data.host_keys).offset(i as isize)).is_null() {
             sshkey_free(*(sensitive_data.host_keys).offset(i as isize));
             let ref mut fresh0 = *(sensitive_data.host_keys).offset(i as isize);
-            *fresh0 = 0 as *mut sshkey;
+            *fresh0 = 0 as *mut crate::sshkey::sshkey;
         }
         if !(*(sensitive_data.host_certificates).offset(i as isize)).is_null() {
             sshkey_free(*(sensitive_data.host_certificates).offset(i as isize));
             let ref mut fresh1 = *(sensitive_data.host_certificates).offset(i as isize);
-            *fresh1 = 0 as *mut sshkey;
+            *fresh1 = 0 as *mut crate::sshkey::sshkey;
         }
         i = i.wrapping_add(1);
         i;
     }
 }
 pub unsafe extern "C" fn demote_sensitive_data() {
-    let mut tmp: *mut sshkey = 0 as *mut sshkey;
+    let mut tmp: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
     let mut i: u_int = 0;
     let mut r: libc::c_int = 0;
     i = 0 as libc::c_int as u_int;
@@ -1748,7 +1721,7 @@ unsafe extern "C" fn append_hostkey_type(
 }
 unsafe extern "C" fn list_hostkey_types() -> *mut libc::c_char {
     let mut b: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
-    let mut key: *mut sshkey = 0 as *mut sshkey;
+    let mut key: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut i: u_int = 0;
     b = crate::sshbuf::sshbuf_new();
@@ -1859,9 +1832,9 @@ unsafe extern "C" fn get_hostkey_by_type(
     mut nid: libc::c_int,
     mut need_private: libc::c_int,
     mut _ssh: *mut ssh,
-) -> *mut sshkey {
+) -> *mut crate::sshkey::sshkey {
     let mut i: u_int = 0;
-    let mut key: *mut sshkey = 0 as *mut sshkey;
+    let mut key: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
     let mut current_block_6: u64;
     i = 0 as libc::c_int as u_int;
     while i < options.num_host_key_files {
@@ -1903,39 +1876,39 @@ unsafe extern "C" fn get_hostkey_by_type(
         i = i.wrapping_add(1);
         i;
     }
-    return 0 as *mut sshkey;
+    return 0 as *mut crate::sshkey::sshkey;
 }
 pub unsafe extern "C" fn get_hostkey_public_by_type(
     mut type_0: libc::c_int,
     mut nid: libc::c_int,
     mut ssh: *mut ssh,
-) -> *mut sshkey {
+) -> *mut crate::sshkey::sshkey {
     return get_hostkey_by_type(type_0, nid, 0 as libc::c_int, ssh);
 }
 pub unsafe extern "C" fn get_hostkey_private_by_type(
     mut type_0: libc::c_int,
     mut nid: libc::c_int,
     mut ssh: *mut ssh,
-) -> *mut sshkey {
+) -> *mut crate::sshkey::sshkey {
     return get_hostkey_by_type(type_0, nid, 1 as libc::c_int, ssh);
 }
-pub unsafe extern "C" fn get_hostkey_by_index(mut ind: libc::c_int) -> *mut sshkey {
+pub unsafe extern "C" fn get_hostkey_by_index(mut ind: libc::c_int) -> *mut crate::sshkey::sshkey {
     if ind < 0 as libc::c_int || ind as u_int >= options.num_host_key_files {
-        return 0 as *mut sshkey;
+        return 0 as *mut crate::sshkey::sshkey;
     }
     return *(sensitive_data.host_keys).offset(ind as isize);
 }
 pub unsafe extern "C" fn get_hostkey_public_by_index(
     mut ind: libc::c_int,
     mut _ssh: *mut ssh,
-) -> *mut sshkey {
+) -> *mut crate::sshkey::sshkey {
     if ind < 0 as libc::c_int || ind as u_int >= options.num_host_key_files {
-        return 0 as *mut sshkey;
+        return 0 as *mut crate::sshkey::sshkey;
     }
     return *(sensitive_data.host_pubkeys).offset(ind as isize);
 }
 pub unsafe extern "C" fn get_hostkey_index(
-    mut key: *mut sshkey,
+    mut key: *mut crate::sshkey::sshkey,
     mut compare: libc::c_int,
     mut _ssh: *mut ssh,
 ) -> libc::c_int {
@@ -1974,7 +1947,7 @@ pub unsafe extern "C" fn get_hostkey_index(
 }
 unsafe extern "C" fn notify_hostkeys(mut ssh: *mut ssh) {
     let mut buf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
-    let mut key: *mut sshkey = 0 as *mut sshkey;
+    let mut key: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
     let mut i: u_int = 0;
     let mut nkeys: u_int = 0;
     let mut r: libc::c_int = 0;
@@ -3493,7 +3466,7 @@ unsafe extern "C" fn set_process_rdomain(mut _ssh: *mut ssh, mut _name: *const l
 }
 unsafe extern "C" fn accumulate_host_timing_secret(
     mut server_cfg: *mut crate::sshbuf::sshbuf,
-    mut key: *mut sshkey,
+    mut key: *mut crate::sshkey::sshkey,
 ) {
     static mut ctx: *mut ssh_digest_ctx = 0 as *const ssh_digest_ctx as *mut ssh_digest_ctx;
     let mut hash: *mut u_char = 0 as *mut u_char;
@@ -3687,8 +3660,8 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     let mut ibytes: u_int64_t = 0;
     let mut obytes: u_int64_t = 0;
     let mut new_umask: mode_t = 0;
-    let mut key: *mut sshkey = 0 as *mut sshkey;
-    let mut pubkey: *mut sshkey = 0 as *mut sshkey;
+    let mut key: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
+    let mut pubkey: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
     let mut keytype: libc::c_int = 0;
     let mut authctxt: *mut Authctxt = 0 as *mut Authctxt;
     let mut connection_info: *mut connection_info = 0 as *mut connection_info;
@@ -4161,12 +4134,12 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     endpwent();
     sensitive_data.host_keys = crate::xmalloc::xcalloc(
         options.num_host_key_files as size_t,
-        ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
-    ) as *mut *mut sshkey;
+        ::core::mem::size_of::<*mut crate::sshkey::sshkey>() as libc::c_ulong,
+    ) as *mut *mut crate::sshkey::sshkey;
     sensitive_data.host_pubkeys = crate::xmalloc::xcalloc(
         options.num_host_key_files as size_t,
-        ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
-    ) as *mut *mut sshkey;
+        ::core::mem::size_of::<*mut crate::sshkey::sshkey>() as libc::c_ulong,
+    ) as *mut *mut crate::sshkey::sshkey;
     if !(options.host_key_agent).is_null() {
         if libc::strcmp(
             options.host_key_agent,
@@ -4252,7 +4225,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                     *(options.host_key_files).offset(i as isize),
                 );
                 sshkey_free(key);
-                key = 0 as *mut sshkey;
+                key = 0 as *mut crate::sshkey::sshkey;
             }
             r = sshkey_load_public(
                 *(options.host_key_files).offset(i as isize),
@@ -4286,7 +4259,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         *(options.host_key_files).offset(i as isize),
                     );
                     sshkey_free(pubkey);
-                    pubkey = 0 as *mut sshkey;
+                    pubkey = 0 as *mut crate::sshkey::sshkey;
                 }
             }
             if pubkey.is_null() && !key.is_null() {
@@ -4357,9 +4330,9 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
                         *(options.host_key_files).offset(i as isize),
                     );
                     let ref mut fresh9 = *(sensitive_data.host_keys).offset(i as isize);
-                    *fresh9 = 0 as *mut sshkey;
+                    *fresh9 = 0 as *mut crate::sshkey::sshkey;
                     let ref mut fresh10 = *(sensitive_data.host_pubkeys).offset(i as isize);
-                    *fresh10 = 0 as *mut sshkey;
+                    *fresh10 = 0 as *mut crate::sshkey::sshkey;
                     current_block_184 = 7337917895049117968;
                 }
                 match current_block_184 {
@@ -4414,7 +4387,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
         i = i.wrapping_add(1);
         i;
     }
-    accumulate_host_timing_secret(cfg, 0 as *mut sshkey);
+    accumulate_host_timing_secret(cfg, 0 as *mut crate::sshkey::sshkey);
     if sensitive_data.have_ssh2_key == 0 {
         crate::log::sshlog(
             b"sshd.c\0" as *const u8 as *const libc::c_char,
@@ -4429,12 +4402,12 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
     }
     sensitive_data.host_certificates = crate::xmalloc::xcalloc(
         options.num_host_key_files as size_t,
-        ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
-    ) as *mut *mut sshkey;
+        ::core::mem::size_of::<*mut crate::sshkey::sshkey>() as libc::c_ulong,
+    ) as *mut *mut crate::sshkey::sshkey;
     i = 0 as libc::c_int as u_int;
     while i < options.num_host_key_files {
         let ref mut fresh11 = *(sensitive_data.host_certificates).offset(i as isize);
-        *fresh11 = 0 as *mut sshkey;
+        *fresh11 = 0 as *mut crate::sshkey::sshkey;
         i = i.wrapping_add(1);
         i;
     }
@@ -5113,8 +5086,8 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
 }
 pub unsafe extern "C" fn sshd_hostkey_sign(
     mut ssh: *mut ssh,
-    mut privkey: *mut sshkey,
-    mut pubkey: *mut sshkey,
+    mut privkey: *mut crate::sshkey::sshkey,
+    mut pubkey: *mut crate::sshkey::sshkey,
     mut signature: *mut *mut u_char,
     mut slenp: *mut size_t,
     mut data: *const u_char,
@@ -5286,22 +5259,34 @@ unsafe extern "C" fn do_ssh2_kex(mut ssh: *mut ssh) {
         Some(kex_gen_server as unsafe extern "C" fn(*mut ssh) -> libc::c_int);
     (*kex).load_host_public_key = Some(
         get_hostkey_public_by_type
-            as unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut sshkey,
+            as unsafe extern "C" fn(
+                libc::c_int,
+                libc::c_int,
+                *mut ssh,
+            ) -> *mut crate::sshkey::sshkey,
     );
     (*kex).load_host_private_key = Some(
         get_hostkey_private_by_type
-            as unsafe extern "C" fn(libc::c_int, libc::c_int, *mut ssh) -> *mut sshkey,
+            as unsafe extern "C" fn(
+                libc::c_int,
+                libc::c_int,
+                *mut ssh,
+            ) -> *mut crate::sshkey::sshkey,
     );
     (*kex).host_key_index = Some(
         get_hostkey_index
-            as unsafe extern "C" fn(*mut sshkey, libc::c_int, *mut ssh) -> libc::c_int,
+            as unsafe extern "C" fn(
+                *mut crate::sshkey::sshkey,
+                libc::c_int,
+                *mut ssh,
+            ) -> libc::c_int,
     );
     (*kex).sign = Some(
         sshd_hostkey_sign
             as unsafe extern "C" fn(
                 *mut ssh,
-                *mut sshkey,
-                *mut sshkey,
+                *mut crate::sshkey::sshkey,
+                *mut crate::sshkey::sshkey,
                 *mut *mut u_char,
                 *mut size_t,
                 *const u_char,

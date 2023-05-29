@@ -3,7 +3,7 @@ extern "C" {
 
     pub type bignum_st;
     pub type bignum_ctx;
-    pub type ec_key_st;
+
     pub type ec_group_st;
     pub type ec_point_st;
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
@@ -12,9 +12,12 @@ extern "C" {
     fn BN_clear_free(a: *mut BIGNUM);
     fn BN_bin2bn(s: *const libc::c_uchar, len: libc::c_int, ret: *mut BIGNUM) -> *mut BIGNUM;
     fn BN_bn2bin(a: *const BIGNUM, to: *mut libc::c_uchar) -> libc::c_int;
-    fn EC_KEY_set_public_key(key: *mut EC_KEY, pub_0: *const EC_POINT) -> libc::c_int;
-    fn EC_KEY_get0_public_key(key: *const EC_KEY) -> *const EC_POINT;
-    fn EC_KEY_get0_group(key: *const EC_KEY) -> *const EC_GROUP;
+    fn EC_KEY_set_public_key(
+        key: *mut crate::sshkey::EC_KEY,
+        pub_0: *const EC_POINT,
+    ) -> libc::c_int;
+    fn EC_KEY_get0_public_key(key: *const crate::sshkey::EC_KEY) -> *const EC_POINT;
+    fn EC_KEY_get0_group(key: *const crate::sshkey::EC_KEY) -> *const EC_GROUP;
     fn EC_POINT_new(group: *const EC_GROUP) -> *mut EC_POINT;
     fn EC_POINT_free(point: *mut EC_POINT);
     fn EC_POINT_point2oct(
@@ -54,7 +57,7 @@ pub type u_char = __u_char;
 pub type size_t = libc::c_ulong;
 pub type BIGNUM = bignum_st;
 pub type BN_CTX = bignum_ctx;
-pub type EC_KEY = ec_key_st;
+
 pub type point_conversion_form_t = libc::c_uint;
 pub const POINT_CONVERSION_HYBRID: point_conversion_form_t = 6;
 pub const POINT_CONVERSION_UNCOMPRESSED: point_conversion_form_t = 4;
@@ -131,7 +134,7 @@ pub unsafe extern "C" fn sshbuf_get_ec(
 }
 pub unsafe extern "C" fn sshbuf_get_eckey(
     mut buf: *mut crate::sshbuf::sshbuf,
-    mut v: *mut EC_KEY,
+    mut v: *mut crate::sshkey::EC_KEY,
 ) -> libc::c_int {
     let mut pt: *mut EC_POINT = EC_POINT_new(EC_KEY_get0_group(v));
     let mut r: libc::c_int = 0;
@@ -244,7 +247,7 @@ pub unsafe extern "C" fn sshbuf_put_ec(
 }
 pub unsafe extern "C" fn sshbuf_put_eckey(
     mut buf: *mut crate::sshbuf::sshbuf,
-    mut v: *const EC_KEY,
+    mut v: *const crate::sshkey::EC_KEY,
 ) -> libc::c_int {
     return sshbuf_put_ec(buf, EC_KEY_get0_public_key(v), EC_KEY_get0_group(v));
 }

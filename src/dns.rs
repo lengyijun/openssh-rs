@@ -4,9 +4,6 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
 
-    pub type dsa_st;
-    pub type rsa_st;
-    pub type ec_key_st;
     fn getaddrinfo(
         __name: *const libc::c_char,
         __service: *const libc::c_char,
@@ -28,7 +25,7 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
     fn sshkey_fingerprint_raw(
-        k: *const sshkey,
+        k: *const crate::sshkey::sshkey,
         _: libc::c_int,
         retp: *mut *mut u_char,
         lenp: *mut size_t,
@@ -111,9 +108,7 @@ pub struct rrsetinfo {
     pub rri_rdatas: *mut rdatainfo,
     pub rri_sigs: *mut rdatainfo,
 }
-pub type DSA = dsa_st;
-pub type RSA = rsa_st;
-pub type EC_KEY = ec_key_st;
+
 pub type sshkey_types = libc::c_uint;
 pub const KEY_UNSPEC: sshkey_types = 14;
 pub const KEY_ED25519_SK_CERT: sshkey_types = 13;
@@ -130,48 +125,7 @@ pub const KEY_ED25519: sshkey_types = 3;
 pub const KEY_ECDSA: sshkey_types = 2;
 pub const KEY_DSA: sshkey_types = 1;
 pub const KEY_RSA: sshkey_types = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_cert {
-    pub certblob: *mut crate::sshbuf::sshbuf,
-    pub type_0: u_int,
-    pub serial: u_int64_t,
-    pub key_id: *mut libc::c_char,
-    pub nprincipals: u_int,
-    pub principals: *mut *mut libc::c_char,
-    pub valid_after: u_int64_t,
-    pub valid_before: u_int64_t,
-    pub critical: *mut crate::sshbuf::sshbuf,
-    pub extensions: *mut crate::sshbuf::sshbuf,
-    pub signature_key: *mut sshkey,
-    pub signature_type: *mut libc::c_char,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey {
-    pub type_0: libc::c_int,
-    pub flags: libc::c_int,
-    pub rsa: *mut RSA,
-    pub dsa: *mut DSA,
-    pub ecdsa_nid: libc::c_int,
-    pub ecdsa: *mut EC_KEY,
-    pub ed25519_sk: *mut u_char,
-    pub ed25519_pk: *mut u_char,
-    pub xmss_name: *mut libc::c_char,
-    pub xmss_filename: *mut libc::c_char,
-    pub xmss_state: *mut libc::c_void,
-    pub xmss_sk: *mut u_char,
-    pub xmss_pk: *mut u_char,
-    pub sk_application: *mut libc::c_char,
-    pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
-    pub sk_reserved: *mut crate::sshbuf::sshbuf,
-    pub cert: *mut sshkey_cert,
-    pub shielded_private: *mut u_char,
-    pub shielded_len: size_t,
-    pub shield_prekey: *mut u_char,
-    pub shield_prekey_len: size_t,
-}
+
 pub type sshfp_types = libc::c_uint;
 pub const SSHFP_KEY_XMSS: sshfp_types = 5;
 pub const SSHFP_KEY_ED25519: sshfp_types = 4;
@@ -218,7 +172,7 @@ unsafe extern "C" fn dns_read_key(
     mut digest_type: *mut u_int8_t,
     mut digest: *mut *mut u_char,
     mut digest_len: *mut size_t,
-    mut key: *mut sshkey,
+    mut key: *mut crate::sshkey::sshkey,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     let mut success: libc::c_int = 0 as libc::c_int;
@@ -346,7 +300,7 @@ unsafe extern "C" fn is_numeric_hostname(mut hostname: *const libc::c_char) -> l
 pub unsafe extern "C" fn verify_host_key_dns(
     mut hostname: *const libc::c_char,
     mut _address: *mut sockaddr,
-    mut hostkey: *mut sshkey,
+    mut hostkey: *mut crate::sshkey::sshkey,
     mut flags: *mut libc::c_int,
 ) -> libc::c_int {
     let mut counter: u_int = 0;
@@ -604,7 +558,7 @@ pub unsafe extern "C" fn verify_host_key_dns(
 }
 pub unsafe extern "C" fn export_dns_rr(
     mut hostname: *const libc::c_char,
-    mut key: *mut sshkey,
+    mut key: *mut crate::sshkey::sshkey,
     mut f: *mut libc::FILE,
     mut generic: libc::c_int,
     mut alg: libc::c_int,

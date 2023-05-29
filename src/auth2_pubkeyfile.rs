@@ -6,9 +6,6 @@ extern "C" {
     pub type _IO_codecvt;
     pub type _IO_marker;
 
-    pub type dsa_st;
-    pub type rsa_st;
-    pub type ec_key_st;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
     fn __getdelim(
@@ -44,20 +41,27 @@ extern "C" {
         errlen: size_t,
     ) -> libc::c_int;
     fn sshkey_cert_check_authority_now(
-        _: *const sshkey,
+        _: *const crate::sshkey::sshkey,
         _: libc::c_int,
         _: libc::c_int,
         _: libc::c_int,
         _: *const libc::c_char,
         _: *mut *const libc::c_char,
     ) -> libc::c_int;
-    fn sshkey_is_cert(_: *const sshkey) -> libc::c_int;
-    fn sshkey_read(_: *mut sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
-    fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
-    fn sshkey_fingerprint(_: *const sshkey, _: libc::c_int, _: sshkey_fp_rep) -> *mut libc::c_char;
-    fn sshkey_equal(_: *const sshkey, _: *const sshkey) -> libc::c_int;
-    fn sshkey_free(_: *mut sshkey);
-    fn sshkey_new(_: libc::c_int) -> *mut sshkey;
+    fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
+    fn sshkey_read(_: *mut crate::sshkey::sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
+    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
+    fn sshkey_fingerprint(
+        _: *const crate::sshkey::sshkey,
+        _: libc::c_int,
+        _: sshkey_fp_rep,
+    ) -> *mut libc::c_char;
+    fn sshkey_equal(
+        _: *const crate::sshkey::sshkey,
+        _: *const crate::sshkey::sshkey,
+    ) -> libc::c_int;
+    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+    fn sshkey_new(_: libc::c_int) -> *mut crate::sshkey::sshkey;
     fn auth_log_authopts(_: *const libc::c_char, _: *const sshauthopt, _: libc::c_int);
     fn auth_debug_add(fmt: *const libc::c_char, _: ...);
     fn sshauthopt_free(opts: *mut sshauthopt);
@@ -65,7 +69,7 @@ extern "C" {
         s: *const libc::c_char,
         errstr: *mut *const libc::c_char,
     ) -> *mut sshauthopt;
-    fn sshauthopt_from_cert(k: *mut sshkey) -> *mut sshauthopt;
+    fn sshauthopt_from_cert(k: *mut crate::sshkey::sshkey) -> *mut sshauthopt;
     fn sshauthopt_merge(
         primary: *const sshauthopt,
         additional: *const sshauthopt,
@@ -124,9 +128,7 @@ pub const SYSLOG_LEVEL_INFO: LogLevel = 3;
 pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
-pub type DSA = dsa_st;
-pub type RSA = rsa_st;
-pub type EC_KEY = ec_key_st;
+
 pub type sshkey_types = libc::c_uint;
 pub const KEY_UNSPEC: sshkey_types = 14;
 pub const KEY_ED25519_SK_CERT: sshkey_types = 13;
@@ -149,48 +151,7 @@ pub const SSH_FP_BUBBLEBABBLE: sshkey_fp_rep = 3;
 pub const SSH_FP_BASE64: sshkey_fp_rep = 2;
 pub const SSH_FP_HEX: sshkey_fp_rep = 1;
 pub const SSH_FP_DEFAULT: sshkey_fp_rep = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_cert {
-    pub certblob: *mut crate::sshbuf::sshbuf,
-    pub type_0: u_int,
-    pub serial: u_int64_t,
-    pub key_id: *mut libc::c_char,
-    pub nprincipals: u_int,
-    pub principals: *mut *mut libc::c_char,
-    pub valid_after: u_int64_t,
-    pub valid_before: u_int64_t,
-    pub critical: *mut crate::sshbuf::sshbuf,
-    pub extensions: *mut crate::sshbuf::sshbuf,
-    pub signature_key: *mut sshkey,
-    pub signature_type: *mut libc::c_char,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey {
-    pub type_0: libc::c_int,
-    pub flags: libc::c_int,
-    pub rsa: *mut RSA,
-    pub dsa: *mut DSA,
-    pub ecdsa_nid: libc::c_int,
-    pub ecdsa: *mut EC_KEY,
-    pub ed25519_sk: *mut u_char,
-    pub ed25519_pk: *mut u_char,
-    pub xmss_name: *mut libc::c_char,
-    pub xmss_filename: *mut libc::c_char,
-    pub xmss_state: *mut libc::c_void,
-    pub xmss_sk: *mut u_char,
-    pub xmss_pk: *mut u_char,
-    pub sk_application: *mut libc::c_char,
-    pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
-    pub sk_reserved: *mut crate::sshbuf::sshbuf,
-    pub cert: *mut sshkey_cert,
-    pub shielded_private: *mut u_char,
-    pub shielded_len: size_t,
-    pub shield_prekey: *mut u_char,
-    pub shield_prekey_len: size_t,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshauthopt {
@@ -414,7 +375,7 @@ pub unsafe extern "C" fn auth_authorise_keyopts(
 }
 unsafe extern "C" fn match_principals_option(
     mut principal_list: *const libc::c_char,
-    mut cert: *mut sshkey_cert,
+    mut cert: *mut crate::sshkey::sshkey_cert,
 ) -> libc::c_int {
     let mut result: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut i: u_int = 0;
@@ -450,7 +411,7 @@ unsafe extern "C" fn match_principals_option(
 }
 pub unsafe extern "C" fn auth_check_principals_line(
     mut cp: *mut libc::c_char,
-    mut cert: *const sshkey_cert,
+    mut cert: *const crate::sshkey::sshkey_cert,
     mut loc: *const libc::c_char,
     mut authoptsp: *mut *mut sshauthopt,
 ) -> libc::c_int {
@@ -547,7 +508,7 @@ pub unsafe extern "C" fn auth_check_principals_line(
 pub unsafe extern "C" fn auth_process_principals(
     mut f: *mut libc::FILE,
     mut file: *const libc::c_char,
-    mut cert: *const sshkey_cert,
+    mut cert: *const crate::sshkey::sshkey_cert,
     mut authoptsp: *mut *mut sshauthopt,
 ) -> libc::c_int {
     let mut loc: [libc::c_char; 256] = [0; 256];
@@ -610,7 +571,7 @@ pub unsafe extern "C" fn auth_process_principals(
 }
 pub unsafe extern "C" fn auth_check_authkey_line(
     mut pw: *mut libc::passwd,
-    mut key: *mut sshkey,
+    mut key: *mut crate::sshkey::sshkey,
     mut cp: *mut libc::c_char,
     mut remote_ip: *const libc::c_char,
     mut remote_host: *const libc::c_char,
@@ -623,7 +584,7 @@ pub unsafe extern "C" fn auth_check_authkey_line(
     } else {
         (*key).type_0
     };
-    let mut found: *mut sshkey = 0 as *mut sshkey;
+    let mut found: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
     let mut keyopts: *mut sshauthopt = 0 as *mut sshauthopt;
     let mut certopts: *mut sshauthopt = 0 as *mut sshauthopt;
     let mut finalopts: *mut sshauthopt = 0 as *mut sshauthopt;
@@ -965,7 +926,7 @@ pub unsafe extern "C" fn auth_check_authkeys_file(
     mut pw: *mut libc::passwd,
     mut f: *mut libc::FILE,
     mut file: *mut libc::c_char,
-    mut key: *mut sshkey,
+    mut key: *mut crate::sshkey::sshkey,
     mut remote_ip: *const libc::c_char,
     mut remote_host: *const libc::c_char,
     mut authoptsp: *mut *mut sshauthopt,

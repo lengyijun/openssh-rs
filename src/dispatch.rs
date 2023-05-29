@@ -1,7 +1,7 @@
 use ::libc;
 extern "C" {
     pub type ssh_channels;
-    pub type sshkey;
+
     pub type kex;
     pub type session_state;
 
@@ -56,7 +56,7 @@ pub struct C2RustUnnamed {
 #[repr(C)]
 pub struct key_entry {
     pub next: C2RustUnnamed_0,
-    pub key: *mut sshkey,
+    pub key: *mut crate::sshkey::sshkey,
 }
 #[derive(Copy, Clone)]
 #[repr(C)]

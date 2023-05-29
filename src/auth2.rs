@@ -5,9 +5,6 @@ use libc::close;
 extern "C" {
     pub type ssh_channels;
 
-    pub type ec_key_st;
-    pub type dsa_st;
-    pub type rsa_st;
     pub type kex;
     pub type session_state;
 
@@ -63,12 +60,25 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshkey_free(_: *mut sshkey);
-    fn sshkey_equal_public(_: *const sshkey, _: *const sshkey) -> libc::c_int;
-    fn sshkey_from_private(_: *const sshkey, _: *mut *mut sshkey) -> libc::c_int;
-    fn sshkey_format_text(_: *const sshkey, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
-    fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
-    fn sshkey_fingerprint(_: *const sshkey, _: libc::c_int, _: sshkey_fp_rep) -> *mut libc::c_char;
+    fn sshkey_free(_: *mut crate::sshkey::sshkey);
+    fn sshkey_equal_public(
+        _: *const crate::sshkey::sshkey,
+        _: *const crate::sshkey::sshkey,
+    ) -> libc::c_int;
+    fn sshkey_from_private(
+        _: *const crate::sshkey::sshkey,
+        _: *mut *mut crate::sshkey::sshkey,
+    ) -> libc::c_int;
+    fn sshkey_format_text(
+        _: *const crate::sshkey::sshkey,
+        _: *mut crate::sshbuf::sshbuf,
+    ) -> libc::c_int;
+    fn sshkey_type(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
+    fn sshkey_fingerprint(
+        _: *const crate::sshkey::sshkey,
+        _: libc::c_int,
+        _: sshkey_fp_rep,
+    ) -> *mut libc::c_char;
     fn auth_log(
         _: *mut ssh,
         _: libc::c_int,
@@ -192,53 +202,9 @@ pub struct C2RustUnnamed {
 #[repr(C)]
 pub struct key_entry {
     pub next: C2RustUnnamed_0,
-    pub key: *mut sshkey,
+    pub key: *mut crate::sshkey::sshkey,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey {
-    pub type_0: libc::c_int,
-    pub flags: libc::c_int,
-    pub rsa: *mut RSA,
-    pub dsa: *mut DSA,
-    pub ecdsa_nid: libc::c_int,
-    pub ecdsa: *mut EC_KEY,
-    pub ed25519_sk: *mut u_char,
-    pub ed25519_pk: *mut u_char,
-    pub xmss_name: *mut libc::c_char,
-    pub xmss_filename: *mut libc::c_char,
-    pub xmss_state: *mut libc::c_void,
-    pub xmss_sk: *mut u_char,
-    pub xmss_pk: *mut u_char,
-    pub sk_application: *mut libc::c_char,
-    pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
-    pub sk_reserved: *mut crate::sshbuf::sshbuf,
-    pub cert: *mut sshkey_cert,
-    pub shielded_private: *mut u_char,
-    pub shielded_len: size_t,
-    pub shield_prekey: *mut u_char,
-    pub shield_prekey_len: size_t,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_cert {
-    pub certblob: *mut crate::sshbuf::sshbuf,
-    pub type_0: u_int,
-    pub serial: u_int64_t,
-    pub key_id: *mut libc::c_char,
-    pub nprincipals: u_int,
-    pub principals: *mut *mut libc::c_char,
-    pub valid_after: u_int64_t,
-    pub valid_before: u_int64_t,
-    pub critical: *mut crate::sshbuf::sshbuf,
-    pub extensions: *mut crate::sshbuf::sshbuf,
-    pub signature_key: *mut sshkey,
-    pub signature_type: *mut libc::c_char,
-}
-pub type EC_KEY = ec_key_st;
-pub type DSA = dsa_st;
-pub type RSA = rsa_st;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_0 {
@@ -452,9 +418,9 @@ pub struct Authctxt {
     pub methoddata: *mut libc::c_void,
     pub kbdintctxt: *mut libc::c_void,
     pub loginmsg: *mut crate::sshbuf::sshbuf,
-    pub prev_keys: *mut *mut sshkey,
+    pub prev_keys: *mut *mut crate::sshkey::sshkey,
     pub nprev_keys: u_int,
-    pub auth_method_key: *mut sshkey,
+    pub auth_method_key: *mut crate::sshkey::sshkey,
     pub auth_method_info: *mut libc::c_char,
     pub session_info: *mut crate::sshbuf::sshbuf,
 }
@@ -1657,7 +1623,7 @@ pub unsafe extern "C" fn auth2_update_methods_lists(
 pub unsafe extern "C" fn auth2_authctxt_reset_info(mut authctxt: *mut Authctxt) {
     sshkey_free((*authctxt).auth_method_key);
     libc::free((*authctxt).auth_method_info as *mut libc::c_void);
-    (*authctxt).auth_method_key = 0 as *mut sshkey;
+    (*authctxt).auth_method_key = 0 as *mut crate::sshkey::sshkey;
     (*authctxt).auth_method_info = 0 as *mut libc::c_char;
 }
 pub unsafe extern "C" fn auth2_record_info(
@@ -1687,10 +1653,10 @@ pub unsafe extern "C" fn auth2_record_info(
 pub unsafe extern "C" fn auth2_record_key(
     mut authctxt: *mut Authctxt,
     mut authenticated: libc::c_int,
-    mut key: *const sshkey,
+    mut key: *const crate::sshkey::sshkey,
 ) {
-    let mut tmp: *mut *mut sshkey = 0 as *mut *mut sshkey;
-    let mut dup: *mut sshkey = 0 as *mut sshkey;
+    let mut tmp: *mut *mut crate::sshkey::sshkey = 0 as *mut *mut crate::sshkey::sshkey;
+    let mut dup: *mut crate::sshkey::sshkey = 0 as *mut crate::sshkey::sshkey;
     let mut r: libc::c_int = 0;
     r = sshkey_from_private(key, &mut dup);
     if r != 0 as libc::c_int {
@@ -1728,8 +1694,8 @@ pub unsafe extern "C" fn auth2_record_key(
             (*authctxt).prev_keys as *mut libc::c_void,
             (*authctxt).nprev_keys as size_t,
             ((*authctxt).nprev_keys).wrapping_add(1 as libc::c_int as libc::c_uint) as size_t,
-            ::core::mem::size_of::<*mut sshkey>() as libc::c_ulong,
-        ) as *mut *mut sshkey;
+            ::core::mem::size_of::<*mut crate::sshkey::sshkey>() as libc::c_ulong,
+        ) as *mut *mut crate::sshkey::sshkey;
         tmp.is_null()
     } {
         sshfatal(
@@ -1751,7 +1717,7 @@ pub unsafe extern "C" fn auth2_record_key(
 }
 pub unsafe extern "C" fn auth2_key_already_used(
     mut authctxt: *mut Authctxt,
-    mut key: *const sshkey,
+    mut key: *const crate::sshkey::sshkey,
 ) -> libc::c_int {
     let mut i: u_int = 0;
     let mut fp: *mut libc::c_char = 0 as *mut libc::c_char;

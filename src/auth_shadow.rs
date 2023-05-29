@@ -1,7 +1,6 @@
 use ::libc;
 extern "C" {
 
-    pub type sshkey;
     fn getspnam(__name: *const libc::c_char) -> *mut spwd;
     fn time(__timer: *mut time_t) -> time_t;
 
@@ -61,9 +60,9 @@ pub struct Authctxt {
     pub methoddata: *mut libc::c_void,
     pub kbdintctxt: *mut libc::c_void,
     pub loginmsg: *mut crate::sshbuf::sshbuf,
-    pub prev_keys: *mut *mut sshkey,
+    pub prev_keys: *mut *mut crate::sshkey::sshkey,
     pub nprev_keys: u_int,
-    pub auth_method_key: *mut sshkey,
+    pub auth_method_key: *mut crate::sshkey::sshkey,
     pub auth_method_info: *mut libc::c_char,
     pub session_info: *mut crate::sshbuf::sshbuf,
 }
