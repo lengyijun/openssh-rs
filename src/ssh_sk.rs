@@ -30,12 +30,6 @@ extern "C" {
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -769,7 +763,7 @@ unsafe extern "C" fn sshsk_key_from_response(
                         );
                         r = -(2 as libc::c_int);
                     } else {
-                        r = sshbuf_put(
+                        r = crate::sshbuf_getput_basic::sshbuf_put(
                             (*key).sk_key_handle,
                             (*resp).key_handle as *const libc::c_void,
                             (*resp).key_handle_len,

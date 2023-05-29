@@ -287,8 +287,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -1348,7 +1346,7 @@ unsafe extern "C" fn buffer_get_bignum_bits(
             b"BN_bin2bn failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    r = sshbuf_consume(b, bytes as size_t);
+    r = crate::sshbuf::sshbuf_consume(b, bytes as size_t);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-keygen.c\0" as *const u8 as *const libc::c_char,

@@ -31,18 +31,12 @@ extern "C" {
 
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_consume_end(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
+
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
         len: size_t,
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
-    fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
 
 }
 pub type __u_char = libc::c_uchar;
@@ -261,7 +255,7 @@ pub unsafe extern "C" fn sshbuf_dtob64(
                 }
             }
         } else {
-            r = sshbuf_put(b64, s as *const libc::c_void, strlen(s));
+            r = crate::sshbuf_getput_basic::sshbuf_put(b64, s as *const libc::c_void, strlen(s));
             if r != 0 as libc::c_int {
                 current_block = 5734119236069516492;
             } else {
@@ -316,7 +310,7 @@ pub unsafe extern "C" fn sshbuf_b64tod(
         freezero(p as *mut libc::c_void, plen);
         return -(4 as libc::c_int);
     }
-    r = sshbuf_put(buf, p as *const libc::c_void, nlen as size_t);
+    r = crate::sshbuf_getput_basic::sshbuf_put(buf, p as *const libc::c_void, nlen as size_t);
     if r < 0 as libc::c_int {
         freezero(p as *mut libc::c_void, plen);
         return r;
@@ -364,7 +358,7 @@ pub unsafe extern "C" fn sshbuf_dtourlb64(
                     != '=' as i32
                 {
                     l = crate::sshbuf::sshbuf_len(b);
-                    p = sshbuf_mutable_ptr(b);
+                    p = crate::sshbuf::sshbuf_mutable_ptr(b);
                     if p.is_null() {
                         r = -(1 as libc::c_int);
                         current_block = 16561732456181174644;
@@ -383,7 +377,7 @@ pub unsafe extern "C" fn sshbuf_dtourlb64(
                         current_block = 16561732456181174644;
                     }
                 } else {
-                    r = sshbuf_consume_end(b, 1 as libc::c_int as size_t);
+                    r = crate::sshbuf::sshbuf_consume_end(b, 1 as libc::c_int as size_t);
                     if r != 0 as libc::c_int {
                         current_block = 16561732456181174644;
                     } else {
@@ -522,7 +516,7 @@ pub unsafe extern "C" fn sshbuf_read(
         }) as libc::c_ulong,
     );
     if adjust != 0 as libc::c_int as libc::c_ulong {
-        r = sshbuf_consume_end(buf, adjust);
+        r = crate::sshbuf::sshbuf_consume_end(buf, adjust);
         if r != 0 as libc::c_int {
             memset(
                 d.offset(rr as isize) as *mut libc::c_void,

@@ -16,11 +16,6 @@ extern "C" {
         len: size_t,
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_put_bignum2_bytes(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -106,7 +101,7 @@ pub unsafe extern "C" fn kexc25519_shared_key_ext(
         return -(20 as libc::c_int);
     }
     if raw != 0 {
-        r = sshbuf_put(
+        r = crate::sshbuf_getput_basic::sshbuf_put(
             out,
             shared_key.as_mut_ptr() as *const libc::c_void,
             32 as libc::c_int as size_t,

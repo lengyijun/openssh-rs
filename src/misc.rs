@@ -150,12 +150,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
@@ -2340,7 +2334,11 @@ unsafe extern "C" fn vdollar_percent_expand(
                             var,
                             val,
                         );
-                        r = sshbuf_put(buf, val as *const libc::c_void, strlen(val));
+                        r = crate::sshbuf_getput_basic::sshbuf_put(
+                            buf,
+                            val as *const libc::c_void,
+                            strlen(val),
+                        );
                         if r != 0 as libc::c_int {
                             sshfatal(
                                 b"misc.c\0" as *const u8 as *const libc::c_char,
@@ -2352,7 +2350,8 @@ unsafe extern "C" fn vdollar_percent_expand(
                                 1 as libc::c_int,
                                 SYSLOG_LEVEL_FATAL,
                                 ssh_err(r),
-                                b"sshbuf_put ${}\0" as *const u8 as *const libc::c_char,
+                                b"crate::sshbuf_getput_basic::sshbuf_put ${}\0" as *const u8
+                                    as *const libc::c_char,
                             );
                         }
                     }
@@ -2390,7 +2389,7 @@ unsafe extern "C" fn vdollar_percent_expand(
                             if !(libc::strchr(keys[i as usize].key, *string as libc::c_int))
                                 .is_null()
                             {
-                                r = sshbuf_put(
+                                r = crate::sshbuf_getput_basic::sshbuf_put(
                                     buf,
                                     keys[i as usize].repl as *const libc::c_void,
                                     strlen(keys[i as usize].repl),
@@ -2406,7 +2405,9 @@ unsafe extern "C" fn vdollar_percent_expand(
                                         1 as libc::c_int,
                                         SYSLOG_LEVEL_FATAL,
                                         ssh_err(r),
-                                        b"sshbuf_put %%-repl\0" as *const u8 as *const libc::c_char,
+                                        b"crate::sshbuf_getput_basic::sshbuf_put %%-repl\0"
+                                            as *const u8
+                                            as *const libc::c_char,
                                     );
                                 }
                                 break;

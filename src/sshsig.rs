@@ -75,14 +75,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_consume_end(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
     fn sshkey_puts(_: *const crate::sshkey::sshkey, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
@@ -257,7 +249,7 @@ pub unsafe extern "C" fn sshsig_armor(
         );
         r = -(2 as libc::c_int);
     } else {
-        r = sshbuf_put(
+        r = crate::sshbuf_getput_basic::sshbuf_put(
             buf,
             b"-----BEGIN SSH SIGNATURE-----\n\0" as *const u8 as *const libc::c_char
                 as *const libc::c_void,
@@ -289,7 +281,7 @@ pub unsafe extern "C" fn sshsig_armor(
                     b"base64 encode signature\0" as *const u8 as *const libc::c_char,
                 );
             } else {
-                r = sshbuf_put(
+                r = crate::sshbuf_getput_basic::sshbuf_put(
                     buf,
                     b"-----END SSH SIGNATURE-----\0" as *const u8 as *const libc::c_char
                         as *const libc::c_void,
@@ -310,7 +302,8 @@ pub unsafe extern "C" fn sshsig_armor(
                         1 as libc::c_int,
                         SYSLOG_LEVEL_ERROR,
                         ssh_err(r),
-                        b"sshbuf_put\0" as *const u8 as *const libc::c_char,
+                        b"crate::sshbuf_getput_basic::sshbuf_put\0" as *const u8
+                            as *const libc::c_char,
                     );
                 } else {
                     *out = buf;
@@ -366,7 +359,7 @@ pub unsafe extern "C" fn sshsig_dearmor(
             b"Couldn't parse signature: missing header\0" as *const u8 as *const libc::c_char,
         );
     } else {
-        r = sshbuf_consume(
+        r = crate::sshbuf::sshbuf_consume(
             sbuf,
             (::core::mem::size_of::<[libc::c_char; 31]>() as libc::c_ulong)
                 .wrapping_sub(1 as libc::c_int as libc::c_ulong),
@@ -407,7 +400,7 @@ pub unsafe extern "C" fn sshsig_dearmor(
                         as *const libc::c_char,
                 );
             } else {
-                r = sshbuf_consume_end(
+                r = crate::sshbuf::sshbuf_consume_end(
                     sbuf,
                     (crate::sshbuf::sshbuf_len(sbuf)).wrapping_sub(eoffset),
                 );
@@ -525,7 +518,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
         );
         r = -(2 as libc::c_int);
     } else {
-        r = sshbuf_put(
+        r = crate::sshbuf_getput_basic::sshbuf_put(
             tosign,
             b"SSHSIG\0" as *const u8 as *const libc::c_char as *const libc::c_void,
             (::core::mem::size_of::<[libc::c_char; 7]>() as libc::c_ulong)
@@ -630,7 +623,7 @@ unsafe extern "C" fn sshsig_wrap_sign(
             match current_block {
                 12108230819160066442 => {}
                 _ => {
-                    r = sshbuf_put(
+                    r = crate::sshbuf_getput_basic::sshbuf_put(
                         blob,
                         b"SSHSIG\0" as *const u8 as *const libc::c_char as *const libc::c_void,
                         (::core::mem::size_of::<[libc::c_char; 7]>() as libc::c_ulong)
@@ -713,7 +706,7 @@ unsafe extern "C" fn sshsig_parse_preamble(mut buf: *mut crate::sshbuf::sshbuf) 
     );
     if r != 0 as libc::c_int
         || {
-            r = sshbuf_consume(
+            r = crate::sshbuf::sshbuf_consume(
                 buf,
                 (::core::mem::size_of::<[libc::c_char; 7]>() as libc::c_ulong)
                     .wrapping_sub(1 as libc::c_int as libc::c_ulong),
@@ -893,7 +886,7 @@ unsafe extern "C" fn sshsig_wrap_verify(
         );
         r = -(2 as libc::c_int);
     } else {
-        r = sshbuf_put(
+        r = crate::sshbuf_getput_basic::sshbuf_put(
             toverify,
             b"SSHSIG\0" as *const u8 as *const libc::c_char as *const libc::c_void,
             (::core::mem::size_of::<[libc::c_char; 7]>() as libc::c_ulong)
@@ -1223,7 +1216,7 @@ unsafe extern "C" fn hash_buffer(
     if b.is_null() {
         r = -(2 as libc::c_int);
     } else {
-        r = sshbuf_put(
+        r = crate::sshbuf_getput_basic::sshbuf_put(
             b,
             hash.as_mut_ptr() as *const libc::c_void,
             crate::digest_openssl::ssh_digest_bytes(alg),
@@ -1237,7 +1230,7 @@ unsafe extern "C" fn hash_buffer(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 ssh_err(r),
-                b"sshbuf_put\0" as *const u8 as *const libc::c_char,
+                b"crate::sshbuf_getput_basic::sshbuf_put\0" as *const u8 as *const libc::c_char,
             );
         } else {
             *bp = b;
@@ -1516,7 +1509,7 @@ unsafe extern "C" fn hash_file(
                 if b.is_null() {
                     r = -(2 as libc::c_int);
                 } else {
-                    r = sshbuf_put(
+                    r = crate::sshbuf_getput_basic::sshbuf_put(
                         b,
                         hash.as_mut_ptr() as *const libc::c_void,
                         crate::digest_openssl::ssh_digest_bytes(alg),
@@ -1532,7 +1525,8 @@ unsafe extern "C" fn hash_file(
                             1 as libc::c_int,
                             SYSLOG_LEVEL_ERROR,
                             ssh_err(r),
-                            b"sshbuf_put\0" as *const u8 as *const libc::c_char,
+                            b"crate::sshbuf_getput_basic::sshbuf_put\0" as *const u8
+                                as *const libc::c_char,
                         );
                     } else {
                         *bp = b;

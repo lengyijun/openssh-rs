@@ -11,7 +11,6 @@ extern "C" {
         len: size_t,
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
-    fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
 
     fn sshbuf_max_size(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
@@ -93,7 +92,7 @@ pub unsafe extern "C" fn ssh_msg_send(
             write as unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t,
         )),
         fd,
-        sshbuf_mutable_ptr(m) as *mut libc::c_void,
+        crate::sshbuf::sshbuf_mutable_ptr(m) as *mut libc::c_void,
         mlen as size_t,
     ) != mlen as libc::c_ulong
     {

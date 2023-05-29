@@ -61,13 +61,7 @@ extern "C" {
     fn compat_banner(_: *mut ssh, _: *const libc::c_char);
 
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_consume_end(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
+
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
@@ -420,7 +414,7 @@ pub unsafe extern "C" fn ssh_input_append(
     mut data: *const u_char,
     mut len: size_t,
 ) -> libc::c_int {
-    return sshbuf_put(
+    return crate::sshbuf_getput_basic::sshbuf_put(
         ssh_packet_get_input(ssh) as *mut crate::sshbuf::sshbuf,
         data as *const libc::c_void,
         len,
@@ -497,7 +491,7 @@ pub unsafe extern "C" fn ssh_output_ptr(mut ssh: *mut ssh, mut len: *mut size_t)
     return crate::sshbuf::sshbuf_ptr(output);
 }
 pub unsafe extern "C" fn ssh_output_consume(mut ssh: *mut ssh, mut len: size_t) -> libc::c_int {
-    return sshbuf_consume(
+    return crate::sshbuf::sshbuf_consume(
         ssh_packet_get_output(ssh) as *mut crate::sshbuf::sshbuf,
         len,
     );
@@ -602,7 +596,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
             }
             _ => {}
         }
-        r = sshbuf_put(
+        r = crate::sshbuf_getput_basic::sshbuf_put(
             ssh_packet_get_output(ssh) as *mut crate::sshbuf::sshbuf,
             mismatch as *const libc::c_void,
             strlen(mismatch),
@@ -612,7 +606,7 @@ pub unsafe extern "C" fn _ssh_read_banner(
         }
         return -(38 as libc::c_int);
     }
-    r = sshbuf_consume(input, j);
+    r = crate::sshbuf::sshbuf_consume(input, j);
     if r != 0 as libc::c_int {
         return r;
     }
@@ -694,7 +688,7 @@ pub unsafe extern "C" fn _ssh_send_banner(
     if r != 0 as libc::c_int {
         return r;
     }
-    r = sshbuf_consume_end(banner, 2 as libc::c_int as size_t);
+    r = crate::sshbuf::sshbuf_consume_end(banner, 2 as libc::c_int as size_t);
     if r != 0 as libc::c_int {
         return r;
     }

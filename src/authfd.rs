@@ -36,13 +36,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
-
     fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
     fn sshkey_from_blob(
         _: *const u_char,
@@ -333,7 +326,7 @@ unsafe extern "C" fn ssh_request_reply(
                 write as unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t,
             )),
             sock,
-            sshbuf_mutable_ptr(request) as *mut libc::c_void,
+            crate::sshbuf::sshbuf_mutable_ptr(request) as *mut libc::c_void,
             crate::sshbuf::sshbuf_len(request),
         ) != crate::sshbuf::sshbuf_len(request)
     {
@@ -374,7 +367,11 @@ unsafe extern "C" fn ssh_request_reply(
         {
             return -(26 as libc::c_int);
         }
-        r = sshbuf_put(reply, buf.as_mut_ptr() as *const libc::c_void, l);
+        r = crate::sshbuf_getput_basic::sshbuf_put(
+            reply,
+            buf.as_mut_ptr() as *const libc::c_void,
+            l,
+        );
         if r != 0 as libc::c_int {
             return r;
         }

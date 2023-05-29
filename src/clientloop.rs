@@ -102,14 +102,6 @@ extern "C" {
     fn ssh_packet_is_rekeying(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_check_rekey(_: *mut ssh) -> libc::c_int;
 
-    fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
@@ -1555,7 +1547,7 @@ unsafe extern "C" fn client_suspend_self(
                 write as unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t,
             )),
             fileno(stdout),
-            sshbuf_mutable_ptr(bout) as *mut libc::c_void,
+            crate::sshbuf::sshbuf_mutable_ptr(bout) as *mut libc::c_void,
             crate::sshbuf::sshbuf_len(bout),
         );
     }
@@ -1568,7 +1560,7 @@ unsafe extern "C" fn client_suspend_self(
                 write as unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t,
             )),
             fileno(stderr),
-            sshbuf_mutable_ptr(berr) as *mut libc::c_void,
+            crate::sshbuf::sshbuf_mutable_ptr(berr) as *mut libc::c_void,
             crate::sshbuf::sshbuf_len(berr),
         );
     }
@@ -1691,7 +1683,7 @@ unsafe extern "C" fn client_status_confirm(
                 (*c).self_0,
                 (*cr).request_type,
             );
-            r = sshbuf_put(
+            r = crate::sshbuf_getput_basic::sshbuf_put(
                 (*c).extended,
                 errmsg.as_mut_ptr() as *const libc::c_void,
                 strlen(errmsg.as_mut_ptr()),
@@ -1707,7 +1699,7 @@ unsafe extern "C" fn client_status_confirm(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     ssh_err(r),
-                    b"sshbuf_put\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshbuf_getput_basic::sshbuf_put\0" as *const u8 as *const libc::c_char,
                 );
             }
         } else {
@@ -2850,7 +2842,11 @@ unsafe extern "C" fn process_escapes(
                         );
                     }
                     s = channel_open_message(ssh);
-                    r = sshbuf_put(berr, s as *const libc::c_void, strlen(s));
+                    r = crate::sshbuf_getput_basic::sshbuf_put(
+                        berr,
+                        s as *const libc::c_void,
+                        strlen(s),
+                    );
                     if r != 0 as libc::c_int {
                         sshfatal(
                             b"clientloop.c\0" as *const u8 as *const libc::c_char,
@@ -2862,7 +2858,8 @@ unsafe extern "C" fn process_escapes(
                             1 as libc::c_int,
                             SYSLOG_LEVEL_FATAL,
                             ssh_err(r),
-                            b"sshbuf_put\0" as *const u8 as *const libc::c_char,
+                            b"crate::sshbuf_getput_basic::sshbuf_put\0" as *const u8
+                                as *const libc::c_char,
                         );
                     }
                     libc::free(s as *mut libc::c_void);
@@ -3549,7 +3546,7 @@ pub unsafe extern "C" fn client_loop(
                 b"Write failed flushing stderr buffer.\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            r = sshbuf_consume(stderr_buffer, len as size_t);
+            r = crate::sshbuf::sshbuf_consume(stderr_buffer, len as size_t);
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"clientloop.c\0" as *const u8 as *const libc::c_char,
@@ -3559,7 +3556,7 @@ pub unsafe extern "C" fn client_loop(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     ssh_err(r),
-                    b"sshbuf_consume\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshbuf::sshbuf_consume\0" as *const u8 as *const libc::c_char,
                 );
             }
         }

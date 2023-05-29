@@ -93,15 +93,6 @@ extern "C" {
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_consume_end(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-
     fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
     fn ssh_digest_update(
         ctx: *mut ssh_digest_ctx,
@@ -899,7 +890,7 @@ pub unsafe extern "C" fn kex_buf2prop(
     if b.is_null() {
         r = -(2 as libc::c_int);
     } else {
-        r = sshbuf_consume(b, 16 as libc::c_int as size_t);
+        r = crate::sshbuf::sshbuf_consume(b, 16 as libc::c_int as size_t);
         if r != 0 as libc::c_int {
             crate::log::sshlog(
                 b"kex.c\0" as *const u8 as *const libc::c_char,
@@ -1460,7 +1451,7 @@ pub unsafe extern "C" fn kex_send_kexinit(mut ssh: *mut ssh) -> libc::c_int {
         );
         return -(4 as libc::c_int);
     }
-    cookie = sshbuf_mutable_ptr((*kex).my);
+    cookie = crate::sshbuf::sshbuf_mutable_ptr((*kex).my);
     if cookie.is_null() {
         crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
@@ -1545,7 +1536,7 @@ pub unsafe extern "C" fn kex_input_kexinit(
     }
     crate::dispatch::ssh_dispatch_set(ssh, 20 as libc::c_int, None);
     ptr = sshpkt_ptr(ssh, &mut dlen);
-    r = sshbuf_put((*kex).peer, ptr as *const libc::c_void, dlen);
+    r = crate::sshbuf_getput_basic::sshbuf_put((*kex).peer, ptr as *const libc::c_void, dlen);
     if r != 0 as libc::c_int {
         return r;
     }
@@ -2480,7 +2471,7 @@ pub unsafe extern "C" fn kex_derive_keys(
             );
             return -(1 as libc::c_int);
         }
-        r = sshbuf_put(
+        r = crate::sshbuf_getput_basic::sshbuf_put(
             (*kex).session_id,
             hash as *const libc::c_void,
             hashlen as size_t,
@@ -2729,7 +2720,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
             write as unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t,
         )),
         ssh_packet_get_connection_out(ssh),
-        sshbuf_mutable_ptr(our_version) as *mut libc::c_void,
+        crate::sshbuf::sshbuf_mutable_ptr(our_version) as *mut libc::c_void,
         crate::sshbuf::sshbuf_len(our_version),
     ) != crate::sshbuf::sshbuf_len(our_version)
     {
@@ -2749,7 +2740,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
         );
         r = -(24 as libc::c_int);
     } else {
-        r = sshbuf_consume_end(our_version, 2 as libc::c_int as size_t);
+        r = crate::sshbuf::sshbuf_consume_end(our_version, 2 as libc::c_int as size_t);
         if r != 0 as libc::c_int {
             oerrno = *libc::__errno_location();
             crate::log::sshlog(
@@ -2762,7 +2753,7 @@ pub unsafe extern "C" fn kex_exchange_identification(
                 1 as libc::c_int,
                 SYSLOG_LEVEL_ERROR,
                 ssh_err(r),
-                b"sshbuf_consume_end\0" as *const u8 as *const libc::c_char,
+                b"crate::sshbuf::sshbuf_consume_end\0" as *const u8 as *const libc::c_char,
             );
         } else {
             our_version_string = crate::sshbuf_misc::sshbuf_dup_string(our_version);
@@ -2963,7 +2954,8 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                             1 as libc::c_int,
                                             SYSLOG_LEVEL_ERROR,
                                             ssh_err(r),
-                                            b"sshbuf_put\0" as *const u8 as *const libc::c_char,
+                                            b"crate::sshbuf_getput_basic::sshbuf_put\0" as *const u8
+                                                as *const libc::c_char,
                                         );
                                         current_block = 4276536258050058664;
                                         break 's_97;

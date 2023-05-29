@@ -41,7 +41,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
@@ -2699,7 +2698,10 @@ unsafe extern "C" fn sign_and_send_pubkey(mut ssh: *mut ssh, mut id: *mut Identi
                     b"append signature\0" as *const u8 as *const libc::c_char,
                 );
             }
-            r = sshbuf_consume(b, skip.wrapping_add(1 as libc::c_int as libc::c_ulong));
+            r = crate::sshbuf::sshbuf_consume(
+                b,
+                skip.wrapping_add(1 as libc::c_int as libc::c_ulong),
+            );
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"sshconnect2.c\0" as *const u8 as *const libc::c_char,

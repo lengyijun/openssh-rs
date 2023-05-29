@@ -94,12 +94,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
 
     fn sshbuf_froms(
@@ -4392,7 +4386,7 @@ unsafe extern "C" fn process() {
     if buf_len < msg_len.wrapping_add(4 as libc::c_int as libc::c_uint) {
         return;
     }
-    r = sshbuf_consume(iqueue, 4 as libc::c_int as size_t);
+    r = crate::sshbuf::sshbuf_consume(iqueue, 4 as libc::c_int as size_t);
     if r != 0 as libc::c_int {
         sshfatal(
             b"sftp-server.c\0" as *const u8 as *const libc::c_char,
@@ -4535,7 +4529,7 @@ unsafe extern "C" fn process() {
         sftp_server_cleanup_exit(255 as libc::c_int);
     }
     if msg_len > consumed && {
-        r = sshbuf_consume(iqueue, msg_len.wrapping_sub(consumed) as size_t);
+        r = crate::sshbuf::sshbuf_consume(iqueue, msg_len.wrapping_sub(consumed) as size_t);
         r != 0 as libc::c_int
     } {
         sshfatal(

@@ -21,12 +21,6 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-
     fn sshkey_private_deserialize_sk(
         buf: *mut crate::sshbuf::sshbuf,
         k: *mut crate::sshkey::sshkey,
@@ -379,8 +373,12 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
             encoded = crate::sshbuf::sshbuf_new();
             if encoded.is_null() {
                 r = -(2 as libc::c_int);
-            } else if sshbuf_put(encoded, sigblob as *const libc::c_void, len) != 0 as libc::c_int
-                || sshbuf_put(
+            } else if crate::sshbuf_getput_basic::sshbuf_put(
+                encoded,
+                sigblob as *const libc::c_void,
+                len,
+            ) != 0 as libc::c_int
+                || crate::sshbuf_getput_basic::sshbuf_put(
                     encoded,
                     apphash.as_mut_ptr() as *const libc::c_void,
                     ::core::mem::size_of::<[u_char; 32]>() as libc::c_ulong,
@@ -388,7 +386,7 @@ unsafe extern "C" fn ssh_ed25519_sk_verify(
                 || crate::sshbuf_getput_basic::sshbuf_put_u8(encoded, sig_flags) != 0 as libc::c_int
                 || crate::sshbuf_getput_basic::sshbuf_put_u32(encoded, sig_counter)
                     != 0 as libc::c_int
-                || sshbuf_put(
+                || crate::sshbuf_getput_basic::sshbuf_put(
                     encoded,
                     msghash.as_mut_ptr() as *const libc::c_void,
                     ::core::mem::size_of::<[u_char; 32]>() as libc::c_ulong,

@@ -120,14 +120,6 @@ extern "C" {
         >,
     ) -> libc::c_int;
 
-    fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-
     fn log_level_get() -> LogLevel;
 
     fn sshfatal(
@@ -254,7 +246,7 @@ unsafe extern "C" fn send_msg(mut m: *mut crate::sshbuf::sshbuf) {
                 write as unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t,
             )),
             fd,
-            sshbuf_mutable_ptr(m) as *mut libc::c_void,
+            crate::sshbuf::sshbuf_mutable_ptr(m) as *mut libc::c_void,
             crate::sshbuf::sshbuf_len(m),
         ) != crate::sshbuf::sshbuf_len(m)
     {
@@ -268,7 +260,7 @@ unsafe extern "C" fn send_msg(mut m: *mut crate::sshbuf::sshbuf) {
             b"write to helper failed\0" as *const u8 as *const libc::c_char,
         );
     }
-    r = sshbuf_consume(m, mlen);
+    r = crate::sshbuf::sshbuf_consume(m, mlen);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
@@ -349,7 +341,11 @@ unsafe extern "C" fn recv_msg(mut m: *mut crate::sshbuf::sshbuf) -> libc::c_int 
             );
             return 0 as libc::c_int;
         }
-        r = sshbuf_put(m, buf.as_mut_ptr() as *const libc::c_void, l as size_t);
+        r = crate::sshbuf_getput_basic::sshbuf_put(
+            m,
+            buf.as_mut_ptr() as *const libc::c_void,
+            l as size_t,
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"ssh-pkcs11-client.c\0" as *const u8 as *const libc::c_char,
@@ -358,7 +354,7 @@ unsafe extern "C" fn recv_msg(mut m: *mut crate::sshbuf::sshbuf) -> libc::c_int 
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 ssh_err(r),
-                b"sshbuf_put\0" as *const u8 as *const libc::c_char,
+                b"crate::sshbuf_getput_basic::sshbuf_put\0" as *const u8 as *const libc::c_char,
             );
         }
         len = (len as libc::c_uint).wrapping_sub(l) as u_int as u_int;

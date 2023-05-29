@@ -189,12 +189,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-
     fn sshbuf_get_stringb(
         buf: *mut crate::sshbuf::sshbuf,
         v: *mut crate::sshbuf::sshbuf,
@@ -2288,7 +2282,7 @@ unsafe extern "C" fn recv_rexec_state(mut fd: libc::c_int, mut conf: *mut crate:
         );
     }
     if !conf.is_null() && {
-        r = sshbuf_put(conf, cp as *const libc::c_void, len);
+        r = crate::sshbuf_getput_basic::sshbuf_put(conf, cp as *const libc::c_void, len);
         r != 0
     } {
         sshfatal(
@@ -2299,7 +2293,7 @@ unsafe extern "C" fn recv_rexec_state(mut fd: libc::c_int, mut conf: *mut crate:
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             ssh_err(r),
-            b"sshbuf_put\0" as *const u8 as *const libc::c_char,
+            b"crate::sshbuf_getput_basic::sshbuf_put\0" as *const u8 as *const libc::c_char,
         );
     }
     while crate::sshbuf::sshbuf_len(inc) != 0 as libc::c_int as libc::c_ulong {

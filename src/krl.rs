@@ -45,13 +45,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-
     fn sshbuf_froms(
         buf: *mut crate::sshbuf::sshbuf,
         bufp: *mut *mut crate::sshbuf::sshbuf,
@@ -2760,7 +2753,7 @@ pub unsafe extern "C" fn ssh_krl_to_blob(
     if sect.is_null() {
         return -(2 as libc::c_int);
     }
-    r = sshbuf_put(
+    r = crate::sshbuf_getput_basic::sshbuf_put(
         buf,
         b"SSHKRL\n\0\0" as *const u8 as *const libc::c_char as *const libc::c_void,
         (::core::mem::size_of::<[libc::c_char; 9]>() as libc::c_ulong)
@@ -3369,7 +3362,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
     if copy.is_null() {
         r = -(2 as libc::c_int);
     } else {
-        r = sshbuf_consume(
+        r = crate::sshbuf::sshbuf_consume(
             copy,
             (::core::mem::size_of::<[libc::c_char; 9]>() as libc::c_ulong)
                 .wrapping_sub(1 as libc::c_int as libc::c_ulong),
@@ -3613,7 +3606,7 @@ pub unsafe extern "C" fn ssh_krl_from_blob(
                                             if copy.is_null() {
                                                 r = -(2 as libc::c_int);
                                             } else {
-                                                r = sshbuf_consume(copy, sects_off);
+                                                r = crate::sshbuf::sshbuf_consume(copy, sects_off);
                                                 if !(r != 0 as libc::c_int) {
                                                     loop {
                                                         if !(crate::sshbuf::sshbuf_len(copy)

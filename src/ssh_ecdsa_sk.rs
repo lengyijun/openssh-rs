@@ -25,11 +25,6 @@ extern "C" {
         bufp: *mut *mut crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
@@ -341,7 +336,7 @@ unsafe extern "C" fn webauthn_check_prepare_hash(
     {
         r = -(4 as libc::c_int);
     } else {
-        r = sshbuf_put(
+        r = crate::sshbuf_getput_basic::sshbuf_put(
             m,
             b"{\"type\":\"webauthn.get\",\"challenge\":\"\0" as *const u8 as *const libc::c_char
                 as *const libc::c_void,
@@ -354,7 +349,7 @@ unsafe extern "C" fn webauthn_check_prepare_hash(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put(
+                r = crate::sshbuf_getput_basic::sshbuf_put(
                     m,
                     b"\",\"origin\":\"\0" as *const u8 as *const libc::c_char
                         as *const libc::c_void,
@@ -364,11 +359,15 @@ unsafe extern "C" fn webauthn_check_prepare_hash(
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put(m, origin as *const libc::c_void, strlen(origin));
+                r = crate::sshbuf_getput_basic::sshbuf_put(
+                    m,
+                    origin as *const libc::c_void,
+                    strlen(origin),
+                );
                 r != 0 as libc::c_int
             }
             || {
-                r = sshbuf_put(
+                r = crate::sshbuf_getput_basic::sshbuf_put(
                     m,
                     b"\"\0" as *const u8 as *const libc::c_char as *const libc::c_void,
                     (::core::mem::size_of::<[libc::c_char; 2]>() as libc::c_ulong)
@@ -568,7 +567,7 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
                                                         as libc::c_ulong,
                                                 );
                                                 if !(ret != 0 as libc::c_int) {
-                                                    ret = sshbuf_put(
+                                                    ret = crate::sshbuf_getput_basic::sshbuf_put(
                                                         original_signed,
                                                         apphash.as_mut_ptr() as *const libc::c_void,
                                                         ::core::mem::size_of::<[u_char; 32]>()
@@ -597,7 +596,7 @@ unsafe extern "C" fn ssh_ecdsa_sk_verify(
                                                             ret != 0 as libc::c_int
                                                         }
                                                         || {
-                                                            ret = sshbuf_put(
+                                                            ret = crate::sshbuf_getput_basic::sshbuf_put(
                                                                 original_signed,
                                                                 msghash.as_mut_ptr()
                                                                     as *const libc::c_void,

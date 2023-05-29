@@ -88,12 +88,6 @@ extern "C" {
 
     fn sshpkt_get_u32(ssh: *mut ssh, valp: *mut u_int32_t) -> libc::c_int;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-
     fn channel_init_channels(ssh: *mut ssh);
     fn channel_new(
         _: *mut ssh,
@@ -3227,7 +3221,7 @@ unsafe fn main_0(mut ac: libc::c_int, mut av: *mut *mut libc::c_char) -> libc::c
             options.remote_command,
         );
         libc::free(cp as *mut libc::c_void);
-        r = sshbuf_put(
+        r = crate::sshbuf_getput_basic::sshbuf_put(
             command,
             options.remote_command as *const libc::c_void,
             strlen(options.remote_command),

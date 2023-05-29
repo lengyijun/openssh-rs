@@ -25,16 +25,10 @@ extern "C" {
 
     fn dh_new_group(_: *mut BIGNUM, _: *mut BIGNUM) -> *mut DH;
 
-    fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
         len: size_t,
         dpp: *mut *mut u_char,
-    ) -> libc::c_int;
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
     ) -> libc::c_int;
 
     fn sshbuf_get_string_direct(
@@ -562,13 +556,13 @@ pub unsafe extern "C" fn mm_log_handler(
         );
     }
     let __v: u_int32_t = len.wrapping_sub(4 as libc::c_int as libc::c_ulong) as u_int32_t;
-    *(sshbuf_mutable_ptr(log_msg)).offset(0 as libc::c_int as isize) =
+    *(crate::sshbuf::sshbuf_mutable_ptr(log_msg)).offset(0 as libc::c_int as isize) =
         (__v >> 24 as libc::c_int & 0xff as libc::c_int as libc::c_uint) as u_char;
-    *(sshbuf_mutable_ptr(log_msg)).offset(1 as libc::c_int as isize) =
+    *(crate::sshbuf::sshbuf_mutable_ptr(log_msg)).offset(1 as libc::c_int as isize) =
         (__v >> 16 as libc::c_int & 0xff as libc::c_int as libc::c_uint) as u_char;
-    *(sshbuf_mutable_ptr(log_msg)).offset(2 as libc::c_int as isize) =
+    *(crate::sshbuf::sshbuf_mutable_ptr(log_msg)).offset(2 as libc::c_int as isize) =
         (__v >> 8 as libc::c_int & 0xff as libc::c_int as libc::c_uint) as u_char;
-    *(sshbuf_mutable_ptr(log_msg)).offset(3 as libc::c_int as isize) =
+    *(crate::sshbuf::sshbuf_mutable_ptr(log_msg)).offset(3 as libc::c_int as isize) =
         (__v & 0xff as libc::c_int as libc::c_uint) as u_char;
     if atomicio(
         ::core::mem::transmute::<
@@ -578,7 +572,7 @@ pub unsafe extern "C" fn mm_log_handler(
             write as unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t,
         )),
         (*mon).m_log_sendfd,
-        sshbuf_mutable_ptr(log_msg) as *mut libc::c_void,
+        crate::sshbuf::sshbuf_mutable_ptr(log_msg) as *mut libc::c_void,
         len,
     ) != len
     {
@@ -671,7 +665,7 @@ pub unsafe extern "C" fn mm_request_send(
             write as unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t,
         )),
         sock,
-        sshbuf_mutable_ptr(m) as *mut libc::c_void,
+        crate::sshbuf::sshbuf_mutable_ptr(m) as *mut libc::c_void,
         mlen,
     ) != mlen
     {
@@ -2563,7 +2557,7 @@ pub unsafe extern "C" fn mm_pty_allocate(
     crate::sshbuf::sshbuf_free(m);
     strlcpy(namebuf, p, namebuflen);
     libc::free(p as *mut libc::c_void);
-    r = sshbuf_put(loginmsg, msg as *const libc::c_void, strlen(msg));
+    r = crate::sshbuf_getput_basic::sshbuf_put(loginmsg, msg as *const libc::c_void, strlen(msg));
     if r != 0 as libc::c_int {
         sshfatal(
             b"monitor_wrap.c\0" as *const u8 as *const libc::c_char,

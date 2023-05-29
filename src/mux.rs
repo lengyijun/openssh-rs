@@ -81,11 +81,6 @@ extern "C" {
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
         len: size_t,
@@ -1385,7 +1380,11 @@ unsafe extern "C" fn mux_master_process_new_session(
                             as *const libc::c_char,
                     );
                 }
-                r = sshbuf_put((*cctx).cmd, cmd as *const libc::c_void, strlen(cmd));
+                r = crate::sshbuf_getput_basic::sshbuf_put(
+                    (*cctx).cmd,
+                    cmd as *const libc::c_void,
+                    strlen(cmd),
+                );
                 if r != 0 as libc::c_int {
                     sshfatal(
                         b"mux.c\0" as *const u8 as *const libc::c_char,
@@ -1397,7 +1396,8 @@ unsafe extern "C" fn mux_master_process_new_session(
                         1 as libc::c_int,
                         SYSLOG_LEVEL_FATAL,
                         ssh_err(r),
-                        b"sshbuf_put\0" as *const u8 as *const libc::c_char,
+                        b"crate::sshbuf_getput_basic::sshbuf_put\0" as *const u8
+                            as *const libc::c_char,
                     );
                 }
                 libc::free(cmd as *mut libc::c_void);
@@ -4288,7 +4288,7 @@ unsafe extern "C" fn mux_client_read_packet(
     }
     r = sshbuf_get_string_direct(queue, &mut ptr, &mut have);
     if r != 0 as libc::c_int || {
-        r = sshbuf_put(m, ptr as *const libc::c_void, have);
+        r = crate::sshbuf_getput_basic::sshbuf_put(m, ptr as *const libc::c_void, have);
         r != 0 as libc::c_int
     } {
         sshfatal(

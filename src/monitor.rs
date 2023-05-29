@@ -100,7 +100,6 @@ extern "C" {
         len: size_t,
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
 
     fn sshbuf_put_stringb(
         buf: *mut crate::sshbuf::sshbuf,
@@ -3031,7 +3030,7 @@ unsafe extern "C" fn monitor_valid_userblob(
             fail += 1;
             fail;
         }
-        r = sshbuf_consume(b, session_id2_len as size_t);
+        r = crate::sshbuf::sshbuf_consume(b, session_id2_len as size_t);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"monitor.c\0" as *const u8 as *const libc::c_char,

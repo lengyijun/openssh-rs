@@ -194,12 +194,7 @@ extern "C" {
         len: size_t,
         dpp: *mut *mut u_char,
     ) -> libc::c_int;
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
+
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
@@ -4100,7 +4095,7 @@ unsafe extern "C" fn sshkey_private_to_blob2(
                             1 as libc::c_int,
                         );
                         if !(r != 0 as libc::c_int) {
-                            r = sshbuf_put(
+                            r = crate::sshbuf_getput_basic::sshbuf_put(
                                 encoded,
                                 b"openssh-key-v1\0" as *const u8 as *const libc::c_char
                                     as *const libc::c_void,
@@ -4210,7 +4205,7 @@ unsafe extern "C" fn sshkey_private_to_blob2(
                                                         );
                                                         if !(r != 0 as libc::c_int) {
                                                             crate::sshbuf::sshbuf_reset(blob);
-                                                            r = sshbuf_put(
+                                                            r = crate::sshbuf_getput_basic::sshbuf_put(
                                                                 blob,
                                                                 b"-----BEGIN OPENSSH PRIVATE KEY-----\n\0" as *const u8
                                                                     as *const libc::c_char as *const libc::c_void,
@@ -4228,7 +4223,7 @@ unsafe extern "C" fn sshkey_private_to_blob2(
                                                                     r != 0 as libc::c_int
                                                                 }
                                                                 || {
-                                                                    r = sshbuf_put(
+                                                                    r = crate::sshbuf_getput_basic::sshbuf_put(
                                                                         blob,
                                                                         b"-----END OPENSSH PRIVATE KEY-----\n\0" as *const u8
                                                                             as *const libc::c_char as *const libc::c_void,
@@ -4435,7 +4430,7 @@ unsafe extern "C" fn private2_decrypt(
     if decrypted.is_null() {
         r = -(2 as libc::c_int);
     } else {
-        r = sshbuf_consume(
+        r = crate::sshbuf::sshbuf_consume(
             decoded,
             ::core::mem::size_of::<[libc::c_char; 15]>() as libc::c_ulong,
         );
@@ -4587,7 +4582,7 @@ unsafe extern "C" fn private2_decrypt(
                                                         r = -(43 as libc::c_int);
                                                     }
                                                 } else {
-                                                    r = sshbuf_consume(
+                                                    r = crate::sshbuf::sshbuf_consume(
                                                         decoded,
                                                         (encrypted_len as libc::c_ulong)
                                                             .wrapping_add(authlen),
@@ -4729,7 +4724,7 @@ unsafe extern "C" fn sshkey_parse_private2_pubkey(
     }
     r = private2_uudecode(blob, &mut decoded);
     if !(r != 0 as libc::c_int) {
-        r = sshbuf_consume(
+        r = crate::sshbuf::sshbuf_consume(
             decoded,
             ::core::mem::size_of::<[libc::c_char; 15]>() as libc::c_ulong,
         );
@@ -4905,7 +4900,11 @@ unsafe extern "C" fn sshkey_private_to_blob_pem_pkcs8(
                         if blen <= 0 as libc::c_int {
                             r = -(1 as libc::c_int);
                         } else {
-                            r = sshbuf_put(blob, bptr as *const libc::c_void, blen as size_t);
+                            r = crate::sshbuf_getput_basic::sshbuf_put(
+                                blob,
+                                bptr as *const libc::c_void,
+                                blen as size_t,
+                            );
                             if !(r != 0 as libc::c_int) {
                                 r = 0 as libc::c_int;
                             }

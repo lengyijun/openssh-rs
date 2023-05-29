@@ -98,11 +98,6 @@ extern "C" {
 
     fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
@@ -452,7 +447,7 @@ unsafe extern "C" fn input_kex_gen_reply(
                                                 if ((*kex).initial_sig).is_null() {
                                                     r = -(2 as libc::c_int);
                                                 } else {
-                                                    r = sshbuf_put(
+                                                    r = crate::sshbuf_getput_basic::sshbuf_put(
                                                         (*kex).initial_sig,
                                                         signature as *const libc::c_void,
                                                         slen,

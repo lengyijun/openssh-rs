@@ -134,8 +134,6 @@ extern "C" {
     fn ssh_packet_get_connection_out(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
 
-    fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
-
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn match_pattern_list(
@@ -963,7 +961,7 @@ unsafe extern "C" fn prepare_auth_info_file(
             write as unsafe extern "C" fn(libc::c_int, *const libc::c_void, size_t) -> ssize_t,
         )),
         fd,
-        sshbuf_mutable_ptr(info) as *mut libc::c_void,
+        crate::sshbuf::sshbuf_mutable_ptr(info) as *mut libc::c_void,
         crate::sshbuf::sshbuf_len(info),
     ) != crate::sshbuf::sshbuf_len(info)
     {

@@ -3,11 +3,6 @@ extern "C" {
 
     pub type bignum_st;
 
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
@@ -129,7 +124,11 @@ pub unsafe extern "C" fn kexgex_hash(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put(b, shared_secret as *const libc::c_void, secretlen);
+            r = crate::sshbuf_getput_basic::sshbuf_put(
+                b,
+                shared_secret as *const libc::c_void,
+                secretlen,
+            );
             r != 0 as libc::c_int
         }
     {

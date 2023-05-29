@@ -92,12 +92,7 @@ extern "C" {
     ) -> libc::c_int;
 
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
+
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
@@ -1450,7 +1445,7 @@ unsafe extern "C" fn parse_sshsig_request(mut msg: *mut crate::sshbuf::sshbuf) -
     );
     if !(r != 0 as libc::c_int
         || {
-            r = sshbuf_consume(b, 6 as libc::c_int as size_t);
+            r = crate::sshbuf::sshbuf_consume(b, 6 as libc::c_int as size_t);
             r != 0 as libc::c_int
         }
         || {
@@ -4327,7 +4322,7 @@ unsafe extern "C" fn handle_conn_read(mut socknum: u_int) -> libc::c_int {
         }
         return -(1 as libc::c_int);
     }
-    r = sshbuf_put(
+    r = crate::sshbuf_getput_basic::sshbuf_put(
         (*sockets.offset(socknum as isize)).input,
         buf.as_mut_ptr() as *const libc::c_void,
         len as size_t,
@@ -4395,7 +4390,7 @@ unsafe extern "C" fn handle_conn_write(mut socknum: u_int) -> libc::c_int {
         }
         return -(1 as libc::c_int);
     }
-    r = sshbuf_consume((*sockets.offset(socknum as isize)).output, len as size_t);
+    r = crate::sshbuf::sshbuf_consume((*sockets.offset(socknum as isize)).output, len as size_t);
     if r != 0 as libc::c_int {
         sshfatal(
             b"ssh-agent.c\0" as *const u8 as *const libc::c_char,

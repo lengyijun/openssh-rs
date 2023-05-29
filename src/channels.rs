@@ -94,19 +94,13 @@ extern "C" {
 
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
-    fn sshbuf_put(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
     fn sshbuf_get(
         buf: *mut crate::sshbuf::sshbuf,
         v: *mut libc::c_void,
         len: size_t,
     ) -> libc::c_int;
-    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
+
     fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
 
     fn sshbuf_avail(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
@@ -2327,7 +2321,7 @@ unsafe extern "C" fn x11_open_helper(
     if crate::sshbuf::sshbuf_len(b) < 12 as libc::c_int as libc::c_ulong {
         return 0 as libc::c_int;
     }
-    ucp = sshbuf_mutable_ptr(b);
+    ucp = crate::sshbuf::sshbuf_mutable_ptr(b);
     if *ucp.offset(0 as libc::c_int as isize) as libc::c_int == 0x42 as libc::c_int {
         proto_len = (256 as libc::c_int * *ucp.offset(6 as libc::c_int as isize) as libc::c_int
             + *ucp.offset(7 as libc::c_int as isize) as libc::c_int) as u_int;
@@ -2716,7 +2710,7 @@ unsafe extern "C" fn channel_decode_socks4(
         p as *const libc::c_char,
         ::core::mem::size_of::<[libc::c_char; 256]>() as libc::c_ulong,
     );
-    r = sshbuf_consume(input, len as size_t);
+    r = crate::sshbuf::sshbuf_consume(input, len as size_t);
     if r != 0 as libc::c_int {
         sshfatal(
             b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -2789,7 +2783,7 @@ unsafe extern "C" fn channel_decode_socks4(
             return -(1 as libc::c_int);
         }
         (*c).path = crate::xmalloc::xstrdup(p as *const libc::c_char);
-        r = sshbuf_consume(input, len as size_t);
+        r = crate::sshbuf::sshbuf_consume(input, len as size_t);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -2846,7 +2840,7 @@ unsafe extern "C" fn channel_decode_socks4(
     s4_rsp.command = 90 as libc::c_int as u_int8_t;
     s4_rsp.dest_port = 0 as libc::c_int as u_int16_t;
     s4_rsp.dest_addr.s_addr = 0 as libc::c_int as in_addr_t;
-    r = sshbuf_put(
+    r = crate::sshbuf_getput_basic::sshbuf_put(
         output,
         &mut s4_rsp as *mut C2RustUnnamed_5 as *const libc::c_void,
         ::core::mem::size_of::<C2RustUnnamed_5>() as libc::c_ulong,
@@ -2947,7 +2941,7 @@ unsafe extern "C" fn channel_decode_socks5(
             );
             return -(1 as libc::c_int);
         }
-        r = sshbuf_consume(
+        r = crate::sshbuf::sshbuf_consume(
             input,
             nmethods.wrapping_add(2 as libc::c_int as libc::c_uint) as size_t,
         );
@@ -3080,7 +3074,7 @@ unsafe extern "C" fn channel_decode_socks5(
     if have < need {
         return 0 as libc::c_int;
     }
-    r = sshbuf_consume(
+    r = crate::sshbuf::sshbuf_consume(
         input,
         ::core::mem::size_of::<C2RustUnnamed_4>() as libc::c_ulong,
     );
@@ -3098,7 +3092,7 @@ unsafe extern "C" fn channel_decode_socks5(
         );
     }
     if s5_req.atyp as libc::c_int == 0x3 as libc::c_int {
-        r = sshbuf_consume(input, 1 as libc::c_int as size_t);
+        r = crate::sshbuf::sshbuf_consume(input, 1 as libc::c_int as size_t);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -3198,7 +3192,7 @@ unsafe extern "C" fn channel_decode_socks5(
     s5_rsp.reserved = 0 as libc::c_int as u_int8_t;
     s5_rsp.atyp = 0x1 as libc::c_int as u_int8_t;
     dest_port = 0 as libc::c_int as u_int16_t;
-    r = sshbuf_put(
+    r = crate::sshbuf_getput_basic::sshbuf_put(
         output,
         &mut s5_rsp as *mut C2RustUnnamed_4 as *const libc::c_void,
         ::core::mem::size_of::<C2RustUnnamed_4>() as libc::c_ulong,
@@ -3212,7 +3206,7 @@ unsafe extern "C" fn channel_decode_socks5(
             r != 0 as libc::c_int
         }
         || {
-            r = sshbuf_put(
+            r = crate::sshbuf_getput_basic::sshbuf_put(
                 output,
                 &mut dest_port as *mut u_int16_t as *const libc::c_void,
                 ::core::mem::size_of::<u_int16_t>() as libc::c_ulong,
@@ -3376,7 +3370,7 @@ unsafe extern "C" fn channel_before_prepare_io_rdynamic(mut ssh: *mut ssh, mut c
         have,
     );
     if (*c).flags & 0x8 as libc::c_int != 0 {
-        r = sshbuf_consume((*c).output, have as size_t);
+        r = crate::sshbuf::sshbuf_consume((*c).output, have as size_t);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -3457,7 +3451,7 @@ unsafe extern "C" fn channel_before_prepare_io_rdynamic(mut ssh: *mut ssh, mut c
                     (*c).self_0,
                 );
             }
-            r = sshbuf_consume((*c).input, len as size_t);
+            r = crate::sshbuf::sshbuf_consume((*c).input, len as size_t);
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -4342,7 +4336,7 @@ unsafe extern "C" fn channel_handle_rfd(mut ssh: *mut ssh, mut c: *mut Channel) 
                     );
                 }
             } else {
-                r = sshbuf_put(
+                r = crate::sshbuf_getput_basic::sshbuf_put(
                     (*c).input,
                     buf.as_mut_ptr() as *const libc::c_void,
                     len as size_t,
@@ -4453,7 +4447,7 @@ unsafe extern "C" fn channel_handle_wfd(mut ssh: *mut ssh, mut c: *mut Channel) 
         }
         buf = data;
     } else {
-        data = sshbuf_mutable_ptr((*c).output);
+        data = crate::sshbuf::sshbuf_mutable_ptr((*c).output);
         buf = data;
         dlen = crate::sshbuf::sshbuf_len((*c).output);
     }
@@ -4514,7 +4508,7 @@ unsafe extern "C" fn channel_handle_wfd(mut ssh: *mut ssh, mut c: *mut Channel) 
                     }
                 }
             }
-            r = sshbuf_consume((*c).output, len as size_t);
+            r = crate::sshbuf::sshbuf_consume((*c).output, len as size_t);
             if r != 0 as libc::c_int {
                 sshfatal(
                     b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -4618,7 +4612,7 @@ unsafe extern "C" fn channel_handle_efd_write(
         );
         channel_close_fd(ssh, c, &mut (*c).efd);
     } else {
-        r = sshbuf_consume((*c).extended, len as size_t);
+        r = crate::sshbuf::sshbuf_consume((*c).extended, len as size_t);
         if r != 0 as libc::c_int {
             sshfatal(
                 b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -4715,7 +4709,7 @@ unsafe extern "C" fn channel_handle_efd_read(
             (*c).self_0,
         );
     } else {
-        r = sshbuf_put(
+        r = crate::sshbuf_getput_basic::sshbuf_put(
             (*c).extended,
             buf.as_mut_ptr() as *const libc::c_void,
             len as size_t,
@@ -4866,7 +4860,7 @@ unsafe extern "C" fn read_mux(mut ssh: *mut ssh, mut c: *mut Channel, mut need: 
             chan_read_failed(ssh, c);
             return 0 as libc::c_int as u_int;
         } else {
-            r = sshbuf_put(
+            r = crate::sshbuf_getput_basic::sshbuf_put(
                 (*c).input,
                 buf.as_mut_ptr() as *const libc::c_void,
                 len as size_t,
@@ -4978,7 +4972,7 @@ unsafe extern "C" fn channel_post_mux_client_write(mut ssh: *mut ssh, mut c: *mu
         chan_mark_dead(ssh, c);
         return;
     }
-    r = sshbuf_consume((*c).output, len as size_t);
+    r = crate::sshbuf::sshbuf_consume((*c).output, len as size_t);
     if r != 0 as libc::c_int {
         sshfatal(
             b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -6083,7 +6077,7 @@ unsafe extern "C" fn channel_output_poll_input_open(mut ssh: *mut ssh, mut c: *m
             (*c).self_0,
         );
     }
-    r = sshbuf_consume((*c).input, len);
+    r = crate::sshbuf::sshbuf_consume((*c).input, len);
     if r != 0 as libc::c_int {
         sshfatal(
             b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -6185,7 +6179,7 @@ unsafe extern "C" fn channel_output_poll_extended_read(mut ssh: *mut ssh, mut c:
             (*c).self_0,
         );
     }
-    r = sshbuf_consume((*c).extended, len);
+    r = crate::sshbuf::sshbuf_consume((*c).extended, len);
     if r != 0 as libc::c_int {
         sshfatal(
             b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -6813,7 +6807,7 @@ pub unsafe extern "C" fn channel_proxy_upstream(
                     r != 0 as libc::c_int
                 }
                 || {
-                    r = sshbuf_put(b, cp as *const libc::c_void, len);
+                    r = crate::sshbuf_getput_basic::sshbuf_put(b, cp as *const libc::c_void, len);
                     r != 0 as libc::c_int
                 }
                 || {
@@ -7049,7 +7043,11 @@ pub unsafe extern "C" fn channel_input_data(
             );
         }
     } else {
-        r = sshbuf_put((*c).output, data as *const libc::c_void, data_len);
+        r = crate::sshbuf_getput_basic::sshbuf_put(
+            (*c).output,
+            data as *const libc::c_void,
+            data_len,
+        );
         if r != 0 as libc::c_int {
             sshfatal(
                 b"channels.c\0" as *const u8 as *const libc::c_char,
@@ -7221,7 +7219,11 @@ pub unsafe extern "C" fn channel_input_extended_data(
         (*c).self_0,
         data_len,
     );
-    r = sshbuf_put((*c).extended, data as *const libc::c_void, data_len);
+    r = crate::sshbuf_getput_basic::sshbuf_put(
+        (*c).extended,
+        data as *const libc::c_void,
+        data_len,
+    );
     if r != 0 as libc::c_int {
         crate::log::sshlog(
             b"channels.c\0" as *const u8 as *const libc::c_char,
