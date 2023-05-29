@@ -39,7 +39,6 @@ extern "C" {
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn dispatch_protocol_error(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
-    fn dispatch_protocol_ignore(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
@@ -972,7 +971,7 @@ pub unsafe extern "C" fn userauth_finish(
             ssh,
             50 as libc::c_int,
             Some(
-                dispatch_protocol_ignore
+                crate::dispatch::dispatch_protocol_ignore
                     as unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int,
             ),
         );
