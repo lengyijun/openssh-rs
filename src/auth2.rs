@@ -45,7 +45,6 @@ extern "C" {
     fn fakepw() -> *mut libc::passwd;
     static mut use_privsep: libc::c_int;
     fn mm_inform_authserv(_: *mut libc::c_char, _: *mut libc::c_char);
-    fn mm_getpwnamallow(_: *mut ssh, _: *const libc::c_char) -> *mut libc::passwd;
 
     static mut options: ServerOptions;
     static mut method_none: Authmethod;
@@ -749,7 +748,7 @@ unsafe extern "C" fn input_userauth_request(
         (*authctxt).attempt = (*authctxt).attempt + 1;
         if fresh1 == 0 as libc::c_int {
             (*authctxt).pw = if use_privsep != 0 {
-                mm_getpwnamallow(ssh, user)
+                crate::monitor_wrap::mm_getpwnamallow(ssh, user)
             } else {
                 crate::auth::getpwnamallow(ssh, user)
             };
