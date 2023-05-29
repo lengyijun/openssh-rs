@@ -1,6 +1,6 @@
 use ::libc;
 extern "C" {
-    pub type sshbuf;
+
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
@@ -27,8 +27,12 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn sshbuf_putf(buf: *mut sshbuf, fmt: *const libc::c_char, _: ...) -> libc::c_int;
-    static mut loginmsg: *mut sshbuf;
+    fn sshbuf_putf(
+        buf: *mut crate::sshbuf::sshbuf,
+        fmt: *const libc::c_char,
+        _: ...
+    ) -> libc::c_int;
+    static mut loginmsg: *mut crate::sshbuf::sshbuf;
     static mut options: ServerOptions;
 }
 pub type __u_int = libc::c_uint;

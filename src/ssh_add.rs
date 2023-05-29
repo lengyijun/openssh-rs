@@ -6,7 +6,7 @@ extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-    pub type sshbuf;
+
     pub type dsa_st;
     pub type rsa_st;
     pub type ec_key_st;
@@ -82,15 +82,15 @@ extern "C" {
         _: *mut *mut sshkey_sig_details,
     ) -> libc::c_int;
     fn sshkey_parse_private_fileblob(
-        buffer: *mut sshbuf,
+        buffer: *mut crate::sshbuf::sshbuf,
         passphrase: *const libc::c_char,
         keyp: *mut *mut sshkey,
         commentp: *mut *mut libc::c_char,
     ) -> libc::c_int;
     fn sshkey_set_filename(_: *mut sshkey, _: *const libc::c_char) -> libc::c_int;
     fn sshkey_signatures_left(_: *const sshkey) -> u_int32_t;
-    fn sshbuf_free(buf: *mut sshbuf);
-    fn sshbuf_load_fd(_: libc::c_int, _: *mut *mut sshbuf) -> libc::c_int;
+    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+    fn sshbuf_load_fd(_: libc::c_int, _: *mut *mut crate::sshbuf::sshbuf) -> libc::c_int;
     fn ssh_get_authentication_socket(fdp: *mut libc::c_int) -> libc::c_int;
     fn ssh_close_authentication_socket(sock: libc::c_int);
     fn ssh_lock_agent(
@@ -242,7 +242,7 @@ pub const SSH_FP_DEFAULT: sshkey_fp_rep = 0;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshkey_cert {
-    pub certblob: *mut sshbuf,
+    pub certblob: *mut crate::sshbuf::sshbuf,
     pub type_0: u_int,
     pub serial: u_int64_t,
     pub key_id: *mut libc::c_char,
@@ -250,8 +250,8 @@ pub struct sshkey_cert {
     pub principals: *mut *mut libc::c_char,
     pub valid_after: u_int64_t,
     pub valid_before: u_int64_t,
-    pub critical: *mut sshbuf,
-    pub extensions: *mut sshbuf,
+    pub critical: *mut crate::sshbuf::sshbuf,
+    pub extensions: *mut crate::sshbuf::sshbuf,
     pub signature_key: *mut sshkey,
     pub signature_type: *mut libc::c_char,
 }
@@ -273,8 +273,8 @@ pub struct sshkey {
     pub xmss_pk: *mut u_char,
     pub sk_application: *mut libc::c_char,
     pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut sshbuf,
-    pub sk_reserved: *mut sshbuf,
+    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
+    pub sk_reserved: *mut crate::sshbuf::sshbuf,
     pub cert: *mut sshkey_cert,
     pub shielded_private: *mut u_char,
     pub shielded_len: size_t,
@@ -580,7 +580,7 @@ unsafe extern "C" fn add_file(
     let mut ret: libc::c_int = -(1 as libc::c_int);
     let mut i: size_t = 0;
     let mut left: u_int32_t = 0;
-    let mut keyblob: *mut sshbuf = 0 as *mut sshbuf;
+    let mut keyblob: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut idlist: *mut ssh_identitylist = 0 as *mut ssh_identitylist;
     if libc::strcmp(filename, b"-\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
         fd = 0 as libc::c_int;

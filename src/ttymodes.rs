@@ -4,7 +4,7 @@ extern "C" {
     pub type sshkey;
     pub type kex;
     pub type session_state;
-    pub type sshbuf;
+
     fn cfgetospeed(__termios_p: *const termios) -> speed_t;
     fn cfgetispeed(__termios_p: *const termios) -> speed_t;
     fn cfsetospeed(__termios_p: *mut termios, __speed: speed_t) -> libc::c_int;
@@ -21,7 +21,7 @@ extern "C" {
         valp: *mut *const u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshpkt_put_stringb(ssh: *mut ssh, v: *const sshbuf) -> libc::c_int;
+    fn sshpkt_put_stringb(ssh: *mut ssh, v: *const crate::sshbuf::sshbuf) -> libc::c_int;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
@@ -34,14 +34,14 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn sshbuf_new() -> *mut sshbuf;
-    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut sshbuf;
-    fn sshbuf_free(buf: *mut sshbuf);
-    fn sshbuf_len(buf: *const sshbuf) -> size_t;
-    fn sshbuf_get_u32(buf: *mut sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut sshbuf, val: u_char) -> libc::c_int;
+
+    fn sshbuf_from(blob: *const libc::c_void, len: size_t) -> *mut crate::sshbuf::sshbuf;
+    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
+    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
+    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
+    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -196,11 +196,11 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
         c_ispeed: 0,
         c_ospeed: 0,
     };
-    let mut buf: *mut sshbuf = 0 as *mut sshbuf;
+    let mut buf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut r: libc::c_int = 0;
     let mut ibaud: libc::c_int = 0;
     let mut obaud: libc::c_int = 0;
-    buf = sshbuf_new();
+    buf = crate::sshbuf::sshbuf_new();
     if buf.is_null() {
         sshfatal(
             b"ttymodes.c\0" as *const u8 as *const libc::c_char,
@@ -210,7 +210,8 @@ pub unsafe extern "C" fn ssh_tty_make_modes(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_new failed\0" as *const u8 as *const libc::c_char,
+            b"crate::crate::sshbuf::sshbuf::sshbuf_new failed\0" as *const u8
+                as *const libc::c_char,
         );
     }
     if tiop.is_null() {
@@ -2026,7 +2027,7 @@ pub unsafe extern "C" fn ssh_tty_parse_modes(mut ssh: *mut ssh, mut fd: libc::c_
         c_ispeed: 0,
         c_ospeed: 0,
     };
-    let mut buf: *mut sshbuf = 0 as *mut sshbuf;
+    let mut buf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut data: *const u_char = 0 as *const u_char;
     let mut opcode: u_char = 0;
     let mut baud: u_int = 0;

@@ -2,7 +2,6 @@ use crate::atomicio::atomicio;
 use ::libc;
 use libc::close;
 extern "C" {
-    pub type sshbuf;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
@@ -10,11 +9,15 @@ extern "C" {
     fn unlink(__name: *const libc::c_char) -> libc::c_int;
 
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
-    fn sshbuf_new() -> *mut sshbuf;
-    fn sshbuf_free(buf: *mut sshbuf);
-    fn sshbuf_len(buf: *const sshbuf) -> size_t;
-    fn sshbuf_mutable_ptr(buf: *const sshbuf) -> *mut u_char;
-    fn sshbuf_put(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
+
+    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+    fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
+    fn sshbuf_put(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const libc::c_void,
+        len: size_t,
+    ) -> libc::c_int;
 
 }
 pub type __u_char = libc::c_uchar;
@@ -37,15 +40,15 @@ pub type size_t = libc::c_ulong;
 
 pub unsafe extern "C" fn sshbuf_load_fd(
     mut fd: libc::c_int,
-    mut blobp: *mut *mut sshbuf,
+    mut blobp: *mut *mut crate::sshbuf::sshbuf,
 ) -> libc::c_int {
     let mut current_block: u64;
     let mut buf: [u_char; 4096] = [0; 4096];
     let mut len: size_t = 0;
     let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut r: libc::c_int = 0;
-    let mut blob: *mut sshbuf = 0 as *mut sshbuf;
-    *blobp = 0 as *mut sshbuf;
+    let mut blob: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    *blobp = 0 as *mut crate::sshbuf::sshbuf;
     if libc::fstat(fd, &mut st) == -(1 as libc::c_int) {
         return -(24 as libc::c_int);
     }
@@ -57,7 +60,7 @@ pub unsafe extern "C" fn sshbuf_load_fd(
     {
         return -(4 as libc::c_int);
     }
-    blob = sshbuf_new();
+    blob = crate::sshbuf::sshbuf_new();
     if blob.is_null() {
         return -(2 as libc::c_int);
     }
@@ -101,7 +104,7 @@ pub unsafe extern "C" fn sshbuf_load_fd(
                 r = -(41 as libc::c_int);
             } else {
                 *blobp = blob;
-                blob = 0 as *mut sshbuf;
+                blob = 0 as *mut crate::sshbuf::sshbuf;
                 r = 0 as libc::c_int;
             }
         }
@@ -116,12 +119,12 @@ pub unsafe extern "C" fn sshbuf_load_fd(
 }
 pub unsafe extern "C" fn sshbuf_load_file(
     mut path: *const libc::c_char,
-    mut bufp: *mut *mut sshbuf,
+    mut bufp: *mut *mut crate::sshbuf::sshbuf,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
     let mut fd: libc::c_int = 0;
     let mut oerrno: libc::c_int = 0;
-    *bufp = 0 as *mut sshbuf;
+    *bufp = 0 as *mut crate::sshbuf::sshbuf;
     fd = libc::open(path, 0 as libc::c_int);
     if fd == -(1 as libc::c_int) {
         return -(24 as libc::c_int);
@@ -139,7 +142,7 @@ pub unsafe extern "C" fn sshbuf_load_file(
 }
 pub unsafe extern "C" fn sshbuf_write_file(
     mut path: *const libc::c_char,
-    mut buf: *mut sshbuf,
+    mut buf: *mut crate::sshbuf::sshbuf,
 ) -> libc::c_int {
     let mut fd: libc::c_int = 0;
     let mut oerrno: libc::c_int = 0;

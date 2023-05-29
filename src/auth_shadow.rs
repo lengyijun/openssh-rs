@@ -1,10 +1,14 @@
 use ::libc;
 extern "C" {
-    pub type sshbuf;
+
     pub type sshkey;
     fn getspnam(__name: *const libc::c_char) -> *mut spwd;
     fn time(__timer: *mut time_t) -> time_t;
-    fn sshbuf_putf(buf: *mut sshbuf, fmt: *const libc::c_char, _: ...) -> libc::c_int;
+    fn sshbuf_putf(
+        buf: *mut crate::sshbuf::sshbuf,
+        fmt: *const libc::c_char,
+        _: ...
+    ) -> libc::c_int;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn sshfatal(
@@ -17,7 +21,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    static mut loginmsg: *mut sshbuf;
+    static mut loginmsg: *mut crate::sshbuf::sshbuf;
 }
 pub type __u_int = libc::c_uint;
 pub type __uid_t = libc::c_uint;
@@ -60,12 +64,12 @@ pub struct Authctxt {
     pub num_auth_methods: u_int,
     pub methoddata: *mut libc::c_void,
     pub kbdintctxt: *mut libc::c_void,
-    pub loginmsg: *mut sshbuf,
+    pub loginmsg: *mut crate::sshbuf::sshbuf,
     pub prev_keys: *mut *mut sshkey,
     pub nprev_keys: u_int,
     pub auth_method_key: *mut sshkey,
     pub auth_method_info: *mut libc::c_char,
-    pub session_info: *mut sshbuf,
+    pub session_info: *mut crate::sshbuf::sshbuf,
 }
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;

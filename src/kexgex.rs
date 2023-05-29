@@ -1,20 +1,28 @@
 use ::libc;
 extern "C" {
-    pub type sshbuf;
+
     pub type bignum_st;
-    fn sshbuf_new() -> *mut sshbuf;
-    fn sshbuf_free(buf: *mut sshbuf);
-    fn sshbuf_len(buf: *const sshbuf) -> size_t;
-    fn sshbuf_put(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
-    fn sshbuf_putb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut sshbuf, val: u_char) -> libc::c_int;
-    fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
-    fn sshbuf_put_bignum2(buf: *mut sshbuf, v: *const BIGNUM) -> libc::c_int;
+
+    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+    fn sshbuf_put(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const libc::c_void,
+        len: size_t,
+    ) -> libc::c_int;
+    fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
+        -> libc::c_int;
+    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
+    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+    fn sshbuf_put_stringb(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const crate::sshbuf::sshbuf,
+    ) -> libc::c_int;
+    fn sshbuf_put_bignum2(buf: *mut crate::sshbuf::sshbuf, v: *const BIGNUM) -> libc::c_int;
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
     fn ssh_digest_buffer(
         alg: libc::c_int,
-        b: *const sshbuf,
+        b: *const crate::sshbuf::sshbuf,
         d: *mut u_char,
         dlen: size_t,
     ) -> libc::c_int;
@@ -27,11 +35,11 @@ pub type u_int32_t = __uint32_t;
 pub type BIGNUM = bignum_st;
 pub unsafe extern "C" fn kexgex_hash(
     mut hash_alg: libc::c_int,
-    mut client_version: *const sshbuf,
-    mut server_version: *const sshbuf,
-    mut client_kexinit: *const sshbuf,
-    mut server_kexinit: *const sshbuf,
-    mut server_host_key_blob: *const sshbuf,
+    mut client_version: *const crate::sshbuf::sshbuf,
+    mut server_version: *const crate::sshbuf::sshbuf,
+    mut client_kexinit: *const crate::sshbuf::sshbuf,
+    mut server_kexinit: *const crate::sshbuf::sshbuf,
+    mut server_host_key_blob: *const crate::sshbuf::sshbuf,
     mut min: libc::c_int,
     mut wantbits: libc::c_int,
     mut max: libc::c_int,
@@ -44,12 +52,12 @@ pub unsafe extern "C" fn kexgex_hash(
     mut hash: *mut u_char,
     mut hashlen: *mut size_t,
 ) -> libc::c_int {
-    let mut b: *mut sshbuf = 0 as *mut sshbuf;
+    let mut b: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut r: libc::c_int = 0;
     if *hashlen < ssh_digest_bytes(1 as libc::c_int) {
         return -(10 as libc::c_int);
     }
-    b = sshbuf_new();
+    b = crate::sshbuf::sshbuf_new();
     if b.is_null() {
         return -(2 as libc::c_int);
     }

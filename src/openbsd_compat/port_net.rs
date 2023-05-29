@@ -3,7 +3,7 @@ use ::libc;
 use libc::close;
 extern "C" {
     pub type ssh;
-    pub type sshbuf;
+
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
     fn getsockopt(
         __fd: libc::c_int,
@@ -39,11 +39,15 @@ extern "C" {
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshbuf_get_string(
-        buf: *mut sshbuf,
+        buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_string(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
+    fn sshbuf_put_string(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const libc::c_void,
+        len: size_t,
+    ) -> libc::c_int;
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
@@ -135,9 +139,9 @@ pub struct Channel {
     pub delayed: libc::c_int,
     pub restore_block: libc::c_int,
     pub restore_flags: [libc::c_int; 3],
-    pub input: *mut sshbuf,
-    pub output: *mut sshbuf,
-    pub extended: *mut sshbuf,
+    pub input: *mut crate::sshbuf::sshbuf,
+    pub output: *mut crate::sshbuf::sshbuf,
+    pub extended: *mut crate::sshbuf::sshbuf,
     pub path: *mut libc::c_char,
     pub listening_port: libc::c_int,
     pub listening_addr: *mut libc::c_char,

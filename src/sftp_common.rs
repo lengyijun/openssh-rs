@@ -1,6 +1,5 @@
 use ::libc;
 extern "C" {
-    pub type sshbuf;
 
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn strmode(mode: libc::c_int, p: *mut libc::c_char);
@@ -20,16 +19,16 @@ extern "C" {
     fn localtime(__timer: *const time_t) -> *mut tm;
 
     fn sshbuf_get_cstring(
-        buf: *mut sshbuf,
+        buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut libc::c_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_get_u64(buf: *mut sshbuf, valp: *mut u_int64_t) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_put_u64(buf: *mut sshbuf, val: u_int64_t) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut sshbuf, val: u_int32_t) -> libc::c_int;
+    fn sshbuf_get_u64(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int64_t) -> libc::c_int;
+    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
+    fn sshbuf_put_u64(buf: *mut crate::sshbuf::sshbuf, val: u_int64_t) -> libc::c_int;
+    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
     fn sshbuf_get_string(
-        buf: *mut sshbuf,
+        buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
@@ -139,7 +138,10 @@ pub unsafe extern "C" fn attrib_to_stat(mut a: *const Attrib, mut st: *mut libc:
         (*st).st_mtime = (*a).mtime as __time_t;
     }
 }
-pub unsafe extern "C" fn decode_attrib(mut b: *mut sshbuf, mut a: *mut Attrib) -> libc::c_int {
+pub unsafe extern "C" fn decode_attrib(
+    mut b: *mut crate::sshbuf::sshbuf,
+    mut a: *mut Attrib,
+) -> libc::c_int {
     let mut r: libc::c_int = 0;
     attrib_clear(a);
     r = sshbuf_get_u32(b, &mut (*a).flags);
@@ -218,7 +220,10 @@ pub unsafe extern "C" fn decode_attrib(mut b: *mut sshbuf, mut a: *mut Attrib) -
     }
     return 0 as libc::c_int;
 }
-pub unsafe extern "C" fn encode_attrib(mut b: *mut sshbuf, mut a: *const Attrib) -> libc::c_int {
+pub unsafe extern "C" fn encode_attrib(
+    mut b: *mut crate::sshbuf::sshbuf,
+    mut a: *const Attrib,
+) -> libc::c_int {
     let mut r: libc::c_int = 0;
     r = sshbuf_put_u32(b, (*a).flags);
     if r != 0 as libc::c_int {

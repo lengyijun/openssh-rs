@@ -1,6 +1,6 @@
 use ::libc;
 extern "C" {
-    pub type sshbuf;
+
     pub type bignum_st;
     pub type bignum_ctx;
     pub type ec_key_st;
@@ -32,19 +32,23 @@ extern "C" {
         len: size_t,
         ctx: *mut BN_CTX,
     ) -> libc::c_int;
-    fn sshbuf_put_string(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
+    fn sshbuf_put_string(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const libc::c_void,
+        len: size_t,
+    ) -> libc::c_int;
     fn sshbuf_get_string_direct(
-        buf: *mut sshbuf,
+        buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *const u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
     fn sshbuf_peek_string_direct(
-        buf: *const sshbuf,
+        buf: *const crate::sshbuf::sshbuf,
         valp: *mut *const u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
     fn sshbuf_get_bignum2_bytes_direct(
-        buf: *mut sshbuf,
+        buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *const u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
@@ -62,7 +66,7 @@ pub const POINT_CONVERSION_COMPRESSED: point_conversion_form_t = 2;
 pub type EC_GROUP = ec_group_st;
 pub type EC_POINT = ec_point_st;
 pub unsafe extern "C" fn sshbuf_get_bignum2(
-    mut buf: *mut sshbuf,
+    mut buf: *mut crate::sshbuf::sshbuf,
     mut valp: *mut *mut BIGNUM,
 ) -> libc::c_int {
     let mut v: *mut BIGNUM = 0 as *mut BIGNUM;
@@ -108,7 +112,7 @@ unsafe extern "C" fn get_ec(
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn sshbuf_get_ec(
-    mut buf: *mut sshbuf,
+    mut buf: *mut crate::sshbuf::sshbuf,
     mut v: *mut EC_POINT,
     mut g: *const EC_GROUP,
 ) -> libc::c_int {
@@ -129,7 +133,10 @@ pub unsafe extern "C" fn sshbuf_get_ec(
     }
     return 0 as libc::c_int;
 }
-pub unsafe extern "C" fn sshbuf_get_eckey(mut buf: *mut sshbuf, mut v: *mut EC_KEY) -> libc::c_int {
+pub unsafe extern "C" fn sshbuf_get_eckey(
+    mut buf: *mut crate::sshbuf::sshbuf,
+    mut v: *mut EC_KEY,
+) -> libc::c_int {
     let mut pt: *mut EC_POINT = EC_POINT_new(EC_KEY_get0_group(v));
     let mut r: libc::c_int = 0;
     let mut d: *const u_char = 0 as *const u_char;
@@ -159,7 +166,7 @@ pub unsafe extern "C" fn sshbuf_get_eckey(mut buf: *mut sshbuf, mut v: *mut EC_K
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn sshbuf_put_bignum2(
-    mut buf: *mut sshbuf,
+    mut buf: *mut crate::sshbuf::sshbuf,
     mut v: *const BIGNUM,
 ) -> libc::c_int {
     let mut d: [u_char; 2049] = [0; 2049];
@@ -199,7 +206,7 @@ pub unsafe extern "C" fn sshbuf_put_bignum2(
     return 0 as libc::c_int;
 }
 pub unsafe extern "C" fn sshbuf_put_ec(
-    mut buf: *mut sshbuf,
+    mut buf: *mut crate::sshbuf::sshbuf,
     mut v: *const EC_POINT,
     mut g: *const EC_GROUP,
 ) -> libc::c_int {
@@ -236,7 +243,7 @@ pub unsafe extern "C" fn sshbuf_put_ec(
     return ret;
 }
 pub unsafe extern "C" fn sshbuf_put_eckey(
-    mut buf: *mut sshbuf,
+    mut buf: *mut crate::sshbuf::sshbuf,
     mut v: *const EC_KEY,
 ) -> libc::c_int {
     return sshbuf_put_ec(buf, EC_KEY_get0_public_key(v), EC_KEY_get0_group(v));

@@ -4,11 +4,11 @@ extern "C" {
     pub type sshkey;
     pub type kex;
     pub type session_state;
-    pub type sshbuf;
+
     fn shutdown(__fd: libc::c_int, __how: libc::c_int) -> libc::c_int;
 
-    fn sshbuf_len(buf: *const sshbuf) -> size_t;
-    fn sshbuf_reset(buf: *mut sshbuf);
+    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
@@ -89,9 +89,9 @@ pub struct Channel {
     pub delayed: libc::c_int,
     pub restore_block: libc::c_int,
     pub restore_flags: [libc::c_int; 3],
-    pub input: *mut sshbuf,
-    pub output: *mut sshbuf,
-    pub extended: *mut sshbuf,
+    pub input: *mut crate::sshbuf::sshbuf,
+    pub output: *mut crate::sshbuf::sshbuf,
+    pub extended: *mut crate::sshbuf::sshbuf,
     pub path: *mut libc::c_char,
     pub listening_port: libc::c_int,
     pub listening_addr: *mut libc::c_char,

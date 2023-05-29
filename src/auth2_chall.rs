@@ -2,7 +2,7 @@ use ::libc;
 
 extern "C" {
     pub type ssh_channels;
-    pub type sshbuf;
+
     pub type ec_key_st;
     pub type dsa_st;
     pub type rsa_st;
@@ -21,11 +21,15 @@ extern "C" {
         _: *const libc::c_char,
         _: *const libc::c_char,
     ) -> libc::c_int;
-    fn sshbuf_new() -> *mut sshbuf;
-    fn sshbuf_free(buf: *mut sshbuf);
-    fn sshbuf_len(buf: *const sshbuf) -> size_t;
-    fn sshbuf_putf(buf: *mut sshbuf, fmt: *const libc::c_char, _: ...) -> libc::c_int;
-    fn sshbuf_dup_string(buf: *mut sshbuf) -> *mut libc::c_char;
+
+    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+    fn sshbuf_putf(
+        buf: *mut crate::sshbuf::sshbuf,
+        fmt: *const libc::c_char,
+        _: ...
+    ) -> libc::c_int;
+    fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
     fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
@@ -119,8 +123,8 @@ pub struct sshkey {
     pub xmss_pk: *mut u_char,
     pub sk_application: *mut libc::c_char,
     pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut sshbuf,
-    pub sk_reserved: *mut sshbuf,
+    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
+    pub sk_reserved: *mut crate::sshbuf::sshbuf,
     pub cert: *mut sshkey_cert,
     pub shielded_private: *mut u_char,
     pub shielded_len: size_t,
@@ -130,7 +134,7 @@ pub struct sshkey {
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshkey_cert {
-    pub certblob: *mut sshbuf,
+    pub certblob: *mut crate::sshbuf::sshbuf,
     pub type_0: u_int,
     pub serial: u_int64_t,
     pub key_id: *mut libc::c_char,
@@ -138,8 +142,8 @@ pub struct sshkey_cert {
     pub principals: *mut *mut libc::c_char,
     pub valid_after: u_int64_t,
     pub valid_before: u_int64_t,
-    pub critical: *mut sshbuf,
-    pub extensions: *mut sshbuf,
+    pub critical: *mut crate::sshbuf::sshbuf,
+    pub extensions: *mut crate::sshbuf::sshbuf,
     pub signature_key: *mut sshkey,
     pub signature_type: *mut libc::c_char,
 }
@@ -178,12 +182,12 @@ pub struct Authctxt {
     pub num_auth_methods: u_int,
     pub methoddata: *mut libc::c_void,
     pub kbdintctxt: *mut libc::c_void,
-    pub loginmsg: *mut sshbuf,
+    pub loginmsg: *mut crate::sshbuf::sshbuf,
     pub prev_keys: *mut *mut sshkey,
     pub nprev_keys: u_int,
     pub auth_method_key: *mut sshkey,
     pub auth_method_info: *mut libc::c_char,
-    pub session_info: *mut sshbuf,
+    pub session_info: *mut crate::sshbuf::sshbuf,
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -227,7 +231,7 @@ pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 pub static mut devices: [*mut KbdintDevice; 1] = [0 as *const KbdintDevice as *mut KbdintDevice];
 unsafe extern "C" fn kbdint_alloc(mut devs: *const libc::c_char) -> *mut KbdintAuthctxt {
     let mut kbdintctxt: *mut KbdintAuthctxt = 0 as *mut KbdintAuthctxt;
-    let mut b: *mut sshbuf = 0 as *mut sshbuf;
+    let mut b: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut i: libc::c_int = 0;
     let mut r: libc::c_int = 0;
     kbdintctxt = crate::xmalloc::xcalloc(
@@ -235,7 +239,7 @@ unsafe extern "C" fn kbdint_alloc(mut devs: *const libc::c_char) -> *mut KbdintA
         ::core::mem::size_of::<KbdintAuthctxt>() as libc::c_ulong,
     ) as *mut KbdintAuthctxt;
     if libc::strcmp(devs, b"\0" as *const u8 as *const libc::c_char) == 0 as libc::c_int {
-        b = sshbuf_new();
+        b = crate::sshbuf::sshbuf_new();
         if b.is_null() {
             sshfatal(
                 b"auth2-chall.c\0" as *const u8 as *const libc::c_char,
@@ -245,7 +249,8 @@ unsafe extern "C" fn kbdint_alloc(mut devs: *const libc::c_char) -> *mut KbdintA
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"sshbuf_new failed\0" as *const u8 as *const libc::c_char,
+                b"crate::crate::sshbuf::sshbuf::sshbuf_new failed\0" as *const u8
+                    as *const libc::c_char,
             );
         }
         i = 0 as libc::c_int;

@@ -1,6 +1,6 @@
 use ::libc;
 extern "C" {
-    pub type sshbuf;
+
     pub type ssh_digest_ctx;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
@@ -23,7 +23,10 @@ extern "C" {
         m: *const libc::c_void,
         mlen: size_t,
     ) -> libc::c_int;
-    fn ssh_digest_update_buffer(ctx: *mut ssh_digest_ctx, b: *const sshbuf) -> libc::c_int;
+    fn ssh_digest_update_buffer(
+        ctx: *mut ssh_digest_ctx,
+        b: *const crate::sshbuf::sshbuf,
+    ) -> libc::c_int;
     fn ssh_digest_final(ctx: *mut ssh_digest_ctx, d: *mut u_char, dlen: size_t) -> libc::c_int;
     fn ssh_digest_free(ctx: *mut ssh_digest_ctx);
 }
@@ -134,7 +137,7 @@ pub unsafe extern "C" fn ssh_hmac_update(
 }
 pub unsafe extern "C" fn ssh_hmac_update_buffer(
     mut ctx: *mut ssh_hmac_ctx,
-    mut b: *const sshbuf,
+    mut b: *const crate::sshbuf::sshbuf,
 ) -> libc::c_int {
     return ssh_digest_update_buffer((*ctx).digest, b);
 }

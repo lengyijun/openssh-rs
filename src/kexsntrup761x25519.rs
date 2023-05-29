@@ -1,7 +1,7 @@
 use ::libc;
 extern "C" {
     pub type ssh;
-    pub type sshbuf;
+
     pub type dh_st;
     pub type dsa_st;
     pub type rsa_st;
@@ -26,20 +26,28 @@ extern "C" {
     fn kexc25519_shared_key_ext(
         key: *const u_char,
         pub_0: *const u_char,
-        out: *mut sshbuf,
+        out: *mut crate::sshbuf::sshbuf,
         _: libc::c_int,
     ) -> libc::c_int;
-    fn sshbuf_new() -> *mut sshbuf;
-    fn sshbuf_free(buf: *mut sshbuf);
-    fn sshbuf_reset(buf: *mut sshbuf);
-    fn sshbuf_len(buf: *const sshbuf) -> size_t;
-    fn sshbuf_ptr(buf: *const sshbuf) -> *const u_char;
-    fn sshbuf_reserve(buf: *mut sshbuf, len: size_t, dpp: *mut *mut u_char) -> libc::c_int;
-    fn sshbuf_put_string(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
+
+    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
+    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
+    fn sshbuf_reserve(
+        buf: *mut crate::sshbuf::sshbuf,
+        len: size_t,
+        dpp: *mut *mut u_char,
+    ) -> libc::c_int;
+    fn sshbuf_put_string(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const libc::c_void,
+        len: size_t,
+    ) -> libc::c_int;
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
     fn ssh_digest_buffer(
         alg: libc::c_int,
-        b: *const sshbuf,
+        b: *const crate::sshbuf::sshbuf,
         d: *mut u_char,
         dlen: size_t,
     ) -> libc::c_int;
@@ -63,7 +71,7 @@ pub type EC_GROUP = ec_group_st;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshkey_cert {
-    pub certblob: *mut sshbuf,
+    pub certblob: *mut crate::sshbuf::sshbuf,
     pub type_0: u_int,
     pub serial: u_int64_t,
     pub key_id: *mut libc::c_char,
@@ -71,8 +79,8 @@ pub struct sshkey_cert {
     pub principals: *mut *mut libc::c_char,
     pub valid_after: u_int64_t,
     pub valid_before: u_int64_t,
-    pub critical: *mut sshbuf,
-    pub extensions: *mut sshbuf,
+    pub critical: *mut crate::sshbuf::sshbuf,
+    pub extensions: *mut crate::sshbuf::sshbuf,
     pub signature_key: *mut sshkey,
     pub signature_type: *mut libc::c_char,
 }
@@ -94,8 +102,8 @@ pub struct sshkey {
     pub xmss_pk: *mut u_char,
     pub sk_application: *mut libc::c_char,
     pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut sshbuf,
-    pub sk_reserved: *mut sshbuf,
+    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
+    pub sk_reserved: *mut crate::sshbuf::sshbuf,
     pub cert: *mut sshkey_cert,
     pub shielded_private: *mut u_char,
     pub shielded_len: size_t,
@@ -155,12 +163,12 @@ pub struct kex {
     pub kex_type: u_int,
     pub server_sig_algs: *mut libc::c_char,
     pub ext_info_c: libc::c_int,
-    pub my: *mut sshbuf,
-    pub peer: *mut sshbuf,
-    pub client_version: *mut sshbuf,
-    pub server_version: *mut sshbuf,
-    pub session_id: *mut sshbuf,
-    pub initial_sig: *mut sshbuf,
+    pub my: *mut crate::sshbuf::sshbuf,
+    pub peer: *mut crate::sshbuf::sshbuf,
+    pub client_version: *mut crate::sshbuf::sshbuf,
+    pub server_version: *mut crate::sshbuf::sshbuf,
+    pub session_id: *mut crate::sshbuf::sshbuf,
+    pub initial_sig: *mut crate::sshbuf::sshbuf,
     pub initial_hostkey: *mut sshkey,
     pub done: sig_atomic_t,
     pub flags: u_int,
@@ -196,14 +204,14 @@ pub struct kex {
     pub c25519_client_key: [u_char; 32],
     pub c25519_client_pubkey: [u_char; 32],
     pub sntrup761_client_key: [u_char; 1763],
-    pub client_pub: *mut sshbuf,
+    pub client_pub: *mut crate::sshbuf::sshbuf,
 }
 pub unsafe extern "C" fn kex_kem_sntrup761x25519_keypair(mut kex: *mut kex) -> libc::c_int {
-    let mut buf: *mut sshbuf = 0 as *mut sshbuf;
+    let mut buf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut cp: *mut u_char = 0 as *mut u_char;
     let mut need: size_t = 0;
     let mut r: libc::c_int = 0;
-    buf = sshbuf_new();
+    buf = crate::sshbuf::sshbuf_new();
     if buf.is_null() {
         return -(2 as libc::c_int);
     }
@@ -214,19 +222,19 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_keypair(mut kex: *mut kex) -> l
         cp = cp.offset(1158 as libc::c_int as isize);
         kexc25519_keygen(((*kex).c25519_client_key).as_mut_ptr(), cp);
         (*kex).client_pub = buf;
-        buf = 0 as *mut sshbuf;
+        buf = 0 as *mut crate::sshbuf::sshbuf;
     }
     sshbuf_free(buf);
     return r;
 }
 pub unsafe extern "C" fn kex_kem_sntrup761x25519_enc(
     mut kex: *mut kex,
-    mut client_blob: *const sshbuf,
-    mut server_blobp: *mut *mut sshbuf,
-    mut shared_secretp: *mut *mut sshbuf,
+    mut client_blob: *const crate::sshbuf::sshbuf,
+    mut server_blobp: *mut *mut crate::sshbuf::sshbuf,
+    mut shared_secretp: *mut *mut crate::sshbuf::sshbuf,
 ) -> libc::c_int {
-    let mut server_blob: *mut sshbuf = 0 as *mut sshbuf;
-    let mut buf: *mut sshbuf = 0 as *mut sshbuf;
+    let mut server_blob: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    let mut buf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut client_pub: *const u_char = 0 as *const u_char;
     let mut kem_key: *mut u_char = 0 as *mut u_char;
     let mut ciphertext: *mut u_char = 0 as *mut u_char;
@@ -235,20 +243,20 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_enc(
     let mut hash: [u_char; 64] = [0; 64];
     let mut need: size_t = 0;
     let mut r: libc::c_int = 0;
-    *server_blobp = 0 as *mut sshbuf;
-    *shared_secretp = 0 as *mut sshbuf;
+    *server_blobp = 0 as *mut crate::sshbuf::sshbuf;
+    *shared_secretp = 0 as *mut crate::sshbuf::sshbuf;
     need = (1158 as libc::c_int + 32 as libc::c_int) as size_t;
     if sshbuf_len(client_blob) != need {
         r = -(21 as libc::c_int);
     } else {
         client_pub = sshbuf_ptr(client_blob);
-        buf = sshbuf_new();
+        buf = crate::sshbuf::sshbuf_new();
         if buf.is_null() {
             r = -(2 as libc::c_int);
         } else {
             r = sshbuf_reserve(buf, 32 as libc::c_int as size_t, &mut kem_key);
             if !(r != 0 as libc::c_int) {
-                server_blob = sshbuf_new();
+                server_blob = crate::sshbuf::sshbuf_new();
                 if server_blob.is_null() {
                     r = -(2 as libc::c_int);
                 } else {
@@ -282,8 +290,8 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_enc(
                                 if !(r != 0 as libc::c_int) {
                                     *server_blobp = server_blob;
                                     *shared_secretp = buf;
-                                    server_blob = 0 as *mut sshbuf;
-                                    buf = 0 as *mut sshbuf;
+                                    server_blob = 0 as *mut crate::sshbuf::sshbuf;
+                                    buf = 0 as *mut crate::sshbuf::sshbuf;
                                 }
                             }
                         }
@@ -306,10 +314,10 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_enc(
 }
 pub unsafe extern "C" fn kex_kem_sntrup761x25519_dec(
     mut kex: *mut kex,
-    mut server_blob: *const sshbuf,
-    mut shared_secretp: *mut *mut sshbuf,
+    mut server_blob: *const crate::sshbuf::sshbuf,
+    mut shared_secretp: *mut *mut crate::sshbuf::sshbuf,
 ) -> libc::c_int {
-    let mut buf: *mut sshbuf = 0 as *mut sshbuf;
+    let mut buf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut kem_key: *mut u_char = 0 as *mut u_char;
     let mut ciphertext: *const u_char = 0 as *const u_char;
     let mut server_pub: *const u_char = 0 as *const u_char;
@@ -317,14 +325,14 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_dec(
     let mut need: size_t = 0;
     let mut r: libc::c_int = 0;
     let mut decoded: libc::c_int = 0;
-    *shared_secretp = 0 as *mut sshbuf;
+    *shared_secretp = 0 as *mut crate::sshbuf::sshbuf;
     need = (1039 as libc::c_int + 32 as libc::c_int) as size_t;
     if sshbuf_len(server_blob) != need {
         r = -(21 as libc::c_int);
     } else {
         ciphertext = sshbuf_ptr(server_blob);
         server_pub = ciphertext.offset(1039 as libc::c_int as isize);
-        buf = sshbuf_new();
+        buf = crate::sshbuf::sshbuf_new();
         if buf.is_null() {
             r = -(2 as libc::c_int);
         } else {
@@ -360,7 +368,7 @@ pub unsafe extern "C" fn kex_kem_sntrup761x25519_dec(
                                 r = -(21 as libc::c_int);
                             } else {
                                 *shared_secretp = buf;
-                                buf = 0 as *mut sshbuf;
+                                buf = 0 as *mut crate::sshbuf::sshbuf;
                             }
                         }
                     }

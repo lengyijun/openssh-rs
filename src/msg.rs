@@ -2,15 +2,19 @@ use crate::atomicio::atomicio;
 use ::libc;
 
 extern "C" {
-    pub type sshbuf;
+
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
 
-    fn sshbuf_reserve(buf: *mut sshbuf, len: size_t, dpp: *mut *mut u_char) -> libc::c_int;
-    fn sshbuf_mutable_ptr(buf: *const sshbuf) -> *mut u_char;
-    fn sshbuf_len(buf: *const sshbuf) -> size_t;
-    fn sshbuf_max_size(buf: *const sshbuf) -> size_t;
-    fn sshbuf_reset(buf: *mut sshbuf);
+    fn sshbuf_reserve(
+        buf: *mut crate::sshbuf::sshbuf,
+        len: size_t,
+        dpp: *mut *mut u_char,
+    ) -> libc::c_int;
+    fn sshbuf_mutable_ptr(buf: *const crate::sshbuf::sshbuf) -> *mut u_char;
+    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+    fn sshbuf_max_size(buf: *const crate::sshbuf::sshbuf) -> size_t;
+    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn get_u32(_: *const libc::c_void) -> u_int32_t;
@@ -38,7 +42,7 @@ pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 pub unsafe extern "C" fn ssh_msg_send(
     mut fd: libc::c_int,
     mut type_0: u_char,
-    mut m: *mut sshbuf,
+    mut m: *mut crate::sshbuf::sshbuf,
 ) -> libc::c_int {
     let mut buf: [u_char; 5] = [0; 5];
     let mut mlen: u_int = sshbuf_len(m) as u_int;
@@ -107,7 +111,10 @@ pub unsafe extern "C" fn ssh_msg_send(
     }
     return 0 as libc::c_int;
 }
-pub unsafe extern "C" fn ssh_msg_recv(mut fd: libc::c_int, mut m: *mut sshbuf) -> libc::c_int {
+pub unsafe extern "C" fn ssh_msg_recv(
+    mut fd: libc::c_int,
+    mut m: *mut crate::sshbuf::sshbuf,
+) -> libc::c_int {
     let mut buf: [u_char; 4] = [0; 4];
     let mut p: *mut u_char = 0 as *mut u_char;
     let mut msg_len: u_int = 0;

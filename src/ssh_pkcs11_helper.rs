@@ -5,7 +5,7 @@ extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-    pub type sshbuf;
+
     pub type dsa_st;
     pub type rsa_st;
     pub type ec_key_st;
@@ -20,30 +20,41 @@ extern "C" {
 
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
 
-    fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_put_string(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
+    fn sshbuf_put_stringb(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const crate::sshbuf::sshbuf,
+    ) -> libc::c_int;
+    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
+    fn sshbuf_put_string(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const libc::c_void,
+        len: size_t,
+    ) -> libc::c_int;
     fn sshbuf_get_cstring(
-        buf: *mut sshbuf,
+        buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut libc::c_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
     fn sshbuf_get_string(
-        buf: *mut sshbuf,
+        buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut sshbuf, val: u_char) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_put(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
-    fn sshbuf_consume(buf: *mut sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_check_reserve(buf: *const sshbuf, len: size_t) -> libc::c_int;
-    fn sshbuf_ptr(buf: *const sshbuf) -> *const u_char;
-    fn sshbuf_len(buf: *const sshbuf) -> size_t;
-    fn sshbuf_free(buf: *mut sshbuf);
-    fn sshbuf_new() -> *mut sshbuf;
+    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
+    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
+    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
+    fn sshbuf_put(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const libc::c_void,
+        len: size_t,
+    ) -> libc::c_int;
+    fn sshbuf_consume(buf: *mut crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
+    fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
+    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
+    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn ECDSA_size(eckey: *const EC_KEY) -> libc::c_int;
     fn ECDSA_sign(
         type_0: libc::c_int,
@@ -160,7 +171,7 @@ pub const KEY_RSA: sshkey_types = 0;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshkey_cert {
-    pub certblob: *mut sshbuf,
+    pub certblob: *mut crate::sshbuf::sshbuf,
     pub type_0: u_int,
     pub serial: u_int64_t,
     pub key_id: *mut libc::c_char,
@@ -168,8 +179,8 @@ pub struct sshkey_cert {
     pub principals: *mut *mut libc::c_char,
     pub valid_after: u_int64_t,
     pub valid_before: u_int64_t,
-    pub critical: *mut sshbuf,
-    pub extensions: *mut sshbuf,
+    pub critical: *mut crate::sshbuf::sshbuf,
+    pub extensions: *mut crate::sshbuf::sshbuf,
     pub signature_key: *mut sshkey,
     pub signature_type: *mut libc::c_char,
 }
@@ -191,8 +202,8 @@ pub struct sshkey {
     pub xmss_pk: *mut u_char,
     pub sk_application: *mut libc::c_char,
     pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut sshbuf,
-    pub sk_reserved: *mut sshbuf,
+    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
+    pub sk_reserved: *mut crate::sshbuf::sshbuf,
     pub cert: *mut sshkey_cert,
     pub shielded_private: *mut u_char,
     pub shielded_len: size_t,
@@ -223,8 +234,10 @@ pub static mut pkcs11_keylist: C2RustUnnamed_0 = C2RustUnnamed_0 {
     tqh_first: 0 as *const pkcs11_keyinfo as *mut pkcs11_keyinfo,
     tqh_last: 0 as *const *mut pkcs11_keyinfo as *mut *mut pkcs11_keyinfo,
 };
-pub static mut iqueue: *mut sshbuf = 0 as *const sshbuf as *mut sshbuf;
-pub static mut oqueue: *mut sshbuf = 0 as *const sshbuf as *mut sshbuf;
+pub static mut iqueue: *mut crate::sshbuf::sshbuf =
+    0 as *const crate::sshbuf::sshbuf as *mut crate::sshbuf::sshbuf;
+pub static mut oqueue: *mut crate::sshbuf::sshbuf =
+    0 as *const crate::sshbuf::sshbuf as *mut crate::sshbuf::sshbuf;
 unsafe extern "C" fn add_key(
     mut k: *mut sshkey,
     mut name: *mut libc::c_char,
@@ -287,7 +300,7 @@ unsafe extern "C" fn lookup_key(mut k: *mut sshkey) -> *mut sshkey {
     }
     return 0 as *mut sshkey;
 }
-unsafe extern "C" fn send_msg(mut m: *mut sshbuf) {
+unsafe extern "C" fn send_msg(mut m: *mut crate::sshbuf::sshbuf) {
     let mut r: libc::c_int = 0;
     r = sshbuf_put_stringb(oqueue, m);
     if r != 0 as libc::c_int {
@@ -311,9 +324,9 @@ unsafe extern "C" fn process_add() {
     let mut nkeys: libc::c_int = 0;
     let mut blob: *mut u_char = 0 as *mut u_char;
     let mut blen: size_t = 0;
-    let mut msg: *mut sshbuf = 0 as *mut sshbuf;
+    let mut msg: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut labels: *mut *mut libc::c_char = 0 as *mut *mut libc::c_char;
-    msg = sshbuf_new();
+    msg = crate::sshbuf::sshbuf_new();
     if msg.is_null() {
         sshfatal(
             b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
@@ -322,7 +335,8 @@ unsafe extern "C" fn process_add() {
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_new failed\0" as *const u8 as *const libc::c_char,
+            b"crate::crate::sshbuf::sshbuf::sshbuf_new failed\0" as *const u8
+                as *const libc::c_char,
         );
     }
     r = sshbuf_get_cstring(iqueue, &mut name, 0 as *mut size_t);
@@ -426,9 +440,9 @@ unsafe extern "C" fn process_add() {
 unsafe extern "C" fn process_del() {
     let mut name: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut pin: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut msg: *mut sshbuf = 0 as *mut sshbuf;
+    let mut msg: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut r: libc::c_int = 0;
-    msg = sshbuf_new();
+    msg = crate::sshbuf::sshbuf_new();
     if msg.is_null() {
         sshfatal(
             b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
@@ -437,7 +451,8 @@ unsafe extern "C" fn process_del() {
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_new failed\0" as *const u8 as *const libc::c_char,
+            b"crate::crate::sshbuf::sshbuf::sshbuf_new failed\0" as *const u8
+                as *const libc::c_char,
         );
     }
     r = sshbuf_get_cstring(iqueue, &mut name, 0 as *mut size_t);
@@ -491,7 +506,7 @@ unsafe extern "C" fn process_sign() {
     let mut ok: libc::c_int = -(1 as libc::c_int);
     let mut key: *mut sshkey = 0 as *mut sshkey;
     let mut found: *mut sshkey = 0 as *mut sshkey;
-    let mut msg: *mut sshbuf = 0 as *mut sshbuf;
+    let mut msg: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     r = sshbuf_get_string(iqueue, &mut blob, &mut blen);
     if r != 0 as libc::c_int
         || {
@@ -588,7 +603,7 @@ unsafe extern "C" fn process_sign() {
         }
         sshkey_free(key);
     }
-    msg = sshbuf_new();
+    msg = crate::sshbuf::sshbuf_new();
     if msg.is_null() {
         sshfatal(
             b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
@@ -597,7 +612,8 @@ unsafe extern "C" fn process_sign() {
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_new failed\0" as *const u8 as *const libc::c_char,
+            b"crate::crate::sshbuf::sshbuf::sshbuf_new failed\0" as *const u8
+                as *const libc::c_char,
         );
     }
     if ok == 0 as libc::c_int {
@@ -836,7 +852,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
     pkcs11_init(0 as libc::c_int);
     in_0 = 0 as libc::c_int;
     out = 1 as libc::c_int;
-    iqueue = sshbuf_new();
+    iqueue = crate::sshbuf::sshbuf_new();
     if iqueue.is_null() {
         sshfatal(
             b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
@@ -845,10 +861,11 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_new failed\0" as *const u8 as *const libc::c_char,
+            b"crate::crate::sshbuf::sshbuf::sshbuf_new failed\0" as *const u8
+                as *const libc::c_char,
         );
     }
-    oqueue = sshbuf_new();
+    oqueue = crate::sshbuf::sshbuf_new();
     if oqueue.is_null() {
         sshfatal(
             b"ssh-pkcs11-helper.c\0" as *const u8 as *const libc::c_char,
@@ -857,7 +874,8 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_new failed\0" as *const u8 as *const libc::c_char,
+            b"crate::crate::sshbuf::sshbuf::sshbuf_new failed\0" as *const u8
+                as *const libc::c_char,
         );
     }
     loop {

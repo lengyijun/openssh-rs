@@ -15,7 +15,6 @@ extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-    pub type sshbuf;
 
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
     fn bind(__fd: libc::c_int, __addr: __CONST_SOCKADDR_ARG, __len: socklen_t) -> libc::c_int;
@@ -150,15 +149,20 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn sshbuf_free(buf: *mut sshbuf);
-    fn sshbuf_dup_string(buf: *mut sshbuf) -> *mut libc::c_char;
-    fn sshbuf_put(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut sshbuf, val: u_char) -> libc::c_int;
-    fn sshbuf_new() -> *mut sshbuf;
-    fn sshbuf_len(buf: *const sshbuf) -> size_t;
-    fn sshbuf_ptr(buf: *const sshbuf) -> *const u_char;
-    fn sshbuf_putb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
-    fn sshbuf_reset(buf: *mut sshbuf);
+    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+    fn sshbuf_dup_string(buf: *mut crate::sshbuf::sshbuf) -> *mut libc::c_char;
+    fn sshbuf_put(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const libc::c_void,
+        len: size_t,
+    ) -> libc::c_int;
+    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+
+    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+    fn sshbuf_ptr(buf: *const crate::sshbuf::sshbuf) -> *const u_char;
+    fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
+        -> libc::c_int;
+    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
 }
 pub type __builtin_va_list = [__va_list_tag; 1];
 #[derive(Copy, Clone)]
@@ -2159,7 +2163,7 @@ unsafe extern "C" fn vdollar_percent_expand(
         key: 0 as *const libc::c_char,
         repl: 0 as *const libc::c_char,
     }; 16];
-    let mut buf: *mut sshbuf = 0 as *mut sshbuf;
+    let mut buf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut r: libc::c_int = 0;
     let mut missingvar: libc::c_int = 0 as libc::c_int;
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -2167,7 +2171,7 @@ unsafe extern "C" fn vdollar_percent_expand(
     let mut varend: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut val: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut len: size_t = 0;
-    buf = sshbuf_new();
+    buf = crate::sshbuf::sshbuf_new();
     if buf.is_null() {
         sshfatal(
             b"misc.c\0" as *const u8 as *const libc::c_char,
@@ -2179,7 +2183,8 @@ unsafe extern "C" fn vdollar_percent_expand(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_new failed\0" as *const u8 as *const libc::c_char,
+            b"crate::crate::sshbuf::sshbuf::sshbuf_new failed\0" as *const u8
+                as *const libc::c_char,
         );
     }
     if parseerror.is_null() {
@@ -3586,11 +3591,11 @@ pub unsafe extern "C" fn argv_assemble(
     let mut r: libc::c_int = 0;
     let mut c: libc::c_char = 0;
     let mut ret: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut buf: *mut sshbuf = 0 as *mut sshbuf;
-    let mut arg: *mut sshbuf = 0 as *mut sshbuf;
-    buf = sshbuf_new();
+    let mut buf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    let mut arg: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    buf = crate::sshbuf::sshbuf_new();
     if buf.is_null() || {
-        arg = sshbuf_new();
+        arg = crate::sshbuf::sshbuf_new();
         arg.is_null()
     } {
         sshfatal(
@@ -3601,7 +3606,8 @@ pub unsafe extern "C" fn argv_assemble(
             1 as libc::c_int,
             SYSLOG_LEVEL_FATAL,
             0 as *const libc::c_char,
-            b"sshbuf_new failed\0" as *const u8 as *const libc::c_char,
+            b"crate::crate::sshbuf::sshbuf::sshbuf_new failed\0" as *const u8
+                as *const libc::c_char,
         );
     }
     i = 0 as libc::c_int;

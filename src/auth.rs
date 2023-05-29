@@ -11,7 +11,7 @@ extern "C" {
     pub type sockaddr_ax25;
     pub type sockaddr_at;
     pub type ssh_channels;
-    pub type sshbuf;
+
     pub type ec_key_st;
     pub type dsa_st;
     pub type rsa_st;
@@ -76,15 +76,15 @@ extern "C" {
     ) -> !;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshbuf_new() -> *mut sshbuf;
-    fn sshbuf_reset(buf: *mut sshbuf);
-    fn sshbuf_len(buf: *const sshbuf) -> size_t;
+
+    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
+    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
     fn sshbuf_get_cstring(
-        buf: *mut sshbuf,
+        buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut libc::c_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
+    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
     fn tilde_expand_filename(_: *const libc::c_char, _: uid_t) -> *mut libc::c_char;
     fn percent_expand(_: *const libc::c_char, _: ...) -> *mut libc::c_char;
     fn lowercase(s: *mut libc::c_char);
@@ -329,8 +329,8 @@ pub struct sshkey {
     pub xmss_pk: *mut u_char,
     pub sk_application: *mut libc::c_char,
     pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut sshbuf,
-    pub sk_reserved: *mut sshbuf,
+    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
+    pub sk_reserved: *mut crate::sshbuf::sshbuf,
     pub cert: *mut sshkey_cert,
     pub shielded_private: *mut u_char,
     pub shielded_len: size_t,
@@ -340,7 +340,7 @@ pub struct sshkey {
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshkey_cert {
-    pub certblob: *mut sshbuf,
+    pub certblob: *mut crate::sshbuf::sshbuf,
     pub type_0: u_int,
     pub serial: u_int64_t,
     pub key_id: *mut libc::c_char,
@@ -348,8 +348,8 @@ pub struct sshkey_cert {
     pub principals: *mut *mut libc::c_char,
     pub valid_after: u_int64_t,
     pub valid_before: u_int64_t,
-    pub critical: *mut sshbuf,
-    pub extensions: *mut sshbuf,
+    pub critical: *mut crate::sshbuf::sshbuf,
+    pub extensions: *mut crate::sshbuf::sshbuf,
     pub signature_key: *mut sshkey,
     pub signature_type: *mut libc::c_char,
 }
@@ -556,7 +556,7 @@ pub struct connection_info {
 pub struct include_item {
     pub selector: *mut libc::c_char,
     pub filename: *mut libc::c_char,
-    pub contents: *mut sshbuf,
+    pub contents: *mut crate::sshbuf::sshbuf,
     pub entry: C2RustUnnamed_3,
 }
 #[derive(Copy, Clone)]
@@ -648,14 +648,15 @@ pub struct Authctxt {
     pub num_auth_methods: u_int,
     pub methoddata: *mut libc::c_void,
     pub kbdintctxt: *mut libc::c_void,
-    pub loginmsg: *mut sshbuf,
+    pub loginmsg: *mut crate::sshbuf::sshbuf,
     pub prev_keys: *mut *mut sshkey,
     pub nprev_keys: u_int,
     pub auth_method_key: *mut sshkey,
     pub auth_method_info: *mut libc::c_char,
-    pub session_info: *mut sshbuf,
+    pub session_info: *mut crate::sshbuf::sshbuf,
 }
-static mut auth_debug: *mut sshbuf = 0 as *const sshbuf as *mut sshbuf;
+static mut auth_debug: *mut crate::sshbuf::sshbuf =
+    0 as *const crate::sshbuf::sshbuf as *mut crate::sshbuf::sshbuf;
 pub unsafe extern "C" fn allowed_user(mut ssh: *mut ssh, mut pw: *mut libc::passwd) -> libc::c_int {
     let mut st: libc::stat = unsafe { std::mem::zeroed() };
     let mut hostname: *const libc::c_char = 0 as *const libc::c_char;
@@ -1496,7 +1497,7 @@ pub unsafe extern "C" fn auth_debug_reset() {
     if !auth_debug.is_null() {
         sshbuf_reset(auth_debug);
     } else {
-        auth_debug = sshbuf_new();
+        auth_debug = crate::sshbuf::sshbuf_new();
         if auth_debug.is_null() {
             sshfatal(
                 b"auth.c\0" as *const u8 as *const libc::c_char,
@@ -1506,7 +1507,8 @@ pub unsafe extern "C" fn auth_debug_reset() {
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"sshbuf_new failed\0" as *const u8 as *const libc::c_char,
+                b"crate::crate::sshbuf::sshbuf::sshbuf_new failed\0" as *const u8
+                    as *const libc::c_char,
             );
         }
     };

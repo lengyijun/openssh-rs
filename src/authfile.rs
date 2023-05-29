@@ -5,7 +5,7 @@ extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-    pub type sshbuf;
+
     pub type dsa_st;
     pub type rsa_st;
     pub type ec_key_st;
@@ -30,7 +30,7 @@ extern "C" {
     fn sshkey_write(_: *const sshkey, _: *mut libc::FILE) -> libc::c_int;
     fn sshkey_private_to_fileblob(
         key: *mut sshkey,
-        blob: *mut sshbuf,
+        blob: *mut crate::sshbuf::sshbuf,
         passphrase: *const libc::c_char,
         comment: *const libc::c_char,
         format: libc::c_int,
@@ -45,22 +45,23 @@ extern "C" {
     fn sshkey_to_certified(_: *mut sshkey) -> libc::c_int;
     fn sshkey_cert_copy(_: *const sshkey, _: *mut sshkey) -> libc::c_int;
     fn sshkey_parse_private_fileblob_type(
-        blob: *mut sshbuf,
+        blob: *mut crate::sshbuf::sshbuf,
         type_0: libc::c_int,
         passphrase: *const libc::c_char,
         keyp: *mut *mut sshkey,
         commentp: *mut *mut libc::c_char,
     ) -> libc::c_int;
     fn sshkey_parse_pubkey_from_private_fileblob_type(
-        blob: *mut sshbuf,
+        blob: *mut crate::sshbuf::sshbuf,
         type_0: libc::c_int,
         pubkeyp: *mut *mut sshkey,
     ) -> libc::c_int;
     fn sshkey_set_filename(_: *mut sshkey, _: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_new() -> *mut sshbuf;
-    fn sshbuf_free(buf: *mut sshbuf);
-    fn sshbuf_load_fd(_: libc::c_int, _: *mut *mut sshbuf) -> libc::c_int;
-    fn sshbuf_write_file(path: *const libc::c_char, buf: *mut sshbuf) -> libc::c_int;
+
+    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+    fn sshbuf_load_fd(_: libc::c_int, _: *mut *mut crate::sshbuf::sshbuf) -> libc::c_int;
+    fn sshbuf_write_file(path: *const libc::c_char, buf: *mut crate::sshbuf::sshbuf)
+        -> libc::c_int;
     fn ssh_krl_file_contains_key(path: *const libc::c_char, key: *const sshkey) -> libc::c_int;
 }
 pub type __u_char = libc::c_uchar;
@@ -121,8 +122,8 @@ pub struct sshkey {
     pub xmss_pk: *mut u_char,
     pub sk_application: *mut libc::c_char,
     pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut sshbuf,
-    pub sk_reserved: *mut sshbuf,
+    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
+    pub sk_reserved: *mut crate::sshbuf::sshbuf,
     pub cert: *mut sshkey_cert,
     pub shielded_private: *mut u_char,
     pub shielded_len: size_t,
@@ -132,7 +133,7 @@ pub struct sshkey {
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshkey_cert {
-    pub certblob: *mut sshbuf,
+    pub certblob: *mut crate::sshbuf::sshbuf,
     pub type_0: u_int,
     pub serial: u_int64_t,
     pub key_id: *mut libc::c_char,
@@ -140,8 +141,8 @@ pub struct sshkey_cert {
     pub principals: *mut *mut libc::c_char,
     pub valid_after: u_int64_t,
     pub valid_before: u_int64_t,
-    pub critical: *mut sshbuf,
-    pub extensions: *mut sshbuf,
+    pub critical: *mut crate::sshbuf::sshbuf,
+    pub extensions: *mut crate::sshbuf::sshbuf,
     pub signature_key: *mut sshkey,
     pub signature_type: *mut libc::c_char,
 }
@@ -170,7 +171,7 @@ unsafe extern "C" fn getline(
     return __getdelim(__lineptr, __n, '\n' as i32, __stream);
 }
 unsafe extern "C" fn sshkey_save_private_blob(
-    mut keybuf: *mut sshbuf,
+    mut keybuf: *mut crate::sshbuf::sshbuf,
     mut filename: *const libc::c_char,
 ) -> libc::c_int {
     let mut r: libc::c_int = 0;
@@ -189,9 +190,9 @@ pub unsafe extern "C" fn sshkey_save_private(
     mut openssh_format_cipher: *const libc::c_char,
     mut openssh_format_rounds: libc::c_int,
 ) -> libc::c_int {
-    let mut keyblob: *mut sshbuf = 0 as *mut sshbuf;
+    let mut keyblob: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut r: libc::c_int = 0;
-    keyblob = sshbuf_new();
+    keyblob = crate::sshbuf::sshbuf_new();
     if keyblob.is_null() {
         return -(2 as libc::c_int);
     }
@@ -344,7 +345,7 @@ pub unsafe extern "C" fn sshkey_load_private_type_fd(
     mut keyp: *mut *mut sshkey,
     mut commentp: *mut *mut libc::c_char,
 ) -> libc::c_int {
-    let mut buffer: *mut sshbuf = 0 as *mut sshbuf;
+    let mut buffer: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut r: libc::c_int = 0;
     if !keyp.is_null() {
         *keyp = 0 as *mut sshkey;
@@ -363,7 +364,7 @@ unsafe extern "C" fn sshkey_load_pubkey_from_private(
     mut filename: *const libc::c_char,
     mut pubkeyp: *mut *mut sshkey,
 ) -> libc::c_int {
-    let mut buffer: *mut sshbuf = 0 as *mut sshbuf;
+    let mut buffer: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut pubkey: *mut sshkey = 0 as *mut sshkey;
     let mut r: libc::c_int = 0;
     let mut fd: libc::c_int = 0;

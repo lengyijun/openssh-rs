@@ -1,7 +1,7 @@
 use ::libc;
 use libc::close;
 extern "C" {
-    pub type sshbuf;
+
     pub type dsa_st;
     pub type rsa_st;
     pub type ec_key_st;
@@ -25,35 +25,49 @@ extern "C" {
     fn log_is_on_stderr() -> libc::c_int;
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshbuf_put_stringb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
-    fn sshbuf_put_cstring(buf: *mut sshbuf, v: *const libc::c_char) -> libc::c_int;
-    fn sshbuf_put_string(buf: *mut sshbuf, v: *const libc::c_void, len: size_t) -> libc::c_int;
-    fn sshbuf_get_stringb(buf: *mut sshbuf, v: *mut sshbuf) -> libc::c_int;
+    fn sshbuf_put_stringb(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const crate::sshbuf::sshbuf,
+    ) -> libc::c_int;
+    fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
+    fn sshbuf_put_string(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *const libc::c_void,
+        len: size_t,
+    ) -> libc::c_int;
+    fn sshbuf_get_stringb(
+        buf: *mut crate::sshbuf::sshbuf,
+        v: *mut crate::sshbuf::sshbuf,
+    ) -> libc::c_int;
     fn sshbuf_get_cstring(
-        buf: *mut sshbuf,
+        buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut libc::c_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
     fn sshbuf_get_string(
-        buf: *mut sshbuf,
+        buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *mut u_char,
         lenp: *mut size_t,
     ) -> libc::c_int;
-    fn sshbuf_put_u8(buf: *mut sshbuf, val: u_char) -> libc::c_int;
-    fn sshbuf_put_u32(buf: *mut sshbuf, val: u_int32_t) -> libc::c_int;
-    fn sshbuf_get_u8(buf: *mut sshbuf, valp: *mut u_char) -> libc::c_int;
-    fn sshbuf_get_u32(buf: *mut sshbuf, valp: *mut u_int32_t) -> libc::c_int;
-    fn sshbuf_putb(buf: *mut sshbuf, v: *const sshbuf) -> libc::c_int;
-    fn sshbuf_len(buf: *const sshbuf) -> size_t;
-    fn sshbuf_reset(buf: *mut sshbuf);
-    fn sshbuf_free(buf: *mut sshbuf);
-    fn sshbuf_new() -> *mut sshbuf;
+    fn sshbuf_put_u8(buf: *mut crate::sshbuf::sshbuf, val: u_char) -> libc::c_int;
+    fn sshbuf_put_u32(buf: *mut crate::sshbuf::sshbuf, val: u_int32_t) -> libc::c_int;
+    fn sshbuf_get_u8(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_char) -> libc::c_int;
+    fn sshbuf_get_u32(buf: *mut crate::sshbuf::sshbuf, valp: *mut u_int32_t) -> libc::c_int;
+    fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
+        -> libc::c_int;
+    fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
+    fn sshbuf_reset(buf: *mut crate::sshbuf::sshbuf);
+    fn sshbuf_free(buf: *mut crate::sshbuf::sshbuf);
+
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_type(_: *const sshkey) -> *const libc::c_char;
-    fn sshkey_private_serialize(key: *mut sshkey, buf: *mut sshbuf) -> libc::c_int;
-    fn sshkey_private_deserialize(buf: *mut sshbuf, keyp: *mut *mut sshkey) -> libc::c_int;
-    fn ssh_msg_send(_: libc::c_int, _: u_char, _: *mut sshbuf) -> libc::c_int;
-    fn ssh_msg_recv(_: libc::c_int, _: *mut sshbuf) -> libc::c_int;
+    fn sshkey_private_serialize(key: *mut sshkey, buf: *mut crate::sshbuf::sshbuf) -> libc::c_int;
+    fn sshkey_private_deserialize(
+        buf: *mut crate::sshbuf::sshbuf,
+        keyp: *mut *mut sshkey,
+    ) -> libc::c_int;
+    fn ssh_msg_send(_: libc::c_int, _: u_char, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
+    fn ssh_msg_recv(_: libc::c_int, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
 
 }
 pub type __u_char = libc::c_uchar;
@@ -96,7 +110,7 @@ pub type EC_KEY = ec_key_st;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshkey_cert {
-    pub certblob: *mut sshbuf,
+    pub certblob: *mut crate::sshbuf::sshbuf,
     pub type_0: u_int,
     pub serial: u_int64_t,
     pub key_id: *mut libc::c_char,
@@ -104,8 +118,8 @@ pub struct sshkey_cert {
     pub principals: *mut *mut libc::c_char,
     pub valid_after: u_int64_t,
     pub valid_before: u_int64_t,
-    pub critical: *mut sshbuf,
-    pub extensions: *mut sshbuf,
+    pub critical: *mut crate::sshbuf::sshbuf,
+    pub extensions: *mut crate::sshbuf::sshbuf,
     pub signature_key: *mut sshkey,
     pub signature_type: *mut libc::c_char,
 }
@@ -127,8 +141,8 @@ pub struct sshkey {
     pub xmss_pk: *mut u_char,
     pub sk_application: *mut libc::c_char,
     pub sk_flags: uint8_t,
-    pub sk_key_handle: *mut sshbuf,
-    pub sk_reserved: *mut sshbuf,
+    pub sk_key_handle: *mut crate::sshbuf::sshbuf,
+    pub sk_reserved: *mut crate::sshbuf::sshbuf,
     pub cert: *mut sshkey_cert,
     pub shielded_private: *mut u_char,
     pub shielded_len: size_t,
@@ -346,8 +360,8 @@ unsafe extern "C" fn reap_helper(mut pid: pid_t) -> libc::c_int {
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn client_converse(
-    mut msg: *mut sshbuf,
-    mut respp: *mut *mut sshbuf,
+    mut msg: *mut crate::sshbuf::sshbuf,
+    mut respp: *mut *mut crate::sshbuf::sshbuf,
     mut type_0: u_int,
 ) -> libc::c_int {
     let mut oerrno: libc::c_int = 0;
@@ -360,16 +374,16 @@ unsafe extern "C" fn client_converse(
     let mut pid: pid_t = 0;
     let mut version: u_char = 0;
     let mut osigchld: Option<unsafe extern "C" fn(libc::c_int) -> ()> = None;
-    let mut req: *mut sshbuf = 0 as *mut sshbuf;
-    let mut resp: *mut sshbuf = 0 as *mut sshbuf;
-    *respp = 0 as *mut sshbuf;
+    let mut req: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    let mut resp: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    *respp = 0 as *mut crate::sshbuf::sshbuf;
     r = start_helper(&mut fd, &mut pid, &mut osigchld);
     if r != 0 as libc::c_int {
         return r;
     }
-    req = sshbuf_new();
+    req = crate::sshbuf::sshbuf_new();
     if req.is_null() || {
-        resp = sshbuf_new();
+        resp = crate::sshbuf::sshbuf_new();
         resp.is_null()
     } {
         r = -(2 as libc::c_int);
@@ -562,7 +576,7 @@ unsafe extern "C" fn client_converse(
     }
     if r == 0 as libc::c_int {
         *respp = resp;
-        resp = 0 as *mut sshbuf;
+        resp = 0 as *mut crate::sshbuf::sshbuf;
     }
     sshbuf_free(req);
     sshbuf_free(resp);
@@ -582,14 +596,14 @@ pub unsafe extern "C" fn sshsk_sign(
 ) -> libc::c_int {
     let mut oerrno: libc::c_int = 0;
     let mut r: libc::c_int = -(1 as libc::c_int);
-    let mut kbuf: *mut sshbuf = 0 as *mut sshbuf;
-    let mut req: *mut sshbuf = 0 as *mut sshbuf;
-    let mut resp: *mut sshbuf = 0 as *mut sshbuf;
+    let mut kbuf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    let mut req: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    let mut resp: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     *sigp = 0 as *mut u_char;
     *lenp = 0 as libc::c_int as size_t;
-    kbuf = sshbuf_new();
+    kbuf = crate::sshbuf::sshbuf_new();
     if kbuf.is_null() || {
-        req = sshbuf_new();
+        req = crate::sshbuf::sshbuf_new();
         req.is_null()
     } {
         r = -(2 as libc::c_int);
@@ -699,16 +713,16 @@ pub unsafe extern "C" fn sshsk_enroll(
     mut userid: *const libc::c_char,
     mut flags: uint8_t,
     mut pin: *const libc::c_char,
-    mut challenge_buf: *mut sshbuf,
+    mut challenge_buf: *mut crate::sshbuf::sshbuf,
     mut keyp: *mut *mut sshkey,
-    mut attest: *mut sshbuf,
+    mut attest: *mut crate::sshbuf::sshbuf,
 ) -> libc::c_int {
     let mut oerrno: libc::c_int = 0;
     let mut r: libc::c_int = -(1 as libc::c_int);
-    let mut kbuf: *mut sshbuf = 0 as *mut sshbuf;
-    let mut abuf: *mut sshbuf = 0 as *mut sshbuf;
-    let mut req: *mut sshbuf = 0 as *mut sshbuf;
-    let mut resp: *mut sshbuf = 0 as *mut sshbuf;
+    let mut kbuf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    let mut abuf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    let mut req: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    let mut resp: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut key: *mut sshkey = 0 as *mut sshkey;
     *keyp = 0 as *mut sshkey;
     if !attest.is_null() {
@@ -717,14 +731,14 @@ pub unsafe extern "C" fn sshsk_enroll(
     if type_0 < 0 as libc::c_int {
         return -(10 as libc::c_int);
     }
-    abuf = sshbuf_new();
+    abuf = crate::sshbuf::sshbuf_new();
     if abuf.is_null()
         || {
-            kbuf = sshbuf_new();
+            kbuf = crate::sshbuf::sshbuf_new();
             kbuf.is_null()
         }
         || {
-            req = sshbuf_new();
+            req = crate::sshbuf::sshbuf_new();
             req.is_null()
         }
     {
@@ -890,9 +904,9 @@ pub unsafe extern "C" fn sshsk_load_resident(
     let mut current_block: u64;
     let mut oerrno: libc::c_int = 0;
     let mut r: libc::c_int = -(1 as libc::c_int);
-    let mut kbuf: *mut sshbuf = 0 as *mut sshbuf;
-    let mut req: *mut sshbuf = 0 as *mut sshbuf;
-    let mut resp: *mut sshbuf = 0 as *mut sshbuf;
+    let mut kbuf: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    let mut req: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
+    let mut resp: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut key: *mut sshkey = 0 as *mut sshkey;
     let mut srk: *mut sshsk_resident_key = 0 as *mut sshsk_resident_key;
     let mut srks: *mut *mut sshsk_resident_key = 0 as *mut *mut sshsk_resident_key;
@@ -902,9 +916,9 @@ pub unsafe extern "C" fn sshsk_load_resident(
     let mut nsrks: size_t = 0 as libc::c_int as size_t;
     *srksp = 0 as *mut *mut sshsk_resident_key;
     *nsrksp = 0 as libc::c_int as size_t;
-    kbuf = sshbuf_new();
+    kbuf = crate::sshbuf::sshbuf_new();
     if kbuf.is_null() || {
-        req = sshbuf_new();
+        req = crate::sshbuf::sshbuf_new();
         req.is_null()
     } {
         r = -(2 as libc::c_int);
