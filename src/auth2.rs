@@ -65,8 +65,6 @@ extern "C" {
 
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
-    
-    fn monotime_double() -> libc::c_double;
     fn sshkey_free(_: *mut sshkey);
     fn sshkey_equal_public(_: *const sshkey, _: *const sshkey) -> libc::c_int;
     fn sshkey_from_private(_: *const sshkey, _: *mut *mut sshkey) -> libc::c_int;
@@ -757,7 +755,7 @@ unsafe extern "C" fn ensure_minimum_time_since(
         tv_sec: 0,
         tv_nsec: 0,
     };
-    let mut elapsed: libc::c_double = monotime_double() - start;
+    let mut elapsed: libc::c_double = crate::misc::monotime_double() - start;
     let mut req: libc::c_double = seconds;
     let mut remain: libc::c_double = 0.;
     loop {
@@ -799,7 +797,7 @@ unsafe extern "C" fn input_userauth_request(
     let mut style: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut r: libc::c_int = 0;
     let mut authenticated: libc::c_int = 0 as libc::c_int;
-    let mut tstart: libc::c_double = monotime_double();
+    let mut tstart: libc::c_double = crate::misc::monotime_double();
     if authctxt.is_null() {
         sshfatal(
             b"auth2.c\0" as *const u8 as *const libc::c_char,

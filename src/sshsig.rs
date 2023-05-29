@@ -49,7 +49,7 @@ extern "C" {
         errstrp: *mut *const libc::c_char,
     ) -> *mut libc::c_char;
     fn opt_match(opts: *mut *const libc::c_char, term: *const libc::c_char) -> libc::c_int;
-    
+
     fn sshbuf_find(
         b: *const crate::sshbuf::sshbuf,
         start_offset: size_t,
@@ -498,7 +498,8 @@ pub unsafe extern "C" fn sshsig_dearmor(
                             1 as libc::c_int,
                             SYSLOG_LEVEL_ERROR,
                             0 as *const libc::c_char,
-                            b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
+                            b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8
+                                as *const libc::c_char,
                         );
                         r = -(2 as libc::c_int);
                     } else {

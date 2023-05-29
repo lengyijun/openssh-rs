@@ -89,7 +89,7 @@ extern "C" {
         _: size_t,
         _: *mut size_t,
     ) -> libc::c_int;
-    
+
     fn sshbuf_get_string_direct(
         buf: *mut crate::sshbuf::sshbuf,
         valp: *mut *const u_char,

@@ -275,7 +275,7 @@ extern "C" {
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn monotime() -> time_t;
-    fn monotime_double() -> libc::c_double;
+
     fn tun_open(_: libc::c_int, _: libc::c_int, _: *mut *mut libc::c_char) -> libc::c_int;
     fn mktemp_proto(_: *mut libc::c_char, _: size_t);
     fn ptimeout_init(pt: *mut libc::timespec);
@@ -3397,7 +3397,7 @@ pub unsafe extern "C" fn client_loop(
         }
     }
     client_repledge();
-    start_time = monotime_double();
+    start_time = crate::misc::monotime_double();
     last_was_cr = 1 as libc::c_int;
     exit_status = -(1 as libc::c_int);
     connection_in = ssh_packet_get_connection_in(ssh);
@@ -3734,7 +3734,7 @@ pub unsafe extern "C" fn client_loop(
         }
     }
     crate::sshbuf::sshbuf_free(stderr_buffer);
-    total_time = monotime_double() - start_time;
+    total_time = crate::misc::monotime_double() - start_time;
     ssh_packet_get_bytes(ssh, &mut ibytes, &mut obytes);
     crate::log::sshlog(
         b"clientloop.c\0" as *const u8 as *const libc::c_char,

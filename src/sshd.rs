@@ -221,7 +221,7 @@ extern "C" {
         buf: *mut crate::sshbuf::sshbuf,
         v: *const crate::sshbuf::sshbuf,
     ) -> libc::c_int;
-    
+
     fn daemonized() -> libc::c_int;
 
     fn set_reuseaddr(_: libc::c_int) -> libc::c_int;

@@ -123,7 +123,7 @@ extern "C" {
         lenp: *mut size_t,
     ) -> libc::c_int;
     fn sshbuf_put_cstring(buf: *mut crate::sshbuf::sshbuf, v: *const libc::c_char) -> libc::c_int;
-    
+
     fn ssh_digest_bytes(alg: libc::c_int) -> size_t;
     fn ssh_digest_start(alg: libc::c_int) -> *mut ssh_digest_ctx;
     fn ssh_digest_update(
@@ -2873,7 +2873,8 @@ pub unsafe extern "C" fn kex_exchange_identification(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_ERROR,
                     0 as *const libc::c_char,
-                    b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8
+                        as *const libc::c_char,
                 );
                 r = -(2 as libc::c_int);
             } else {
@@ -3113,7 +3114,8 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                 1 as libc::c_int,
                                 SYSLOG_LEVEL_ERROR,
                                 0 as *const libc::c_char,
-                                b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
+                                b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8
+                                    as *const libc::c_char,
                             );
                             r = -(2 as libc::c_int);
                             current_block = 4276536258050058664;
@@ -3162,7 +3164,8 @@ pub unsafe extern "C" fn kex_exchange_identification(
                     _ => {
                         match current_block {
                             9859671972921157070 => {
-                                peer_version_string = crate::sshbuf_misc::sshbuf_dup_string(peer_version);
+                                peer_version_string =
+                                    crate::sshbuf_misc::sshbuf_dup_string(peer_version);
                                 if peer_version_string.is_null() {
                                     sshfatal(
                                         b"kex.c\0" as *const u8 as *const libc::c_char,
@@ -3174,7 +3177,8 @@ pub unsafe extern "C" fn kex_exchange_identification(
                                         1 as libc::c_int,
                                         SYSLOG_LEVEL_FATAL,
                                         0 as *const libc::c_char,
-                                        b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8
+                                        b"crate::sshbuf_misc::sshbuf_dup_string failed\0"
+                                            as *const u8
                                             as *const libc::c_char,
                                     );
                                 }

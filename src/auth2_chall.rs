@@ -24,7 +24,6 @@ extern "C" {
 
     fn sshbuf_len(buf: *const crate::sshbuf::sshbuf) -> size_t;
 
-    
     fn ssh_packet_write_wait(_: *mut ssh) -> libc::c_int;
     fn sshpkt_start(ssh: *mut ssh, type_0: u_char) -> libc::c_int;
     fn sshpkt_send(ssh: *mut ssh) -> libc::c_int;
@@ -285,7 +284,8 @@ unsafe extern "C" fn kbdint_alloc(mut devs: *const libc::c_char) -> *mut KbdintA
                 1 as libc::c_int,
                 SYSLOG_LEVEL_FATAL,
                 0 as *const libc::c_char,
-                b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
+                b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8
+                    as *const libc::c_char,
             );
         }
         crate::sshbuf::sshbuf_free(b);

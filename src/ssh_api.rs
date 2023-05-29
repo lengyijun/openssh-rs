@@ -80,7 +80,6 @@ extern "C" {
     fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
         -> libc::c_int;
 
-    
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;

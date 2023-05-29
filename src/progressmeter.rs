@@ -16,7 +16,6 @@ extern "C" {
         fmt: *const libc::c_char,
         _: ...
     );
-    fn monotime_double() -> libc::c_double;
 
     fn asmprintf(
         _: *mut *mut libc::c_char,
@@ -144,7 +143,7 @@ pub unsafe extern "C" fn refresh_progress_meter(mut force_update: libc::c_int) {
     }
     transferred = *counter - (if cur_pos != 0 { cur_pos } else { start_pos });
     cur_pos = *counter;
-    now = monotime_double();
+    now = crate::misc::monotime_double();
     bytes_left = end_pos - cur_pos;
     if bytes_left > 0 as libc::c_int as libc::c_long {
         elapsed = now - last_update;
@@ -297,7 +296,7 @@ pub unsafe extern "C" fn start_progress_meter(
     mut filesize: off_t,
     mut ctr: *mut off_t,
 ) {
-    last_update = monotime_double();
+    last_update = crate::misc::monotime_double();
     start = last_update;
     file = f;
     start_pos = *ctr;

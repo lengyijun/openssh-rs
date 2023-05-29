@@ -286,7 +286,7 @@ extern "C" {
         wrap: libc::c_int,
     ) -> *mut libc::c_char;
     fn sshbuf_b64tod(buf: *mut crate::sshbuf::sshbuf, b64: *const libc::c_char) -> libc::c_int;
-    
+
     fn sshbuf_load_file(_: *const libc::c_char, _: *mut *mut crate::sshbuf::sshbuf) -> libc::c_int;
     fn sshbuf_write_file(path: *const libc::c_char, buf: *mut crate::sshbuf::sshbuf)
         -> libc::c_int;

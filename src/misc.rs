@@ -150,7 +150,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    
     fn sshbuf_put(
         buf: *mut crate::sshbuf::sshbuf,
         v: *const libc::c_void,
@@ -2480,7 +2479,8 @@ unsafe extern "C" fn vdollar_percent_expand(
                     1 as libc::c_int,
                     SYSLOG_LEVEL_FATAL,
                     0 as *const libc::c_char,
-                    b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8 as *const libc::c_char,
+                    b"crate::sshbuf_misc::sshbuf_dup_string failed\0" as *const u8
+                        as *const libc::c_char,
                 );
             }
             *parseerror = 0 as libc::c_int;
