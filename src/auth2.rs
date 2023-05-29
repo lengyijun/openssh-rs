@@ -42,7 +42,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn getpwnamallow(_: *mut ssh, user: *const libc::c_char) -> *mut libc::passwd;
     fn auth_root_allowed(_: *mut ssh, _: *const libc::c_char) -> libc::c_int;
     fn auth2_challenge_stop(_: *mut ssh);
     fn fakepw() -> *mut libc::passwd;
@@ -755,7 +754,7 @@ unsafe extern "C" fn input_userauth_request(
             (*authctxt).pw = if use_privsep != 0 {
                 mm_getpwnamallow(ssh, user)
             } else {
-                getpwnamallow(ssh, user)
+                crate::auth::getpwnamallow(ssh, user)
             };
             (*authctxt).user = crate::xmalloc::xstrdup(user);
             if !((*authctxt).pw).is_null()

@@ -146,7 +146,7 @@ extern "C" {
         _: *const libc::c_char,
     ) -> libc::c_int;
     fn auth2_setup_methods_lists(_: *mut Authctxt) -> libc::c_int;
-    fn getpwnamallow(_: *mut ssh, user: *const libc::c_char) -> *mut libc::passwd;
+
     fn get_hostkey_by_index(_: libc::c_int) -> *mut crate::sshkey::sshkey;
     fn get_hostkey_public_by_index(_: libc::c_int, _: *mut ssh) -> *mut crate::sshkey::sshkey;
     fn get_hostkey_public_by_type(
@@ -1886,7 +1886,7 @@ pub unsafe extern "C" fn mm_answer_pwnamallow(
             b"parse\0" as *const u8 as *const libc::c_char,
         );
     }
-    pwent = getpwnamallow(ssh, (*authctxt).user);
+    pwent = crate::auth::getpwnamallow(ssh, (*authctxt).user);
     setproctitle(
         b"%s [priv]\0" as *const u8 as *const libc::c_char,
         if !pwent.is_null() {
