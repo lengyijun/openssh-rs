@@ -42,7 +42,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn auth_maxtries_exceeded(_: *mut ssh) -> !;
     fn getpwnamallow(_: *mut ssh, user: *const libc::c_char) -> *mut libc::passwd;
     fn auth_root_allowed(_: *mut ssh, _: *const libc::c_char) -> libc::c_int;
     fn auth2_challenge_stop(_: *mut ssh);
@@ -755,7 +754,7 @@ unsafe extern "C" fn input_userauth_request(
             *fresh0 = 0 as libc::c_int as libc::c_char;
         }
         if (*authctxt).attempt >= 1024 as libc::c_int {
-            auth_maxtries_exceeded(ssh);
+            crate::auth::auth_maxtries_exceeded(ssh);
         }
         let fresh1 = (*authctxt).attempt;
         (*authctxt).attempt = (*authctxt).attempt + 1;
@@ -997,7 +996,7 @@ pub unsafe extern "C" fn userauth_finish(
             (*authctxt).failures;
         }
         if (*authctxt).failures >= options.max_authtries {
-            auth_maxtries_exceeded(ssh);
+            crate::auth::auth_maxtries_exceeded(ssh);
         }
         methods = authmethods_get(authctxt);
         crate::log::sshlog(
