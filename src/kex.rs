@@ -74,7 +74,7 @@ extern "C" {
         _: libc::c_char,
     ) -> *mut libc::c_char;
     fn sshkey_ecdsa_nid_from_name(_: *const libc::c_char) -> libc::c_int;
-    fn mac_setup(_: *mut sshmac, _: *mut libc::c_char) -> libc::c_int;
+
     fn mac_clear(_: *mut sshmac);
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
@@ -1880,7 +1880,7 @@ unsafe extern "C" fn choose_mac(
     if name.is_null() {
         return -(32 as libc::c_int);
     }
-    if mac_setup(mac, name) < 0 as libc::c_int {
+    if crate::mac::mac_setup(mac, name) < 0 as libc::c_int {
         crate::log::sshlog(
             b"kex.c\0" as *const u8 as *const libc::c_char,
             (*::core::mem::transmute::<&[u8; 11], &[libc::c_char; 11]>(b"choose_mac\0")).as_ptr(),

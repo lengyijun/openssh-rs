@@ -107,24 +107,7 @@ extern "C" {
     fn kex_free_newkeys(_: *mut newkeys);
     fn kex_free(_: *mut kex);
     fn kex_start_rekex(_: *mut ssh) -> libc::c_int;
-    fn mac_setup(_: *mut sshmac, _: *mut libc::c_char) -> libc::c_int;
-    fn mac_init(_: *mut sshmac) -> libc::c_int;
-    fn mac_compute(
-        _: *mut sshmac,
-        _: u_int32_t,
-        _: *const u_char,
-        _: libc::c_int,
-        _: *mut u_char,
-        _: size_t,
-    ) -> libc::c_int;
-    fn mac_check(
-        _: *mut sshmac,
-        _: u_int32_t,
-        _: *const u_char,
-        _: size_t,
-        _: *const u_char,
-        _: size_t,
-    ) -> libc::c_int;
+
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn cleanup_exit(_: libc::c_int) -> !;
 
@@ -821,7 +804,7 @@ pub unsafe extern "C" fn ssh_packet_stop_discard(mut ssh: *mut ssh) -> libc::c_i
                 return r;
             }
         }
-        mac_compute(
+        crate::mac::mac_compute(
             (*state).packet_discard_mac,
             (*state).p_read.seqnr,
             crate::sshbuf::sshbuf_ptr((*state).incoming_packet),
@@ -1359,7 +1342,7 @@ pub unsafe extern "C" fn ssh_set_newkeys(mut ssh: *mut ssh, mut mode: libc::c_in
     mac = &mut (**((*state).newkeys).as_mut_ptr().offset(mode as isize)).mac;
     comp = &mut (**((*state).newkeys).as_mut_ptr().offset(mode as isize)).comp;
     if cipher_authlen((*enc).cipher) == 0 as libc::c_int as libc::c_uint {
-        r = mac_init(mac);
+        r = crate::mac::mac_init(mac);
         if r != 0 as libc::c_int {
             return r;
         }
@@ -1707,7 +1690,7 @@ pub unsafe extern "C" fn ssh_packet_send2_wrapped(mut ssh: *mut ssh) -> libc::c_
                         (__v & 0xff as libc::c_int as libc::c_uint) as u_char;
                     *cp.offset(4 as libc::c_int as isize) = padlen;
                     if !mac.is_null() && (*mac).enabled != 0 && (*mac).etm == 0 {
-                        r = mac_compute(
+                        r = crate::mac::mac_compute(
                             mac,
                             (*state).p_send.seqnr,
                             crate::sshbuf::sshbuf_ptr((*state).outgoing_packet),
@@ -1745,7 +1728,7 @@ pub unsafe extern "C" fn ssh_packet_send2_wrapped(mut ssh: *mut ssh) -> libc::c_
                                 if !(r != 0 as libc::c_int) {
                                     if !mac.is_null() && (*mac).enabled != 0 {
                                         if (*mac).etm != 0 {
-                                            r = mac_compute(
+                                            r = crate::mac::mac_compute(
                                                 mac,
                                                 (*state).p_send.seqnr,
                                                 cp,
@@ -2408,7 +2391,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                 return 0 as libc::c_int;
             }
             if !mac.is_null() && (*mac).enabled != 0 && (*mac).etm != 0 {
-                r = mac_check(
+                r = crate::mac::mac_check(
                     mac,
                     (*state).p_read.seqnr,
                     crate::sshbuf::sshbuf_ptr((*state).input),
@@ -2467,7 +2450,7 @@ pub unsafe extern "C" fn ssh_packet_read_poll2(
                             if !(r != 0 as libc::c_int) {
                                 if !mac.is_null() && (*mac).enabled != 0 {
                                     if (*mac).etm == 0 && {
-                                        r = mac_check(
+                                        r = crate::mac::mac_check(
                                             mac,
                                             (*state).p_read.seqnr,
                                             crate::sshbuf::sshbuf_ptr((*state).incoming_packet),
@@ -3817,7 +3800,7 @@ unsafe extern "C" fn newkeys_from_blob(
                         if r != 0 as libc::c_int {
                             current_block = 15195334471293752841;
                         } else {
-                            r = mac_setup(mac, (*mac).name);
+                            r = crate::mac::mac_setup(mac, (*mac).name);
                             if r != 0 as libc::c_int {
                                 current_block = 15195334471293752841;
                             } else {
