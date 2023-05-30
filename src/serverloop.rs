@@ -2,6 +2,7 @@ use crate::auth::Authctxt;
 use crate::auth_options::sshauthopt;
 use crate::kex::dh_st;
 use crate::packet::key_entry;
+use crate::session::Session;
 use libc::pid_t;
 
 use crate::packet::ssh;
@@ -591,39 +592,6 @@ pub const KEY_ECDSA: sshkey_types = 2;
 pub const KEY_DSA: sshkey_types = 1;
 pub const KEY_RSA: sshkey_types = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Session {
-    pub used: libc::c_int,
-    pub self_0: libc::c_int,
-    pub next_unused: libc::c_int,
-    pub pw: *mut libc::passwd,
-    pub authctxt: *mut Authctxt,
-    pub pid: pid_t,
-    pub forced: libc::c_int,
-    pub term: *mut libc::c_char,
-    pub ptyfd: libc::c_int,
-    pub ttyfd: libc::c_int,
-    pub ptymaster: libc::c_int,
-    pub row: u_int,
-    pub col: u_int,
-    pub xpixel: u_int,
-    pub ypixel: u_int,
-    pub tty: [libc::c_char; 64],
-    pub display_number: u_int,
-    pub display: *mut libc::c_char,
-    pub screen: u_int,
-    pub auth_display: *mut libc::c_char,
-    pub auth_proto: *mut libc::c_char,
-    pub auth_data: *mut libc::c_char,
-    pub single_connection: libc::c_int,
-    pub chanid: libc::c_int,
-    pub x11_chanids: *mut libc::c_int,
-    pub is_subsystem: libc::c_int,
-    pub subsys: *mut libc::c_char,
-    pub num_env: u_int,
-    pub env: *mut C2RustUnnamed_4,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_4 {
