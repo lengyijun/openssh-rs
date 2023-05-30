@@ -1,6 +1,7 @@
 use ::libc;
 use libc::close;
 use libc::kill;
+use libc::pid_t;
 
 extern "C" {
     pub type sockaddr_x25;
@@ -192,7 +193,7 @@ pub type u_char = __u_char;
 pub type u_short = __u_short;
 pub type u_int = __u_int;
 pub type uid_t = __uid_t;
-pub type pid_t = __pid_t;
+
 pub type clockid_t = __clockid_t;
 pub type time_t = __time_t;
 pub type size_t = libc::c_ulong;

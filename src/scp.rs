@@ -29,6 +29,7 @@ use ::libc;
 use libc::close;
 use libc::isatty;
 use libc::kill;
+use libc::pid_t;
 
 extern "C" {
     pub type _IO_wide_data;
@@ -112,7 +113,7 @@ pub type u_int = __u_int;
 pub type mode_t = __mode_t;
 pub type uid_t = __uid_t;
 pub type off_t = __off_t;
-pub type pid_t = __pid_t;
+
 pub type ssize_t = __ssize_t;
 pub type time_t = __time_t;
 pub type size_t = libc::c_ulong;

@@ -1,5 +1,6 @@
 use crate::atomicio::atomicio;
 use crate::packet::key_entry;
+use libc::pid_t;
 
 use crate::packet::ssh;
 use ::libc;
@@ -91,7 +92,7 @@ pub type u_int = __u_int;
 pub type u_long = __u_long;
 pub type uid_t = __uid_t;
 pub type off_t = __off_t;
-pub type pid_t = __pid_t;
+
 pub type ssize_t = __ssize_t;
 pub type time_t = __time_t;
 pub type size_t = libc::c_ulong;

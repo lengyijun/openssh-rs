@@ -1,4 +1,5 @@
 use ::libc;
+use libc::pid_t;
 extern "C" {
     fn mmap(
         __addr: *mut libc::c_void,
@@ -34,7 +35,7 @@ pub type __pid_t = libc::c_int;
 pub type __sig_atomic_t = libc::c_int;
 pub type u_char = __u_char;
 pub type u_int = __u_int;
-pub type pid_t = __pid_t;
+
 pub type size_t = libc::c_ulong;
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;

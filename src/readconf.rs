@@ -2,6 +2,7 @@ use crate::digest_openssl::ssh_digest_ctx;
 use crate::misc::parse_uri;
 use ::libc;
 use libc::kill;
+use libc::pid_t;
 
 extern "C" {
     pub type _IO_wide_data;
@@ -182,7 +183,7 @@ pub type __syscall_slong_t = libc::c_long;
 pub type u_char = __u_char;
 pub type u_int = __u_int;
 pub type mode_t = __mode_t;
-pub type pid_t = __pid_t;
+
 pub type size_t = libc::c_ulong;
 pub type int64_t = __int64_t;
 pub type u_int64_t = __uint64_t;

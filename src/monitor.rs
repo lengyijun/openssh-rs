@@ -1,6 +1,7 @@
 use crate::kex::dh_st;
 use crate::kex::kex;
 use crate::packet::key_entry;
+use libc::pid_t;
 
 use crate::packet::ssh;
 
@@ -257,7 +258,7 @@ pub type u_char = __u_char;
 pub type u_int = __u_int;
 pub type mode_t = __mode_t;
 pub type uid_t = __uid_t;
-pub type pid_t = __pid_t;
+
 pub type ssize_t = __ssize_t;
 pub type size_t = libc::c_ulong;
 pub type int64_t = __int64_t;

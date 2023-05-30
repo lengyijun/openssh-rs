@@ -2,6 +2,7 @@ use ::libc;
 use libc::close;
 use libc::isatty;
 use libc::kill;
+use libc::pid_t;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -77,7 +78,7 @@ pub type __off_t = libc::c_long;
 pub type __off64_t = libc::c_long;
 pub type __pid_t = libc::c_int;
 pub type __ssize_t = libc::c_long;
-pub type pid_t = __pid_t;
+
 pub type ssize_t = __ssize_t;
 pub type size_t = libc::c_ulong;
 

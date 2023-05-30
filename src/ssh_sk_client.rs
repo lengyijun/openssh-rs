@@ -1,5 +1,6 @@
 use ::libc;
 use libc::close;
+use libc::pid_t;
 extern "C" {
 
     fn freezero(_: *mut libc::c_void, _: size_t);
@@ -54,7 +55,7 @@ pub type __uint64_t = libc::c_ulong;
 pub type __pid_t = libc::c_int;
 pub type u_char = __u_char;
 pub type u_int = __u_int;
-pub type pid_t = __pid_t;
+
 pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;

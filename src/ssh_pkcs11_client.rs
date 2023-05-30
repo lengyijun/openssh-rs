@@ -1,6 +1,7 @@
 use crate::atomicio::atomicio;
 use ::libc;
 use libc::close;
+use libc::pid_t;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -159,7 +160,7 @@ pub type __pid_t = libc::c_int;
 pub type __ssize_t = libc::c_long;
 pub type u_char = __u_char;
 pub type u_int = __u_int;
-pub type pid_t = __pid_t;
+
 pub type ssize_t = __ssize_t;
 pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;

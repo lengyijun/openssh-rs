@@ -1,4 +1,5 @@
 use ::libc;
+use libc::pid_t;
 extern "C" {
     pub type monitor;
 
@@ -21,7 +22,7 @@ pub type __uint32_t = libc::c_uint;
 pub type __uint64_t = libc::c_ulong;
 pub type __pid_t = libc::c_int;
 pub type __rlim_t = libc::c_ulong;
-pub type pid_t = __pid_t;
+
 pub type size_t = libc::c_ulong;
 pub type uint32_t = __uint32_t;
 pub type uint64_t = __uint64_t;

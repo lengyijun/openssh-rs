@@ -2,6 +2,7 @@ use crate::log::log_init;
 use ::libc;
 use libc::close;
 use libc::kill;
+use libc::pid_t;
 
 extern "C" {
     pub type sockaddr_x25;
@@ -233,7 +234,7 @@ pub type u_int = __u_int;
 pub type gid_t = __gid_t;
 pub type mode_t = __mode_t;
 pub type uid_t = __uid_t;
-pub type pid_t = __pid_t;
+
 pub type ssize_t = __ssize_t;
 pub type time_t = __time_t;
 pub type size_t = libc::c_ulong;

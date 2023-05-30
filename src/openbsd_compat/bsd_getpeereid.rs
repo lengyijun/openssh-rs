@@ -1,4 +1,5 @@
 use ::libc;
+use libc::pid_t;
 extern "C" {
     fn getsockopt(
         __fd: libc::c_int,
@@ -14,7 +15,7 @@ pub type __pid_t = libc::c_int;
 pub type __socklen_t = libc::c_uint;
 pub type gid_t = __gid_t;
 pub type uid_t = __uid_t;
-pub type pid_t = __pid_t;
+
 pub type socklen_t = __socklen_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
