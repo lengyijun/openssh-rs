@@ -1,3 +1,4 @@
+use crate::auth::Authctxt;
 use ::libc;
 extern "C" {
 
@@ -40,32 +41,7 @@ pub struct spwd {
     pub sp_expire: libc::c_long,
     pub sp_flag: libc::c_ulong,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Authctxt {
-    pub success: sig_atomic_t,
-    pub authenticated: libc::c_int,
-    pub postponed: libc::c_int,
-    pub valid: libc::c_int,
-    pub attempt: libc::c_int,
-    pub failures: libc::c_int,
-    pub server_caused_failure: libc::c_int,
-    pub force_pwchange: libc::c_int,
-    pub user: *mut libc::c_char,
-    pub service: *mut libc::c_char,
-    pub pw: *mut libc::passwd,
-    pub style: *mut libc::c_char,
-    pub auth_methods: *mut *mut libc::c_char,
-    pub num_auth_methods: u_int,
-    pub methoddata: *mut libc::c_void,
-    pub kbdintctxt: *mut libc::c_void,
-    pub loginmsg: *mut crate::sshbuf::sshbuf,
-    pub prev_keys: *mut *mut crate::sshkey::sshkey,
-    pub nprev_keys: u_int,
-    pub auth_method_key: *mut crate::sshkey::sshkey,
-    pub auth_method_info: *mut libc::c_char,
-    pub session_info: *mut crate::sshbuf::sshbuf,
-}
+
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;
 pub const SYSLOG_LEVEL_DEBUG3: LogLevel = 7;

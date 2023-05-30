@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::auth::Authctxt;
 use crate::packet::key_entry;
 
 use crate::packet::ssh;
@@ -312,32 +313,7 @@ pub const SSH_FP_BUBBLEBABBLE: sshkey_fp_rep = 3;
 pub const SSH_FP_BASE64: sshkey_fp_rep = 2;
 pub const SSH_FP_HEX: sshkey_fp_rep = 1;
 pub const SSH_FP_DEFAULT: sshkey_fp_rep = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Authctxt {
-    pub success: sig_atomic_t,
-    pub authenticated: libc::c_int,
-    pub postponed: libc::c_int,
-    pub valid: libc::c_int,
-    pub attempt: libc::c_int,
-    pub failures: libc::c_int,
-    pub server_caused_failure: libc::c_int,
-    pub force_pwchange: libc::c_int,
-    pub user: *mut libc::c_char,
-    pub service: *mut libc::c_char,
-    pub pw: *mut libc::passwd,
-    pub style: *mut libc::c_char,
-    pub auth_methods: *mut *mut libc::c_char,
-    pub num_auth_methods: u_int,
-    pub methoddata: *mut libc::c_void,
-    pub kbdintctxt: *mut libc::c_void,
-    pub loginmsg: *mut crate::sshbuf::sshbuf,
-    pub prev_keys: *mut *mut crate::sshkey::sshkey,
-    pub nprev_keys: u_int,
-    pub auth_method_key: *mut crate::sshkey::sshkey,
-    pub auth_method_info: *mut libc::c_char,
-    pub session_info: *mut crate::sshbuf::sshbuf,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct Authmethod {

@@ -580,7 +580,7 @@ pub struct cauthmethod {
     pub enabled: *mut libc::c_int,
     pub batch_flag: *mut libc::c_int,
 }
-pub type Authctxt = cauthctxt;
+type Authctxt = cauthctxt;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct cauthctxt {
