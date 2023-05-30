@@ -1,7 +1,7 @@
+use crate::monitor::monitor;
 use ::libc;
 use libc::pid_t;
 extern "C" {
-    pub type monitor;
 
     fn setrlimit(__resource: __rlimit_resource_t, __rlimits: *const rlimit) -> libc::c_int;
     fn prctl(__option: libc::c_int, _: ...) -> libc::c_int;

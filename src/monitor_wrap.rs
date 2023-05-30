@@ -1,5 +1,6 @@
 use crate::kex::dh_st;
 use crate::kex::kex;
+use crate::monitor::monitor;
 use crate::packet::key_entry;
 use libc::pid_t;
 
@@ -278,16 +279,7 @@ pub const MONITOR_REQ_AUTHSERV: monitor_reqtype = 4;
 pub const MONITOR_REQ_FREE: monitor_reqtype = 2;
 pub const MONITOR_ANS_MODULI: monitor_reqtype = 1;
 pub const MONITOR_REQ_MODULI: monitor_reqtype = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct monitor {
-    pub m_recvfd: libc::c_int,
-    pub m_sendfd: libc::c_int,
-    pub m_log_recvfd: libc::c_int,
-    pub m_log_sendfd: libc::c_int,
-    pub m_pkex: *mut *mut kex,
-    pub m_pid: pid_t,
-}
+
 pub type mm_keytype = libc::c_uint;
 pub const MM_USERKEY: mm_keytype = 2;
 pub const MM_HOSTKEY: mm_keytype = 1;
