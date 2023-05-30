@@ -7,11 +7,16 @@ use crate::packet::key_entry;
 use crate::packet::ssh;
 use crate::session::Session;
 use crate::sshd::pmonitor;
+use crate::sshkey::sshkey_from_blob;
 use crate::sshkey::sshkey_froms;
 use crate::sshkey::sshkey_puts;
 use crate::sshkey::sshkey_sig_details;
+use crate::sshkey::sshkey_sig_details_free;
 use crate::sshkey::sshkey_sign;
+use crate::sshkey::sshkey_ssh_name;
 use crate::sshkey::sshkey_to_blob;
+use crate::sshkey::sshkey_type_from_name;
+use crate::sshkey::sshkey_verify;
 use ::libc;
 use libc::close;
 use libc::kill;
@@ -61,25 +66,6 @@ extern "C" {
         g: *mut *const BIGNUM,
     );
     fn DH_free(dh: *mut DH);
-
-    fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
-    fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_from_blob(
-        _: *const u_char,
-        _: size_t,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn sshkey_verify(
-        _: *const crate::sshkey::sshkey,
-        _: *const u_char,
-        _: size_t,
-        _: *const u_char,
-        _: size_t,
-        _: *const libc::c_char,
-        _: u_int,
-        _: *mut *mut sshkey_sig_details,
-    ) -> libc::c_int;
-    fn sshkey_sig_details_free(_: *mut sshkey_sig_details);
 
     fn sshbuf_reserve(
         buf: *mut crate::sshbuf::sshbuf,
