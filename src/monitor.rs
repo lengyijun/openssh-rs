@@ -1,15 +1,13 @@
+use crate::atomicio::atomicio;
 use crate::kex::dh_st;
 use crate::kex::kex;
 use crate::packet::key_entry;
-use libc::pid_t;
-
 use crate::packet::ssh;
-
-use crate::atomicio::atomicio;
-
+use crate::sshd::pmonitor;
 use ::libc;
 use libc::close;
 use libc::kill;
+use libc::pid_t;
 
 extern "C" {
     pub type sockaddr_x25;
@@ -945,7 +943,7 @@ unsafe extern "C" fn monitor_permit_authentications(mut permit: libc::c_int) {
         ent;
     }
 }
-pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor: *mut monitor) {
+pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor1: *mut monitor) {
     let mut ent: *mut mon_table = 0 as *mut mon_table;
     let mut authenticated: libc::c_int = 0 as libc::c_int;
     let mut partial: libc::c_int = 0 as libc::c_int;
@@ -959,14 +957,14 @@ pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor: 
         0 as *const libc::c_char,
         b"preauth child monitor started\0" as *const u8 as *const libc::c_char,
     );
-    if (*pmonitor).m_recvfd >= 0 as libc::c_int {
-        close((*pmonitor).m_recvfd);
+    if (*pmonitor1).m_recvfd >= 0 as libc::c_int {
+        close((*pmonitor1).m_recvfd);
     }
-    if (*pmonitor).m_log_sendfd >= 0 as libc::c_int {
-        close((*pmonitor).m_log_sendfd);
+    if (*pmonitor1).m_log_sendfd >= 0 as libc::c_int {
+        close((*pmonitor1).m_log_sendfd);
     }
-    (*pmonitor).m_recvfd = -(1 as libc::c_int);
-    (*pmonitor).m_log_sendfd = (*pmonitor).m_recvfd;
+    (*pmonitor1).m_recvfd = -(1 as libc::c_int);
+    (*pmonitor1).m_log_sendfd = (*pmonitor1).m_recvfd;
     authctxt = (*ssh).authctxt as *mut Authctxt;
     memset(
         authctxt as *mut libc::c_void,
@@ -983,7 +981,7 @@ pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor: 
         auth_method = b"unknown\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
         auth_submethod = 0 as *mut libc::c_char;
         auth2_authctxt_reset_info(authctxt);
-        authenticated = (monitor_read(ssh, pmonitor, mon_dispatch, &mut ent) == 1 as libc::c_int)
+        authenticated = (monitor_read(ssh, pmonitor1, mon_dispatch, &mut ent) == 1 as libc::c_int)
             as libc::c_int;
         if options.num_auth_methods != 0 as libc::c_int as libc::c_uint {
             if authenticated != 0
@@ -1084,18 +1082,18 @@ pub unsafe extern "C" fn monitor_child_preauth(mut ssh: *mut ssh, mut pmonitor: 
         b"user %s\0" as *const u8 as *const libc::c_char,
         (*authctxt).user,
     );
-    mm_get_keystate(ssh, pmonitor);
-    while (*pmonitor).m_log_recvfd != -(1 as libc::c_int)
-        && monitor_read_log(pmonitor) == 0 as libc::c_int
+    mm_get_keystate(ssh, pmonitor1);
+    while (*pmonitor1).m_log_recvfd != -(1 as libc::c_int)
+        && monitor_read_log(pmonitor1) == 0 as libc::c_int
     {}
-    if (*pmonitor).m_recvfd >= 0 as libc::c_int {
-        close((*pmonitor).m_recvfd);
+    if (*pmonitor1).m_recvfd >= 0 as libc::c_int {
+        close((*pmonitor1).m_recvfd);
     }
-    if (*pmonitor).m_log_sendfd >= 0 as libc::c_int {
-        close((*pmonitor).m_log_sendfd);
+    if (*pmonitor1).m_log_sendfd >= 0 as libc::c_int {
+        close((*pmonitor1).m_log_sendfd);
     }
-    (*pmonitor).m_log_recvfd = -(1 as libc::c_int);
-    (*pmonitor).m_sendfd = (*pmonitor).m_log_recvfd;
+    (*pmonitor1).m_log_recvfd = -(1 as libc::c_int);
+    (*pmonitor1).m_sendfd = (*pmonitor1).m_log_recvfd;
 }
 unsafe extern "C" fn monitor_set_child_handler(mut pid: pid_t) {
     monitor_child_pid = pid;
@@ -1103,7 +1101,7 @@ unsafe extern "C" fn monitor_set_child_handler(mut pid: pid_t) {
 unsafe extern "C" fn monitor_child_handler(mut sig: libc::c_int) {
     kill(monitor_child_pid, sig);
 }
-unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int {
+unsafe extern "C" fn monitor_read_log(mut pmonitor1: *mut monitor) -> libc::c_int {
     let mut logmsg: *mut crate::sshbuf::sshbuf = 0 as *mut crate::sshbuf::sshbuf;
     let mut len: u_int = 0;
     let mut level: u_int = 0;
@@ -1139,7 +1137,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
     }
     if atomicio(
         Some(read as unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t),
-        (*pmonitor).m_log_recvfd,
+        (*pmonitor1).m_log_recvfd,
         p as *mut libc::c_void,
         4 as libc::c_int as size_t,
     ) != 4 as libc::c_int as libc::c_ulong
@@ -1156,8 +1154,8 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
                 0 as *const libc::c_char,
                 b"child log fd closed\0" as *const u8 as *const libc::c_char,
             );
-            close((*pmonitor).m_log_recvfd);
-            (*pmonitor).m_log_recvfd = -(1 as libc::c_int);
+            close((*pmonitor1).m_log_recvfd);
+            (*pmonitor1).m_log_recvfd = -(1 as libc::c_int);
             return -(1 as libc::c_int);
         }
         sshfatal(
@@ -1214,7 +1212,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
     }
     if atomicio(
         Some(read as unsafe extern "C" fn(libc::c_int, *mut libc::c_void, size_t) -> ssize_t),
-        (*pmonitor).m_log_recvfd,
+        (*pmonitor1).m_log_recvfd,
         p as *mut libc::c_void,
         len as size_t,
     ) != len as libc::c_ulong
@@ -1278,7 +1276,7 @@ unsafe extern "C" fn monitor_read_log(mut pmonitor: *mut monitor) -> libc::c_int
 }
 unsafe extern "C" fn monitor_read(
     mut ssh: *mut ssh,
-    mut pmonitor: *mut monitor,
+    mut pmonitor1: *mut monitor,
     mut ent: *mut mon_table,
     mut pent: *mut *mut mon_table,
 ) -> libc::c_int {
@@ -1297,9 +1295,9 @@ unsafe extern "C" fn monitor_read(
             0 as libc::c_int,
             ::core::mem::size_of::<[pollfd; 2]>() as libc::c_ulong,
         );
-        pfd[0 as libc::c_int as usize].fd = (*pmonitor).m_sendfd;
+        pfd[0 as libc::c_int as usize].fd = (*pmonitor1).m_sendfd;
         pfd[0 as libc::c_int as usize].events = 0x1 as libc::c_int as libc::c_short;
-        pfd[1 as libc::c_int as usize].fd = (*pmonitor).m_log_recvfd;
+        pfd[1 as libc::c_int as usize].fd = (*pmonitor1).m_log_recvfd;
         pfd[1 as libc::c_int as usize].events =
             (if pfd[1 as libc::c_int as usize].fd == -(1 as libc::c_int) {
                 0 as libc::c_int
@@ -1333,7 +1331,7 @@ unsafe extern "C" fn monitor_read(
                 libc::strerror(*libc::__errno_location()),
             );
         } else if pfd[1 as libc::c_int as usize].revents != 0 {
-            monitor_read_log(pmonitor);
+            monitor_read_log(pmonitor1);
         } else if pfd[0 as libc::c_int as usize].revents != 0 {
             break;
         }
@@ -1350,7 +1348,7 @@ unsafe extern "C" fn monitor_read(
             b"crate::crate::sshbuf::sshbuf::sshbuf_new\0" as *const u8 as *const libc::c_char,
         );
     }
-    mm_request_receive((*pmonitor).m_sendfd, m);
+    mm_request_receive((*pmonitor1).m_sendfd, m);
     r = crate::sshbuf_getput_basic::sshbuf_get_u8(m, &mut type_0);
     if r != 0 as libc::c_int {
         sshfatal(
@@ -1395,7 +1393,7 @@ unsafe extern "C" fn monitor_read(
             );
         }
         ret = (Some(((*ent).f).expect("non-null function pointer")))
-            .expect("non-null function pointer")(ssh, (*pmonitor).m_sendfd, m);
+            .expect("non-null function pointer")(ssh, (*pmonitor1).m_sendfd, m);
         crate::sshbuf::sshbuf_free(m);
         if (*ent).flags & 0x10 as libc::c_int != 0 {
             crate::log::sshlog(
@@ -3839,9 +3837,6 @@ pub unsafe extern "C" fn mm_answer_pty(
     mut sock: libc::c_int,
     mut m: *mut crate::sshbuf::sshbuf,
 ) -> libc::c_int {
-    extern "C" {
-        static mut pmonitor: *mut monitor;
-    }
     let mut s: *mut Session = 0 as *mut Session;
     let mut r: libc::c_int = 0;
     let mut res: libc::c_int = 0;
@@ -4178,7 +4173,7 @@ pub unsafe extern "C" fn monitor_apply_keystate(mut ssh: *mut ssh, mut _pmonitor
             ) -> libc::c_int,
     );
 }
-pub unsafe extern "C" fn mm_get_keystate(mut _ssh: *mut ssh, mut pmonitor: *mut monitor) {
+pub unsafe extern "C" fn mm_get_keystate(mut _ssh: *mut ssh, mut pmonitor1: *mut monitor) {
     crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"mm_get_keystate\0")).as_ptr(),
@@ -4202,7 +4197,7 @@ pub unsafe extern "C" fn mm_get_keystate(mut _ssh: *mut ssh, mut pmonitor: *mut 
                 as *const libc::c_char,
         );
     }
-    mm_request_receive_expect((*pmonitor).m_sendfd, MONITOR_REQ_KEYEXPORT, child_state);
+    mm_request_receive_expect((*pmonitor1).m_sendfd, MONITOR_REQ_KEYEXPORT, child_state);
     crate::log::sshlog(
         b"monitor.c\0" as *const u8 as *const libc::c_char,
         (*::core::mem::transmute::<&[u8; 16], &[libc::c_char; 16]>(b"mm_get_keystate\0")).as_ptr(),
