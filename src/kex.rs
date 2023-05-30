@@ -1,10 +1,27 @@
 use crate::atomicio::atomicio;
-use crate::packet::key_entry;
-
 use crate::cipher::sshcipher;
+use crate::compat::compat_banner;
+use crate::compat::compat_kex_proposal;
 use crate::digest_openssl::ssh_digest_ctx;
+use crate::mac::mac_clear;
 use crate::mac::sshmac;
+use crate::misc::waitrfd;
+use crate::packet::key_entry;
 use crate::packet::ssh;
+use crate::packet::ssh_packet_get_connection_in;
+use crate::packet::ssh_packet_get_connection_out;
+use crate::packet::ssh_remote_ipaddr;
+use crate::packet::ssh_remote_port;
+use crate::packet::ssh_set_newkeys;
+use crate::packet::sshpkt_ptr;
+use crate::packet::sshpkt_putb;
+use crate::r#match::match_filter_allowlist;
+use crate::r#match::match_filter_denylist;
+use crate::sshbuf::sshbuf_fromb;
+use crate::ssherr::ssh_err;
+use crate::sshkey::sshkey_alg_list;
+use crate::sshkey::sshkey_ecdsa_nid_from_name;
+use crate::sshkey::sshkey_type_from_name;
 use crate::sshkey::EC_GROUP;
 
 use ::libc;
@@ -38,28 +55,6 @@ extern "C" {
     fn EC_KEY_free(key: *mut crate::sshkey::EC_KEY);
 
     fn ssh_dispatch_range(_: *mut ssh, _: u_int, _: u_int, _: Option<dispatch_fn>);
-    fn ssh_set_newkeys(_: *mut ssh, mode: libc::c_int) -> libc::c_int;
-    fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
-    fn ssh_remote_port(_: *mut ssh) -> libc::c_int;
-    fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
-    fn ssh_packet_get_connection_out(_: *mut ssh) -> libc::c_int;
-    fn sshpkt_putb(ssh: *mut ssh, b: *const crate::sshbuf::sshbuf) -> libc::c_int;
-
-    fn sshpkt_ptr(_: *mut ssh, lenp: *mut size_t) -> *const u_char;
-    fn compat_banner(_: *mut ssh, _: *const libc::c_char);
-    fn compat_kex_proposal(_: *mut ssh, _: *const libc::c_char) -> *mut libc::c_char;
-
-    fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
-    fn sshkey_alg_list(
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_char,
-    ) -> *mut libc::c_char;
-    fn sshkey_ecdsa_nid_from_name(_: *const libc::c_char) -> libc::c_int;
-
-    fn mac_clear(_: *mut sshmac);
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -76,11 +71,6 @@ extern "C" {
         _: *const libc::c_char,
         _: *mut u_int,
     ) -> *mut libc::c_char;
-    fn match_filter_denylist(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
-    fn match_filter_allowlist(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
-    fn waitrfd(_: libc::c_int, _: *mut libc::c_int) -> libc::c_int;
-
-    fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
 
 }
 pub type __u_char = libc::c_uchar;
