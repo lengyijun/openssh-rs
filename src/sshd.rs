@@ -4,6 +4,7 @@ use crate::auth::Authctxt;
 use crate::auth2::auth2_methods_valid;
 use crate::auth2::do_authentication2;
 use crate::auth2_chall::privsep_challenge_enable;
+use crate::auth_options::sshauthopt;
 use crate::authfd::ssh_agent_sign;
 use crate::authfd::ssh_get_authentication_socket;
 use crate::authfile::sshkey_load_private;
@@ -790,31 +791,7 @@ pub const KEX_DH_GRP16_SHA512: kex_exchange = 3;
 pub const KEX_DH_GRP14_SHA256: kex_exchange = 2;
 pub const KEX_DH_GRP14_SHA1: kex_exchange = 1;
 pub const KEX_DH_GRP1_SHA1: kex_exchange = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshauthopt {
-    pub permit_port_forwarding_flag: libc::c_int,
-    pub permit_agent_forwarding_flag: libc::c_int,
-    pub permit_x11_forwarding_flag: libc::c_int,
-    pub permit_pty_flag: libc::c_int,
-    pub permit_user_rc: libc::c_int,
-    pub restricted: libc::c_int,
-    pub valid_before: uint64_t,
-    pub cert_authority: libc::c_int,
-    pub cert_principals: *mut libc::c_char,
-    pub force_tun_device: libc::c_int,
-    pub force_command: *mut libc::c_char,
-    pub nenv: size_t,
-    pub env: *mut *mut libc::c_char,
-    pub npermitopen: size_t,
-    pub permitopen: *mut *mut libc::c_char,
-    pub npermitlisten: size_t,
-    pub permitlisten: *mut *mut libc::c_char,
-    pub required_from_host_cert: *mut libc::c_char,
-    pub required_from_host_keys: *mut libc::c_char,
-    pub no_require_user_presence: libc::c_int,
-    pub require_verify: libc::c_int,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_6 {

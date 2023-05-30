@@ -1,4 +1,5 @@
 use crate::auth::Authctxt;
+use crate::auth_options::sshauthopt;
 use crate::kex::dh_st;
 use crate::kex::kex;
 use crate::monitor::monitor;
@@ -145,32 +146,6 @@ pub type dispatch_fn = unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) ->
 pub type DH = dh_st;
 
 pub type BIGNUM = bignum_st;
-
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshauthopt {
-    pub permit_port_forwarding_flag: libc::c_int,
-    pub permit_agent_forwarding_flag: libc::c_int,
-    pub permit_x11_forwarding_flag: libc::c_int,
-    pub permit_pty_flag: libc::c_int,
-    pub permit_user_rc: libc::c_int,
-    pub restricted: libc::c_int,
-    pub valid_before: uint64_t,
-    pub cert_authority: libc::c_int,
-    pub cert_principals: *mut libc::c_char,
-    pub force_tun_device: libc::c_int,
-    pub force_command: *mut libc::c_char,
-    pub nenv: size_t,
-    pub env: *mut *mut libc::c_char,
-    pub npermitopen: size_t,
-    pub permitopen: *mut *mut libc::c_char,
-    pub npermitlisten: size_t,
-    pub permitlisten: *mut *mut libc::c_char,
-    pub required_from_host_cert: *mut libc::c_char,
-    pub required_from_host_keys: *mut libc::c_char,
-    pub no_require_user_presence: libc::c_int,
-    pub require_verify: libc::c_int,
-}
 
 pub type SyslogFacility = libc::c_int;
 pub const SYSLOG_FACILITY_NOT_SET: SyslogFacility = -1;
