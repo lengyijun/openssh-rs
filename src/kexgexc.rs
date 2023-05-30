@@ -1,6 +1,7 @@
 use crate::kex::dh_st;
 use crate::kex::kex;
 use crate::packet::key_entry;
+use crate::sshkey::sshkey_sig_details;
 
 use crate::packet::ssh;
 
@@ -122,12 +123,7 @@ pub type dispatch_fn = unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) ->
 pub type DH = dh_st;
 
 pub type BIGNUM = bignum_st;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_sig_details {
-    pub sk_counter: uint32_t,
-    pub sk_flags: uint8_t,
-}
+
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;
 pub const SYSLOG_LEVEL_DEBUG3: LogLevel = 7;

@@ -1,4 +1,5 @@
 use crate::digest_openssl::ssh_digest_ctx;
+use crate::sshkey::sshkey_sig_details;
 use ::libc;
 extern "C" {
     pub type _IO_wide_data;
@@ -179,12 +180,7 @@ pub struct sshsigopt {
     pub valid_after: uint64_t,
     pub valid_before: uint64_t,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_sig_details {
-    pub sk_counter: uint32_t,
-    pub sk_flags: uint8_t,
-}
+
 pub type sshsig_signer = unsafe extern "C" fn(
     *mut crate::sshkey::sshkey,
     *mut *mut u_char,

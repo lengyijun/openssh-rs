@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::sshkey::sshkey_sig_details;
 
 use crate::log::log_init;
 use crate::utf8::msetlocale;
@@ -583,12 +584,6 @@ pub const SSHKEY_PRIVATE_PKCS8: sshkey_private_format = 2;
 pub const SSHKEY_PRIVATE_PEM: sshkey_private_format = 1;
 pub const SSHKEY_PRIVATE_OPENSSH: sshkey_private_format = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_sig_details {
-    pub sk_counter: uint32_t,
-    pub sk_flags: uint8_t,
-}
 pub type sshkey_certify_signer = unsafe extern "C" fn(
     *mut crate::sshkey::sshkey,
     *mut *mut u_char,

@@ -1,4 +1,5 @@
 use crate::log::log_init;
+use crate::sshkey::sshkey_sig_details;
 use ::libc;
 use libc::close;
 use libc::kill;
@@ -380,12 +381,6 @@ pub const SSHKEY_SERIALIZE_FULL: sshkey_serialize_rep = 2;
 pub const SSHKEY_SERIALIZE_STATE: sshkey_serialize_rep = 1;
 pub const SSHKEY_SERIALIZE_DEFAULT: sshkey_serialize_rep = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_sig_details {
-    pub sk_counter: uint32_t,
-    pub sk_flags: uint8_t,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct dest_constraint_hop {

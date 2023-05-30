@@ -1,4 +1,5 @@
 use crate::log::log_init;
+use crate::sshkey::sshkey_sig_details;
 use ::libc;
 use libc::close;
 
@@ -233,12 +234,6 @@ pub const SSH_FP_BASE64: sshkey_fp_rep = 2;
 pub const SSH_FP_HEX: sshkey_fp_rep = 1;
 pub const SSH_FP_DEFAULT: sshkey_fp_rep = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_sig_details {
-    pub sk_counter: uint32_t,
-    pub sk_flags: uint8_t,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct ssh_identitylist {

@@ -1,6 +1,7 @@
 use crate::kex::dh_st;
 use crate::kex::kex;
 use crate::packet::key_entry;
+use crate::sshkey::sshkey_sig_details;
 
 use crate::packet::ssh;
 
@@ -150,12 +151,6 @@ pub type dispatch_fn = unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) ->
 
 pub type DH = dh_st;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_sig_details {
-    pub sk_counter: uint32_t,
-    pub sk_flags: uint8_t,
-}
 pub type kex_exchange = libc::c_uint;
 pub const KEX_MAX: kex_exchange = 10;
 pub const KEX_KEM_SNTRUP761X25519_SHA512: kex_exchange = 9;

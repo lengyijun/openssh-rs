@@ -1,13 +1,14 @@
-use crate::sshkey::sshkey_froms;
-use crate::sshkey::sshkey_puts;
-use crate::sshkey::sshkey_sign;
-use crate::sshkey::sshkey_to_blob;
 use crate::atomicio::atomicio;
 use crate::kex::dh_st;
 use crate::kex::kex;
 use crate::packet::key_entry;
 use crate::packet::ssh;
 use crate::sshd::pmonitor;
+use crate::sshkey::sshkey_froms;
+use crate::sshkey::sshkey_puts;
+use crate::sshkey::sshkey_sig_details;
+use crate::sshkey::sshkey_sign;
+use crate::sshkey::sshkey_to_blob;
 use ::libc;
 use libc::close;
 use libc::kill;
@@ -381,12 +382,7 @@ pub const SSH_FP_BUBBLEBABBLE: sshkey_fp_rep = 3;
 pub const SSH_FP_BASE64: sshkey_fp_rep = 2;
 pub const SSH_FP_HEX: sshkey_fp_rep = 1;
 pub const SSH_FP_DEFAULT: sshkey_fp_rep = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_sig_details {
-    pub sk_counter: uint32_t,
-    pub sk_flags: uint8_t,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshauthopt {

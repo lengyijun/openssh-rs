@@ -1,5 +1,6 @@
 use crate::kex::dh_st;
 use crate::packet::key_entry;
+use crate::sshkey::sshkey_sig_details;
 use libc::pid_t;
 
 use crate::packet::ssh;
@@ -624,12 +625,7 @@ pub const SSH_FP_BUBBLEBABBLE: sshkey_fp_rep = 3;
 pub const SSH_FP_BASE64: sshkey_fp_rep = 2;
 pub const SSH_FP_HEX: sshkey_fp_rep = 1;
 pub const SSH_FP_DEFAULT: sshkey_fp_rep = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshkey_sig_details {
-    pub sk_counter: uint32_t,
-    pub sk_flags: uint8_t,
-}
+
 pub type SyslogFacility = libc::c_int;
 pub const SYSLOG_FACILITY_NOT_SET: SyslogFacility = -1;
 pub const SYSLOG_FACILITY_LOCAL7: SyslogFacility = 10;
