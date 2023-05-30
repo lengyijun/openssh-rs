@@ -1,3 +1,7 @@
+use crate::sshkey::sshkey_froms;
+use crate::sshkey::sshkey_puts;
+use crate::sshkey::sshkey_sign;
+use crate::sshkey::sshkey_to_blob;
 use crate::atomicio::atomicio;
 use crate::kex::dh_st;
 use crate::kex::kex;
@@ -60,27 +64,6 @@ extern "C" {
         _: *const u_char,
         _: size_t,
         _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn sshkey_froms(
-        _: *mut crate::sshbuf::sshbuf,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn sshkey_to_blob(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut u_char,
-        _: *mut size_t,
-    ) -> libc::c_int;
-    fn sshkey_puts(_: *const crate::sshkey::sshkey, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
-    fn sshkey_sign(
-        _: *mut crate::sshkey::sshkey,
-        _: *mut *mut u_char,
-        _: *mut size_t,
-        _: *const u_char,
-        _: size_t,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: u_int,
     ) -> libc::c_int;
     fn sshkey_verify(
         _: *const crate::sshkey::sshkey,
