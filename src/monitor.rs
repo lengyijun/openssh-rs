@@ -1,13 +1,40 @@
 use crate::atomicio::atomicio;
+use crate::auth::auth_activate_options;
 use crate::auth::Authctxt;
+use crate::auth2::auth2_authctxt_reset_info;
+use crate::auth2::auth2_key_already_used;
+use crate::auth2::auth2_read_banner;
+use crate::auth2::auth2_record_info;
+use crate::auth2::auth2_record_key;
+use crate::auth2::auth2_setup_methods_lists;
+use crate::auth2::auth2_update_methods_lists;
+use crate::auth2::auth2_update_session_info;
+use crate::auth2_hostbased::hostbased_key_allowed;
+use crate::auth2_pubkey::user_key_allowed;
 use crate::auth_options::sshauthopt;
+use crate::auth_passwd::auth_password;
+use crate::dh::choose_dh;
 use crate::kex::dh_st;
 use crate::kex::kex;
+use crate::kexgen::kex_gen_server;
+use crate::kexgexs::kexgex_server;
 use crate::packet::key_entry;
 use crate::packet::ssh;
+use crate::packet::ssh_clear_newkeys;
+use crate::packet::ssh_packet_get_connection_in;
 use crate::session::Session;
+use crate::sshbuf::sshbuf_reserve;
+use crate::sshbuf_getput_basic::sshbuf_get_string_direct;
+use crate::sshbuf_getput_basic::sshbuf_put_stringb;
+use crate::sshbuf_getput_crypto::sshbuf_put_bignum2;
 use crate::sshbuf_getput_crypto::BIGNUM;
+use crate::sshd::get_hostkey_by_index;
+use crate::sshd::get_hostkey_index;
+use crate::sshd::get_hostkey_private_by_type;
+use crate::sshd::get_hostkey_public_by_index;
+use crate::sshd::get_hostkey_public_by_type;
 use crate::sshd::pmonitor;
+use crate::sshd::sshd_hostkey_sign;
 use crate::sshkey::sshkey_from_blob;
 use crate::sshkey::sshkey_froms;
 use crate::sshkey::sshkey_puts;
@@ -67,83 +94,6 @@ extern "C" {
         g: *mut *const BIGNUM,
     );
     fn DH_free(dh: *mut DH);
-
-    fn sshbuf_reserve(
-        buf: *mut crate::sshbuf::sshbuf,
-        len: size_t,
-        dpp: *mut *mut u_char,
-    ) -> libc::c_int;
-
-    fn sshbuf_put_stringb(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-    fn sshbuf_get_string_direct(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *const u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_put_bignum2(buf: *mut crate::sshbuf::sshbuf, v: *const BIGNUM) -> libc::c_int;
-    fn get_hostkey_private_by_type(
-        _: libc::c_int,
-        _: libc::c_int,
-        _: *mut ssh,
-    ) -> *mut crate::sshkey::sshkey;
-    fn auth_password(_: *mut ssh, _: *const libc::c_char) -> libc::c_int;
-    fn hostbased_key_allowed(
-        _: *mut ssh,
-        _: *mut libc::passwd,
-        _: *const libc::c_char,
-        _: *mut libc::c_char,
-        _: *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn user_key_allowed(
-        ssh: *mut ssh,
-        _: *mut libc::passwd,
-        _: *mut crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: *mut *mut sshauthopt,
-    ) -> libc::c_int;
-    fn auth2_key_already_used(_: *mut Authctxt, _: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn auth2_authctxt_reset_info(_: *mut Authctxt);
-    fn auth2_record_key(_: *mut Authctxt, _: libc::c_int, _: *const crate::sshkey::sshkey);
-    fn auth2_record_info(authctxt_0: *mut Authctxt, _: *const libc::c_char, _: ...);
-    fn auth2_update_session_info(_: *mut Authctxt, _: *const libc::c_char, _: *const libc::c_char);
-
-    fn auth2_read_banner() -> *mut libc::c_char;
-    fn auth2_update_methods_lists(
-        _: *mut Authctxt,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-    ) -> libc::c_int;
-    fn auth2_setup_methods_lists(_: *mut Authctxt) -> libc::c_int;
-
-    fn get_hostkey_by_index(_: libc::c_int) -> *mut crate::sshkey::sshkey;
-    fn get_hostkey_public_by_index(_: libc::c_int, _: *mut ssh) -> *mut crate::sshkey::sshkey;
-    fn get_hostkey_public_by_type(
-        _: libc::c_int,
-        _: libc::c_int,
-        _: *mut ssh,
-    ) -> *mut crate::sshkey::sshkey;
-    fn get_hostkey_index(_: *mut crate::sshkey::sshkey, _: libc::c_int, _: *mut ssh)
-        -> libc::c_int;
-    fn sshd_hostkey_sign(
-        _: *mut ssh,
-        _: *mut crate::sshkey::sshkey,
-        _: *mut crate::sshkey::sshkey,
-        _: *mut *mut u_char,
-        _: *mut size_t,
-        _: *const u_char,
-        _: size_t,
-        _: *const libc::c_char,
-    ) -> libc::c_int;
-    fn auth_activate_options(_: *mut ssh, _: *mut sshauthopt) -> libc::c_int;
-
-    fn kexgex_server(_: *mut ssh) -> libc::c_int;
-    fn kex_gen_server(_: *mut ssh) -> libc::c_int;
-    fn choose_dh(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> *mut DH;
-    fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
-    fn ssh_clear_newkeys(_: *mut ssh, _: libc::c_int);
 
     fn ssh_packet_connection_is_on_socket(_: *mut ssh) -> libc::c_int;
     fn ssh_packet_set_state(_: *mut ssh, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
