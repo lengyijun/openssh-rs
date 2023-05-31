@@ -1,3 +1,4 @@
+use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::EC_GROUP;
 use ::libc;
 extern "C" {
@@ -244,7 +245,7 @@ pub struct asn1_string_st {
     pub flags: libc::c_long,
 }
 pub type ASN1_OCTET_STRING = asn1_string_st;
-pub type BIGNUM = bignum_st;
+
 pub type BN_CTX = bignum_ctx;
 pub type EVP_PKEY = evp_pkey_st;
 

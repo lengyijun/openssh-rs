@@ -1,3 +1,4 @@
+use crate::sshbuf_getput_crypto::BIGNUM;
 use ::libc;
 extern "C" {
 
@@ -24,7 +25,7 @@ pub type __uint32_t = libc::c_uint;
 pub type u_char = __u_char;
 pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;
-pub type BIGNUM = bignum_st;
+
 pub unsafe extern "C" fn kexgex_hash(
     mut hash_alg: libc::c_int,
     mut client_version: *const crate::sshbuf::sshbuf,

@@ -1,4 +1,5 @@
 use crate::kex::dh_st;
+use crate::sshbuf_getput_crypto::BIGNUM;
 use ::libc;
 extern "C" {
     pub type _IO_wide_data;
@@ -54,7 +55,6 @@ pub type uint32_t = __uint32_t;
 
 pub type _IO_lock_t = ();
 
-pub type BIGNUM = bignum_st;
 pub type DH = dh_st;
 #[derive(Copy, Clone)]
 #[repr(C)]

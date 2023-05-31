@@ -6,6 +6,7 @@ use crate::kex::kex;
 use crate::packet::key_entry;
 use crate::packet::ssh;
 use crate::session::Session;
+use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshd::pmonitor;
 use crate::sshkey::sshkey_from_blob;
 use crate::sshkey::sshkey_froms;
@@ -364,7 +365,6 @@ pub type dispatch_fn = unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) ->
 
 pub type DH = dh_st;
 
-pub type BIGNUM = bignum_st;
 pub type sshkey_fp_rep = libc::c_uint;
 pub const SSH_FP_RANDOMART: sshkey_fp_rep = 4;
 pub const SSH_FP_BUBBLEBABBLE: sshkey_fp_rep = 3;

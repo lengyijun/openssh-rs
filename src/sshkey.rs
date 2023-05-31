@@ -1,5 +1,6 @@
 use crate::cipher::sshcipher;
 use crate::cipher::sshcipher_ctx;
+use crate::sshbuf_getput_crypto::BIGNUM;
 use ::libc;
 extern "C" {
     pub type _IO_wide_data;
@@ -303,7 +304,7 @@ pub type uint64_t = __uint64_t;
 pub type _IO_lock_t = ();
 
 pub type BIO = bio_st;
-pub type BIGNUM = bignum_st;
+
 pub type BN_CTX = bignum_ctx;
 pub type EVP_CIPHER = evp_cipher_st;
 pub type EVP_PKEY = evp_pkey_st;

@@ -6,6 +6,7 @@ use crate::kex::kex;
 use crate::kex::newkeys;
 use crate::kex::sshcomp;
 use crate::mac::sshmac;
+use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::EC_GROUP;
 
 use crate::kex::sshenc;
@@ -474,7 +475,7 @@ pub type alloc_func = Option<unsafe extern "C" fn(voidpf, uInt, uInt) -> voidpf>
 pub type uInt = libc::c_uint;
 pub type Bytef = Byte;
 pub type Byte = libc::c_uchar;
-pub type BIGNUM = bignum_st;
+
 pub type EC_POINT = ec_point_st;
 pub type z_streamp = *mut z_stream;
 pub type kex_modes = libc::c_uint;

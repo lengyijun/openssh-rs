@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::sshkey_sig_details;
 
 use crate::log::log_init;
@@ -545,7 +546,6 @@ pub type uint64_t = __uint64_t;
 
 pub type _IO_lock_t = ();
 
-pub type BIGNUM = bignum_st;
 pub type EVP_CIPHER = evp_cipher_st;
 pub type EVP_PKEY = evp_pkey_st;
 

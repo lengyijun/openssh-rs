@@ -4,6 +4,7 @@ use crate::kex::kex;
 use crate::monitor::monitor;
 use crate::packet::key_entry;
 use crate::session::Session;
+use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::sshkey_sig_details;
 
 use crate::packet::ssh;
@@ -143,8 +144,6 @@ pub struct C2RustUnnamed_1 {
 pub type dispatch_fn = unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int;
 
 pub type DH = dh_st;
-
-pub type BIGNUM = bignum_st;
 
 pub type SyslogFacility = libc::c_int;
 pub const SYSLOG_FACILITY_NOT_SET: SyslogFacility = -1;

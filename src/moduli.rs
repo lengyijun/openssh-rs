@@ -1,3 +1,4 @@
+use crate::sshbuf_getput_crypto::BIGNUM;
 use ::libc;
 use libc::close;
 extern "C" {
@@ -83,7 +84,6 @@ pub type u_int64_t = __uint64_t;
 
 pub type _IO_lock_t = ();
 
-pub type BIGNUM = bignum_st;
 pub type BN_CTX = bignum_ctx;
 pub type BN_GENCB = bn_gencb_st;
 #[derive(Copy, Clone)]

@@ -1,4 +1,5 @@
 use crate::kex::dh_st;
+use crate::sshbuf_getput_crypto::BIGNUM;
 
 use crate::kex::kex;
 
@@ -70,7 +71,7 @@ pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
 pub type uint8_t = __uint8_t;
 pub type sig_atomic_t = __sig_atomic_t;
-pub type BIGNUM = bignum_st;
+
 pub type DH = dh_st;
 
 pub type EC_POINT = ec_point_st;

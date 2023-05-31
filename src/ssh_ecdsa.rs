@@ -1,3 +1,4 @@
+use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::sshkey_sig_details;
 use crate::sshkey::EC_GROUP;
 use ::libc;
@@ -91,7 +92,7 @@ pub type size_t = libc::c_ulong;
 pub type u_int64_t = __uint64_t;
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
-pub type BIGNUM = bignum_st;
+
 pub type BN_CTX = bignum_ctx;
 
 pub type EC_POINT = ec_point_st;

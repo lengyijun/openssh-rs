@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::sshbuf_getput_crypto::BIGNUM;
 use ::libc;
 use libc::close;
 use libc::pid_t;
@@ -179,7 +180,6 @@ pub type uint8_t = __uint8_t;
 
 pub type _IO_lock_t = ();
 
-pub type BIGNUM = bignum_st;
 pub type BN_CTX = bignum_ctx;
 
 pub type RSA_METHOD = rsa_meth_st;

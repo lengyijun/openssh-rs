@@ -1,6 +1,7 @@
 use crate::kex::dh_st;
 use crate::kex::kex;
 use crate::packet::key_entry;
+use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::sshkey_sig_details;
 
 use crate::packet::ssh;
@@ -121,8 +122,6 @@ pub struct C2RustUnnamed_1 {
 pub type dispatch_fn = unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) -> libc::c_int;
 
 pub type DH = dh_st;
-
-pub type BIGNUM = bignum_st;
 
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;

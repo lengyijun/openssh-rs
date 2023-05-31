@@ -1,6 +1,7 @@
 use crate::kex::dh_st;
 use crate::kex::kex;
 use crate::packet::key_entry;
+use crate::sshbuf_getput_crypto::BIGNUM;
 
 use crate::packet::ssh;
 
@@ -111,7 +112,6 @@ pub type dispatch_fn = unsafe extern "C" fn(libc::c_int, u_int32_t, *mut ssh) ->
 
 pub type DH = dh_st;
 
-pub type BIGNUM = bignum_st;
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;
 pub const SYSLOG_LEVEL_DEBUG3: LogLevel = 7;
