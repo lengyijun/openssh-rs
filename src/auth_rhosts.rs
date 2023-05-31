@@ -1,5 +1,6 @@
+use crate::servconf::listenaddr;
 use ::libc;
-use libc::addrinfo;
+
 use libc::close;
 
 extern "C" {
@@ -96,12 +97,7 @@ pub struct queued_listenaddr {
     pub port: libc::c_int,
     pub rdomain: *mut libc::c_char,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct listenaddr {
-    pub rdomain: *mut libc::c_char,
-    pub addrs: *mut addrinfo,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct ServerOptions {

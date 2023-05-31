@@ -73,6 +73,7 @@ use crate::sandbox_seccomp_filter::ssh_sandbox_init;
 use crate::sandbox_seccomp_filter::ssh_sandbox_parent_finish;
 use crate::sandbox_seccomp_filter::ssh_sandbox_parent_preauth;
 use crate::servconf::connection_info;
+use crate::servconf::listenaddr;
 use crate::sshbuf_getput_basic::sshbuf_get_stringb;
 use crate::sshbuf_getput_basic::sshbuf_put_stringb;
 use crate::sshd::libc::endpwent;
@@ -555,12 +556,7 @@ pub struct queued_listenaddr {
     pub port: libc::c_int,
     pub rdomain: *mut libc::c_char,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct listenaddr {
-    pub rdomain: *mut libc::c_char,
-    pub addrs: *mut addrinfo,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct ServerOptions {

@@ -1,5 +1,6 @@
+use crate::servconf::listenaddr;
 use ::libc;
-use libc::addrinfo;
+
 use libc::pid_t;
 use libc::sockaddr;
 extern "C" {
@@ -262,12 +263,7 @@ pub struct ForwardOptions {
     pub streamlocal_bind_mask: mode_t,
     pub streamlocal_bind_unlink: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct listenaddr {
-    pub rdomain: *mut libc::c_char,
-    pub addrs: *mut addrinfo,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct queued_listenaddr {

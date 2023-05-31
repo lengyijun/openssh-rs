@@ -3,10 +3,10 @@ use crate::kex::dh_st;
 use crate::kex::kex;
 use crate::monitor::monitor;
 use crate::packet::key_entry;
+use crate::servconf::listenaddr;
 use crate::session::Session;
 use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::sshkey_sig_details;
-use libc::addrinfo;
 
 use crate::packet::ssh;
 
@@ -348,12 +348,7 @@ pub struct ForwardOptions {
     pub streamlocal_bind_mask: mode_t,
     pub streamlocal_bind_unlink: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct listenaddr {
-    pub rdomain: *mut libc::c_char,
-    pub addrs: *mut addrinfo,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct queued_listenaddr {

@@ -2,6 +2,7 @@ use crate::auth::Authctxt;
 use crate::auth_options::sshauthopt;
 use crate::kex::dh_st;
 use crate::packet::key_entry;
+use crate::servconf::listenaddr;
 use crate::session::Session;
 use libc::addrinfo;
 use libc::pid_t;
@@ -426,12 +427,7 @@ pub struct queued_listenaddr {
     pub port: libc::c_int,
     pub rdomain: *mut libc::c_char,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct listenaddr {
-    pub rdomain: *mut libc::c_char,
-    pub addrs: *mut addrinfo,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct ServerOptions {

@@ -33,6 +33,7 @@ use crate::packet::ssh_packet_get_connection_in;
 use crate::packet::ssh_packet_set_state;
 use crate::packet::ssh_remote_ipaddr;
 use crate::packet::ssh_remote_port;
+use crate::servconf::listenaddr;
 use crate::session::session_by_tty;
 use crate::session::session_destroy_all;
 use crate::session::session_get_remote_name_or_ip;
@@ -69,7 +70,7 @@ use crate::sshpty::pty_allocate;
 use crate::sshpty::pty_setowner;
 use ::libc;
 use libc::__errno_location;
-use libc::addrinfo;
+
 use libc::close;
 use libc::exit;
 use libc::kill;
@@ -349,12 +350,7 @@ pub struct queued_listenaddr {
     pub port: libc::c_int,
     pub rdomain: *mut libc::c_char,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct listenaddr {
-    pub rdomain: *mut libc::c_char,
-    pub addrs: *mut addrinfo,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct ServerOptions {
