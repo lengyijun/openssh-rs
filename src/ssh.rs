@@ -28,6 +28,19 @@ use crate::clientloop::client_request_tun_fwd;
 use crate::clientloop::client_session2_setup;
 use crate::clientloop::client_x11_get_proto;
 use crate::kex::dh_st;
+use crate::misc::a2tun;
+use crate::misc::cleanhostname;
+use crate::misc::hpdelim;
+use crate::misc::lookup_env_in_list;
+use crate::misc::lowercase;
+use crate::misc::percent_dollar_expand;
+use crate::misc::percent_expand;
+use crate::misc::pwcopy;
+use crate::misc::ssh_gai_strerror;
+use crate::misc::stdfd_devnull;
+use crate::misc::tilde_expand_filename;
+use crate::misc::valid_domain;
+use crate::misc::valid_env_name;
 use crate::misc::Forward;
 use crate::mux::muxclient;
 use crate::mux::muxserver_listen;
@@ -141,29 +154,6 @@ extern "C" {
         _: ...
     ) -> !;
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-
-    fn a2tun(_: *const libc::c_char, _: *mut libc::c_int) -> libc::c_int;
-    fn hpdelim(_: *mut *mut libc::c_char) -> *mut libc::c_char;
-    fn cleanhostname(_: *mut libc::c_char) -> *mut libc::c_char;
-    fn tilde_expand_filename(_: *const libc::c_char, _: uid_t) -> *mut libc::c_char;
-    fn percent_expand(_: *const libc::c_char, _: ...) -> *mut libc::c_char;
-    fn percent_dollar_expand(_: *const libc::c_char, _: ...) -> *mut libc::c_char;
-
-    fn lowercase(s: *mut libc::c_char);
-    fn valid_domain(
-        _: *mut libc::c_char,
-        _: libc::c_int,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_int;
-    fn valid_env_name(_: *const libc::c_char) -> libc::c_int;
-    fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
-    fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
-    fn ssh_gai_strerror(_: libc::c_int) -> *const libc::c_char;
-    fn lookup_env_in_list(
-        env: *const libc::c_char,
-        envs: *const *mut libc::c_char,
-        nenvs: size_t,
-    ) -> *const libc::c_char;
 
     fn ssh_connection_hash(
         thishost: *const libc::c_char,
