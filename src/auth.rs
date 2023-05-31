@@ -1,5 +1,6 @@
 use crate::auth_options::sshauthopt;
 use crate::packet::key_entry;
+use crate::servconf::connection_info;
 use libc::addrinfo;
 use libc::sockaddr;
 
@@ -446,17 +447,7 @@ pub struct ServerOptions {
     pub num_channel_timeouts: u_int,
     pub unused_connection_timeout: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct connection_info {
-    pub user: *const libc::c_char,
-    pub host: *const libc::c_char,
-    pub address: *const libc::c_char,
-    pub laddress: *const libc::c_char,
-    pub lport: libc::c_int,
-    pub rdomain: *const libc::c_char,
-    pub test: libc::c_int,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct include_item {
