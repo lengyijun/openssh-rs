@@ -1,3 +1,34 @@
+use crate::authfd::ssh_get_authentication_socket;
+use crate::authfile::sshkey_load_cert;
+use crate::authfile::sshkey_load_public;
+use crate::channels::channel_add_permission;
+use crate::channels::channel_clear_permission;
+use crate::channels::channel_connect_stdio_fwd;
+use crate::channels::channel_disable_admin;
+use crate::channels::channel_init_channels;
+use crate::channels::channel_new;
+use crate::channels::channel_register_cleanup;
+use crate::channels::channel_register_open_confirm;
+use crate::channels::channel_request_remote_forwarding;
+use crate::channels::channel_request_start;
+use crate::channels::channel_send_open;
+use crate::channels::channel_set_af;
+use crate::channels::channel_setup_local_fwd_listener;
+use crate::channels::channel_update_permission;
+use crate::channels::permitopen_port;
+use crate::channels::x11_request_forwarding_with_spoofing;
+use crate::clientloop::client_expect_confirm;
+use crate::clientloop::client_loop;
+use crate::clientloop::client_register_global_confirm;
+use crate::clientloop::client_request_tun_fwd;
+use crate::clientloop::client_session2_setup;
+use crate::clientloop::client_x11_get_proto;
+use crate::mux::muxclient;
+use crate::mux::muxserver_listen;
+use crate::sshkey::sshkey_alg_list;
+use crate::sshkey::sshkey_check_rsa_length;
+use crate::sshkey::sshkey_is_cert;
+use crate::sshkey::sshkey_ssh_name;
 use crate::channels::Channel;
 use crate::cipher::cipher_alg_list;
 use crate::cipher::ciphers_valid;
@@ -91,124 +122,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn OpenSSL_version(type_0: libc::c_int) -> *const libc::c_char;
-
-    fn channel_init_channels(ssh: *mut ssh);
-    fn channel_new(
-        _: *mut ssh,
-        _: *mut libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: u_int,
-        _: u_int,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: libc::c_int,
-    ) -> *mut Channel;
-    fn channel_send_open(_: *mut ssh, _: libc::c_int);
-    fn channel_request_start(_: *mut ssh, _: libc::c_int, _: *mut libc::c_char, _: libc::c_int);
-    fn channel_register_cleanup(
-        _: *mut ssh,
-        _: libc::c_int,
-        _: Option<channel_callback_fn>,
-        _: libc::c_int,
-    );
-    fn channel_register_open_confirm(
-        _: *mut ssh,
-        _: libc::c_int,
-        _: Option<channel_open_fn>,
-        _: *mut libc::c_void,
-    );
-    fn channel_set_af(_: *mut ssh, af: libc::c_int);
-    fn channel_add_permission(
-        _: *mut ssh,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: *mut libc::c_char,
-        _: libc::c_int,
-    );
-    fn channel_clear_permission(_: *mut ssh, _: libc::c_int, _: libc::c_int);
-    fn channel_disable_admin(_: *mut ssh, _: libc::c_int);
-    fn channel_update_permission(_: *mut ssh, _: libc::c_int, _: libc::c_int);
-    fn channel_connect_stdio_fwd(
-        _: *mut ssh,
-        _: *const libc::c_char,
-        _: u_short,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-    ) -> *mut Channel;
-    fn channel_request_remote_forwarding(_: *mut ssh, _: *mut Forward) -> libc::c_int;
-    fn channel_setup_local_fwd_listener(
-        _: *mut ssh,
-        _: *mut Forward,
-        _: *mut ForwardOptions,
-    ) -> libc::c_int;
-    fn permitopen_port(_: *const libc::c_char) -> libc::c_int;
-    fn x11_request_forwarding_with_spoofing(
-        _: *mut ssh,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-    );
-
-    fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_alg_list(
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_char,
-    ) -> *mut libc::c_char;
-    fn sshkey_check_rsa_length(_: *const crate::sshkey::sshkey, _: libc::c_int) -> libc::c_int;
-    fn ssh_get_authentication_socket(fdp: *mut libc::c_int) -> libc::c_int;
-    fn sshkey_load_cert(_: *const libc::c_char, _: *mut *mut crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_load_public(
-        _: *const libc::c_char,
-        _: *mut *mut crate::sshkey::sshkey,
-        _: *mut *mut libc::c_char,
-    ) -> libc::c_int;
-    fn client_loop(_: *mut ssh, _: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
-    fn client_x11_get_proto(
-        _: *mut ssh,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: u_int,
-        _: u_int,
-        _: *mut *mut libc::c_char,
-        _: *mut *mut libc::c_char,
-    ) -> libc::c_int;
-    fn client_session2_setup(
-        _: *mut ssh,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: *mut termios,
-        _: libc::c_int,
-        _: *mut crate::sshbuf::sshbuf,
-        _: *mut *mut libc::c_char,
-    );
-    fn client_request_tun_fwd(
-        _: *mut ssh,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: Option<channel_open_fn>,
-        _: *mut libc::c_void,
-    ) -> *mut libc::c_char;
-    fn client_register_global_confirm(_: Option<global_confirm_cb>, _: *mut libc::c_void);
-    fn client_expect_confirm(
-        _: *mut ssh,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: confirm_action,
-    );
-    fn muxserver_listen(_: *mut ssh);
-    fn muxclient(_: *const libc::c_char) -> libc::c_int;
 
     fn log_is_on_stderr() -> libc::c_int;
     fn log_redirect_stderr_to(_: *const libc::c_char);
