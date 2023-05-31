@@ -1,5 +1,6 @@
 use crate::kex::dh_st;
 use crate::packet::key_entry;
+use crate::servconf::ForwardOptions;
 use libc::addrinfo;
 use libc::pid_t;
 use libc::sockaddr;
@@ -602,13 +603,7 @@ pub struct Forward {
     pub allocated_port: libc::c_int,
     pub handle: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ForwardOptions {
-    pub gateway_ports: libc::c_int,
-    pub streamlocal_bind_mask: mode_t,
-    pub streamlocal_bind_unlink: libc::c_int,
-}
+
 pub type global_confirm_cb =
     unsafe extern "C" fn(*mut ssh, libc::c_int, u_int32_t, *mut libc::c_void) -> ();
 pub type confirm_action = libc::c_uint;

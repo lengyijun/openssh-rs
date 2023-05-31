@@ -1,5 +1,6 @@
 use crate::kex::dh_st;
 use crate::packet::key_entry;
+use crate::servconf::ForwardOptions;
 use crate::sshkey::sshkey_sig_details;
 use libc::addrinfo;
 use libc::pid_t;
@@ -582,13 +583,7 @@ pub struct Forward {
     pub allocated_port: libc::c_int,
     pub handle: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ForwardOptions {
-    pub gateway_ports: libc::c_int,
-    pub streamlocal_bind_mask: mode_t,
-    pub streamlocal_bind_unlink: libc::c_int,
-}
+
 pub type sshkey_types = libc::c_uint;
 pub const KEY_UNSPEC: sshkey_types = 14;
 pub const KEY_ED25519_SK_CERT: sshkey_types = 13;

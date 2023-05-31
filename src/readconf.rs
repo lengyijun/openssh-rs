@@ -1,5 +1,6 @@
 use crate::digest_openssl::ssh_digest_ctx;
 use crate::misc::parse_uri;
+use crate::servconf::ForwardOptions;
 use ::libc;
 use libc::kill;
 use libc::pid_t;
@@ -258,13 +259,7 @@ pub struct Forward {
     pub allocated_port: libc::c_int,
     pub handle: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ForwardOptions {
-    pub gateway_ports: libc::c_int,
-    pub streamlocal_bind_mask: mode_t,
-    pub streamlocal_bind_unlink: libc::c_int,
-}
+
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 #[derive(Copy, Clone)]
 #[repr(C)]

@@ -1,5 +1,6 @@
 use crate::kex::dh_st;
 use crate::packet::key_entry;
+use crate::servconf::ForwardOptions;
 use libc::pid_t;
 use libc::sockaddr;
 
@@ -560,13 +561,7 @@ pub const SYSLOG_FACILITY_LOCAL0: SyslogFacility = 3;
 pub const SYSLOG_FACILITY_AUTH: SyslogFacility = 2;
 pub const SYSLOG_FACILITY_USER: SyslogFacility = 1;
 pub const SYSLOG_FACILITY_DAEMON: SyslogFacility = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ForwardOptions {
-    pub gateway_ports: libc::c_int,
-    pub streamlocal_bind_mask: mode_t,
-    pub streamlocal_bind_unlink: libc::c_int,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct cauthmethod {
