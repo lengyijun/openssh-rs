@@ -5,6 +5,7 @@ use crate::auth2::auth2_methods_valid;
 use crate::auth2::do_authentication2;
 use crate::auth2_chall::privsep_challenge_enable;
 use crate::auth_options::sshauthopt;
+use crate::auth_options::sshauthopt_new_with_keys_defaults;
 use crate::authfd::ssh_agent_sign;
 use crate::authfd::ssh_get_authentication_socket;
 use crate::authfile::sshkey_load_private;
@@ -25,11 +26,23 @@ use crate::kex::kex_setup;
 use crate::kexgen::kex_gen_server;
 use crate::kexgexs::kexgex_server;
 use crate::log::log_init;
+use crate::log::sshsigdie;
 use crate::misc::convtime;
 use crate::misc::daemonized;
 use crate::misc::set_rdomain;
 use crate::misc::set_reuseaddr;
+use crate::misc::ssh_gai_strerror;
 use crate::monitor::monitor;
+use crate::monitor::monitor_apply_keystate;
+use crate::monitor::monitor_child_postauth;
+use crate::monitor::monitor_child_preauth;
+use crate::monitor::monitor_clear_keystate;
+use crate::monitor::monitor_init;
+use crate::monitor::monitor_reinit;
+use crate::monitor_wrap::mm_log_handler;
+use crate::monitor_wrap::mm_send_keystate;
+use crate::monitor_wrap::mm_sshkey_sign;
+use crate::monitor_wrap::mm_terminate;
 use crate::msg::ssh_msg_recv;
 use crate::msg::ssh_msg_send;
 use crate::packet::key_entry;
@@ -55,11 +68,16 @@ use crate::platform::platform_pre_fork;
 use crate::platform::platform_pre_listen;
 use crate::platform::platform_pre_restart;
 use crate::sandbox_seccomp_filter::ssh_sandbox;
+use crate::sandbox_seccomp_filter::ssh_sandbox_child;
+use crate::sandbox_seccomp_filter::ssh_sandbox_init;
+use crate::sandbox_seccomp_filter::ssh_sandbox_parent_finish;
+use crate::sandbox_seccomp_filter::ssh_sandbox_parent_preauth;
 use crate::sshbuf_getput_basic::sshbuf_get_stringb;
 use crate::sshbuf_getput_basic::sshbuf_put_stringb;
 use crate::sshd::libc::endpwent;
 use crate::sshd::libc::getpwnam;
 use crate::sshkey::sshkey_check_rsa_length;
+use crate::sshkey::sshkey_equal;
 use crate::sshkey::sshkey_is_cert;
 use crate::sshkey::sshkey_is_sk;
 use crate::sshkey::sshkey_private_serialize;
@@ -203,16 +221,6 @@ extern "C" {
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn log_redirect_stderr_to(_: *const libc::c_char);
-    fn sshsigdie(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: LogLevel,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: ...
-    ) -> !;
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -237,7 +245,6 @@ extern "C" {
     fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
     fn sock_set_v6only(_: libc::c_int);
     fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
-    fn ssh_gai_strerror(_: libc::c_int) -> *const libc::c_char;
 
     fn match_pattern_list(
         _: *const libc::c_char,
@@ -289,40 +296,9 @@ extern "C" {
     );
     fn permanently_set_uid(_: *mut libc::passwd);
 
-    fn sshkey_equal(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
-
     fn do_authenticated(_: *mut ssh, _: *mut Authctxt);
     fn do_cleanup(_: *mut ssh, _: *mut Authctxt);
     fn do_setusercontext(_: *mut libc::passwd);
-    fn monitor_init() -> *mut monitor;
-    fn monitor_reinit(_: *mut monitor);
-    fn monitor_child_preauth(_: *mut ssh, _: *mut monitor);
-    fn monitor_child_postauth(_: *mut ssh, _: *mut monitor);
-    fn monitor_clear_keystate(_: *mut ssh, _: *mut monitor);
-    fn monitor_apply_keystate(_: *mut ssh, _: *mut monitor);
-    fn mm_log_handler(_: LogLevel, _: libc::c_int, _: *const libc::c_char, _: *mut libc::c_void);
-    fn mm_sshkey_sign(
-        _: *mut ssh,
-        _: *mut crate::sshkey::sshkey,
-        _: *mut *mut u_char,
-        _: *mut size_t,
-        _: *const u_char,
-        _: size_t,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        compat: u_int,
-    ) -> libc::c_int;
-    fn mm_terminate();
-    fn mm_send_keystate(_: *mut ssh, _: *mut monitor);
-    fn ssh_sandbox_init(_: *mut monitor) -> *mut ssh_sandbox;
-    fn ssh_sandbox_child(_: *mut ssh_sandbox);
-    fn ssh_sandbox_parent_finish(_: *mut ssh_sandbox);
-    fn ssh_sandbox_parent_preauth(_: *mut ssh_sandbox, _: pid_t);
-    fn sshauthopt_new_with_keys_defaults() -> *mut sshauthopt;
     fn srclimit_init(_: libc::c_int, _: libc::c_int, _: libc::c_int, _: libc::c_int);
     fn srclimit_check_allow(_: libc::c_int, _: libc::c_int) -> libc::c_int;
     fn srclimit_done(_: libc::c_int);
