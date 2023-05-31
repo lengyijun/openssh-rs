@@ -1,6 +1,7 @@
 use crate::atomicio::atomicio;
 use crate::auth::Authctxt;
 use crate::packet::key_entry;
+use libc::sockaddr;
 
 use crate::packet::ssh;
 use ::libc;
@@ -90,12 +91,7 @@ pub type u_int64_t = __uint64_t;
 
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr {
-    pub sa_family: sa_family_t,
-    pub sa_data: [libc::c_char; 14],
-}
+
 pub type uint8_t = __uint8_t;
 
 pub type sig_atomic_t = __sig_atomic_t;

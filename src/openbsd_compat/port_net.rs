@@ -2,6 +2,7 @@ use crate::packet::ssh;
 use ::c2rust_bitfields;
 use ::libc;
 use libc::close;
+use libc::sockaddr;
 extern "C" {
 
     fn socket(__domain: libc::c_int, __type: libc::c_int, __protocol: libc::c_int) -> libc::c_int;
@@ -63,12 +64,7 @@ pub const SOCK_RAW: __socket_type = 3;
 pub const SOCK_DGRAM: __socket_type = 2;
 pub const SOCK_STREAM: __socket_type = 1;
 pub type sa_family_t = libc::c_ushort;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr {
-    pub sa_family: sa_family_t,
-    pub sa_data: [libc::c_char; 14],
-}
+
 pub type uint32_t = __uint32_t;
 pub type uint8_t = __uint8_t;
 #[derive(Copy, Clone)]

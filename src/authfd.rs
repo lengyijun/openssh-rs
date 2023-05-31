@@ -1,6 +1,7 @@
 use crate::atomicio::atomicio;
 use ::libc;
 use libc::close;
+use libc::sockaddr;
 
 extern "C" {
     pub type sockaddr_x25;
@@ -83,12 +84,7 @@ pub const SOCK_RAW: __socket_type = 3;
 pub const SOCK_DGRAM: __socket_type = 2;
 pub const SOCK_STREAM: __socket_type = 1;
 pub type sa_family_t = libc::c_ushort;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr {
-    pub sa_family: sa_family_t,
-    pub sa_data: [libc::c_char; 14],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sockaddr_un {

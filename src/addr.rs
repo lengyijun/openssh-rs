@@ -1,4 +1,5 @@
 use ::libc;
+use libc::sockaddr;
 extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn getaddrinfo(
@@ -34,12 +35,7 @@ pub type u_int16_t = __uint16_t;
 pub type u_int32_t = __uint32_t;
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr {
-    pub sa_family: sa_family_t,
-    pub sa_data: [libc::c_char; 14],
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sockaddr_storage {
