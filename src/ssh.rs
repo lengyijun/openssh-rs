@@ -1,7 +1,17 @@
 use crate::channels::Channel;
+use crate::cipher::cipher_alg_list;
+use crate::cipher::ciphers_valid;
+use crate::cipher::compression_alg_list;
 use crate::kex::dh_st;
 use crate::misc::Forward;
 use crate::packet::key_entry;
+use crate::packet::ssh_alloc_session_state;
+use crate::packet::ssh_packet_close;
+use crate::packet::ssh_packet_get_mux;
+use crate::packet::ssh_packet_set_connection;
+use crate::packet::ssh_packet_set_interactive;
+use crate::packet::ssh_packet_set_mux;
+use crate::packet::ssh_packet_set_timeout;
 use crate::servconf::ForwardOptions;
 use libc::addrinfo;
 use libc::pid_t;
@@ -80,17 +90,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn OpenSSL_version(type_0: libc::c_int) -> *const libc::c_char;
-
-    fn ciphers_valid(_: *const libc::c_char) -> libc::c_int;
-    fn cipher_alg_list(_: libc::c_char, _: libc::c_int) -> *mut libc::c_char;
-    fn compression_alg_list(_: libc::c_int) -> *const libc::c_char;
-    fn ssh_alloc_session_state() -> *mut ssh;
-    fn ssh_packet_set_connection(_: *mut ssh, _: libc::c_int, _: libc::c_int) -> *mut ssh;
-    fn ssh_packet_set_timeout(_: *mut ssh, _: libc::c_int, _: libc::c_int);
-    fn ssh_packet_close(_: *mut ssh);
-    fn ssh_packet_set_interactive(_: *mut ssh, _: libc::c_int, _: libc::c_int, _: libc::c_int);
-    fn ssh_packet_set_mux(_: *mut ssh);
-    fn ssh_packet_get_mux(_: *mut ssh) -> libc::c_int;
 
     fn channel_init_channels(ssh: *mut ssh);
     fn channel_new(
