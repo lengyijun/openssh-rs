@@ -3,6 +3,7 @@ use crate::misc::Forward;
 use crate::packet::key_entry;
 use crate::servconf::ForwardOptions;
 use crate::sshconnect::ssh_conn_info;
+use crate::sshconnect::Sensitive;
 use libc::pid_t;
 use libc::sockaddr;
 
@@ -356,12 +357,6 @@ pub const KEX_DH_GRP16_SHA512: kex_exchange = 3;
 pub const KEX_DH_GRP14_SHA256: kex_exchange = 2;
 pub const KEX_DH_GRP14_SHA1: kex_exchange = 1;
 pub const KEX_DH_GRP1_SHA1: kex_exchange = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Sensitive {
-    pub keys: *mut *mut crate::sshkey::sshkey,
-    pub nkeys: libc::c_int,
-}
 
 #[derive(Copy, Clone)]
 #[repr(C)]

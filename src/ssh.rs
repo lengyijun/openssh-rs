@@ -41,6 +41,7 @@ use crate::packet::ssh_packet_set_mux;
 use crate::packet::ssh_packet_set_timeout;
 use crate::servconf::ForwardOptions;
 use crate::sshconnect::ssh_conn_info;
+use crate::sshconnect::Sensitive;
 use crate::sshkey::sshkey_alg_list;
 use crate::sshkey::sshkey_check_rsa_length;
 use crate::sshkey::sshkey_is_cert;
@@ -594,12 +595,6 @@ pub struct Options {
     pub required_rsa_size: libc::c_int,
     pub enable_escape_commandline: libc::c_int,
     pub ignored_unknown: *mut libc::c_char,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Sensitive {
-    pub keys: *mut *mut crate::sshkey::sshkey,
-    pub nkeys: libc::c_int,
 }
 
 #[inline]
