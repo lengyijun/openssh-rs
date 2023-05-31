@@ -54,6 +54,7 @@ use crate::platform::platform_post_fork_parent;
 use crate::platform::platform_pre_fork;
 use crate::platform::platform_pre_listen;
 use crate::platform::platform_pre_restart;
+use crate::sandbox_seccomp_filter::ssh_sandbox;
 use crate::sshbuf_getput_basic::sshbuf_get_stringb;
 use crate::sshbuf_getput_basic::sshbuf_put_stringb;
 use crate::sshd::libc::endpwent;
@@ -90,7 +91,6 @@ extern "C" {
 
     pub type ec_group_st;
 
-    pub type ssh_sandbox;
     static mut stderr: *mut libc::FILE;
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
     fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::FILE;

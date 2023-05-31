@@ -12,16 +12,30 @@ use crate::auth2::auth2_update_session_info;
 use crate::auth2_hostbased::hostbased_key_allowed;
 use crate::auth2_pubkey::user_key_allowed;
 use crate::auth_options::sshauthopt;
+use crate::auth_options::sshauthopt_free;
+use crate::auth_options::sshauthopt_serialise;
 use crate::auth_passwd::auth_password;
+use crate::authfd::ssh_agent_sign;
 use crate::dh::choose_dh;
 use crate::kex::dh_st;
 use crate::kex::kex;
 use crate::kexgen::kex_gen_server;
 use crate::kexgexs::kexgex_server;
+use crate::log::log_level_name;
+use crate::log::sshlogdirect;
 use crate::packet::key_entry;
 use crate::packet::ssh;
 use crate::packet::ssh_clear_newkeys;
+use crate::packet::ssh_packet_connection_is_on_socket;
 use crate::packet::ssh_packet_get_connection_in;
+use crate::packet::ssh_packet_set_state;
+use crate::packet::ssh_remote_ipaddr;
+use crate::packet::ssh_remote_port;
+use crate::session::session_by_tty;
+use crate::session::session_get_remote_name_or_ip;
+use crate::session::session_new;
+use crate::session::session_pty_cleanup2;
+use crate::session::session_unused;
 use crate::session::Session;
 use crate::sshbuf::sshbuf_reserve;
 use crate::sshbuf_getput_basic::sshbuf_get_string_direct;
@@ -35,6 +49,7 @@ use crate::sshd::get_hostkey_public_by_index;
 use crate::sshd::get_hostkey_public_by_type;
 use crate::sshd::pmonitor;
 use crate::sshd::sshd_hostkey_sign;
+use crate::ssherr::ssh_err;
 use crate::sshkey::sshkey_from_blob;
 use crate::sshkey::sshkey_froms;
 use crate::sshkey::sshkey_puts;
@@ -45,6 +60,9 @@ use crate::sshkey::sshkey_ssh_name;
 use crate::sshkey::sshkey_to_blob;
 use crate::sshkey::sshkey_type_from_name;
 use crate::sshkey::sshkey_verify;
+use crate::sshlogin::record_login;
+use crate::sshpty::pty_allocate;
+use crate::sshpty::pty_setowner;
 use ::libc;
 use libc::close;
 use libc::kill;
@@ -96,39 +114,6 @@ extern "C" {
     );
     fn DH_free(dh: *mut DH);
 
-    fn ssh_packet_connection_is_on_socket(_: *mut ssh) -> libc::c_int;
-    fn ssh_packet_set_state(_: *mut ssh, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
-    fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
-    fn ssh_remote_port(_: *mut ssh) -> libc::c_int;
-    fn sshauthopt_free(opts: *mut sshauthopt);
-    fn sshauthopt_serialise(
-        opts: *const sshauthopt,
-        m: *mut crate::sshbuf::sshbuf,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn pty_allocate(
-        _: *mut libc::c_int,
-        _: *mut libc::c_int,
-        _: *mut libc::c_char,
-        _: size_t,
-    ) -> libc::c_int;
-    fn pty_setowner(_: *mut libc::passwd, _: *const libc::c_char);
-    fn session_unused(_: libc::c_int);
-    fn session_destroy_all(_: *mut ssh, _: Option<unsafe extern "C" fn(*mut Session) -> ()>);
-    fn session_pty_cleanup2(_: *mut Session);
-    fn session_new() -> *mut Session;
-    fn session_by_tty(_: *mut libc::c_char) -> *mut Session;
-    fn session_get_remote_name_or_ip(_: *mut ssh, _: u_int, _: libc::c_int) -> *const libc::c_char;
-    fn record_login(
-        _: pid_t,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: uid_t,
-        _: *const libc::c_char,
-        _: *mut sockaddr,
-        _: socklen_t,
-    );
-    fn log_level_name(_: LogLevel) -> *const libc::c_char;
     fn cleanup_exit(_: libc::c_int) -> !;
 
     fn sshfatal(
@@ -141,23 +126,11 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn sshlogdirect(_: LogLevel, _: libc::c_int, _: *const libc::c_char, _: ...);
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
 
     fn mm_request_send(_: libc::c_int, _: monitor_reqtype, _: *mut crate::sshbuf::sshbuf);
     fn mm_request_receive(_: libc::c_int, _: *mut crate::sshbuf::sshbuf);
     fn mm_request_receive_expect(_: libc::c_int, _: monitor_reqtype, _: *mut crate::sshbuf::sshbuf);
     fn mm_send_fd(_: libc::c_int, _: libc::c_int) -> libc::c_int;
-    fn ssh_agent_sign(
-        sock: libc::c_int,
-        key: *const crate::sshkey::sshkey,
-        sigp: *mut *mut u_char,
-        lenp: *mut size_t,
-        data: *const u_char,
-        datalen: size_t,
-        alg: *const libc::c_char,
-        compat: u_int,
-    ) -> libc::c_int;
     static mut options: ServerOptions;
     static mut utmp_len: u_int;
     static mut loginmsg: *mut crate::sshbuf::sshbuf;
