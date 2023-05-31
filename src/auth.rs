@@ -1,6 +1,8 @@
 use crate::auth_options::sshauthopt;
 use crate::packet::key_entry;
 use crate::servconf::connection_info;
+use crate::servconf::include_item;
+use crate::servconf::include_list;
 use crate::servconf::ServerOptions;
 
 use libc::addrinfo;
@@ -304,24 +306,11 @@ pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct include_item {
-    pub selector: *mut libc::c_char,
-    pub filename: *mut libc::c_char,
-    pub contents: *mut crate::sshbuf::sshbuf,
-    pub entry: C2RustUnnamed_3,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
 pub struct C2RustUnnamed_3 {
     pub tqe_next: *mut include_item,
     pub tqe_prev: *mut *mut include_item,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct include_list {
-    pub tqh_first: *mut include_item,
-    pub tqh_last: *mut *mut include_item,
-}
+
 pub type sshkey_fp_rep = libc::c_uint;
 pub const SSH_FP_RANDOMART: sshkey_fp_rep = 4;
 pub const SSH_FP_BUBBLEBABBLE: sshkey_fp_rep = 3;

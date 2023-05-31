@@ -73,6 +73,8 @@ use crate::sandbox_seccomp_filter::ssh_sandbox_init;
 use crate::sandbox_seccomp_filter::ssh_sandbox_parent_finish;
 use crate::sandbox_seccomp_filter::ssh_sandbox_parent_preauth;
 use crate::servconf::connection_info;
+use crate::servconf::include_item;
+use crate::servconf::include_list;
 use crate::servconf::listenaddr;
 use crate::servconf::queued_listenaddr;
 use crate::servconf::ForwardOptions;
@@ -548,24 +550,11 @@ pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct include_item {
-    pub selector: *mut libc::c_char,
-    pub filename: *mut libc::c_char,
-    pub contents: *mut crate::sshbuf::sshbuf,
-    pub entry: C2RustUnnamed_5,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
 pub struct C2RustUnnamed_5 {
     pub tqe_next: *mut include_item,
     pub tqe_prev: *mut *mut include_item,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct include_list {
-    pub tqh_first: *mut include_item,
-    pub tqh_last: *mut *mut include_item,
-}
+
 pub type sshkey_types = libc::c_uint;
 pub const KEY_UNSPEC: sshkey_types = 14;
 pub const KEY_ED25519_SK_CERT: sshkey_types = 13;
