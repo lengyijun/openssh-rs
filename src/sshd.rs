@@ -134,6 +134,7 @@ use libc::close;
 use libc::kill;
 use libc::pid_t;
 use libc::sockaddr;
+use libc::sockaddr_storage;
 
 extern "C" {
     pub type sockaddr_x25;
@@ -323,13 +324,6 @@ pub const SOCK_DGRAM: __socket_type = 2;
 pub const SOCK_STREAM: __socket_type = 1;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union __SOCKADDR_ARG {
@@ -2274,11 +2268,7 @@ unsafe extern "C" fn server_accept_loop(
     let mut startup_p: [libc::c_int; 2] = [-(1 as libc::c_int), -(1 as libc::c_int)];
     let mut startup_pollfd: *mut libc::c_int = 0 as *mut libc::c_int;
     let mut c: libc::c_char = 0 as libc::c_int as libc::c_char;
-    let mut from: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut from: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut fromlen: socklen_t = 0;
     let mut pid: pid_t = 0;
     let mut rnd: [u_char; 256] = [0; 256];
@@ -2870,11 +2860,7 @@ unsafe extern "C" fn server_accept_loop(
 }
 unsafe extern "C" fn check_ip_options(mut ssh: *mut ssh) {
     let mut sock_in: libc::c_int = ssh_packet_get_connection_in(ssh);
-    let mut from: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut from: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut opts: [u_char; 200] = [0; 200];
     let mut i: socklen_t = 0;
     let mut option_size: socklen_t =

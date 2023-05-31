@@ -1,5 +1,6 @@
 use ::libc;
 use libc::sockaddr;
+use libc::sockaddr_storage;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_un;
@@ -45,13 +46,6 @@ pub type u_int32_t = __uint32_t;
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union __SOCKADDR_ARG {
@@ -224,11 +218,7 @@ pub unsafe extern "C" fn srclimit_check_allow(
         },
         scope_id: 0,
     };
-    let mut addr: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut addr: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut addrlen: socklen_t =
         ::core::mem::size_of::<sockaddr_storage>() as libc::c_ulong as socklen_t;
     let mut sa: *mut sockaddr = &mut addr as *mut sockaddr_storage as *mut sockaddr;

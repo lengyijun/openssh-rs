@@ -2,6 +2,7 @@ use crate::atomicio::atomicio;
 use crate::packet::key_entry;
 use libc::pid_t;
 use libc::sockaddr;
+use libc::sockaddr_storage;
 
 use crate::packet::ssh;
 use ::libc;
@@ -104,13 +105,6 @@ pub type u_int64_t = __uint64_t;
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union __SOCKADDR_ARG {
@@ -1005,11 +999,7 @@ pub unsafe extern "C" fn record_failed_login(
         },
         ut_addr_v6: [0; 4],
     };
-    let mut from: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut from: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut fromlen: socklen_t =
         ::core::mem::size_of::<sockaddr_storage>() as libc::c_ulong as socklen_t;
     let mut a4: *mut sockaddr_in = 0 as *mut sockaddr_in;

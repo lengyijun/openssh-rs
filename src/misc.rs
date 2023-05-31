@@ -3,6 +3,7 @@ use libc::close;
 use libc::kill;
 use libc::pid_t;
 use libc::sockaddr;
+use libc::sockaddr_storage;
 
 extern "C" {
     pub type sockaddr_x25;
@@ -221,13 +222,6 @@ pub const SOCK_DGRAM: __socket_type = 2;
 pub const SOCK_STREAM: __socket_type = 1;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union __SOCKADDR_ARG {
@@ -825,11 +819,7 @@ pub unsafe extern "C" fn set_rdomain(
     return sys_set_rdomain(fd, name);
 }
 pub unsafe extern "C" fn get_sock_af(mut fd: libc::c_int) -> libc::c_int {
-    let mut to: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut to: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut tolen: socklen_t =
         ::core::mem::size_of::<sockaddr_storage>() as libc::c_ulong as socklen_t;
     memset(

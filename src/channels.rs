@@ -3,6 +3,7 @@ use crate::packet::key_entry;
 use crate::servconf::ForwardOptions;
 use libc::addrinfo;
 use libc::sockaddr;
+use libc::sockaddr_storage;
 use libc::termios;
 
 use crate::packet::ssh;
@@ -214,13 +215,6 @@ pub const SOCK_DGRAM: __socket_type = 2;
 pub const SOCK_STREAM: __socket_type = 1;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union __SOCKADDR_ARG {
@@ -3434,11 +3428,7 @@ unsafe extern "C" fn channel_before_prepare_io_rdynamic(mut ssh: *mut ssh, mut c
 }
 unsafe extern "C" fn channel_post_x11_listener(mut ssh: *mut ssh, mut c: *mut Channel) {
     let mut nc: *mut Channel = 0 as *mut Channel;
-    let mut addr: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut addr: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut r: libc::c_int = 0;
     let mut newsock: libc::c_int = 0;
     let mut oerrno: libc::c_int = 0;
@@ -3757,11 +3747,7 @@ pub unsafe extern "C" fn channel_set_x11_refuse_time(mut ssh: *mut ssh, mut refu
 }
 unsafe extern "C" fn channel_post_port_listener(mut ssh: *mut ssh, mut c: *mut Channel) {
     let mut nc: *mut Channel = 0 as *mut Channel;
-    let mut addr: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut addr: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut newsock: libc::c_int = 0;
     let mut nextstate: libc::c_int = 0;
     let mut addrlen: socklen_t = 0;
@@ -3866,11 +3852,7 @@ unsafe extern "C" fn channel_post_auth_listener(mut ssh: *mut ssh, mut c: *mut C
     let mut nc: *mut Channel = 0 as *mut Channel;
     let mut r: libc::c_int = 0;
     let mut newsock: libc::c_int = 0;
-    let mut addr: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut addr: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut addrlen: socklen_t = 0;
     if (*c).io_ready & 0x10 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint {
         return;
@@ -4953,11 +4935,7 @@ unsafe extern "C" fn channel_post_mux_client(mut ssh: *mut ssh, mut c: *mut Chan
 }
 unsafe extern "C" fn channel_post_mux_listener(mut ssh: *mut ssh, mut c: *mut Channel) {
     let mut nc: *mut Channel = 0 as *mut Channel;
-    let mut addr: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut addr: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut addrlen: socklen_t = 0;
     let mut newsock: libc::c_int = 0;
     let mut euid: uid_t = 0;

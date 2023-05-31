@@ -34,6 +34,7 @@ use crate::packet::ssh_packet_set_state;
 use crate::packet::ssh_remote_ipaddr;
 use crate::packet::ssh_remote_port;
 use crate::servconf::ServerOptions;
+use libc::sockaddr_storage;
 
 use crate::session::session_by_tty;
 use crate::session::session_destroy_all;
@@ -183,13 +184,6 @@ pub const SOCK_DGRAM: __socket_type = 2;
 pub const SOCK_STREAM: __socket_type = 1;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union __SOCKADDR_ARG {
@@ -3415,11 +3409,7 @@ unsafe extern "C" fn mm_record_login(
     mut pw: *mut libc::passwd,
 ) {
     let mut fromlen: socklen_t = 0;
-    let mut from: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut from: sockaddr_storage = unsafe { std::mem::zeroed() };
     memset(
         &mut from as *mut sockaddr_storage as *mut libc::c_void,
         0 as libc::c_int,

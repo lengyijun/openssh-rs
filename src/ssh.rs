@@ -62,6 +62,7 @@ use crate::sshkey::sshkey_ssh_name;
 use libc::addrinfo;
 use libc::pid_t;
 use libc::sockaddr;
+use libc::sockaddr_storage;
 use libc::termios;
 
 use crate::packet::ssh;
@@ -303,13 +304,6 @@ pub const SOCK_DGRAM: __socket_type = 2;
 pub const SOCK_STREAM: __socket_type = 1;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sockaddr_in6 {
@@ -735,11 +729,8 @@ pub static mut config: *mut libc::c_char = 0 as *const libc::c_char as *mut libc
 pub static mut host: *mut libc::c_char = 0 as *const libc::c_char as *mut libc::c_char;
 pub static mut forward_agent_sock_path: *mut libc::c_char =
     0 as *const libc::c_char as *mut libc::c_char;
-pub static mut hostaddr: sockaddr_storage = sockaddr_storage {
-    ss_family: 0,
-    __ss_padding: [0; 118],
-    __ss_align: 0,
-};
+pub static mut hostaddr: sockaddr_storage =
+    unsafe { std::mem::MaybeUninit::zeroed().assume_init() };
 pub static mut sensitive_data: Sensitive = Sensitive {
     keys: 0 as *const *mut crate::sshkey::sshkey as *mut *mut crate::sshkey::sshkey,
     nkeys: 0,

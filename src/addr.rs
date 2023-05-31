@@ -1,6 +1,7 @@
 use ::libc;
 use libc::addrinfo;
 use libc::sockaddr;
+use libc::sockaddr_storage;
 extern "C" {
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
     fn getaddrinfo(
@@ -37,13 +38,6 @@ pub type u_int32_t = __uint32_t;
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sockaddr_in6 {
@@ -621,11 +615,7 @@ pub unsafe extern "C" fn addr_ntop(
     mut p: *mut libc::c_char,
     mut len: size_t,
 ) -> libc::c_int {
-    let mut ss: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut ss: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut slen: socklen_t =
         ::core::mem::size_of::<sockaddr_storage>() as libc::c_ulong as socklen_t;
     if addr_xaddr_to_sa(

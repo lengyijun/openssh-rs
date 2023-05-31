@@ -9,6 +9,7 @@ use crate::mac::sshmac;
 use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::EC_GROUP;
 use libc::sockaddr;
+use libc::sockaddr_storage;
 
 use crate::kex::sshenc;
 
@@ -242,13 +243,6 @@ pub struct __sigset_t {
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union __SOCKADDR_ARG {
@@ -776,16 +770,8 @@ unsafe extern "C" fn ssh_packet_start_discard(
 }
 pub unsafe extern "C" fn ssh_packet_connection_is_on_socket(mut ssh: *mut ssh) -> libc::c_int {
     let mut state: *mut session_state = 0 as *mut session_state;
-    let mut from: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
-    let mut to: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut from: sockaddr_storage = unsafe { std::mem::zeroed() };
+    let mut to: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut fromlen: socklen_t = 0;
     let mut tolen: socklen_t = 0;
     if ssh.is_null() || ((*ssh).state).is_null() {

@@ -7,6 +7,7 @@
 #![allow(unused_mut)]
 #![feature(c_variadic)]
 #![feature(extern_types)]
+#![feature(const_maybe_uninit_zeroed)]
 
 #[macro_use]
 extern crate c2rust_bitfields;

@@ -4,6 +4,7 @@ use crate::servconf::connection_info;
 use crate::servconf::include_item;
 use crate::servconf::include_list;
 use crate::servconf::ServerOptions;
+use libc::sockaddr_storage;
 
 use libc::addrinfo;
 use libc::sockaddr;
@@ -191,13 +192,6 @@ pub const SOCK_DGRAM: __socket_type = 2;
 pub const SOCK_STREAM: __socket_type = 1;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union __SOCKADDR_ARG {
@@ -1285,11 +1279,7 @@ pub unsafe extern "C" fn fakepw() -> *mut libc::passwd {
     return &mut fake;
 }
 unsafe extern "C" fn remote_hostname(mut ssh: *mut ssh) -> *mut libc::c_char {
-    let mut from: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut from: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut fromlen: socklen_t = 0;
     let mut hints: addrinfo = addrinfo {
         ai_flags: 0,

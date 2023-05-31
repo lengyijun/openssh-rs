@@ -5,6 +5,7 @@ use crate::servconf::ForwardOptions;
 use libc::addrinfo;
 use libc::pid_t;
 use libc::sockaddr;
+use libc::sockaddr_storage;
 
 use crate::packet::ssh;
 
@@ -286,13 +287,6 @@ pub const SOCK_DGRAM: __socket_type = 2;
 pub const SOCK_STREAM: __socket_type = 1;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sockaddr_in6 {
@@ -1266,11 +1260,7 @@ unsafe extern "C" fn ssh_create_socket(mut ai: *mut addrinfo) -> libc::c_int {
     let mut current_block: u64;
     let mut sock: libc::c_int = 0;
     let mut r: libc::c_int = 0;
-    let mut bindaddr: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut bindaddr: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut bindaddrlen: socklen_t = 0 as libc::c_int as socklen_t;
     let mut hints: addrinfo = addrinfo {
         ai_flags: 0,

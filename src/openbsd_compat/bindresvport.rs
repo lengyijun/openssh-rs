@@ -1,5 +1,6 @@
 use ::libc;
 use libc::sockaddr;
+use libc::sockaddr_storage;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_un;
@@ -27,13 +28,6 @@ pub type u_int16_t = __uint16_t;
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union __SOCKADDR_ARG {
@@ -120,11 +114,7 @@ pub unsafe extern "C" fn bindresvport_sa(
 ) -> libc::c_int {
     let mut error: libc::c_int = 0;
     let mut af: libc::c_int = 0;
-    let mut myaddr: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut myaddr: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut in_0: *mut sockaddr_in = 0 as *mut sockaddr_in;
     let mut in6: *mut sockaddr_in6 = 0 as *mut sockaddr_in6;
     let mut portp: *mut u_int16_t = 0 as *mut u_int16_t;

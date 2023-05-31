@@ -1,5 +1,6 @@
 use ::libc;
 use libc::sockaddr;
+use libc::sockaddr_storage;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_ns;
@@ -51,13 +52,6 @@ pub type u_int16_t = __uint16_t;
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union __SOCKADDR_ARG {
@@ -202,11 +196,7 @@ unsafe extern "C" fn get_socket_address(
     mut remote: libc::c_int,
     mut flags: libc::c_int,
 ) -> *mut libc::c_char {
-    let mut addr: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut addr: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut addrlen: socklen_t = 0;
     let mut ntop: [libc::c_char; 1025] = [0; 1025];
     let mut r: libc::c_int = 0;
@@ -328,11 +318,7 @@ pub unsafe extern "C" fn get_local_name(mut fd: libc::c_int) -> *mut libc::c_cha
     return host;
 }
 unsafe extern "C" fn get_sock_port(mut sock: libc::c_int, mut local: libc::c_int) -> libc::c_int {
-    let mut from: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut from: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut fromlen: socklen_t = 0;
     let mut strport: [libc::c_char; 32] = [0; 32];
     let mut r: libc::c_int = 0;

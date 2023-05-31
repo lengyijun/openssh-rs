@@ -4,6 +4,7 @@ use crate::channels::Channel;
 use crate::kex::dh_st;
 use crate::packet::key_entry;
 use crate::servconf::ServerOptions;
+use libc::sockaddr_storage;
 
 use libc::addrinfo;
 use libc::pid_t;
@@ -308,13 +309,6 @@ pub type u_int64_t = __uint64_t;
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sockaddr_storage {
-    pub ss_family: sa_family_t,
-    pub __ss_padding: [libc::c_char; 118],
-    pub __ss_align: libc::c_ulong,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union __SOCKADDR_ARG {
@@ -1323,11 +1317,7 @@ pub unsafe extern "C" fn do_login(
     mut command: *const libc::c_char,
 ) {
     let mut fromlen: socklen_t = 0;
-    let mut from: sockaddr_storage = sockaddr_storage {
-        ss_family: 0,
-        __ss_padding: [0; 118],
-        __ss_align: 0,
-    };
+    let mut from: sockaddr_storage = unsafe { std::mem::zeroed() };
     let mut pw: *mut libc::passwd = (*s).pw;
     let mut pid: pid_t = libc::getpid();
     memset(
