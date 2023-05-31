@@ -17,24 +17,20 @@ use crate::channels::channel_setup_local_fwd_listener;
 use crate::channels::channel_update_permission;
 use crate::channels::permitopen_port;
 use crate::channels::x11_request_forwarding_with_spoofing;
+use crate::channels::Channel;
+use crate::cipher::cipher_alg_list;
+use crate::cipher::ciphers_valid;
+use crate::cipher::compression_alg_list;
 use crate::clientloop::client_expect_confirm;
 use crate::clientloop::client_loop;
 use crate::clientloop::client_register_global_confirm;
 use crate::clientloop::client_request_tun_fwd;
 use crate::clientloop::client_session2_setup;
 use crate::clientloop::client_x11_get_proto;
-use crate::mux::muxclient;
-use crate::mux::muxserver_listen;
-use crate::sshkey::sshkey_alg_list;
-use crate::sshkey::sshkey_check_rsa_length;
-use crate::sshkey::sshkey_is_cert;
-use crate::sshkey::sshkey_ssh_name;
-use crate::channels::Channel;
-use crate::cipher::cipher_alg_list;
-use crate::cipher::ciphers_valid;
-use crate::cipher::compression_alg_list;
 use crate::kex::dh_st;
 use crate::misc::Forward;
+use crate::mux::muxclient;
+use crate::mux::muxserver_listen;
 use crate::packet::key_entry;
 use crate::packet::ssh_alloc_session_state;
 use crate::packet::ssh_packet_close;
@@ -44,6 +40,11 @@ use crate::packet::ssh_packet_set_interactive;
 use crate::packet::ssh_packet_set_mux;
 use crate::packet::ssh_packet_set_timeout;
 use crate::servconf::ForwardOptions;
+use crate::sshconnect::ssh_conn_info;
+use crate::sshkey::sshkey_alg_list;
+use crate::sshkey::sshkey_check_rsa_length;
+use crate::sshkey::sshkey_is_cert;
+use crate::sshkey::sshkey_ssh_name;
 use libc::addrinfo;
 use libc::pid_t;
 use libc::sockaddr;
@@ -600,21 +601,7 @@ pub struct Sensitive {
     pub keys: *mut *mut crate::sshkey::sshkey,
     pub nkeys: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ssh_conn_info {
-    pub conn_hash_hex: *mut libc::c_char,
-    pub shorthost: *mut libc::c_char,
-    pub uidstr: *mut libc::c_char,
-    pub keyalias: *mut libc::c_char,
-    pub thishost: *mut libc::c_char,
-    pub host_arg: *mut libc::c_char,
-    pub portstr: *mut libc::c_char,
-    pub remhost: *mut libc::c_char,
-    pub remuser: *mut libc::c_char,
-    pub homedir: *mut libc::c_char,
-    pub locuser: *mut libc::c_char,
-}
+
 #[inline]
 unsafe extern "C" fn __bswap_16(mut __bsx: __uint16_t) -> __uint16_t {
     return (__bsx as libc::c_int >> 8 as libc::c_int & 0xff as libc::c_int

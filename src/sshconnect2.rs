@@ -2,6 +2,7 @@ use crate::kex::dh_st;
 use crate::misc::Forward;
 use crate::packet::key_entry;
 use crate::servconf::ForwardOptions;
+use crate::sshconnect::ssh_conn_info;
 use libc::pid_t;
 use libc::sockaddr;
 
@@ -361,21 +362,7 @@ pub struct Sensitive {
     pub keys: *mut *mut crate::sshkey::sshkey,
     pub nkeys: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ssh_conn_info {
-    pub conn_hash_hex: *mut libc::c_char,
-    pub shorthost: *mut libc::c_char,
-    pub uidstr: *mut libc::c_char,
-    pub keyalias: *mut libc::c_char,
-    pub thishost: *mut libc::c_char,
-    pub host_arg: *mut libc::c_char,
-    pub portstr: *mut libc::c_char,
-    pub remhost: *mut libc::c_char,
-    pub remuser: *mut libc::c_char,
-    pub homedir: *mut libc::c_char,
-    pub locuser: *mut libc::c_char,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct hostkeys {
