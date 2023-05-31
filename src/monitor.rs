@@ -22,7 +22,9 @@ use crate::kex::kex;
 use crate::kexgen::kex_gen_server;
 use crate::kexgexs::kexgex_server;
 use crate::log::log_level_name;
+use crate::log::sshlog;
 use crate::log::sshlogdirect;
+use crate::misc::ssh_signal;
 use crate::packet::key_entry;
 use crate::packet::ssh;
 use crate::packet::ssh_clear_newkeys;
@@ -32,11 +34,13 @@ use crate::packet::ssh_packet_set_state;
 use crate::packet::ssh_remote_ipaddr;
 use crate::packet::ssh_remote_port;
 use crate::session::session_by_tty;
+use crate::session::session_destroy_all;
 use crate::session::session_get_remote_name_or_ip;
 use crate::session::session_new;
 use crate::session::session_pty_cleanup2;
 use crate::session::session_unused;
 use crate::session::Session;
+use crate::sshbuf::sshbuf;
 use crate::sshbuf::sshbuf_reserve;
 use crate::sshbuf_getput_basic::sshbuf_get_string_direct;
 use crate::sshbuf_getput_basic::sshbuf_put_stringb;
@@ -64,10 +68,13 @@ use crate::sshlogin::record_login;
 use crate::sshpty::pty_allocate;
 use crate::sshpty::pty_setowner;
 use ::libc;
+use libc::__errno_location;
 use libc::close;
+use libc::exit;
 use libc::kill;
 use libc::pid_t;
 use libc::sockaddr;
+use libc::waitpid;
 
 extern "C" {
     pub type sockaddr_x25;
@@ -4139,4 +4146,140 @@ pub unsafe extern "C" fn monitor_init() -> *mut monitor {
 }
 pub unsafe extern "C" fn monitor_reinit(mut mon: *mut monitor) {
     monitor_openfds(mon, 0 as libc::c_int);
+}
+
+pub unsafe extern "C" fn monitor_child_postauth(mut ssh: *mut ssh, mut pmonitor_0: *mut monitor) {
+    close((*pmonitor_0).m_recvfd);
+    (*pmonitor_0).m_recvfd = -(1 as libc::c_int);
+    monitor_set_child_handler((*pmonitor_0).m_pid);
+    ssh_signal(
+        1 as libc::c_int,
+        Some(monitor_child_handler as unsafe extern "C" fn(libc::c_int) -> ()),
+    );
+    ssh_signal(
+        15 as libc::c_int,
+        Some(monitor_child_handler as unsafe extern "C" fn(libc::c_int) -> ()),
+    );
+    ssh_signal(
+        2 as libc::c_int,
+        Some(monitor_child_handler as unsafe extern "C" fn(libc::c_int) -> ()),
+    );
+    ssh_signal(
+        25 as libc::c_int,
+        ::core::mem::transmute::<libc::intptr_t, __sighandler_t>(
+            1 as libc::c_int as libc::intptr_t,
+        ),
+    );
+    mon_dispatch = mon_dispatch_postauth20.as_mut_ptr();
+    monitor_permit(mon_dispatch, MONITOR_REQ_MODULI, 1 as libc::c_int);
+    monitor_permit(mon_dispatch, MONITOR_REQ_SIGN, 1 as libc::c_int);
+    monitor_permit(mon_dispatch, MONITOR_REQ_TERM, 1 as libc::c_int);
+    if (*auth_opts).permit_pty_flag != 0 {
+        monitor_permit(mon_dispatch, MONITOR_REQ_PTY, 1 as libc::c_int);
+        monitor_permit(mon_dispatch, MONITOR_REQ_PTYCLEANUP, 1 as libc::c_int);
+    }
+    loop {
+        monitor_read(ssh, pmonitor_0, mon_dispatch, 0 as *mut *mut mon_table);
+    }
+}
+
+pub static mut mon_dispatch_postauth20: [mon_table; 6] = unsafe {
+    [
+        {
+            let mut init = mon_table {
+                type_0: MONITOR_REQ_MODULI,
+                flags: 0 as libc::c_int,
+                f: Some(
+                    mm_answer_moduli
+                        as unsafe extern "C" fn(*mut ssh, libc::c_int, *mut sshbuf) -> libc::c_int,
+                ),
+            };
+            init
+        },
+        {
+            let mut init = mon_table {
+                type_0: MONITOR_REQ_SIGN,
+                flags: 0 as libc::c_int,
+                f: Some(
+                    mm_answer_sign
+                        as unsafe extern "C" fn(*mut ssh, libc::c_int, *mut sshbuf) -> libc::c_int,
+                ),
+            };
+            init
+        },
+        {
+            let mut init = mon_table {
+                type_0: MONITOR_REQ_PTY,
+                flags: 0 as libc::c_int,
+                f: Some(
+                    mm_answer_pty
+                        as unsafe extern "C" fn(*mut ssh, libc::c_int, *mut sshbuf) -> libc::c_int,
+                ),
+            };
+            init
+        },
+        {
+            let mut init = mon_table {
+                type_0: MONITOR_REQ_PTYCLEANUP,
+                flags: 0 as libc::c_int,
+                f: Some(
+                    mm_answer_pty_cleanup
+                        as unsafe extern "C" fn(*mut ssh, libc::c_int, *mut sshbuf) -> libc::c_int,
+                ),
+            };
+            init
+        },
+        {
+            let mut init = mon_table {
+                type_0: MONITOR_REQ_TERM,
+                flags: 0 as libc::c_int,
+                f: Some(
+                    mm_answer_term
+                        as unsafe extern "C" fn(*mut ssh, libc::c_int, *mut sshbuf) -> libc::c_int,
+                ),
+            };
+            init
+        },
+        {
+            let mut init = mon_table {
+                type_0: MONITOR_REQ_MODULI,
+                flags: 0 as libc::c_int,
+                f: None,
+            };
+            init
+        },
+    ]
+};
+
+pub unsafe extern "C" fn mm_answer_term(
+    mut ssh: *mut ssh,
+    mut _sock: libc::c_int,
+    mut _req: *mut sshbuf,
+) -> libc::c_int {
+    let mut res: libc::c_int = 0;
+    let mut status: libc::c_int = 0;
+    sshlog(
+        b"monitor.c\0" as *const u8 as *const libc::c_char,
+        (*::core::mem::transmute::<&[u8; 15], &[libc::c_char; 15]>(b"mm_answer_term\0")).as_ptr(),
+        1633 as libc::c_int,
+        1 as libc::c_int,
+        SYSLOG_LEVEL_DEBUG3,
+        0 as *const libc::c_char,
+        b"tearing down sessions\0" as *const u8 as *const libc::c_char,
+    );
+    session_destroy_all(
+        ssh,
+        Some(mm_session_close as unsafe extern "C" fn(*mut Session) -> ()),
+    );
+    while waitpid((*pmonitor).m_pid, &mut status, 0 as libc::c_int) == -(1 as libc::c_int) {
+        if *__errno_location() != 4 as libc::c_int {
+            exit(1 as libc::c_int);
+        }
+    }
+    res = if status & 0x7f as libc::c_int == 0 as libc::c_int {
+        (status & 0xff00 as libc::c_int) >> 8 as libc::c_int
+    } else {
+        1 as libc::c_int
+    };
+    exit(res);
 }
