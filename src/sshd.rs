@@ -16,6 +16,7 @@ use crate::canohost::get_peer_ipaddr;
 use crate::canohost::get_peer_port;
 use crate::channels::channel_init_channels;
 use crate::channels::channel_set_af;
+use crate::dh::dh_set_moduli_file;
 use crate::digest_openssl::ssh_digest_ctx;
 use crate::kex::dh_st;
 use crate::kex::kex;
@@ -26,12 +27,22 @@ use crate::kex::kex_setup;
 use crate::kexgen::kex_gen_server;
 use crate::kexgexs::kexgex_server;
 use crate::log::log_init;
+use crate::log::log_redirect_stderr_to;
+use crate::log::log_verbose_add;
+use crate::log::set_log_handler;
 use crate::log::sshsigdie;
 use crate::misc::convtime;
 use crate::misc::daemonized;
+use crate::misc::fmt_timeframe;
+use crate::misc::monotime;
+use crate::misc::path_absolute;
+use crate::misc::pwcopy;
 use crate::misc::set_rdomain;
 use crate::misc::set_reuseaddr;
+use crate::misc::sock_set_v6only;
 use crate::misc::ssh_gai_strerror;
+use crate::misc::stdfd_devnull;
+use crate::misc::xextendf;
 use crate::monitor::monitor;
 use crate::monitor::monitor_apply_keystate;
 use crate::monitor::monitor_child_postauth;
@@ -62,27 +73,50 @@ use crate::packet::ssh_packet_set_server;
 use crate::packet::ssh_packet_set_timeout;
 use crate::packet::ssh_remote_ipaddr;
 use crate::packet::ssh_remote_port;
+use crate::packet::sshpkt_fatal;
+use crate::packet::sshpkt_put_stringb;
 use crate::platform::platform_post_fork_child;
 use crate::platform::platform_post_fork_parent;
 use crate::platform::platform_pre_fork;
 use crate::platform::platform_pre_listen;
 use crate::platform::platform_pre_restart;
+use crate::r#match::match_pattern_list;
 use crate::sandbox_seccomp_filter::ssh_sandbox;
 use crate::sandbox_seccomp_filter::ssh_sandbox_child;
 use crate::sandbox_seccomp_filter::ssh_sandbox_init;
 use crate::sandbox_seccomp_filter::ssh_sandbox_parent_finish;
 use crate::sandbox_seccomp_filter::ssh_sandbox_parent_preauth;
 use crate::servconf::connection_info;
+use crate::servconf::dump_config;
+use crate::servconf::fill_default_server_options;
+use crate::servconf::get_connection_info;
 use crate::servconf::include_item;
 use crate::servconf::include_list;
+use crate::servconf::initialize_server_options;
 use crate::servconf::listenaddr;
+use crate::servconf::load_server_config;
+use crate::servconf::parse_server_config;
+use crate::servconf::parse_server_match_config;
+use crate::servconf::parse_server_match_testspec;
+use crate::servconf::process_channel_timeouts;
+use crate::servconf::process_permitopen;
+use crate::servconf::process_server_config_line;
 use crate::servconf::queued_listenaddr;
+use crate::servconf::servconf_add_hostcert;
+use crate::servconf::servconf_add_hostkey;
 use crate::servconf::ForwardOptions;
 use crate::servconf::ServerOptions;
+use crate::session::do_authenticated;
+use crate::session::do_cleanup;
+use crate::session::do_setusercontext;
+use crate::srclimit::srclimit_check_allow;
+use crate::srclimit::srclimit_done;
+use crate::srclimit::srclimit_init;
 use crate::sshbuf_getput_basic::sshbuf_get_stringb;
 use crate::sshbuf_getput_basic::sshbuf_put_stringb;
 use crate::sshd::libc::endpwent;
 use crate::sshd::libc::getpwnam;
+use crate::ssherr::ssh_err;
 use crate::sshkey::sshkey_check_rsa_length;
 use crate::sshkey::sshkey_equal;
 use crate::sshkey::sshkey_is_cert;
@@ -93,6 +127,7 @@ use crate::sshkey::sshkey_shield_private;
 use crate::sshkey::sshkey_sign;
 use crate::sshkey::sshkey_ssh_name;
 use crate::sshpty::disconnect_controlling_tty;
+use crate::uidswap::permanently_set_uid;
 use ::libc;
 use libc::addrinfo;
 use libc::close;
@@ -220,15 +255,6 @@ extern "C" {
     fn RAND_seed(buf: *const libc::c_void, num: libc::c_int);
     fn RAND_poll() -> libc::c_int;
 
-    fn sshpkt_fatal(ssh: *mut ssh, r: libc::c_int, fmt: *const libc::c_char, _: ...) -> !;
-
-    fn sshpkt_put_stringb(ssh: *mut ssh, v: *const crate::sshbuf::sshbuf) -> libc::c_int;
-
-    fn log_verbose_add(_: *const libc::c_char);
-    fn set_log_handler(_: Option<log_handler_fn>, _: *mut libc::c_void);
-
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn log_redirect_stderr_to(_: *const libc::c_char);
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -240,77 +266,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn fmt_timeframe(t: time_t) -> *const libc::c_char;
-    fn xextendf(
-        s: *mut *mut libc::c_char,
-        sep: *const libc::c_char,
-        fmt: *const libc::c_char,
-        _: ...
-    );
-
-    fn monotime() -> time_t;
-    fn path_absolute(_: *const libc::c_char) -> libc::c_int;
-    fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
-    fn sock_set_v6only(_: libc::c_int);
-    fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
-
-    fn match_pattern_list(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn get_connection_info(_: *mut ssh, _: libc::c_int, _: libc::c_int) -> *mut connection_info;
-    fn initialize_server_options(_: *mut ServerOptions);
-    fn fill_default_server_options(_: *mut ServerOptions);
-    fn process_server_config_line(
-        _: *mut ServerOptions,
-        _: *mut libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: *mut libc::c_int,
-        _: *mut connection_info,
-        includes_0: *mut include_list,
-    ) -> libc::c_int;
-    fn process_permitopen(ssh: *mut ssh, options_0: *mut ServerOptions);
-    fn process_channel_timeouts(ssh: *mut ssh, _: *mut ServerOptions);
-    fn load_server_config(_: *const libc::c_char, _: *mut crate::sshbuf::sshbuf);
-    fn parse_server_config(
-        _: *mut ServerOptions,
-        _: *const libc::c_char,
-        _: *mut crate::sshbuf::sshbuf,
-        includes_0: *mut include_list,
-        _: *mut connection_info,
-        _: libc::c_int,
-    );
-    fn parse_server_match_config(
-        _: *mut ServerOptions,
-        includes_0: *mut include_list,
-        _: *mut connection_info,
-    );
-    fn parse_server_match_testspec(_: *mut connection_info, _: *mut libc::c_char) -> libc::c_int;
-    fn dump_config(_: *mut ServerOptions);
-    fn servconf_add_hostkey(
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: *mut ServerOptions,
-        path: *const libc::c_char,
-        _: libc::c_int,
-    );
-    fn servconf_add_hostcert(
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: *mut ServerOptions,
-        path: *const libc::c_char,
-    );
-    fn permanently_set_uid(_: *mut libc::passwd);
-
-    fn do_authenticated(_: *mut ssh, _: *mut Authctxt);
-    fn do_cleanup(_: *mut ssh, _: *mut Authctxt);
-    fn do_setusercontext(_: *mut libc::passwd);
-    fn srclimit_init(_: libc::c_int, _: libc::c_int, _: libc::c_int, _: libc::c_int);
-    fn srclimit_check_allow(_: libc::c_int, _: libc::c_int) -> libc::c_int;
-    fn srclimit_done(_: libc::c_int);
-    fn dh_set_moduli_file(_: *const libc::c_char);
     static mut __progname: *mut libc::c_char;
 }
 pub type __u_char = libc::c_uchar;
