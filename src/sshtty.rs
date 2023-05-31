@@ -1,4 +1,5 @@
 use ::libc;
+use libc::termios;
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -19,18 +20,6 @@ pub type size_t = libc::c_ulong;
 pub type cc_t = libc::c_uchar;
 pub type speed_t = libc::c_uint;
 pub type tcflag_t = libc::c_uint;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct termios {
-    pub c_iflag: tcflag_t,
-    pub c_oflag: tcflag_t,
-    pub c_cflag: tcflag_t,
-    pub c_lflag: tcflag_t,
-    pub c_line: cc_t,
-    pub c_cc: [cc_t; 32],
-    pub c_ispeed: speed_t,
-    pub c_ospeed: speed_t,
-}
 
 pub type _IO_lock_t = ();
 
