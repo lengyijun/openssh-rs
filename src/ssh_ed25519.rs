@@ -1,34 +1,16 @@
+use crate::ed25519::crypto_sign_ed25519;
+use crate::ed25519::crypto_sign_ed25519_keypair;
+use crate::ed25519::crypto_sign_ed25519_open;
+use crate::sshbuf_getput_basic::sshbuf_get_string_direct;
 use crate::sshkey::sshkey_sig_details;
+use crate::sshkey::sshkey_type_plain;
 use ::libc;
 extern "C" {
 
     fn freezero(_: *mut libc::c_void, _: size_t);
 
-    fn crypto_sign_ed25519(
-        _: *mut libc::c_uchar,
-        _: *mut libc::c_ulonglong,
-        _: *const libc::c_uchar,
-        _: libc::c_ulonglong,
-        _: *const libc::c_uchar,
-    ) -> libc::c_int;
-    fn crypto_sign_ed25519_open(
-        _: *mut libc::c_uchar,
-        _: *mut libc::c_ulonglong,
-        _: *const libc::c_uchar,
-        _: libc::c_ulonglong,
-        _: *const libc::c_uchar,
-    ) -> libc::c_int;
-    fn crypto_sign_ed25519_keypair(_: *mut libc::c_uchar, _: *mut libc::c_uchar) -> libc::c_int;
     fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
-
-    fn sshbuf_get_string_direct(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *const u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-
-    fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
