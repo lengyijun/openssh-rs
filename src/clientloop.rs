@@ -1,3 +1,4 @@
+use crate::channels::Channel;
 use crate::kex::dh_st;
 use crate::misc::Forward;
 use crate::packet::key_entry;
@@ -420,67 +421,7 @@ pub struct pollfd {
     pub events: libc::c_short,
     pub revents: libc::c_short,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Channel {
-    pub type_0: libc::c_int,
-    pub self_0: libc::c_int,
-    pub remote_id: uint32_t,
-    pub have_remote_id: libc::c_int,
-    pub istate: u_int,
-    pub ostate: u_int,
-    pub flags: libc::c_int,
-    pub rfd: libc::c_int,
-    pub wfd: libc::c_int,
-    pub efd: libc::c_int,
-    pub sock: libc::c_int,
-    pub io_want: u_int,
-    pub io_ready: u_int,
-    pub pfds: [libc::c_int; 4],
-    pub ctl_chan: libc::c_int,
-    pub isatty: libc::c_int,
-    pub client_tty: libc::c_int,
-    pub force_drain: libc::c_int,
-    pub notbefore: time_t,
-    pub delayed: libc::c_int,
-    pub restore_block: libc::c_int,
-    pub restore_flags: [libc::c_int; 3],
-    pub input: *mut crate::sshbuf::sshbuf,
-    pub output: *mut crate::sshbuf::sshbuf,
-    pub extended: *mut crate::sshbuf::sshbuf,
-    pub path: *mut libc::c_char,
-    pub listening_port: libc::c_int,
-    pub listening_addr: *mut libc::c_char,
-    pub host_port: libc::c_int,
-    pub remote_name: *mut libc::c_char,
-    pub remote_window: u_int,
-    pub remote_maxpacket: u_int,
-    pub local_window: u_int,
-    pub local_window_max: u_int,
-    pub local_consumed: u_int,
-    pub local_maxpacket: u_int,
-    pub extended_usage: libc::c_int,
-    pub single_connection: libc::c_int,
-    pub ctype: *mut libc::c_char,
-    pub xctype: *mut libc::c_char,
-    pub open_confirm: Option<channel_open_fn>,
-    pub open_confirm_ctx: *mut libc::c_void,
-    pub detach_user: Option<channel_callback_fn>,
-    pub detach_close: libc::c_int,
-    pub status_confirms: channel_confirms,
-    pub input_filter: Option<channel_infilter_fn>,
-    pub output_filter: Option<channel_outfilter_fn>,
-    pub filter_ctx: *mut libc::c_void,
-    pub filter_cleanup: Option<channel_filter_cleanup_fn>,
-    pub datagram: libc::c_int,
-    pub connect_ctx: channel_connect,
-    pub mux_rcb: Option<mux_callback_fn>,
-    pub mux_ctx: *mut libc::c_void,
-    pub mux_pause: libc::c_int,
-    pub mux_downstream_id: libc::c_int,
-    pub lastused: time_t,
-    pub inactive_deadline: u_int,
-}
+
 pub type mux_callback_fn = unsafe extern "C" fn(*mut ssh, *mut Channel) -> libc::c_int;
 
 #[derive(Copy, Clone)]
