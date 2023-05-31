@@ -1,3 +1,4 @@
+use crate::misc::Forward;
 use crate::servconf::ForwardOptions;
 use ::libc;
 use libc::close;
@@ -132,19 +133,6 @@ pub const SSH_FP_BUBBLEBABBLE: sshkey_fp_rep = 3;
 pub const SSH_FP_BASE64: sshkey_fp_rep = 2;
 pub const SSH_FP_HEX: sshkey_fp_rep = 1;
 pub const SSH_FP_DEFAULT: sshkey_fp_rep = 0;
-
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Forward {
-    pub listen_host: *mut libc::c_char,
-    pub listen_port: libc::c_int,
-    pub listen_path: *mut libc::c_char,
-    pub connect_host: *mut libc::c_char,
-    pub connect_port: libc::c_int,
-    pub connect_path: *mut libc::c_char,
-    pub allocated_port: libc::c_int,
-    pub handle: libc::c_int,
-}
 
 #[derive(Copy, Clone)]
 #[repr(C)]

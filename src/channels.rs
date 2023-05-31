@@ -1,3 +1,4 @@
+use crate::misc::Forward;
 use crate::packet::key_entry;
 use crate::servconf::ForwardOptions;
 use libc::addrinfo;
@@ -510,18 +511,6 @@ pub const SYSLOG_LEVEL_INFO: LogLevel = 3;
 pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Forward {
-    pub listen_host: *mut libc::c_char,
-    pub listen_port: libc::c_int,
-    pub listen_path: *mut libc::c_char,
-    pub connect_host: *mut libc::c_char,
-    pub connect_port: libc::c_int,
-    pub connect_path: *mut libc::c_char,
-    pub allocated_port: libc::c_int,
-    pub handle: libc::c_int,
-}
 
 #[derive(Copy, Clone)]
 #[repr(C)]

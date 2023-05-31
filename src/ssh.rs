@@ -1,4 +1,5 @@
 use crate::kex::dh_st;
+use crate::misc::Forward;
 use crate::packet::key_entry;
 use crate::servconf::ForwardOptions;
 use libc::addrinfo;
@@ -591,18 +592,6 @@ pub type channel_callback_fn =
     unsafe extern "C" fn(*mut ssh, libc::c_int, libc::c_int, *mut libc::c_void) -> ();
 pub type channel_open_fn =
     unsafe extern "C" fn(*mut ssh, libc::c_int, libc::c_int, *mut libc::c_void) -> ();
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Forward {
-    pub listen_host: *mut libc::c_char,
-    pub listen_port: libc::c_int,
-    pub listen_path: *mut libc::c_char,
-    pub connect_host: *mut libc::c_char,
-    pub connect_port: libc::c_int,
-    pub connect_path: *mut libc::c_char,
-    pub allocated_port: libc::c_int,
-    pub handle: libc::c_int,
-}
 
 pub type global_confirm_cb =
     unsafe extern "C" fn(*mut ssh, libc::c_int, u_int32_t, *mut libc::c_void) -> ();

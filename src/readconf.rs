@@ -1,5 +1,6 @@
 use crate::digest_openssl::ssh_digest_ctx;
 use crate::misc::parse_uri;
+use crate::misc::Forward;
 use crate::servconf::ForwardOptions;
 use ::libc;
 use libc::kill;
@@ -246,19 +247,6 @@ pub const SYSLOG_LEVEL_INFO: LogLevel = 3;
 pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
-
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Forward {
-    pub listen_host: *mut libc::c_char,
-    pub listen_port: libc::c_int,
-    pub listen_path: *mut libc::c_char,
-    pub connect_host: *mut libc::c_char,
-    pub connect_port: libc::c_int,
-    pub connect_path: *mut libc::c_char,
-    pub allocated_port: libc::c_int,
-    pub handle: libc::c_int,
-}
 
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 #[derive(Copy, Clone)]

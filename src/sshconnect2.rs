@@ -1,4 +1,5 @@
 use crate::kex::dh_st;
+use crate::misc::Forward;
 use crate::packet::key_entry;
 use crate::servconf::ForwardOptions;
 use libc::pid_t;
@@ -536,18 +537,7 @@ pub struct allowed_cname {
     pub source_list: *mut libc::c_char,
     pub target_list: *mut libc::c_char,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Forward {
-    pub listen_host: *mut libc::c_char,
-    pub listen_port: libc::c_int,
-    pub listen_path: *mut libc::c_char,
-    pub connect_host: *mut libc::c_char,
-    pub connect_port: libc::c_int,
-    pub connect_path: *mut libc::c_char,
-    pub allocated_port: libc::c_int,
-    pub handle: libc::c_int,
-}
+
 pub type SyslogFacility = libc::c_int;
 pub const SYSLOG_FACILITY_NOT_SET: SyslogFacility = -1;
 pub const SYSLOG_FACILITY_LOCAL7: SyslogFacility = 10;
