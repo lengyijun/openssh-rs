@@ -3,8 +3,8 @@ use crate::auth_options::sshauthopt;
 use crate::kex::dh_st;
 use crate::packet::key_entry;
 use crate::session::Session;
+use libc::addrinfo;
 use libc::pid_t;
-use libc::sockaddr;
 
 use crate::packet::ssh;
 
@@ -236,18 +236,7 @@ pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
 
 pub type sig_atomic_t = __sig_atomic_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct addrinfo {
-    pub ai_flags: libc::c_int,
-    pub ai_family: libc::c_int,
-    pub ai_socktype: libc::c_int,
-    pub ai_protocol: libc::c_int,
-    pub ai_addrlen: socklen_t,
-    pub ai_addr: *mut sockaddr,
-    pub ai_canonname: *mut libc::c_char,
-    pub ai_next: *mut addrinfo,
-}
+
 pub type nfds_t = libc::c_ulong;
 #[derive(Copy, Clone)]
 #[repr(C)]

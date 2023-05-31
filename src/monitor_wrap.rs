@@ -6,7 +6,7 @@ use crate::packet::key_entry;
 use crate::session::Session;
 use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::sshkey_sig_details;
-use libc::sockaddr;
+use libc::addrinfo;
 
 use crate::packet::ssh;
 
@@ -105,18 +105,6 @@ pub type uint8_t = __uint8_t;
 pub type uint64_t = __uint64_t;
 
 pub type sig_atomic_t = __sig_atomic_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct addrinfo {
-    pub ai_flags: libc::c_int,
-    pub ai_family: libc::c_int,
-    pub ai_socktype: libc::c_int,
-    pub ai_protocol: libc::c_int,
-    pub ai_addrlen: socklen_t,
-    pub ai_addr: *mut sockaddr,
-    pub ai_canonname: *mut libc::c_char,
-    pub ai_next: *mut addrinfo,
-}
 
 #[derive(Copy, Clone)]
 #[repr(C)]

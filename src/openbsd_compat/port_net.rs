@@ -1,6 +1,7 @@
 use crate::packet::ssh;
 use ::c2rust_bitfields;
 use ::libc;
+use libc::addrinfo;
 use libc::close;
 use libc::sockaddr;
 extern "C" {
@@ -89,18 +90,7 @@ pub struct ip {
     pub ip_src: in_addr,
     pub ip_dst: in_addr,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct addrinfo {
-    pub ai_flags: libc::c_int,
-    pub ai_family: libc::c_int,
-    pub ai_socktype: libc::c_int,
-    pub ai_protocol: libc::c_int,
-    pub ai_addrlen: socklen_t,
-    pub ai_addr: *mut sockaddr,
-    pub ai_canonname: *mut libc::c_char,
-    pub ai_next: *mut addrinfo,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct Channel {

@@ -1,6 +1,6 @@
 use ::libc;
+use libc::addrinfo;
 use libc::close;
-use libc::sockaddr;
 
 extern "C" {
     pub type _IO_wide_data;
@@ -59,18 +59,6 @@ pub type sa_family_t = libc::c_ushort;
 
 pub type _IO_lock_t = ();
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct addrinfo {
-    pub ai_flags: libc::c_int,
-    pub ai_family: libc::c_int,
-    pub ai_socktype: libc::c_int,
-    pub ai_protocol: libc::c_int,
-    pub ai_addrlen: socklen_t,
-    pub ai_addr: *mut sockaddr,
-    pub ai_canonname: *mut libc::c_char,
-    pub ai_next: *mut addrinfo,
-}
 pub type SyslogFacility = libc::c_int;
 pub const SYSLOG_FACILITY_NOT_SET: SyslogFacility = -1;
 pub const SYSLOG_FACILITY_LOCAL7: SyslogFacility = 10;

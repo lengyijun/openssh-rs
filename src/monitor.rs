@@ -69,6 +69,7 @@ use crate::sshpty::pty_allocate;
 use crate::sshpty::pty_setowner;
 use ::libc;
 use libc::__errno_location;
+use libc::addrinfo;
 use libc::close;
 use libc::exit;
 use libc::kill;
@@ -247,18 +248,7 @@ pub type uint64_t = __uint64_t;
 
 pub type sig_atomic_t = __sig_atomic_t;
 pub type __sighandler_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct addrinfo {
-    pub ai_flags: libc::c_int,
-    pub ai_family: libc::c_int,
-    pub ai_socktype: libc::c_int,
-    pub ai_protocol: libc::c_int,
-    pub ai_addrlen: socklen_t,
-    pub ai_addr: *mut sockaddr,
-    pub ai_canonname: *mut libc::c_char,
-    pub ai_next: *mut addrinfo,
-}
+
 pub type nfds_t = libc::c_ulong;
 #[derive(Copy, Clone)]
 #[repr(C)]

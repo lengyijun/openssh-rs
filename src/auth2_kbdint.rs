@@ -1,5 +1,5 @@
 use crate::packet::key_entry;
-use libc::sockaddr;
+use libc::addrinfo;
 
 use crate::packet::ssh;
 use ::libc;
@@ -34,19 +34,6 @@ pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
 pub type socklen_t = __socklen_t;
 pub type sa_family_t = libc::c_ushort;
-
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct addrinfo {
-    pub ai_flags: libc::c_int,
-    pub ai_family: libc::c_int,
-    pub ai_socktype: libc::c_int,
-    pub ai_protocol: libc::c_int,
-    pub ai_addrlen: socklen_t,
-    pub ai_addr: *mut sockaddr,
-    pub ai_canonname: *mut libc::c_char,
-    pub ai_next: *mut addrinfo,
-}
 
 #[derive(Copy, Clone)]
 #[repr(C)]

@@ -1,5 +1,6 @@
 use crate::kex::dh_st;
 use crate::packet::key_entry;
+use libc::addrinfo;
 use libc::sockaddr;
 
 use crate::packet::ssh;
@@ -455,18 +456,7 @@ pub const _SC_NGROUPS_MAX: C2RustUnnamed_0 = 3;
 pub const _SC_CLK_TCK: C2RustUnnamed_0 = 2;
 pub const _SC_CHILD_MAX: C2RustUnnamed_0 = 1;
 pub const _SC_ARG_MAX: C2RustUnnamed_0 = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct addrinfo {
-    pub ai_flags: libc::c_int,
-    pub ai_family: libc::c_int,
-    pub ai_socktype: libc::c_int,
-    pub ai_protocol: libc::c_int,
-    pub ai_addrlen: socklen_t,
-    pub ai_addr: *mut sockaddr,
-    pub ai_canonname: *mut libc::c_char,
-    pub ai_next: *mut addrinfo,
-}
+
 pub type va_list = __builtin_va_list;
 pub type nfds_t = libc::c_ulong;
 #[derive(Copy, Clone)]

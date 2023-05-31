@@ -1,5 +1,5 @@
 use crate::packet::key_entry;
-use libc::sockaddr;
+use libc::addrinfo;
 
 use crate::packet::ssh;
 use ::libc;
@@ -41,18 +41,7 @@ pub const SHUT_RDWR: C2RustUnnamed = 2;
 pub const SHUT_WR: C2RustUnnamed = 1;
 pub const SHUT_RD: C2RustUnnamed = 0;
 pub type uint32_t = __uint32_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct addrinfo {
-    pub ai_flags: libc::c_int,
-    pub ai_family: libc::c_int,
-    pub ai_socktype: libc::c_int,
-    pub ai_protocol: libc::c_int,
-    pub ai_addrlen: socklen_t,
-    pub ai_addr: *mut sockaddr,
-    pub ai_canonname: *mut libc::c_char,
-    pub ai_next: *mut addrinfo,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct Channel {

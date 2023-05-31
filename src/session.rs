@@ -2,6 +2,7 @@ use crate::auth::Authctxt;
 use crate::auth_options::sshauthopt;
 use crate::kex::dh_st;
 use crate::packet::key_entry;
+use libc::addrinfo;
 use libc::pid_t;
 use libc::sockaddr;
 
@@ -379,18 +380,7 @@ pub type _IO_lock_t = ();
 
 pub type sig_atomic_t = __sig_atomic_t;
 pub type __sighandler_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct addrinfo {
-    pub ai_flags: libc::c_int,
-    pub ai_family: libc::c_int,
-    pub ai_socktype: libc::c_int,
-    pub ai_protocol: libc::c_int,
-    pub ai_addrlen: socklen_t,
-    pub ai_addr: *mut sockaddr,
-    pub ai_canonname: *mut libc::c_char,
-    pub ai_next: *mut addrinfo,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct Channel {
