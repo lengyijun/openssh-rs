@@ -1,7 +1,36 @@
 use crate::authfd::dest_constraint;
 use crate::authfd::dest_constraint_hop;
+use crate::digest_openssl::ssh_digest_alg_by_name;
 use crate::log::log_init;
+use crate::r#match::match_pattern;
+use crate::r#match::match_pattern_list;
+use crate::ssh_pkcs11::pkcs11_add_provider;
+use crate::ssh_pkcs11::pkcs11_del_provider;
+use crate::ssh_pkcs11::pkcs11_init;
+use crate::ssh_pkcs11::pkcs11_terminate;
+use crate::sshbuf::sshbuf_check_reserve;
+use crate::sshbuf::sshbuf_fromb;
+use crate::sshbuf_getput_basic::sshbuf_froms;
+use crate::sshbuf_getput_basic::sshbuf_get_string_direct;
+use crate::sshbuf_getput_basic::sshbuf_get_stringb;
+use crate::sshbuf_getput_basic::sshbuf_put_stringb;
+use crate::sshbuf_getput_basic::sshbuf_putb;
+use crate::sshbuf_misc::sshbuf_cmp;
+use crate::ssherr::ssh_err;
+use crate::sshkey::sshkey_cert_check_host;
+use crate::sshkey::sshkey_enable_maxsign;
+use crate::sshkey::sshkey_equal;
+use crate::sshkey::sshkey_froms;
+use crate::sshkey::sshkey_is_cert;
+use crate::sshkey::sshkey_is_sk;
+use crate::sshkey::sshkey_private_deserialize;
+use crate::sshkey::sshkey_puts_opts;
+use crate::sshkey::sshkey_shield_private;
 use crate::sshkey::sshkey_sig_details;
+use crate::sshkey::sshkey_sign;
+use crate::sshkey::sshkey_ssh_name;
+use crate::sshkey::sshkey_type_from_name;
+use crate::sshkey::sshkey_verify;
 use ::libc;
 use libc::close;
 use libc::kill;
@@ -90,92 +119,6 @@ extern "C" {
     fn mkdtemp(__template: *mut libc::c_char) -> *mut libc::c_char;
     fn realpath(__name: *const libc::c_char, __resolved: *mut libc::c_char) -> *mut libc::c_char;
 
-    fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
-    fn sshbuf_froms(
-        buf: *mut crate::sshbuf::sshbuf,
-        bufp: *mut *mut crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-
-    fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-
-    fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
-        -> libc::c_int;
-
-    fn sshbuf_get_stringb(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *mut crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-
-    fn sshbuf_put_stringb(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-    fn sshbuf_get_string_direct(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *const u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_cmp(
-        b: *const crate::sshbuf::sshbuf,
-        offset: size_t,
-        s: *const libc::c_void,
-        len: size_t,
-    ) -> libc::c_int;
-
-    fn sshkey_equal(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
-
-    fn sshkey_shield_private(_: *mut crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
-    fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_cert_check_host(
-        _: *const crate::sshkey::sshkey,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_int;
-    fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_froms(
-        _: *mut crate::sshbuf::sshbuf,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn sshkey_puts_opts(
-        _: *const crate::sshkey::sshkey,
-        _: *mut crate::sshbuf::sshbuf,
-        _: sshkey_serialize_rep,
-    ) -> libc::c_int;
-    fn sshkey_sign(
-        _: *mut crate::sshkey::sshkey,
-        _: *mut *mut u_char,
-        _: *mut size_t,
-        _: *const u_char,
-        _: size_t,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: u_int,
-    ) -> libc::c_int;
-    fn sshkey_verify(
-        _: *const crate::sshkey::sshkey,
-        _: *const u_char,
-        _: size_t,
-        _: *const u_char,
-        _: size_t,
-        _: *const libc::c_char,
-        _: u_int,
-        _: *mut *mut sshkey_sig_details,
-    ) -> libc::c_int;
-    fn sshkey_private_deserialize(
-        buf: *mut crate::sshbuf::sshbuf,
-        keyp: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn sshkey_enable_maxsign(_: *mut crate::sshkey::sshkey, _: u_int32_t) -> libc::c_int;
-
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -198,22 +141,6 @@ extern "C" {
     fn notify_start(_: libc::c_int, _: *const libc::c_char, _: ...) -> *mut notifier_ctx;
     fn notify_complete(_: *mut notifier_ctx, _: *const libc::c_char, _: ...);
 
-    fn ssh_digest_alg_by_name(name: *const libc::c_char) -> libc::c_int;
-    fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn match_pattern_list(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn pkcs11_init(_: libc::c_int) -> libc::c_int;
-    fn pkcs11_terminate();
-    fn pkcs11_add_provider(
-        _: *mut libc::c_char,
-        _: *mut libc::c_char,
-        _: *mut *mut *mut crate::sshkey::sshkey,
-        _: *mut *mut *mut libc::c_char,
-    ) -> libc::c_int;
-    fn pkcs11_del_provider(_: *mut libc::c_char) -> libc::c_int;
     static mut __progname: *mut libc::c_char;
 }
 pub type __u_char = libc::c_uchar;
