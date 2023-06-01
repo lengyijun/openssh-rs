@@ -1,4 +1,6 @@
 use crate::auth_options::sshauthopt;
+use crate::hostfile::hostkey_entry;
+use crate::hostfile::hostkeys;
 use crate::packet::key_entry;
 use crate::servconf::connection_info;
 use crate::servconf::include_item;
@@ -322,22 +324,6 @@ pub const MRK_CA: HostkeyMarker = 3;
 pub const MRK_REVOKE: HostkeyMarker = 2;
 pub const MRK_NONE: HostkeyMarker = 1;
 pub const MRK_ERROR: HostkeyMarker = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct hostkey_entry {
-    pub host: *mut libc::c_char,
-    pub file: *mut libc::c_char,
-    pub line: u_long,
-    pub key: *mut crate::sshkey::sshkey,
-    pub marker: HostkeyMarker,
-    pub note: u_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct hostkeys {
-    pub entries: *mut hostkey_entry,
-    pub num_entries: u_int,
-}
 
 #[derive(Copy, Clone)]
 #[repr(C)]
