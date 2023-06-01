@@ -1,4 +1,8 @@
 use crate::authfd::dest_constraint;
+use crate::authfd::ssh_add_identity_constrained;
+use crate::authfd::ssh_get_authentication_socket;
+use crate::authfile::sshkey_check_revoked;
+use crate::dns::verify_host_key_dns;
 use crate::hostfile::add_host_to_hostfile;
 use crate::hostfile::check_key_in_hostkeys;
 use crate::hostfile::free_hostkeys;
@@ -11,14 +15,34 @@ use crate::hostfile::load_hostkeys;
 use crate::hostfile::load_hostkeys_file;
 use crate::hostfile::lookup_key_in_hostkeys_by_type;
 use crate::kex::dh_st;
+use crate::kex::kex_exchange_identification;
+use crate::misc::argv_assemble;
+use crate::misc::argv_split;
+use crate::misc::exited_cleanly;
+use crate::misc::lowercase;
+use crate::misc::percent_dollar_expand;
+use crate::misc::percent_expand;
+use crate::misc::put_host_port;
+use crate::misc::set_sock_tos;
+use crate::misc::ssh_gai_strerror;
+use crate::misc::stdfd_devnull;
+use crate::misc::subprocess;
+use crate::misc::timeout_connect;
+use crate::misc::xextendf;
+use crate::monitor_fdpass::mm_receive_fd;
 use crate::packet::key_entry;
 use crate::packet::ssh;
 use crate::packet::ssh_packet_set_connection;
 use crate::packet::ssh_packet_set_nonblocking;
 use crate::packet::sshpkt_fatal;
 use crate::readconf::Options;
+use crate::readpass::ask_permission;
+use crate::readpass::read_passphrase;
+use crate::sshconnect::libc::freeifaddrs;
+use crate::sshconnect::libc::getifaddrs;
 use crate::sshconnect2::ssh_kex2;
 use crate::sshconnect2::ssh_userauth2;
+use crate::ssherr::ssh_err;
 use crate::sshkey::sshkey_cert_check_host;
 use crate::sshkey::sshkey_drop_cert;
 use crate::sshkey::sshkey_equal;
@@ -30,6 +54,7 @@ use crate::sshkey::sshkey_to_base64;
 use ::libc;
 use libc::addrinfo;
 use libc::close;
+use libc::ifaddrs;
 use libc::kill;
 use libc::pid_t;
 use libc::sockaddr;
@@ -102,10 +127,6 @@ extern "C" {
     fn strspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
-    fn getifaddrs(__ifap: *mut *mut ifaddrs) -> libc::c_int;
-    fn freeifaddrs(__ifa: *mut ifaddrs);
-
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -116,80 +137,7 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn set_sock_tos(_: libc::c_int, _: libc::c_int);
-    fn timeout_connect(
-        _: libc::c_int,
-        _: *const sockaddr,
-        _: socklen_t,
-        _: *mut libc::c_int,
-    ) -> libc::c_int;
-    fn put_host_port(_: *const libc::c_char, _: u_short) -> *mut libc::c_char;
-    fn percent_expand(_: *const libc::c_char, _: ...) -> *mut libc::c_char;
-    fn percent_dollar_expand(_: *const libc::c_char, _: ...) -> *mut libc::c_char;
-    fn xextendf(
-        s: *mut *mut libc::c_char,
-        sep: *const libc::c_char,
-        fmt: *const libc::c_char,
-        _: ...
-    );
-    fn lowercase(s: *mut libc::c_char);
-    fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
-    fn ssh_gai_strerror(_: libc::c_int) -> *const libc::c_char;
-    fn subprocess(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: *mut *mut libc::c_char,
-        _: *mut *mut libc::FILE,
-        _: u_int,
-        _: *mut libc::passwd,
-        _: Option<privdrop_fn>,
-        _: Option<privrestore_fn>,
-    ) -> pid_t;
-    fn argv_split(
-        _: *const libc::c_char,
-        _: *mut libc::c_int,
-        _: *mut *mut *mut libc::c_char,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn argv_assemble(_: libc::c_int, argv: *mut *mut libc::c_char) -> *mut libc::c_char;
-    fn exited_cleanly(
-        _: pid_t,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
-    fn ask_permission(_: *const libc::c_char, _: ...) -> libc::c_int;
 
-    fn verify_host_key_dns(
-        _: *const libc::c_char,
-        _: *mut sockaddr,
-        _: *mut crate::sshkey::sshkey,
-        _: *mut libc::c_int,
-    ) -> libc::c_int;
-    fn mm_receive_fd(_: libc::c_int) -> libc::c_int;
-    fn sshkey_check_revoked(
-        key: *mut crate::sshkey::sshkey,
-        revoked_keys_file: *const libc::c_char,
-    ) -> libc::c_int;
-    fn ssh_get_authentication_socket(fdp: *mut libc::c_int) -> libc::c_int;
-    fn ssh_add_identity_constrained(
-        sock: libc::c_int,
-        key: *mut crate::sshkey::sshkey,
-        comment: *const libc::c_char,
-        life: u_int,
-        confirm_0: u_int,
-        maxsign: u_int,
-        provider: *const libc::c_char,
-        dest_constraints: *mut *mut dest_constraint,
-        ndest_constraints: size_t,
-    ) -> libc::c_int;
-    fn kex_exchange_identification(
-        _: *mut ssh,
-        _: libc::c_int,
-        _: *const libc::c_char,
-    ) -> libc::c_int;
     static mut debug_flag: libc::c_int;
     static mut options: Options;
 }
@@ -335,17 +283,7 @@ pub const IFF_LOOPBACK: C2RustUnnamed_3 = 8;
 pub const IFF_DEBUG: C2RustUnnamed_3 = 4;
 pub const IFF_BROADCAST: C2RustUnnamed_3 = 2;
 pub const IFF_UP: C2RustUnnamed_3 = 1;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ifaddrs {
-    pub ifa_next: *mut ifaddrs,
-    pub ifa_name: *mut libc::c_char,
-    pub ifa_flags: libc::c_uint,
-    pub ifa_addr: *mut sockaddr,
-    pub ifa_netmask: *mut sockaddr,
-    pub ifa_ifu: C2RustUnnamed_4,
-    pub ifa_data: *mut libc::c_void,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union C2RustUnnamed_4 {
