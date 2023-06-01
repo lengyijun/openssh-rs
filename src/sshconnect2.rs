@@ -1,32 +1,81 @@
+use crate::authfd::ssh_agent_bind_hostkey;
+use crate::authfd::ssh_agent_sign;
+use crate::authfd::ssh_close_authentication_socket;
+use crate::authfd::ssh_fetch_identitylist;
+use crate::authfd::ssh_free_identitylist;
+use crate::authfd::ssh_get_authentication_socket;
 use crate::authfd::ssh_identitylist;
+use crate::authfile::sshkey_load_private_type;
+use crate::canohost::get_local_name;
+use crate::cipher::compression_alg_list;
+use crate::compat::compat_kex_proposal;
 use crate::dispatch::ssh_dispatch_range;
+use crate::hostfile::free_hostkeys;
 use crate::hostfile::hostkey_entry;
 use crate::hostfile::hostkeys;
+use crate::hostfile::init_hostkeys;
+use crate::hostfile::load_hostkeys;
+use crate::hostfile::lookup_key_in_hostkeys_by_type;
+use crate::hostfile::lookup_marker_in_hostkeys;
 use crate::kex::dh_st;
+use crate::kex::kex_assemble_names;
+use crate::kex::kex_input_ext_info;
+use crate::kex::kex_names_cat;
+use crate::kex::kex_prop2buf;
+use crate::kex::kex_proposal_free_entries;
+use crate::kex::kex_proposal_populate_entries;
+use crate::kex::kex_setup;
+use crate::kexgen::kex_gen_client;
+use crate::kexgexc::kexgex_client;
+use crate::msg::ssh_msg_recv;
+use crate::msg::ssh_msg_send;
+use crate::packet::key_entry;
+use crate::packet::ssh;
 use crate::packet::ssh_packet_connection_is_on_socket;
 use crate::packet::ssh_packet_get_connection_in;
 use crate::packet::ssh_packet_remaining;
+use crate::packet::ssh_packet_set_rekey_limits;
 use crate::packet::ssh_remote_ipaddr;
 use crate::packet::ssh_remote_port;
+use crate::packet::sshpkt_add_padding;
 use crate::packet::sshpkt_put_string;
 use crate::packet::sshpkt_putb;
+use crate::r#match::match_list;
+use crate::r#match::match_pattern_list;
+use crate::readconf::kex_default_pk_alg;
 use crate::readconf::Options;
+use crate::readpass::read_passphrase;
 use crate::sshbuf_getput_basic::sshbuf_put_stringb;
 use crate::sshbuf_getput_basic::sshbuf_putb;
-use crate::sshkey::sshkey_equal;
-
-use crate::packet::key_entry;
-
+use crate::sshconnect::get_hostfile_hostname_ipaddr;
+use crate::sshconnect::load_hostkeys_command;
+use crate::sshconnect::maybe_add_key_to_agent;
 use crate::sshconnect::ssh_conn_info;
+use crate::sshconnect::verify_host_key;
 use crate::sshconnect::Sensitive;
-use libc::pid_t;
-use libc::sockaddr;
-
-use crate::packet::ssh;
-
+use crate::ssherr::ssh_err;
+use crate::sshkey::sshkey_alg_list;
+use crate::sshkey::sshkey_check_rsa_length;
+use crate::sshkey::sshkey_check_sigtype;
+use crate::sshkey::sshkey_ecdsa_nid_from_name;
+use crate::sshkey::sshkey_equal;
+use crate::sshkey::sshkey_from_blob;
+use crate::sshkey::sshkey_is_cert;
+use crate::sshkey::sshkey_is_sk;
+use crate::sshkey::sshkey_match_keyname_to_sigalgs;
+use crate::sshkey::sshkey_puts;
+use crate::sshkey::sshkey_sigalg_by_name;
+use crate::sshkey::sshkey_sign;
+use crate::sshkey::sshkey_ssh_name;
+use crate::sshkey::sshkey_to_blob;
+use crate::sshkey::sshkey_type_from_name;
+use crate::sshkey::sshkey_type_is_cert;
+use crate::sshkey::sshkey_type_plain;
 use crate::utf8::fmprintf;
 use ::libc;
 use libc::close;
+use libc::pid_t;
+use libc::sockaddr;
 
 extern "C" {
     pub type _IO_wide_data;
@@ -57,134 +106,6 @@ extern "C" {
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
 
-    fn sshpkt_add_padding(_: *mut ssh, _: u_char) -> libc::c_int;
-
-    fn ssh_packet_set_rekey_limits(_: *mut ssh, _: u_int64_t, _: u_int32_t);
-
-    fn compat_kex_proposal(_: *mut ssh, _: *const libc::c_char) -> *mut libc::c_char;
-    fn compression_alg_list(_: libc::c_int) -> *const libc::c_char;
-
-    fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
-    fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_type_is_cert(_: libc::c_int) -> libc::c_int;
-    fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
-    fn sshkey_match_keyname_to_sigalgs(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-    ) -> libc::c_int;
-    fn sshkey_ecdsa_nid_from_name(_: *const libc::c_char) -> libc::c_int;
-    fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn sshkey_alg_list(
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_char,
-    ) -> *mut libc::c_char;
-    fn sshkey_from_blob(
-        _: *const u_char,
-        _: size_t,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn sshkey_to_blob(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut u_char,
-        _: *mut size_t,
-    ) -> libc::c_int;
-    fn sshkey_puts(_: *const crate::sshkey::sshkey, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
-    fn sshkey_sign(
-        _: *mut crate::sshkey::sshkey,
-        _: *mut *mut u_char,
-        _: *mut size_t,
-        _: *const u_char,
-        _: size_t,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: u_int,
-    ) -> libc::c_int;
-    fn sshkey_check_sigtype(_: *const u_char, _: size_t, _: *const libc::c_char) -> libc::c_int;
-    fn sshkey_sigalg_by_name(_: *const libc::c_char) -> *const libc::c_char;
-    fn sshkey_check_rsa_length(_: *const crate::sshkey::sshkey, _: libc::c_int) -> libc::c_int;
-    fn kex_names_cat(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
-    fn kex_assemble_names(
-        _: *mut *mut libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-    ) -> libc::c_int;
-    fn kex_proposal_populate_entries(
-        _: *mut ssh,
-        prop: *mut *mut libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-    );
-    fn kex_proposal_free_entries(prop: *mut *mut libc::c_char);
-    fn kex_setup(_: *mut ssh, _: *mut *mut libc::c_char) -> libc::c_int;
-    fn kex_prop2buf(_: *mut crate::sshbuf::sshbuf, proposal: *mut *mut libc::c_char)
-        -> libc::c_int;
-    fn kex_input_ext_info(_: libc::c_int, _: u_int32_t, _: *mut ssh) -> libc::c_int;
-    fn kexgex_client(_: *mut ssh) -> libc::c_int;
-    fn kex_gen_client(_: *mut ssh) -> libc::c_int;
-    fn verify_host_key(
-        _: *mut libc::c_char,
-        _: *mut sockaddr,
-        _: *mut crate::sshkey::sshkey,
-        _: *const ssh_conn_info,
-    ) -> libc::c_int;
-    fn get_hostfile_hostname_ipaddr(
-        _: *mut libc::c_char,
-        _: *mut sockaddr,
-        _: u_short,
-        _: *mut *mut libc::c_char,
-        _: *mut *mut libc::c_char,
-    );
-    fn maybe_add_key_to_agent(
-        _: *const libc::c_char,
-        _: *mut crate::sshkey::sshkey,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-    );
-    fn load_hostkeys_command(
-        _: *mut hostkeys,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const ssh_conn_info,
-        _: *const crate::sshkey::sshkey,
-        _: *const libc::c_char,
-    );
-    fn sshkey_load_private_type(
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *mut *mut crate::sshkey::sshkey,
-        _: *mut *mut libc::c_char,
-    ) -> libc::c_int;
-    fn ssh_get_authentication_socket(fdp: *mut libc::c_int) -> libc::c_int;
-    fn ssh_close_authentication_socket(sock: libc::c_int);
-    fn ssh_fetch_identitylist(sock: libc::c_int, idlp: *mut *mut ssh_identitylist) -> libc::c_int;
-    fn ssh_free_identitylist(idl: *mut ssh_identitylist);
-    fn ssh_agent_sign(
-        sock: libc::c_int,
-        key: *const crate::sshkey::sshkey,
-        sigp: *mut *mut u_char,
-        lenp: *mut size_t,
-        data: *const u_char,
-        datalen: size_t,
-        alg: *const libc::c_char,
-        compat: u_int,
-    ) -> libc::c_int;
-    fn ssh_agent_bind_hostkey(
-        sock: libc::c_int,
-        key: *const crate::sshkey::sshkey,
-        session_id: *const crate::sshbuf::sshbuf,
-        signature: *const crate::sshbuf::sshbuf,
-        forwarding: libc::c_int,
-    ) -> libc::c_int;
-
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -195,34 +116,8 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn notify_start(_: libc::c_int, _: *const libc::c_char, _: ...) -> *mut notifier_ctx;
     fn notify_complete(_: *mut notifier_ctx, _: *const libc::c_char, _: ...);
-
-    fn kex_default_pk_alg() -> *const libc::c_char;
-    fn match_pattern_list(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn match_list(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *mut u_int,
-    ) -> *mut libc::c_char;
-    fn get_local_name(_: libc::c_int) -> *mut libc::c_char;
-    fn ssh_msg_send(_: libc::c_int, _: u_char, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
-    fn ssh_msg_recv(_: libc::c_int, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
-    fn init_hostkeys() -> *mut hostkeys;
-    fn load_hostkeys(_: *mut hostkeys, _: *const libc::c_char, _: *const libc::c_char, _: u_int);
-    fn free_hostkeys(_: *mut hostkeys);
-    fn lookup_key_in_hostkeys_by_type(
-        _: *mut hostkeys,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: *mut *const hostkey_entry,
-    ) -> libc::c_int;
-    fn lookup_marker_in_hostkeys(_: *mut hostkeys, _: libc::c_int) -> libc::c_int;
 
     fn asmprintf(
         _: *mut *mut libc::c_char,
