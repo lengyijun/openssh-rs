@@ -1,6 +1,17 @@
 use crate::authfd::ssh_identitylist;
+use crate::dispatch::ssh_dispatch_range;
 use crate::kex::dh_st;
+use crate::packet::ssh_packet_connection_is_on_socket;
+use crate::packet::ssh_packet_get_connection_in;
+use crate::packet::ssh_packet_remaining;
+use crate::packet::ssh_remote_ipaddr;
+use crate::packet::ssh_remote_port;
+use crate::packet::sshpkt_put_string;
+use crate::packet::sshpkt_putb;
 use crate::readconf::Options;
+use crate::sshbuf_getput_basic::sshbuf_put_stringb;
+use crate::sshbuf_getput_basic::sshbuf_putb;
+use crate::sshkey::sshkey_equal;
 
 use crate::packet::key_entry;
 
@@ -44,37 +55,12 @@ extern "C" {
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
 
-    fn sshbuf_put_stringb(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-
-    fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
-        -> libc::c_int;
-
-    fn ssh_packet_get_connection_in(_: *mut ssh) -> libc::c_int;
-    fn ssh_packet_connection_is_on_socket(_: *mut ssh) -> libc::c_int;
-    fn ssh_packet_remaining(_: *mut ssh) -> libc::c_int;
-    fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
-    fn ssh_remote_port(_: *mut ssh) -> libc::c_int;
-
-    fn sshpkt_put_string(ssh: *mut ssh, v: *const libc::c_void, len: size_t) -> libc::c_int;
-
-    fn sshpkt_putb(ssh: *mut ssh, b: *const crate::sshbuf::sshbuf) -> libc::c_int;
-
     fn sshpkt_add_padding(_: *mut ssh, _: u_char) -> libc::c_int;
 
     fn ssh_packet_set_rekey_limits(_: *mut ssh, _: u_int64_t, _: u_int32_t);
 
-    fn ssh_dispatch_range(_: *mut ssh, _: u_int, _: u_int, _: Option<dispatch_fn>);
-
     fn compat_kex_proposal(_: *mut ssh, _: *const libc::c_char) -> *mut libc::c_char;
     fn compression_alg_list(_: libc::c_int) -> *const libc::c_char;
-
-    fn sshkey_equal(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
 
     fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
     fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
