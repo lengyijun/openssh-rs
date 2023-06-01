@@ -2,9 +2,24 @@ use crate::authfd::dest_constraint;
 use crate::authfd::dest_constraint_hop;
 use crate::digest_openssl::ssh_digest_alg_by_name;
 use crate::log::log_init;
+use crate::misc::convtime;
+use crate::misc::mktemp_proto;
+use crate::misc::monotime;
+use crate::misc::stdfd_devnull;
+use crate::misc::unix_listener;
+use crate::openbsd_compat::bcrypt_pbkdf::bcrypt_pbkdf;
+use crate::openbsd_compat::timingsafe_bcmp::timingsafe_bcmp;
 use crate::r#match::match_pattern;
 use crate::r#match::match_pattern_list;
+use crate::readpass::ask_permission;
 use crate::readpass::notifier_ctx;
+use crate::readpass::notify_complete;
+use crate::readpass::notify_start;
+use crate::readpass::read_passphrase;
+use crate::ssh_agent::libc::getenv;
+use crate::ssh_agent::libc::mkdtemp;
+use crate::ssh_agent::libc::realpath;
+use crate::ssh_agent::libc::setenv;
 use crate::ssh_pkcs11::pkcs11_add_provider;
 use crate::ssh_pkcs11::pkcs11_del_provider;
 use crate::ssh_pkcs11::pkcs11_init;
@@ -88,16 +103,6 @@ extern "C" {
     fn getpeereid(_: libc::c_int, _: *mut uid_t, _: *mut gid_t) -> libc::c_int;
     fn arc4random_buf(_: *mut libc::c_void, _: size_t);
 
-    fn timingsafe_bcmp(_: *const libc::c_void, _: *const libc::c_void, _: size_t) -> libc::c_int;
-    fn bcrypt_pbkdf(
-        _: *const libc::c_char,
-        _: size_t,
-        _: *const uint8_t,
-        _: size_t,
-        _: *mut uint8_t,
-        _: size_t,
-        _: libc::c_uint,
-    ) -> libc::c_int;
     fn freezero(_: *mut libc::c_void, _: size_t);
     fn seed_rng();
     fn getrlimit(__resource: __rlimit_resource_t, __rlimits: *mut rlimit) -> libc::c_int;
@@ -109,15 +114,6 @@ extern "C" {
 
     fn explicit_bzero(__s: *mut libc::c_void, __n: size_t);
 
-    fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
-    fn setenv(
-        __name: *const libc::c_char,
-        __value: *const libc::c_char,
-        __replace: libc::c_int,
-    ) -> libc::c_int;
-    fn mkdtemp(__template: *mut libc::c_char) -> *mut libc::c_char;
-    fn realpath(__name: *const libc::c_char, __resolved: *mut libc::c_char) -> *mut libc::c_char;
-
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -128,17 +124,6 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-
-    fn convtime(_: *const libc::c_char) -> libc::c_int;
-
-    fn monotime() -> time_t;
-    fn unix_listener(_: *const libc::c_char, _: libc::c_int, _: libc::c_int) -> libc::c_int;
-    fn stdfd_devnull(_: libc::c_int, _: libc::c_int, _: libc::c_int) -> libc::c_int;
-    fn mktemp_proto(_: *mut libc::c_char, _: size_t);
-    fn read_passphrase(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
-    fn ask_permission(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn notify_start(_: libc::c_int, _: *const libc::c_char, _: ...) -> *mut notifier_ctx;
-    fn notify_complete(_: *mut notifier_ctx, _: *const libc::c_char, _: ...);
 
     static mut __progname: *mut libc::c_char;
 }

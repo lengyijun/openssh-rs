@@ -1,10 +1,33 @@
+use crate::compat::compat_banner;
 use crate::kex::dh_st;
 use crate::kex::kex;
+use crate::kex::kex_buf2prop;
+use crate::kex::kex_prop2buf;
+use crate::kex::kex_prop_free;
+use crate::kex::kex_ready;
+use crate::kex::kex_send_kexinit;
+use crate::kexgen::kex_gen_client;
+use crate::kexgen::kex_gen_server;
+use crate::kexgexc::kexgex_client;
+use crate::kexgexs::kexgex_server;
 use crate::packet::key_entry;
-
 use crate::packet::ssh;
-
+use crate::packet::ssh_packet_close;
+use crate::packet::ssh_packet_get_input;
+use crate::packet::ssh_packet_get_output;
+use crate::packet::ssh_packet_read_poll2;
+use crate::packet::ssh_packet_set_connection;
+use crate::packet::ssh_packet_set_server;
+use crate::packet::sshpkt_ptr;
+use crate::packet::sshpkt_put;
+use crate::sshbuf::sshbuf_check_reserve;
+use crate::sshbuf_getput_basic::sshbuf_putb;
+use crate::sshkey::sshkey_is_cert;
+use crate::sshkey::sshkey_sign;
+use crate::sshkey::sshkey_type_from_name;
+use crate::sshkey::sshkey_type_plain;
 use ::libc;
+
 extern "C" {
 
     pub type ec_group_st;
@@ -15,55 +38,11 @@ extern "C" {
 
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
-    fn sshpkt_ptr(_: *mut ssh, lenp: *mut size_t) -> *const u_char;
-    fn sshpkt_put(ssh: *mut ssh, v: *const libc::c_void, len: size_t) -> libc::c_int;
-
-    fn ssh_packet_get_output(_: *mut ssh) -> *mut libc::c_void;
-    fn ssh_packet_get_input(_: *mut ssh) -> *mut libc::c_void;
-    fn ssh_packet_read_poll2(_: *mut ssh, _: *mut u_char, seqnr_p: *mut u_int32_t) -> libc::c_int;
-    fn ssh_packet_set_server(_: *mut ssh);
-    fn ssh_packet_close(_: *mut ssh);
-    fn ssh_packet_set_connection(_: *mut ssh, _: libc::c_int, _: libc::c_int) -> *mut ssh;
-    fn kex_gen_server(_: *mut ssh) -> libc::c_int;
-    fn kex_gen_client(_: *mut ssh) -> libc::c_int;
-    fn kexgex_server(_: *mut ssh) -> libc::c_int;
-    fn kexgex_client(_: *mut ssh) -> libc::c_int;
-    fn kex_send_kexinit(_: *mut ssh) -> libc::c_int;
-    fn kex_prop_free(_: *mut *mut libc::c_char);
-    fn kex_prop2buf(_: *mut crate::sshbuf::sshbuf, proposal: *mut *mut libc::c_char)
-        -> libc::c_int;
-    fn kex_buf2prop(
-        _: *mut crate::sshbuf::sshbuf,
-        _: *mut libc::c_int,
-        _: *mut *mut *mut libc::c_char,
-    ) -> libc::c_int;
-    fn kex_ready(_: *mut ssh, _: *mut *mut libc::c_char) -> libc::c_int;
-    fn sshkey_sign(
-        _: *mut crate::sshkey::sshkey,
-        _: *mut *mut u_char,
-        _: *mut size_t,
-        _: *const u_char,
-        _: size_t,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: u_int,
-    ) -> libc::c_int;
-    fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
-    fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
-
     fn strsep(__stringp: *mut *mut libc::c_char, __delim: *const libc::c_char)
         -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
-    fn compat_banner(_: *mut ssh, _: *const libc::c_char);
-
-    fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-
-    fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
-        -> libc::c_int;
 
 }
 pub type __u_char = libc::c_uchar;
