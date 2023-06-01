@@ -1,5 +1,6 @@
 use crate::sftp_client::sftp_conn;
-use crate::sftp_common::Attrib;
+use crate::sftp_client::SFTP_DIRENT;
+
 use ::libc;
 
 extern "C" {
@@ -60,13 +61,6 @@ pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct SFTP_DIRENT {
-    pub filename: *mut libc::c_char,
-    pub longname: *mut libc::c_char,
-    pub a: Attrib,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct idname_tree {

@@ -12,6 +12,7 @@ use crate::sftp_client::path_append;
 use crate::sftp_client::remote_is_dir;
 use crate::sftp_client::sftp_conn;
 use crate::sftp_client::upload_dir;
+use crate::sftp_client::SFTP_DIRENT;
 use crate::sftp_common::Attrib;
 use crate::utf8::msetlocale;
 use ::libc;
@@ -402,13 +403,6 @@ pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct SFTP_DIRENT {
-    pub filename: *mut libc::c_char,
-    pub longname: *mut libc::c_char,
-    pub a: Attrib,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sftp_statvfs {

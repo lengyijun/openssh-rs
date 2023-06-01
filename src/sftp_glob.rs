@@ -1,5 +1,6 @@
 use crate::sftp_client::do_stat;
 use crate::sftp_client::sftp_conn;
+use crate::sftp_client::SFTP_DIRENT;
 use crate::sftp_common::Attrib;
 use ::libc;
 
@@ -44,13 +45,6 @@ pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct SFTP_DIRENT {
-    pub filename: *mut libc::c_char,
-    pub longname: *mut libc::c_char,
-    pub a: Attrib,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed {
