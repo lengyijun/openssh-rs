@@ -1,3 +1,24 @@
+use crate::hostfile::add_host_to_hostfile;
+use crate::hostfile::check_key_in_hostkeys;
+use crate::hostfile::free_hostkeys;
+use crate::hostfile::hostkeys_foreach;
+use crate::hostfile::init_hostkeys;
+use crate::hostfile::load_hostkeys;
+use crate::hostfile::load_hostkeys_file;
+use crate::hostfile::lookup_key_in_hostkeys_by_type;
+use crate::packet::ssh_packet_set_connection;
+use crate::packet::ssh_packet_set_nonblocking;
+use crate::packet::sshpkt_fatal;
+use crate::sshconnect2::ssh_kex2;
+use crate::sshconnect2::ssh_userauth2;
+use crate::sshkey::sshkey_cert_check_host;
+use crate::sshkey::sshkey_drop_cert;
+use crate::sshkey::sshkey_equal;
+use crate::sshkey::sshkey_format_cert_validity;
+use crate::sshkey::sshkey_is_cert;
+use crate::sshkey::sshkey_is_sk;
+use crate::sshkey::sshkey_ssh_name;
+use crate::sshkey::sshkey_to_base64;
 use crate::hostfile::hostkey_entry;
 use crate::hostfile::hostkey_foreach_line;
 use crate::hostfile::hostkeys;
@@ -85,83 +106,6 @@ extern "C" {
 
     fn getifaddrs(__ifap: *mut *mut ifaddrs) -> libc::c_int;
     fn freeifaddrs(__ifa: *mut ifaddrs);
-
-    fn init_hostkeys() -> *mut hostkeys;
-    fn load_hostkeys(_: *mut hostkeys, _: *const libc::c_char, _: *const libc::c_char, _: u_int);
-    fn load_hostkeys_file(
-        _: *mut hostkeys,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *mut libc::FILE,
-        note: u_int,
-    );
-    fn free_hostkeys(_: *mut hostkeys);
-    fn check_key_in_hostkeys(
-        _: *mut hostkeys,
-        _: *mut crate::sshkey::sshkey,
-        _: *mut *const hostkey_entry,
-    ) -> HostStatus;
-    fn lookup_key_in_hostkeys_by_type(
-        _: *mut hostkeys,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: *mut *const hostkey_entry,
-    ) -> libc::c_int;
-    fn add_host_to_hostfile(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn hostkeys_foreach(
-        path: *const libc::c_char,
-        callback: Option<hostkeys_foreach_fn>,
-        ctx: *mut libc::c_void,
-        host: *const libc::c_char,
-        ip: *const libc::c_char,
-        options_0: u_int,
-        note: u_int,
-    ) -> libc::c_int;
-    fn ssh_packet_set_connection(_: *mut ssh, _: libc::c_int, _: libc::c_int) -> *mut ssh;
-    fn ssh_packet_set_nonblocking(_: *mut ssh);
-    fn sshpkt_fatal(ssh: *mut ssh, r: libc::c_int, fmt: *const libc::c_char, _: ...) -> !;
-    fn sshkey_to_base64(_: *const crate::sshkey::sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
-    fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-
-    fn sshkey_equal(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
-
-    fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_is_sk(_: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_drop_cert(_: *mut crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_cert_check_host(
-        _: *const crate::sshkey::sshkey,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_int;
-    fn sshkey_format_cert_validity(
-        _: *const crate::sshkey::sshkey_cert,
-        _: *mut libc::c_char,
-        _: size_t,
-    ) -> size_t;
-    fn ssh_kex2(
-        ssh: *mut ssh,
-        _: *mut libc::c_char,
-        _: *mut sockaddr,
-        _: u_short,
-        _: *const ssh_conn_info,
-    );
-    fn ssh_userauth2(
-        ssh: *mut ssh,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *mut libc::c_char,
-        _: *mut Sensitive,
-    );
 
     fn ssh_err(n: libc::c_int) -> *const libc::c_char;
     fn sshfatal(
