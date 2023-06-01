@@ -1,6 +1,7 @@
 use crate::atomicio::atomicio;
 use crate::authfd::ssh_identitylist;
 use crate::hostfile::hostkey_foreach_line;
+use crate::readpass::notifier_ctx;
 use crate::ssh_sk::sshsk_resident_key;
 use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::sshkey_sig_details;
@@ -19,7 +20,6 @@ extern "C" {
     pub type evp_cipher_st;
     pub type evp_pkey_st;
 
-    pub type notifier_ctx;
     pub type ssh_krl;
 
     fn strcasecmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;

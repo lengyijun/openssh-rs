@@ -44,6 +44,7 @@ use crate::r#match::match_list;
 use crate::r#match::match_pattern_list;
 use crate::readconf::kex_default_pk_alg;
 use crate::readconf::Options;
+use crate::readpass::notifier_ctx;
 use crate::readpass::read_passphrase;
 use crate::sshbuf_getput_basic::sshbuf_put_stringb;
 use crate::sshbuf_getput_basic::sshbuf_putb;
@@ -83,8 +84,6 @@ extern "C" {
     pub type _IO_marker;
 
     pub type ec_group_st;
-
-    pub type notifier_ctx;
 
     fn closefrom(__lowfd: libc::c_int);
     fn pipe(__pipedes: *mut libc::c_int) -> libc::c_int;

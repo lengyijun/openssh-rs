@@ -4,6 +4,7 @@ use crate::digest_openssl::ssh_digest_alg_by_name;
 use crate::log::log_init;
 use crate::r#match::match_pattern;
 use crate::r#match::match_pattern_list;
+use crate::readpass::notifier_ctx;
 use crate::ssh_pkcs11::pkcs11_add_provider;
 use crate::ssh_pkcs11::pkcs11_del_provider;
 use crate::ssh_pkcs11::pkcs11_init;
@@ -50,8 +51,6 @@ extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
     pub type _IO_marker;
-
-    pub type notifier_ctx;
 
     fn read(__fd: libc::c_int, __buf: *mut libc::c_void, __nbytes: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __n: size_t) -> ssize_t;
