@@ -1,6 +1,11 @@
+use crate::openbsd_compat::glob::_ssh__compat_glob;
+use crate::sftp_client::do_lstat;
+use crate::sftp_client::do_readdir;
 use crate::sftp_client::do_stat;
+use crate::sftp_client::free_sftp_dirents;
 use crate::sftp_client::sftp_conn;
 use crate::sftp_client::SFTP_DIRENT;
+use crate::sftp_common::attrib_to_stat;
 use crate::sftp_common::Attrib;
 use ::libc;
 
@@ -12,21 +17,6 @@ extern "C" {
     fn memset(__s: *mut libc::c_void, __c: libc::c_int, __n: size_t) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
-    fn attrib_to_stat(_: *const Attrib, _: *mut libc::stat);
-    fn do_readdir(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: *mut *mut *mut SFTP_DIRENT,
-    ) -> libc::c_int;
-    fn free_sftp_dirents(_: *mut *mut SFTP_DIRENT);
-
-    fn do_lstat(_: *mut sftp_conn, _: *const libc::c_char, _: libc::c_int) -> *mut Attrib;
-    fn _ssh__compat_glob(
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-        _: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t,
-    ) -> libc::c_int;
 }
 pub type __uint32_t = libc::c_uint;
 pub type __uint64_t = libc::c_ulong;
