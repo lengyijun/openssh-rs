@@ -1,5 +1,6 @@
 use crate::atomicio::atomicio;
 use crate::authfd::ssh_identitylist;
+use crate::hostfile::hostkey_foreach_line;
 use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::sshkey_sig_details;
 
@@ -625,22 +626,7 @@ pub const MRK_CA: C2RustUnnamed = 3;
 pub const MRK_REVOKE: C2RustUnnamed = 2;
 pub const MRK_NONE: C2RustUnnamed = 1;
 pub const MRK_ERROR: C2RustUnnamed = 0;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct hostkey_foreach_line {
-    pub path: *const libc::c_char,
-    pub linenum: u_long,
-    pub status: u_int,
-    pub match_0: u_int,
-    pub line: *mut libc::c_char,
-    pub marker: libc::c_int,
-    pub hosts: *const libc::c_char,
-    pub rawkey: *const libc::c_char,
-    pub keytype: libc::c_int,
-    pub key: *mut crate::sshkey::sshkey,
-    pub comment: *const libc::c_char,
-    pub note: u_int,
-}
+
 pub type hostkeys_foreach_fn =
     unsafe extern "C" fn(*mut hostkey_foreach_line, *mut libc::c_void) -> libc::c_int;
 

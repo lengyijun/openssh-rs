@@ -1,4 +1,5 @@
 use crate::channels::Channel;
+use crate::hostfile::hostkey_foreach_line;
 use crate::kex::dh_st;
 use crate::misc::Forward;
 use crate::packet::key_entry;
@@ -599,22 +600,7 @@ pub struct hostkeys_update_ctx {
     pub old_key_seen: libc::c_int,
     pub other_name_seen: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct hostkey_foreach_line {
-    pub path: *const libc::c_char,
-    pub linenum: u_long,
-    pub status: u_int,
-    pub match_0: u_int,
-    pub line: *mut libc::c_char,
-    pub marker: libc::c_int,
-    pub hosts: *const libc::c_char,
-    pub rawkey: *const libc::c_char,
-    pub keytype: libc::c_int,
-    pub key: *mut crate::sshkey::sshkey,
-    pub comment: *const libc::c_char,
-    pub note: u_int,
-}
+
 pub type hostkeys_foreach_fn =
     unsafe extern "C" fn(*mut hostkey_foreach_line, *mut libc::c_void) -> libc::c_int;
 pub const MRK_NONE: C2RustUnnamed_6 = 1;
