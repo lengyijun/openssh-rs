@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::authfd::ssh_identitylist;
 use crate::sshbuf_getput_crypto::BIGNUM;
 use crate::sshkey::sshkey_sig_details;
 
@@ -642,13 +643,7 @@ pub struct hostkey_foreach_line {
 }
 pub type hostkeys_foreach_fn =
     unsafe extern "C" fn(*mut hostkey_foreach_line, *mut libc::c_void) -> libc::c_int;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ssh_identitylist {
-    pub nkeys: size_t,
-    pub keys: *mut *mut crate::sshkey::sshkey,
-    pub comments: *mut *mut libc::c_char,
-}
+
 pub type sshsig_signer = unsafe extern "C" fn(
     *mut crate::sshkey::sshkey,
     *mut *mut u_char,

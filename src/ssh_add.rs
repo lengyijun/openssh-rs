@@ -1,3 +1,4 @@
+use crate::authfd::ssh_identitylist;
 use crate::log::log_init;
 use crate::sshkey::sshkey_sig_details;
 use ::libc;
@@ -234,13 +235,6 @@ pub const SSH_FP_BASE64: sshkey_fp_rep = 2;
 pub const SSH_FP_HEX: sshkey_fp_rep = 1;
 pub const SSH_FP_DEFAULT: sshkey_fp_rep = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ssh_identitylist {
-    pub nkeys: size_t,
-    pub keys: *mut *mut crate::sshkey::sshkey,
-    pub comments: *mut *mut libc::c_char,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct dest_constraint_hop {

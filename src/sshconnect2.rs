@@ -1,3 +1,4 @@
+use crate::authfd::ssh_identitylist;
 use crate::kex::dh_st;
 use crate::readconf::Options;
 
@@ -462,13 +463,7 @@ pub struct C2RustUnnamed_3 {
 pub type Identity = identity;
 pub type Authmethod = cauthmethod;
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ssh_identitylist {
-    pub nkeys: size_t,
-    pub keys: *mut *mut crate::sshkey::sshkey,
-    pub comments: *mut *mut libc::c_char,
-}
+
 static mut xxx_host: *mut libc::c_char = 0 as *const libc::c_char as *mut libc::c_char;
 static mut xxx_hostaddr: *mut sockaddr = 0 as *const sockaddr as *mut sockaddr;
 static mut xxx_conn_info: *const ssh_conn_info = 0 as *const ssh_conn_info;
