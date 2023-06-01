@@ -1,4 +1,5 @@
 use crate::atomicio::atomicio;
+use crate::atomicio::iovec;
 use crate::sftp_common::Attrib;
 use ::libc;
 use libc::close;
@@ -119,12 +120,6 @@ pub type size_t = libc::c_ulong;
 pub type u_int32_t = __uint32_t;
 pub type u_int64_t = __uint64_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct iovec {
-    pub iov_base: *mut libc::c_void,
-    pub iov_len: size_t,
-}
 pub type uint64_t = __uint64_t;
 
 pub type sig_atomic_t = __sig_atomic_t;

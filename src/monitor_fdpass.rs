@@ -1,3 +1,4 @@
+use crate::atomicio::iovec;
 use ::libc;
 extern "C" {
     fn sendmsg(__fd: libc::c_int, __message: *const msghdr, __flags: libc::c_int) -> ssize_t;
@@ -14,12 +15,7 @@ pub type __socklen_t = libc::c_uint;
 pub type ssize_t = __ssize_t;
 pub type caddr_t = __caddr_t;
 pub type size_t = libc::c_ulong;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct iovec {
-    pub iov_base: *mut libc::c_void,
-    pub iov_len: size_t,
-}
+
 pub type socklen_t = __socklen_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
