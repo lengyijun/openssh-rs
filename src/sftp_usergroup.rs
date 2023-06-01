@@ -1,5 +1,8 @@
+use crate::sftp_client::can_get_users_groups_by_id;
+use crate::sftp_client::do_get_users_groups_by_id;
 use crate::sftp_client::sftp_conn;
 use crate::sftp_client::SFTP_DIRENT;
+use crate::ssherr::ssh_err;
 
 use ::libc;
 
@@ -16,18 +19,6 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-
-    fn can_get_users_groups_by_id(conn: *mut sftp_conn) -> libc::c_int;
-    fn do_get_users_groups_by_id(
-        conn: *mut sftp_conn,
-        uids: *const u_int,
-        nuids: u_int,
-        gids: *const u_int,
-        ngids: u_int,
-        usernamesp: *mut *mut *mut libc::c_char,
-        groupnamesp: *mut *mut *mut libc::c_char,
-    ) -> libc::c_int;
 }
 pub type __u_int = libc::c_uint;
 pub type __uint32_t = libc::c_uint;

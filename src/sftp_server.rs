@@ -1,6 +1,19 @@
 use crate::atomicio::atomicio;
+use crate::misc::get_u32;
+use crate::misc::put_u32;
+use crate::misc::tilde_expand;
+use crate::r#match::match_list;
+use crate::sftp_common::attrib_clear;
+use crate::sftp_common::decode_attrib;
+use crate::sftp_common::encode_attrib;
+use crate::sftp_common::ls_file;
+use crate::sftp_common::stat_to_attrib;
 use crate::sftp_common::Attrib;
-
+use crate::sftp_realpath::sftp_realpath;
+use crate::sshbuf_getput_basic::sshbuf_froms;
+use crate::sshbuf_getput_basic::sshbuf_put_stringb;
+use crate::ssherr::ssh_err;
+use crate::xmalloc::xreallocarray;
 use ::libc;
 use libc::close;
 
@@ -87,25 +100,6 @@ extern "C" {
     ) -> size_t;
     fn localtime(__timer: *const time_t) -> *mut tm;
 
-    fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
-
-    fn sshbuf_put_stringb(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-
-    fn sshbuf_check_reserve(buf: *const crate::sshbuf::sshbuf, len: size_t) -> libc::c_int;
-
-    fn sshbuf_froms(
-        buf: *mut crate::sshbuf::sshbuf,
-        bufp: *mut *mut crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-
-    fn log_facility_number(_: *mut libc::c_char) -> SyslogFacility;
-    fn log_level_number(_: *mut libc::c_char) -> LogLevel;
-
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -116,30 +110,6 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn tilde_expand(_: *const libc::c_char, _: uid_t, _: *mut *mut libc::c_char) -> libc::c_int;
-    fn tilde_expand_filename(_: *const libc::c_char, _: uid_t) -> *mut libc::c_char;
-    fn percent_expand(_: *const libc::c_char, _: ...) -> *mut libc::c_char;
-    fn pwcopy(_: *mut libc::passwd) -> *mut libc::passwd;
-    fn get_u32(_: *const libc::c_void) -> u_int32_t;
-    fn put_u32(_: *mut libc::c_void, _: u_int32_t);
-    fn match_list(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *mut u_int,
-    ) -> *mut libc::c_char;
-    fn attrib_clear(_: *mut Attrib);
-    fn stat_to_attrib(_: *const libc::stat, _: *mut Attrib);
-    fn decode_attrib(_: *mut crate::sshbuf::sshbuf, _: *mut Attrib) -> libc::c_int;
-    fn encode_attrib(_: *mut crate::sshbuf::sshbuf, _: *const Attrib) -> libc::c_int;
-    fn ls_file(
-        _: *const libc::c_char,
-        _: *const libc::stat,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-    ) -> *mut libc::c_char;
-    fn sftp_realpath(_: *const libc::c_char, _: *mut libc::c_char) -> *mut libc::c_char;
 }
 pub type __u_char = libc::c_uchar;
 pub type __u_int = libc::c_uint;
