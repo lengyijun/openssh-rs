@@ -11,6 +11,7 @@ use crate::sftp_client::globpath_is_dir;
 use crate::sftp_client::path_append;
 use crate::sftp_client::remote_is_dir;
 use crate::sftp_client::sftp_conn;
+use crate::sftp_client::sftp_statvfs;
 use crate::sftp_client::upload_dir;
 use crate::sftp_client::SFTP_DIRENT;
 use crate::sftp_common::Attrib;
@@ -403,21 +404,6 @@ pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sftp_statvfs {
-    pub f_bsize: u_int64_t,
-    pub f_frsize: u_int64_t,
-    pub f_blocks: u_int64_t,
-    pub f_bfree: u_int64_t,
-    pub f_bavail: u_int64_t,
-    pub f_files: u_int64_t,
-    pub f_ffree: u_int64_t,
-    pub f_favail: u_int64_t,
-    pub f_fsid: u_int64_t,
-    pub f_flag: u_int64_t,
-    pub f_namemax: u_int64_t,
-}
 pub type sftp_command = libc::c_uint;
 pub const I_PROGRESS: sftp_command = 28;
 pub const I_VERSION: sftp_command = 27;
