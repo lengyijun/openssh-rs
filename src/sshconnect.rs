@@ -1,3 +1,4 @@
+use crate::authfd::dest_constraint_hop;
 use crate::hostfile::add_host_to_hostfile;
 use crate::hostfile::check_key_in_hostkeys;
 use crate::hostfile::free_hostkeys;
@@ -454,16 +455,7 @@ pub struct dest_constraint {
     pub from: dest_constraint_hop,
     pub to: dest_constraint_hop,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct dest_constraint_hop {
-    pub user: *mut libc::c_char,
-    pub hostname: *mut libc::c_char,
-    pub is_ca: libc::c_int,
-    pub nkeys: u_int,
-    pub keys: *mut *mut crate::sshkey::sshkey,
-    pub key_is_ca: *mut libc::c_int,
-}
+
 #[inline]
 unsafe extern "C" fn __bswap_32(mut __bsx: __uint32_t) -> __uint32_t {
     return (__bsx & 0xff000000 as libc::c_uint) >> 24 as libc::c_int

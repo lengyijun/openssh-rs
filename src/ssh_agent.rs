@@ -1,3 +1,4 @@
+use crate::authfd::dest_constraint_hop;
 use crate::log::log_init;
 use crate::sshkey::sshkey_sig_details;
 use ::libc;
@@ -377,16 +378,7 @@ pub const SSHKEY_SERIALIZE_FULL: sshkey_serialize_rep = 2;
 pub const SSHKEY_SERIALIZE_STATE: sshkey_serialize_rep = 1;
 pub const SSHKEY_SERIALIZE_DEFAULT: sshkey_serialize_rep = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct dest_constraint_hop {
-    pub user: *mut libc::c_char,
-    pub hostname: *mut libc::c_char,
-    pub is_ca: libc::c_int,
-    pub nkeys: u_int,
-    pub keys: *mut *mut crate::sshkey::sshkey,
-    pub key_is_ca: *mut libc::c_int,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct dest_constraint {
