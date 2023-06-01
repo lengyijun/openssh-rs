@@ -1,15 +1,22 @@
-use crate::authfd::dest_constraint_hop;
+use crate::authfd::dest_constraint;
 use crate::hostfile::add_host_to_hostfile;
 use crate::hostfile::check_key_in_hostkeys;
 use crate::hostfile::free_hostkeys;
+use crate::hostfile::hostkey_entry;
+use crate::hostfile::hostkey_foreach_line;
+use crate::hostfile::hostkeys;
 use crate::hostfile::hostkeys_foreach;
 use crate::hostfile::init_hostkeys;
 use crate::hostfile::load_hostkeys;
 use crate::hostfile::load_hostkeys_file;
 use crate::hostfile::lookup_key_in_hostkeys_by_type;
+use crate::kex::dh_st;
+use crate::packet::key_entry;
+use crate::packet::ssh;
 use crate::packet::ssh_packet_set_connection;
 use crate::packet::ssh_packet_set_nonblocking;
 use crate::packet::sshpkt_fatal;
+use crate::readconf::Options;
 use crate::sshconnect2::ssh_kex2;
 use crate::sshconnect2::ssh_userauth2;
 use crate::sshkey::sshkey_cert_check_host;
@@ -20,24 +27,14 @@ use crate::sshkey::sshkey_is_cert;
 use crate::sshkey::sshkey_is_sk;
 use crate::sshkey::sshkey_ssh_name;
 use crate::sshkey::sshkey_to_base64;
-use crate::hostfile::hostkey_entry;
-use crate::hostfile::hostkey_foreach_line;
-use crate::hostfile::hostkeys;
-use crate::kex::dh_st;
-use crate::readconf::Options;
-
-use crate::packet::key_entry;
-
+use ::libc;
 use libc::addrinfo;
+use libc::close;
+use libc::kill;
 use libc::pid_t;
 use libc::sockaddr;
 use libc::sockaddr_storage;
 
-use crate::packet::ssh;
-
-use ::libc;
-use libc::close;
-use libc::kill;
 extern "C" {
     pub type sockaddr_x25;
     pub type sockaddr_un;
@@ -449,12 +446,6 @@ pub struct find_by_key_ctx {
 }
 pub type privrestore_fn = unsafe extern "C" fn() -> ();
 pub type privdrop_fn = unsafe extern "C" fn(*mut libc::passwd) -> ();
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct dest_constraint {
-    pub from: dest_constraint_hop,
-    pub to: dest_constraint_hop,
-}
 
 #[inline]
 unsafe extern "C" fn __bswap_32(mut __bsx: __uint32_t) -> __uint32_t {

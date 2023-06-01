@@ -1,3 +1,4 @@
+use crate::authfd::dest_constraint;
 use crate::authfd::dest_constraint_hop;
 use crate::log::log_init;
 use crate::sshkey::sshkey_sig_details;
@@ -378,13 +379,6 @@ pub const SSHKEY_SERIALIZE_FULL: sshkey_serialize_rep = 2;
 pub const SSHKEY_SERIALIZE_STATE: sshkey_serialize_rep = 1;
 pub const SSHKEY_SERIALIZE_DEFAULT: sshkey_serialize_rep = 0;
 
-
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct dest_constraint {
-    pub from: dest_constraint_hop,
-    pub to: dest_constraint_hop,
-}
 pub type SyslogFacility = libc::c_int;
 pub const SYSLOG_FACILITY_NOT_SET: SyslogFacility = -1;
 pub const SYSLOG_FACILITY_LOCAL7: SyslogFacility = 10;

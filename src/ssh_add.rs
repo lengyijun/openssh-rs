@@ -1,3 +1,4 @@
+use crate::authfd::dest_constraint;
 use crate::authfd::dest_constraint_hop;
 use crate::authfd::ssh_identitylist;
 use crate::hostfile::hostkey_entry;
@@ -238,13 +239,6 @@ pub const SSH_FP_BASE64: sshkey_fp_rep = 2;
 pub const SSH_FP_HEX: sshkey_fp_rep = 1;
 pub const SSH_FP_DEFAULT: sshkey_fp_rep = 0;
 
-
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct dest_constraint {
-    pub from: dest_constraint_hop,
-    pub to: dest_constraint_hop,
-}
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sshsk_resident_key {
