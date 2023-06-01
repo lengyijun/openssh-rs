@@ -1,6 +1,23 @@
+use crate::cipher::cipher_crypt;
+use crate::cipher::cipher_free;
+use crate::cipher::cipher_init;
 use crate::cipher::sshcipher;
 use crate::cipher::sshcipher_ctx;
+use crate::digest_openssl::ssh_digest_alg_name;
+use crate::r#match::match_pattern;
+use crate::r#match::match_pattern_list;
+use crate::ssh_sk::sshsk_sign;
+use crate::sshbuf::sshbuf_fromb;
+use crate::sshbuf::sshbuf_reserve;
+use crate::sshbuf_getput_basic::sshbuf_froms;
+use crate::sshbuf_getput_basic::sshbuf_get_string_direct;
+use crate::sshbuf_getput_basic::sshbuf_get_stringb;
+use crate::sshbuf_getput_basic::sshbuf_put_stringb;
+use crate::sshbuf_getput_basic::sshbuf_putb;
 use crate::sshbuf_getput_crypto::BIGNUM;
+use crate::sshbuf_misc::sshbuf_b64tod;
+use crate::sshbuf_misc::sshbuf_dtob64;
+use crate::sshbuf_misc::sshbuf_dtob64_string;
 use ::libc;
 extern "C" {
     pub type _IO_wide_data;
@@ -184,83 +201,6 @@ extern "C" {
     ) -> libc::c_int;
     fn format_absolute_time(_: uint64_t, _: *mut libc::c_char, _: size_t);
 
-    fn sshbuf_fromb(buf: *mut crate::sshbuf::sshbuf) -> *mut crate::sshbuf::sshbuf;
-    fn sshbuf_froms(
-        buf: *mut crate::sshbuf::sshbuf,
-        bufp: *mut *mut crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-
-    fn sshbuf_reserve(
-        buf: *mut crate::sshbuf::sshbuf,
-        len: size_t,
-        dpp: *mut *mut u_char,
-    ) -> libc::c_int;
-
-    fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
-        -> libc::c_int;
-
-    fn sshbuf_get_stringb(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *mut crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-
-    fn sshbuf_put_stringb(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-    fn sshbuf_get_string_direct(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *const u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_dtob64_string(
-        buf: *const crate::sshbuf::sshbuf,
-        wrap: libc::c_int,
-    ) -> *mut libc::c_char;
-    fn sshbuf_dtob64(
-        d: *const crate::sshbuf::sshbuf,
-        b64: *mut crate::sshbuf::sshbuf,
-        wrap: libc::c_int,
-    ) -> libc::c_int;
-    fn sshbuf_b64tod(buf: *mut crate::sshbuf::sshbuf, b64: *const libc::c_char) -> libc::c_int;
-    fn cipher_free(_: *mut sshcipher_ctx);
-    fn cipher_crypt(
-        _: *mut sshcipher_ctx,
-        _: u_int,
-        _: *mut u_char,
-        _: *const u_char,
-        _: u_int,
-        _: u_int,
-        _: u_int,
-    ) -> libc::c_int;
-    fn cipher_init(
-        _: *mut *mut sshcipher_ctx,
-        _: *const sshcipher,
-        _: *const u_char,
-        _: u_int,
-        _: *const u_char,
-        _: u_int,
-        _: libc::c_int,
-    ) -> libc::c_int;
-
-    fn ssh_digest_alg_name(alg: libc::c_int) -> *const libc::c_char;
-
-    fn match_pattern(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn match_pattern_list(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn sshsk_sign(
-        provider_path: *const libc::c_char,
-        key: *mut sshkey,
-        sigp: *mut *mut u_char,
-        lenp: *mut size_t,
-        data: *const u_char,
-        datalen: size_t,
-        compat: u_int,
-        pin: *const libc::c_char,
-    ) -> libc::c_int;
     static sshkey_ed25519_impl: sshkey_impl;
     static sshkey_ed25519_cert_impl: sshkey_impl;
     static sshkey_ed25519_sk_impl: sshkey_impl;

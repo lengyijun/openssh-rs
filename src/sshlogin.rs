@@ -1,28 +1,23 @@
+use crate::loginrec::login_alloc_entry;
+use crate::loginrec::login_free_entry;
+use crate::loginrec::login_get_lastlog;
+use crate::loginrec::login_login;
+use crate::loginrec::login_logout;
+use crate::loginrec::login_netinfo;
+use crate::loginrec::login_set_addr;
 use crate::loginrec::logininfo;
 use crate::servconf::ServerOptions;
-
-use crate::loginrec::login_netinfo;
+use crate::ssherr::ssh_err;
 use ::libc;
 use libc::pid_t;
 use libc::sockaddr;
+
 extern "C" {
 
     fn strlcpy(dst: *mut libc::c_char, src: *const libc::c_char, siz: size_t) -> size_t;
 
     fn strcspn(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_ulong;
     fn ctime(__timer: *const time_t) -> *mut libc::c_char;
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn login_alloc_entry(
-        pid: pid_t,
-        username: *const libc::c_char,
-        hostname: *const libc::c_char,
-        line: *const libc::c_char,
-    ) -> *mut logininfo;
-    fn login_free_entry(li: *mut logininfo);
-    fn login_login(li: *mut logininfo) -> libc::c_int;
-    fn login_logout(li: *mut logininfo) -> libc::c_int;
-    fn login_set_addr(li: *mut logininfo, sa: *const sockaddr, sa_size: libc::c_uint);
-    fn login_get_lastlog(li: *mut logininfo, uid: uid_t) -> *mut logininfo;
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
