@@ -218,7 +218,6 @@ pub mod ssh_keygen;
 pub mod ssh_keyscan;
 pub mod ssh_keysign;
 pub mod ssh_pkcs11;
-pub mod ssh_pkcs11_client;
 pub mod ssh_pkcs11_helper;
 pub mod ssh_rsa;
 pub mod ssh_sk;
