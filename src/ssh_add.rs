@@ -4,6 +4,7 @@ use crate::authfd::ssh_identitylist;
 use crate::hostfile::hostkey_entry;
 use crate::hostfile::hostkeys;
 use crate::log::log_init;
+use crate::ssh_sk::sshsk_resident_key;
 use crate::sshkey::sshkey_sig_details;
 use ::libc;
 use libc::close;
@@ -239,13 +240,6 @@ pub const SSH_FP_BASE64: sshkey_fp_rep = 2;
 pub const SSH_FP_HEX: sshkey_fp_rep = 1;
 pub const SSH_FP_DEFAULT: sshkey_fp_rep = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshsk_resident_key {
-    pub key: *mut crate::sshkey::sshkey,
-    pub user_id: *mut uint8_t,
-    pub user_id_len: size_t,
-}
 pub type HostkeyMarker = libc::c_uint;
 pub const MRK_CA: HostkeyMarker = 3;
 pub const MRK_REVOKE: HostkeyMarker = 2;

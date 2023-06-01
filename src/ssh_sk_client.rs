@@ -1,3 +1,4 @@
+use crate::ssh_sk::sshsk_resident_key;
 use ::libc;
 use libc::close;
 use libc::pid_t;
@@ -82,13 +83,6 @@ pub const SYSLOG_LEVEL_ERROR: LogLevel = 2;
 pub const SYSLOG_LEVEL_FATAL: LogLevel = 1;
 pub const SYSLOG_LEVEL_QUIET: LogLevel = 0;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct sshsk_resident_key {
-    pub key: *mut crate::sshkey::sshkey,
-    pub user_id: *mut uint8_t,
-    pub user_id_len: size_t,
-}
 pub type sshsig_t = Option<unsafe extern "C" fn(libc::c_int) -> ()>;
 unsafe extern "C" fn start_helper(
     mut fdp: *mut libc::c_int,
