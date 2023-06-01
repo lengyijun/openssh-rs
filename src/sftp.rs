@@ -1,20 +1,54 @@
 use crate::log::log_init;
 use crate::misc::arglist;
+use crate::misc::argv_free;
+use crate::misc::argv_split;
+use crate::misc::cleanhostname;
 use crate::misc::parse_uri;
 use crate::misc::parse_user_host_path;
+use crate::misc::parse_user_host_port;
+use crate::misc::path_absolute;
+use crate::misc::tilde_expand_filename;
+use crate::openbsd_compat::glob::_ssh__compat_glob;
+use crate::openbsd_compat::glob::_ssh__compat_globfree;
+use crate::sftp_client::can_get_users_groups_by_id;
+use crate::sftp_client::do_copy;
+use crate::sftp_client::do_hardlink;
 use crate::sftp_client::do_init;
+use crate::sftp_client::do_lsetstat;
+use crate::sftp_client::do_lstat;
 use crate::sftp_client::do_mkdir;
+use crate::sftp_client::do_readdir;
+use crate::sftp_client::do_realpath;
+use crate::sftp_client::do_rename;
+use crate::sftp_client::do_rm;
+use crate::sftp_client::do_rmdir;
+use crate::sftp_client::do_setstat;
 use crate::sftp_client::do_stat;
+use crate::sftp_client::do_statvfs;
+use crate::sftp_client::do_symlink;
 use crate::sftp_client::do_upload;
 use crate::sftp_client::download_dir;
+use crate::sftp_client::free_sftp_dirents;
 use crate::sftp_client::globpath_is_dir;
+use crate::sftp_client::local_is_dir;
+use crate::sftp_client::make_absolute;
 use crate::sftp_client::path_append;
 use crate::sftp_client::remote_is_dir;
 use crate::sftp_client::sftp_conn;
+use crate::sftp_client::sftp_proto_version;
 use crate::sftp_client::sftp_statvfs;
 use crate::sftp_client::upload_dir;
 use crate::sftp_client::SFTP_DIRENT;
+use crate::sftp_common::attrib_clear;
+use crate::sftp_common::attrib_to_stat;
+use crate::sftp_common::ls_file;
 use crate::sftp_common::Attrib;
+use crate::sftp_usergroup::get_remote_user_groups_from_dirents;
+use crate::sftp_usergroup::get_remote_user_groups_from_glob;
+use crate::sftp_usergroup::rgroup_name;
+use crate::sftp_usergroup::ruser_name;
+use crate::ssherr::ssh_err;
+use crate::utf8::mprintf;
 use crate::utf8::msetlocale;
 use ::libc;
 use libc::close;
@@ -105,98 +139,6 @@ extern "C" {
         _: *const libc::c_char,
         _: ...
     ) -> !;
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-
-    fn cleanhostname(_: *mut libc::c_char) -> *mut libc::c_char;
-
-    fn parse_user_host_port(
-        _: *const libc::c_char,
-        _: *mut *mut libc::c_char,
-        _: *mut *mut libc::c_char,
-        _: *mut libc::c_int,
-    ) -> libc::c_int;
-
-    fn tilde_expand_filename(_: *const libc::c_char, _: uid_t) -> *mut libc::c_char;
-
-    fn path_absolute(_: *const libc::c_char) -> libc::c_int;
-
-    fn argv_split(
-        _: *const libc::c_char,
-        _: *mut libc::c_int,
-        _: *mut *mut *mut libc::c_char,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn argv_free(_: *mut *mut libc::c_char, _: libc::c_int);
-
-    fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
-
-    fn attrib_clear(_: *mut Attrib);
-    fn attrib_to_stat(_: *const Attrib, _: *mut libc::stat);
-    fn ls_file(
-        _: *const libc::c_char,
-        _: *const libc::stat,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-    ) -> *mut libc::c_char;
-
-    fn sftp_proto_version(_: *mut sftp_conn) -> u_int;
-    fn do_readdir(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: *mut *mut *mut SFTP_DIRENT,
-    ) -> libc::c_int;
-    fn free_sftp_dirents(_: *mut *mut SFTP_DIRENT);
-    fn do_rm(_: *mut sftp_conn, _: *const libc::c_char) -> libc::c_int;
-
-    fn do_rmdir(_: *mut sftp_conn, _: *const libc::c_char) -> libc::c_int;
-
-    fn do_lstat(_: *mut sftp_conn, _: *const libc::c_char, _: libc::c_int) -> *mut Attrib;
-    fn do_setstat(_: *mut sftp_conn, _: *const libc::c_char, _: *mut Attrib) -> libc::c_int;
-    fn do_lsetstat(conn: *mut sftp_conn, path: *const libc::c_char, a: *mut Attrib) -> libc::c_int;
-    fn do_realpath(_: *mut sftp_conn, _: *const libc::c_char) -> *mut libc::c_char;
-    fn do_statvfs(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: *mut sftp_statvfs,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn do_rename(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn do_copy(_: *mut sftp_conn, _: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-
-    fn do_symlink(_: *mut sftp_conn, _: *const libc::c_char, _: *const libc::c_char)
-        -> libc::c_int;
-    fn make_absolute(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
-    fn do_hardlink(
-        _: *mut sftp_conn,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-    ) -> libc::c_int;
-
-    fn can_get_users_groups_by_id(conn: *mut sftp_conn) -> libc::c_int;
-
-    fn local_is_dir(path: *const libc::c_char) -> libc::c_int;
-
-    fn _ssh__compat_glob(
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: Option<unsafe extern "C" fn(*const libc::c_char, libc::c_int) -> libc::c_int>,
-        _: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t,
-    ) -> libc::c_int;
-    fn _ssh__compat_globfree(_: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t);
-    fn get_remote_user_groups_from_glob(
-        conn: *mut sftp_conn,
-        g: *mut crate::openbsd_compat::glob::_ssh_compat_glob_t,
-    );
-    fn get_remote_user_groups_from_dirents(conn: *mut sftp_conn, d: *mut *mut SFTP_DIRENT);
-    fn ruser_name(uid: uid_t) -> *const libc::c_char;
-    fn rgroup_name(gid: uid_t) -> *const libc::c_char;
 
     static mut __progname: *mut libc::c_char;
 }
