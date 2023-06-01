@@ -1,6 +1,20 @@
 use crate::atomicio::atomicio;
+use crate::atomicio::atomiciov6;
 use crate::atomicio::iovec;
+use crate::misc::path_absolute;
+use crate::misc::put_u32;
+use crate::sftp_common::attrib_clear;
+use crate::sftp_common::decode_attrib;
+use crate::sftp_common::encode_attrib;
+use crate::sftp_common::fx2txt;
+use crate::sftp_common::stat_to_attrib;
 use crate::sftp_common::Attrib;
+use crate::sshbuf::sshbuf_reserve;
+use crate::sshbuf_getput_basic::sshbuf_froms;
+use crate::sshbuf_getput_basic::sshbuf_put_stringb;
+use crate::ssherr::ssh_err;
+use crate::utf8::mprintf;
+use crate::xmalloc::xreallocarray;
 use ::libc;
 use libc::close;
 
@@ -33,25 +47,6 @@ extern "C" {
     fn strpbrk(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
 
-    fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
-
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn sshbuf_put_stringb(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-
-    fn sshbuf_reserve(
-        buf: *mut crate::sshbuf::sshbuf,
-        len: size_t,
-        dpp: *mut *mut u_char,
-    ) -> libc::c_int;
-
-    fn sshbuf_froms(
-        buf: *mut crate::sshbuf::sshbuf,
-        bufp: *mut *mut crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-
     fn sshfatal(
         _: *const libc::c_char,
         _: *const libc::c_char,
@@ -63,24 +58,6 @@ extern "C" {
         _: ...
     ) -> !;
 
-    fn atomiciov6(
-        f: Option<unsafe extern "C" fn(libc::c_int, *const iovec, libc::c_int) -> ssize_t>,
-        fd: libc::c_int,
-        _iov: *const iovec,
-        iovcnt: libc::c_int,
-        cb: Option<unsafe extern "C" fn(*mut libc::c_void, size_t) -> libc::c_int>,
-        _: *mut libc::c_void,
-    ) -> size_t;
-
-    fn path_absolute(_: *const libc::c_char) -> libc::c_int;
-    fn put_u32(_: *mut libc::c_void, _: u_int32_t);
-
-    fn mprintf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn attrib_clear(_: *mut Attrib);
-    fn stat_to_attrib(_: *const libc::stat, _: *mut Attrib);
-    fn decode_attrib(_: *mut crate::sshbuf::sshbuf, _: *mut Attrib) -> libc::c_int;
-    fn encode_attrib(_: *mut crate::sshbuf::sshbuf, _: *const Attrib) -> libc::c_int;
-    fn fx2txt(_: libc::c_int) -> *const libc::c_char;
     static mut interrupted: sig_atomic_t;
     static mut showprogress: libc::c_int;
 }
