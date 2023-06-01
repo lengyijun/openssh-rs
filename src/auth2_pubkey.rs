@@ -1,8 +1,54 @@
+use crate::auth::auth_activate_options;
+use crate::auth::auth_debug_add;
+use crate::auth::auth_get_canonical_hostname;
+use crate::auth::auth_key_is_revoked;
+use crate::auth::authorized_principals_file;
+use crate::auth::expand_authorized_keys;
 use crate::auth::Authctxt;
+use crate::auth2::auth2_key_already_used;
+use crate::auth2::auth2_record_info;
+use crate::auth2::auth2_record_key;
+use crate::auth2_pubkeyfile::auth_authorise_keyopts;
+use crate::auth2_pubkeyfile::auth_check_authkeys_file;
+use crate::auth2_pubkeyfile::auth_openkeyfile;
+use crate::auth2_pubkeyfile::auth_openprincipals;
+use crate::auth2_pubkeyfile::auth_process_principals;
 use crate::auth_options::sshauthopt;
+use crate::auth_options::sshauthopt_free;
+use crate::auth_options::sshauthopt_from_cert;
+use crate::auth_options::sshauthopt_merge;
+use crate::authfile::sshkey_in_file;
 use crate::kex::dh_st;
+use crate::log::log_level_get;
+use crate::monitor_wrap::mm_sshkey_verify;
+use crate::monitor_wrap::mm_user_key_allowed;
 use crate::packet::key_entry;
+use crate::packet::ssh_remote_ipaddr;
+use crate::packet::ssh_remote_port;
+use crate::packet::sshpkt_getb_froms;
+use crate::packet::sshpkt_put_string;
+use crate::r#match::match_pattern_list;
 use crate::servconf::ServerOptions;
+use crate::ssh_api::use_privsep;
+use crate::sshbuf_getput_basic::sshbuf_put_stringb;
+use crate::sshbuf_getput_basic::sshbuf_putb;
+use crate::sshbuf_misc::sshbuf_dtob64_string;
+use crate::ssherr::ssh_err;
+use crate::sshkey::sshkey_cert_check_authority_now;
+use crate::sshkey::sshkey_check_cert_sigtype;
+use crate::sshkey::sshkey_check_rsa_length;
+use crate::sshkey::sshkey_equal;
+use crate::sshkey::sshkey_from_blob;
+use crate::sshkey::sshkey_fromb;
+use crate::sshkey::sshkey_is_cert;
+use crate::sshkey::sshkey_puts;
+use crate::sshkey::sshkey_sig_details_free;
+use crate::sshkey::sshkey_ssh_name;
+use crate::sshkey::sshkey_to_base64;
+use crate::sshkey::sshkey_type_from_name;
+use crate::sshkey::sshkey_verify;
+use crate::uidswap::restore_uid;
+use crate::uidswap::temporarily_use_uid;
 
 use crate::sshkey::sshkey_sig_details;
 
@@ -24,27 +70,6 @@ extern "C" {
     fn fclose(__stream: *mut libc::FILE) -> libc::c_int;
 
     fn xreallocarray(_: *mut libc::c_void, _: size_t, _: size_t) -> *mut libc::c_void;
-
-    fn sshpkt_getb_froms(ssh: *mut ssh, valp: *mut *mut crate::sshbuf::sshbuf) -> libc::c_int;
-
-    fn sshpkt_put_string(ssh: *mut ssh, v: *const libc::c_void, len: size_t) -> libc::c_int;
-
-    fn ssh_remote_port(_: *mut ssh) -> libc::c_int;
-    fn ssh_remote_ipaddr(_: *mut ssh) -> *const libc::c_char;
-
-    fn sshbuf_putb(buf: *mut crate::sshbuf::sshbuf, v: *const crate::sshbuf::sshbuf)
-        -> libc::c_int;
-
-    fn sshbuf_put_stringb(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-    fn sshbuf_dtob64_string(
-        buf: *const crate::sshbuf::sshbuf,
-        wrap: libc::c_int,
-    ) -> *mut libc::c_char;
-    fn ssh_err(n: libc::c_int) -> *const libc::c_char;
-    fn log_level_get() -> LogLevel;
 
     fn sshfatal(
         _: *const libc::c_char,
@@ -82,129 +107,6 @@ extern "C" {
         _: libc::c_int,
     ) -> libc::c_int;
 
-    fn sshkey_equal(
-        _: *const crate::sshkey::sshkey,
-        _: *const crate::sshkey::sshkey,
-    ) -> libc::c_int;
-
-    fn sshkey_type_from_name(_: *const libc::c_char) -> libc::c_int;
-    fn sshkey_is_cert(_: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn sshkey_cert_check_authority_now(
-        _: *const crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: *mut *const libc::c_char,
-    ) -> libc::c_int;
-    fn sshkey_check_cert_sigtype(
-        _: *const crate::sshkey::sshkey,
-        _: *const libc::c_char,
-    ) -> libc::c_int;
-    fn sshkey_sig_details_free(_: *mut sshkey_sig_details);
-    fn sshkey_check_rsa_length(_: *const crate::sshkey::sshkey, _: libc::c_int) -> libc::c_int;
-    fn sshkey_verify(
-        _: *const crate::sshkey::sshkey,
-        _: *const u_char,
-        _: size_t,
-        _: *const u_char,
-        _: size_t,
-        _: *const libc::c_char,
-        _: u_int,
-        _: *mut *mut sshkey_sig_details,
-    ) -> libc::c_int;
-    fn sshkey_puts(_: *const crate::sshkey::sshkey, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
-    fn sshkey_to_base64(_: *const crate::sshkey::sshkey, _: *mut *mut libc::c_char) -> libc::c_int;
-    fn sshkey_fromb(
-        _: *mut crate::sshbuf::sshbuf,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn sshkey_from_blob(
-        _: *const u_char,
-        _: size_t,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn sshkey_ssh_name(_: *const crate::sshkey::sshkey) -> *const libc::c_char;
-    fn auth2_key_already_used(_: *mut Authctxt, _: *const crate::sshkey::sshkey) -> libc::c_int;
-    fn auth2_record_key(_: *mut Authctxt, _: libc::c_int, _: *const crate::sshkey::sshkey);
-    fn auth2_record_info(authctxt: *mut Authctxt, _: *const libc::c_char, _: ...);
-    fn auth_process_principals(
-        _: *mut libc::FILE,
-        _: *const libc::c_char,
-        _: *const crate::sshkey::sshkey_cert,
-        _: *mut *mut sshauthopt,
-    ) -> libc::c_int;
-    fn auth_openprincipals(
-        _: *const libc::c_char,
-        _: *mut libc::passwd,
-        _: libc::c_int,
-    ) -> *mut libc::FILE;
-    fn authorized_principals_file(_: *mut libc::passwd) -> *mut libc::c_char;
-    fn auth_openkeyfile(
-        _: *const libc::c_char,
-        _: *mut libc::passwd,
-        _: libc::c_int,
-    ) -> *mut libc::FILE;
-    fn expand_authorized_keys(_: *const libc::c_char, pw: *mut libc::passwd) -> *mut libc::c_char;
-    fn auth_key_is_revoked(_: *mut crate::sshkey::sshkey) -> libc::c_int;
-    fn auth_authorise_keyopts(
-        _: *mut libc::passwd,
-        _: *mut sshauthopt,
-        _: libc::c_int,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-    ) -> libc::c_int;
-    fn auth_debug_add(fmt: *const libc::c_char, _: ...);
-    fn auth_activate_options(_: *mut ssh, _: *mut sshauthopt) -> libc::c_int;
-    fn auth_check_authkeys_file(
-        _: *mut libc::passwd,
-        _: *mut libc::FILE,
-        _: *mut libc::c_char,
-        _: *mut crate::sshkey::sshkey,
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: *mut *mut sshauthopt,
-    ) -> libc::c_int;
-    fn auth_get_canonical_hostname(_: *mut ssh, _: libc::c_int) -> *const libc::c_char;
-    fn temporarily_use_uid(_: *mut libc::passwd);
-    fn restore_uid();
-    fn sshauthopt_free(opts: *mut sshauthopt);
-    fn sshauthopt_from_cert(k: *mut crate::sshkey::sshkey) -> *mut sshauthopt;
-    fn sshauthopt_merge(
-        primary: *const sshauthopt,
-        additional: *const sshauthopt,
-        errstrp: *mut *const libc::c_char,
-    ) -> *mut sshauthopt;
-    static mut use_privsep: libc::c_int;
-    fn mm_user_key_allowed(
-        ssh: *mut ssh,
-        _: *mut libc::passwd,
-        _: *mut crate::sshkey::sshkey,
-        _: libc::c_int,
-        _: *mut *mut sshauthopt,
-    ) -> libc::c_int;
-    fn mm_sshkey_verify(
-        _: *const crate::sshkey::sshkey,
-        _: *const u_char,
-        _: size_t,
-        _: *const u_char,
-        _: size_t,
-        _: *const libc::c_char,
-        _: u_int,
-        _: *mut *mut sshkey_sig_details,
-    ) -> libc::c_int;
-    fn sshkey_in_file(
-        _: *mut crate::sshkey::sshkey,
-        _: *const libc::c_char,
-        _: libc::c_int,
-        _: libc::c_int,
-    ) -> libc::c_int;
-    fn match_pattern_list(
-        _: *const libc::c_char,
-        _: *const libc::c_char,
-        _: libc::c_int,
-    ) -> libc::c_int;
     static mut options: ServerOptions;
 }
 pub type __u_char = libc::c_uchar;

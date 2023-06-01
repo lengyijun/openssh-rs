@@ -1,4 +1,12 @@
 use crate::atomicio::atomicio;
+use crate::sshbuf_getput_basic::sshbuf_get_string_direct;
+use crate::sshbuf_getput_basic::sshbuf_put_stringb;
+use crate::sshkey::sshkey_check_sigtype;
+use crate::sshkey::sshkey_from_blob;
+use crate::sshkey::sshkey_private_serialize_maxsign;
+use crate::sshkey::sshkey_puts;
+use crate::sshkey::sshkey_to_blob;
+use crate::sshkey::sshkey_type_plain;
 use ::libc;
 use libc::close;
 use libc::sockaddr;
@@ -27,35 +35,6 @@ extern "C" {
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
 
     fn getenv(__name: *const libc::c_char) -> *mut libc::c_char;
-    fn sshbuf_get_string_direct(
-        buf: *mut crate::sshbuf::sshbuf,
-        valp: *mut *const u_char,
-        lenp: *mut size_t,
-    ) -> libc::c_int;
-    fn sshbuf_put_stringb(
-        buf: *mut crate::sshbuf::sshbuf,
-        v: *const crate::sshbuf::sshbuf,
-    ) -> libc::c_int;
-
-    fn sshkey_type_plain(_: libc::c_int) -> libc::c_int;
-    fn sshkey_from_blob(
-        _: *const u_char,
-        _: size_t,
-        _: *mut *mut crate::sshkey::sshkey,
-    ) -> libc::c_int;
-    fn sshkey_to_blob(
-        _: *const crate::sshkey::sshkey,
-        _: *mut *mut u_char,
-        _: *mut size_t,
-    ) -> libc::c_int;
-    fn sshkey_puts(_: *const crate::sshkey::sshkey, _: *mut crate::sshbuf::sshbuf) -> libc::c_int;
-    fn sshkey_check_sigtype(_: *const u_char, _: size_t, _: *const libc::c_char) -> libc::c_int;
-    fn sshkey_private_serialize_maxsign(
-        key: *mut crate::sshkey::sshkey,
-        buf: *mut crate::sshbuf::sshbuf,
-        maxsign: u_int32_t,
-        _: libc::c_int,
-    ) -> libc::c_int;
 
 }
 pub type __u_char = libc::c_uchar;
