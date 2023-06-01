@@ -1,8 +1,8 @@
+use crate::loginrec::logininfo;
 use crate::servconf::ServerOptions;
-use libc::sockaddr_storage;
 
+use crate::loginrec::login_netinfo;
 use ::libc;
-
 use libc::pid_t;
 use libc::sockaddr;
 extern "C" {
@@ -76,30 +76,6 @@ pub struct in_addr {
 }
 pub type in_addr_t = uint32_t;
 
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct logininfo {
-    pub progname: [libc::c_char; 64],
-    pub progname_null: libc::c_int,
-    pub type_0: libc::c_short,
-    pub pid: pid_t,
-    pub uid: uid_t,
-    pub line: [libc::c_char; 64],
-    pub username: [libc::c_char; 512],
-    pub hostname: [libc::c_char; 256],
-    pub exit: libc::c_int,
-    pub termination: libc::c_int,
-    pub tv_sec: libc::c_uint,
-    pub tv_usec: libc::c_uint,
-    pub hostaddr: login_netinfo,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub union login_netinfo {
-    pub sa: sockaddr,
-    pub sa_in: sockaddr_in,
-    pub sa_storage: sockaddr_storage,
-}
 pub type LogLevel = libc::c_int;
 pub const SYSLOG_LEVEL_NOT_SET: LogLevel = -1;
 pub const SYSLOG_LEVEL_DEBUG3: LogLevel = 7;
